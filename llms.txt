@@ -5,6 +5,7 @@
 ## Weave.js
 
 - [Home](https://inditextech.github.io/weavejs/prerelease/): Weave.js — the framework for building visual collaborative applications.
+- [Home](https://inditextech.github.io/weavejs/5.7.0/): Weave.js — the framework for building visual collaborative applications.
 - [Home](https://inditextech.github.io/weavejs/5.6.0/): Weave.js — the framework for building visual collaborative applications.
 - [Home](https://inditextech.github.io/weavejs/5.4.2/): Weave.js — the framework for building visual collaborative applications.
 - [Home](https://inditextech.github.io/weavejs/5.4.1/): Weave.js — the framework for building visual collaborative applications.
@@ -84,10 +85,6 @@
 - [Text (native editing)](https://inditextech.github.io/weavejs/prerelease/main/build/nodes/text-v2/): Text node with editing drawn natively on the canvas
 - [Text](https://inditextech.github.io/weavejs/prerelease/main/build/nodes/text/): Draw and edit text on the canvas
 - [Video](https://inditextech.github.io/weavejs/prerelease/main/build/nodes/video/): Render a video on the canvas
-- [Azure Web PubSub](https://inditextech.github.io/weavejs/prerelease/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
-- [Stores](https://inditextech.github.io/weavejs/prerelease/main/build/stores/): Stores maintained by Weave.js team
-- [Standalone](https://inditextech.github.io/weavejs/prerelease/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
-- [WebSockets](https://inditextech.github.io/weavejs/prerelease/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
 - [Comments Renderer](https://inditextech.github.io/weavejs/prerelease/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
 - [Connected Users](https://inditextech.github.io/weavejs/prerelease/main/build/plugins/connected-users/): Get an structure with information about the connected users
 - [Context Menu](https://inditextech.github.io/weavejs/prerelease/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
@@ -106,9 +103,107 @@
 - [Users Pointers](https://inditextech.github.io/weavejs/prerelease/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/prerelease/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
 - [Users Selector](https://inditextech.github.io/weavejs/prerelease/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
+- [Azure Web PubSub](https://inditextech.github.io/weavejs/prerelease/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
+- [Stores](https://inditextech.github.io/weavejs/prerelease/main/build/stores/): Stores maintained by Weave.js team
+- [Standalone](https://inditextech.github.io/weavejs/prerelease/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
+- [WebSockets](https://inditextech.github.io/weavejs/prerelease/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
 - [Enter Room page](https://inditextech.github.io/weavejs/prerelease/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/prerelease/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
 - [Room page](https://inditextech.github.io/weavejs/prerelease/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
+- [Application structure](https://inditextech.github.io/weavejs/5.7.0/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
+- [Architecture overview](https://inditextech.github.io/weavejs/5.7.0/main/architecture/): Deep dive into Weave.js architecture and design principles
+- [Contributing](https://inditextech.github.io/weavejs/5.7.0/main/contributing/): Want to collaborate? Learn how.
+- [Glossary](https://inditextech.github.io/weavejs/5.7.0/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
+- [About Weave.js](https://inditextech.github.io/weavejs/5.7.0/main/): Build collaborative canvas applications
+- [Quickstart](https://inditextech.github.io/weavejs/5.7.0/main/quickstart/): Build a real-time collaborative canvas application in minutes
+- [Requirements](https://inditextech.github.io/weavejs/5.7.0/main/requirements/): Required system dependencies and versions
+- [Roadmap](https://inditextech.github.io/weavejs/5.7.0/main/roadmap/): Future development plans and upcoming features for Weave.js
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/main/build/): Build your visual collaborative tool with Weave.js
+- [Weave instance](https://inditextech.github.io/weavejs/5.7.0/main/build/weave/): Build your visual collaborative tool with Weave.js
+- [Changelog](https://inditextech.github.io/weavejs/5.7.0/main/changelog/): Check out the latest changes to Weave.js.
+- [Set up the backend](https://inditextech.github.io/weavejs/5.7.0/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
+- [v1.0.0](https://inditextech.github.io/weavejs/5.7.0/main/release-notes/1.0.0/): Initial stable release of Weave.js
+- [Manual installation](https://inditextech.github.io/weavejs/5.7.0/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
+- [v2.0.0](https://inditextech.github.io/weavejs/5.7.0/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
+- [v3.0.0](https://inditextech.github.io/weavejs/5.7.0/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+- [v4.0.0](https://inditextech.github.io/weavejs/5.7.0/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
+- [v5.0.0](https://inditextech.github.io/weavejs/5.7.0/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+- [Release notes](https://inditextech.github.io/weavejs/5.7.0/main/release-notes/): Discover what's new in Weave.js
+- [Comment](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/comment/): Give feedback and collaborate with other users.
+- [Connector](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/connector/): Draw a connected line between nodes
+- [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/arrow/): Draw an arrow on the canvas
+- [Frame](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/frame/): Canvas-in-canvas element
+- [Group](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/group/): Group nodes and manipulate them
+- [Image](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/image/): Render images on the canvas
+- [Nodes](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/): Nodes maintained by Weave.js team
+- [Layer](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/layer/): Segment and order the Stage in layers
+- [Line (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/line/): Draw a line on the canvas
+- [Measure](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/measure/): Draw measure reference distance on the canvas
+- [Polygon](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
+- [Stage](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/stage/): Main node to structure the canvas elements
+- [Star](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/star/): Draw a star on the canvas
+- [Text (native editing)](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/text-v2/): Text node with editing drawn natively on the canvas
+- [Video](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/video/): Render a video on the canvas
+- [Comments Renderer](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
+- [Connected Users](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/connected-users/): Get an structure with information about the connected users
+- [Context Menu](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/copy-paste-nodes/): Activate support to copy and paste the nodes
+- [Plugins](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/): Plugins maintained by Weave.js team
+- [Nodes Snapping](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [Stage Drop Area](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [Stage Grid](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [Stage Keyboard Move](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
+- [Stage minimap](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
+- [Stage Panning](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
+- [Stage Resize](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
+- [Stage Zoom](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
+- [Users Pointers](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [Users Presence](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
+- [Stores](https://inditextech.github.io/weavejs/5.7.0/main/build/stores/): Stores maintained by Weave.js team
+- [Standalone](https://inditextech.github.io/weavejs/5.7.0/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
+- [WebSockets](https://inditextech.github.io/weavejs/5.7.0/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
+- [Room page](https://inditextech.github.io/weavejs/5.7.0/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
+- [Set up the frontend](https://inditextech.github.io/weavejs/5.7.0/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
+- [Arrow Tool (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/arrow-tool/): Add an arrow to the canvas
+- [Comment Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
+- [Fit to Screen Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
+- [Images Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/images-tool/): Add multiple images to the canvas
+- [Image Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/image-tool/): Add an image to the canvas
+- [Actions](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/): Actions maintained by Weave.js team
+- [Polygon Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/pen-tool/): Add line segments to the canvas
+- [Video Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/video-tool/): Add a video to the canvas
+- [Ellipse](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
+- [Rectangle](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/rectangle/): Draw a rectangle on the canvas
+- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
+- [Stroke](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/stroke/): Draw a free-line on the canvas
+- [Text](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/text/): Draw and edit text on the canvas
+- [Nodes Multi-selection Feedback](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
+- [Nodes Selection](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
+- [Users Selector](https://inditextech.github.io/weavejs/5.7.0/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
+- [Enter Room page](https://inditextech.github.io/weavejs/5.7.0/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
+- [Align Nodes Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/align-nodes-tool/): Select nodes and align among them
+- [Brush Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
+- [Ellipse Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
+- [Connector Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/connector-tool/): Add connectors to the canvas
+- [Export Stage Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
+- [Frame Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
+- [Line Tool (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/line-tool/): Add a simple line to the canvas
+- [Measure Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/measure-tool/): Add measures to the canvas
+- [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [Text Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/text-tool/): Add text to the canvas
+- [Zoom In Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [Stroke Single](https://inditextech.github.io/weavejs/5.7.0/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
+- [Eraser Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [Export Node Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/export-node-tool/): Export the selected node as an image
+- [Move Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/move-tool/): Activate the panning or movement of the canvas
+- [Rectangle Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
+- [Star Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/star-tool/): Add a star to the canvas
+- [Stroke Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/stroke-tool/): Add a simple line to the canvas
+- [Zoom Out Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
+- [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
+- [Selection Tool](https://inditextech.github.io/weavejs/5.7.0/main/build/actions/selection-tool/): Activate the selection of canvas nodes
+- [Azure Web PubSub](https://inditextech.github.io/weavejs/5.7.0/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
 - [Application structure](https://inditextech.github.io/weavejs/5.6.0/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
 - [Architecture overview](https://inditextech.github.io/weavejs/5.6.0/main/architecture/): Deep dive into Weave.js architecture and design principles
 - [Contributing](https://inditextech.github.io/weavejs/5.6.0/main/contributing/): Want to collaborate? Learn how.
@@ -122,12 +217,12 @@
 - [Manual installation](https://inditextech.github.io/weavejs/5.6.0/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
 - [v1.0.0](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/1.0.0/): Initial stable release of Weave.js
 - [v2.0.0](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
-- [v4.0.0](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
 - [v3.0.0](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+- [v4.0.0](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
 - [v5.0.0](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
 - [Release notes](https://inditextech.github.io/weavejs/5.6.0/main/release-notes/): Discover what's new in Weave.js
-- [Weave instance](https://inditextech.github.io/weavejs/5.6.0/main/build/weave/): Build your visual collaborative tool with Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/main/build/): Build your visual collaborative tool with Weave.js
+- [Weave instance](https://inditextech.github.io/weavejs/5.6.0/main/build/weave/): Build your visual collaborative tool with Weave.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.6.0/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
 - [Room page](https://inditextech.github.io/weavejs/5.6.0/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
 - [Arrow Tool (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/arrow-tool/): Add an arrow to the canvas
@@ -136,26 +231,26 @@
 - [Image Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/image-tool/): Add an image to the canvas
 - [Images Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/images-tool/): Add multiple images to the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/): Actions maintained by Weave.js team
-- [Polygon Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/pen-tool/): Add line segments to the canvas
+- [Polygon Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [Video Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/video-tool/): Add a video to the canvas
 - [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/arrow/): Draw an arrow on the canvas
 - [Comment](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/comment/): Give feedback and collaborate with other users.
 - [Connector](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/connector/): Draw a connected line between nodes
 - [Frame](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/frame/): Canvas-in-canvas element
 - [Group](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/group/): Group nodes and manipulate them
-- [Image](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/image/): Render images on the canvas
-- [Layer](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/layer/): Segment and order the Stage in layers
-- [Line (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/line/): Draw a line on the canvas
 - [Nodes](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/): Nodes maintained by Weave.js team
+- [Layer](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/layer/): Segment and order the Stage in layers
+- [Image](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/image/): Render images on the canvas
+- [Line (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/line/): Draw a line on the canvas
 - [Measure](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/measure/): Draw measure reference distance on the canvas
 - [Polygon](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
 - [Stage](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/stage/): Main node to structure the canvas elements
 - [Star](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/star/): Draw a star on the canvas
 - [Text](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/text/): Draw &amp; edit text on the canvas
 - [Video](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/video/): Render a video on the canvas
-- [Standalone](https://inditextech.github.io/weavejs/5.6.0/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
 - [Stores](https://inditextech.github.io/weavejs/5.6.0/main/build/stores/): Stores maintained by Weave.js team
+- [Standalone](https://inditextech.github.io/weavejs/5.6.0/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
 - [WebSockets](https://inditextech.github.io/weavejs/5.6.0/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
 - [Enter Room page](https://inditextech.github.io/weavejs/5.6.0/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
 - [Align Nodes Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/align-nodes-tool/): Select nodes and align among them
@@ -169,6 +264,10 @@
 - [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
 - [Text Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/text-tool/): Add text to the canvas
 - [Zoom In Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [Ellipse](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
+- [Rectangle](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/rectangle/): Draw a rectangle on the canvas
+- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
+- [Stroke](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Comments Renderer](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
 - [Connected Users](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/connected-users/): Get an structure with information about the connected users
 - [Context Menu](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
@@ -184,10 +283,6 @@
 - [Stage Zoom](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
 - [Users Pointers](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Ellipse](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
-- [Rectangle](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/rectangle/): Draw a rectangle on the canvas
-- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
-- [Stroke](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Eraser Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Export Node Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/export-node-tool/): Export the selected node as an image
 - [Move Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/move-tool/): Activate the panning or movement of the canvas
@@ -195,15 +290,15 @@
 - [Star Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/star-tool/): Add a star to the canvas
 - [Stroke Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/stroke-tool/): Add a simple line to the canvas
 - [Zoom Out Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
+- [Stroke Single](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Nodes Multi-selection Feedback](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
 - [Nodes Selection](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [Users Selector](https://inditextech.github.io/weavejs/5.6.0/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
-- [Stroke Single](https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
 - [Selection Tool](https://inditextech.github.io/weavejs/5.6.0/main/build/actions/selection-tool/): Activate the selection of canvas nodes
 - [Azure Web PubSub](https://inditextech.github.io/weavejs/5.6.0/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
-- [Application structure](https://inditextech.github.io/weavejs/5.4.2/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
 - [Architecture overview](https://inditextech.github.io/weavejs/5.4.2/main/architecture/): Deep dive into Weave.js architecture and design principles
+- [Application structure](https://inditextech.github.io/weavejs/5.4.2/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
 - [Contributing](https://inditextech.github.io/weavejs/5.4.2/main/contributing/): Want to collaborate? Learn how.
 - [Glossary](https://inditextech.github.io/weavejs/5.4.2/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
 - [About Weave.js](https://inditextech.github.io/weavejs/5.4.2/main/): Build collaborative canvas applications
@@ -212,13 +307,13 @@
 - [Roadmap](https://inditextech.github.io/weavejs/5.4.2/main/roadmap/): Future development plans and upcoming features for Weave.js
 - [Changelog](https://inditextech.github.io/weavejs/5.4.2/main/changelog/): Check out the latest changes to Weave.js.
 - [v1.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/1.0.0/): Initial stable release of Weave.js
-- [v2.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
-- [v4.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
-- [v3.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
-- [Release notes](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/): Discover what's new in Weave.js
-- [v5.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
-- [Set up the backend](https://inditextech.github.io/weavejs/5.4.2/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
 - [Manual installation](https://inditextech.github.io/weavejs/5.4.2/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
+- [Set up the backend](https://inditextech.github.io/weavejs/5.4.2/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
+- [v2.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
+- [v3.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+- [v4.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
+- [v5.0.0](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+- [Release notes](https://inditextech.github.io/weavejs/5.4.2/main/release-notes/): Discover what's new in Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.4.2/main/build/): Build your visual collaborative tool with Weave.js
 - [Weave instance](https://inditextech.github.io/weavejs/5.4.2/main/build/weave/): Build your visual collaborative tool with Weave.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.4.2/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
@@ -258,15 +353,10 @@
 - [Measure Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/measure-tool/): Add measures to the canvas
 - [Text Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/text-tool/): Add text to the canvas
 - [Zoom In Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [Ellipse](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
-- [Image](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/image/): Render images on the canvas
-- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
-- [Rectangle](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/rectangle/): Draw a rectangle on the canvas
-- [Stroke](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Comments Renderer](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
 - [Connected Users](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/connected-users/): Get an structure with information about the connected users
-- [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [Context Menu](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [Plugins](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/): Plugins maintained by Weave.js team
 - [Nodes Snapping](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [Stage Drop Area](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
@@ -275,23 +365,28 @@
 - [Stage minimap](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
 - [Stage Panning](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
 - [Stage Resize](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [Users Pointers](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Stage Zoom](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
+- [Users Pointers](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
+- [Ellipse](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
+- [Image](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/image/): Render images on the canvas
+- [Rectangle](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/rectangle/): Draw a rectangle on the canvas
+- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
+- [Stroke](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Ellipse Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
 - [Eraser Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Export Node Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/export-node-tool/): Export the selected node as an image
 - [Move Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/move-tool/): Activate the panning or movement of the canvas
-- [Star Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/star-tool/): Add a star to the canvas
 - [Stroke Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/stroke-tool/): Add a simple line to the canvas
+- [Star Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/star-tool/): Add a star to the canvas
 - [Zoom Out Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
-- [Stroke Single](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Nodes Multi-selection Feedback](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
 - [Nodes Selection](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [Users Selector](https://inditextech.github.io/weavejs/5.4.2/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
+- [Stroke Single](https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [Rectangle Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Polygon Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [Rectangle Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
 - [Selection Tool](https://inditextech.github.io/weavejs/5.4.2/main/build/actions/selection-tool/): Activate the selection of canvas nodes
 - [Azure Web PubSub](https://inditextech.github.io/weavejs/5.4.2/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
@@ -305,22 +400,22 @@
 - [Roadmap](https://inditextech.github.io/weavejs/5.4.1/main/roadmap/): Future development plans and upcoming features for Weave.js
 - [Changelog](https://inditextech.github.io/weavejs/5.4.1/main/changelog/): Check out the latest changes to Weave.js.
 - [Set up the backend](https://inditextech.github.io/weavejs/5.4.1/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
-- [v1.0.0](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/1.0.0/): Initial stable release of Weave.js
 - [Manual installation](https://inditextech.github.io/weavejs/5.4.1/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
+- [v1.0.0](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/1.0.0/): Initial stable release of Weave.js
 - [v2.0.0](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
 - [v4.0.0](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
-- [Release notes](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/): Discover what's new in Weave.js
 - [v3.0.0](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+- [Release notes](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/): Discover what's new in Weave.js
 - [v5.0.0](https://inditextech.github.io/weavejs/5.4.1/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
-- [Weave instance](https://inditextech.github.io/weavejs/5.4.1/main/build/weave/): Build your visual collaborative tool with Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.4.1/main/build/): Build your visual collaborative tool with Weave.js
+- [Weave instance](https://inditextech.github.io/weavejs/5.4.1/main/build/weave/): Build your visual collaborative tool with Weave.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.4.1/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
 - [Room page](https://inditextech.github.io/weavejs/5.4.1/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
 - [Arrow Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/arrow-tool/): Add an arrow to the canvas
 - [Comment Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
 - [Fit to Screen Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [Image Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/image-tool/): Add an image to the canvas
 - [Images Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/images-tool/): Add multiple images to the canvas
+- [Image Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/image-tool/): Add an image to the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/): Actions maintained by Weave.js team
 - [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/pen-tool/): Add line segments to the canvas
 - [Video Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/video-tool/): Add a video to the canvas
@@ -343,19 +438,24 @@
 - [WebSockets](https://inditextech.github.io/weavejs/5.4.1/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
 - [Enter Room page](https://inditextech.github.io/weavejs/5.4.1/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
 - [Align Nodes Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/align-nodes-tool/): Select nodes and align among them
-- [Brush Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
 - [Connector Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/connector-tool/): Add connectors to the canvas
+- [Brush Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
 - [Export Stage Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
 - [Frame Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
-- [Measure Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/measure-tool/): Add measures to the canvas
 - [Line Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/line-tool/): Add a simple line to the canvas
+- [Measure Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/measure-tool/): Add measures to the canvas
 - [Text Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/text-tool/): Add text to the canvas
 - [Zoom In Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [Ellipse](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
+- [Image](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/image/): Render images on the canvas
+- [Rectangle](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/rectangle/): Draw a rectangle on the canvas
+- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
+- [Stroke](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Comments Renderer](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
 - [Connected Users](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/connected-users/): Get an structure with information about the connected users
 - [Context Menu](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
-- [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [Plugins](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/): Plugins maintained by Weave.js team
+- [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [Nodes Snapping](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [Stage Drop Area](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [Stage Grid](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
@@ -366,11 +466,6 @@
 - [Stage Zoom](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
 - [Users Pointers](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Ellipse](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
-- [Image](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/image/): Render images on the canvas
-- [Rectangle](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/rectangle/): Draw a rectangle on the canvas
-- [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
-- [Stroke](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Ellipse Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
 - [Eraser Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Export Node Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/export-node-tool/): Export the selected node as an image
@@ -378,18 +473,18 @@
 - [Star Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/star-tool/): Add a star to the canvas
 - [Stroke Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/stroke-tool/): Add a simple line to the canvas
 - [Zoom Out Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
+- [Stroke Single](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Nodes Multi-selection Feedback](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
 - [Nodes Selection](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [Users Selector](https://inditextech.github.io/weavejs/5.4.1/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
-- [Stroke Single](https://inditextech.github.io/weavejs/5.4.1/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [Polygon Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
-- [Rectangle Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [Rectangle Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
+- [Polygon Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [Selection Tool](https://inditextech.github.io/weavejs/5.4.1/main/build/actions/selection-tool/): Activate the selection of canvas nodes
 - [Azure Web PubSub](https://inditextech.github.io/weavejs/5.4.1/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
-- [Application structure](https://inditextech.github.io/weavejs/5.4.0/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
 - [Architecture overview](https://inditextech.github.io/weavejs/5.4.0/main/architecture/): Deep dive into Weave.js architecture and design principles
+- [Application structure](https://inditextech.github.io/weavejs/5.4.0/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
 - [Contributing](https://inditextech.github.io/weavejs/5.4.0/main/contributing/): Want to collaborate? Learn how.
 - [Glossary](https://inditextech.github.io/weavejs/5.4.0/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
 - [About Weave.js](https://inditextech.github.io/weavejs/5.4.0/main/): Build collaborative canvas applications
@@ -398,32 +493,32 @@
 - [Roadmap](https://inditextech.github.io/weavejs/5.4.0/main/roadmap/): Future development plans and upcoming features for Weave.js
 - [Changelog](https://inditextech.github.io/weavejs/5.4.0/main/changelog/): Check out the latest changes to Weave.js.
 - [Set up the backend](https://inditextech.github.io/weavejs/5.4.0/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
+- [v1.0.0](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/1.0.0/): Initial stable release of Weave.js
 - [Manual installation](https://inditextech.github.io/weavejs/5.4.0/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
 - [v2.0.0](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
-- [v1.0.0](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/1.0.0/): Initial stable release of Weave.js
-- [Release notes](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/): Discover what's new in Weave.js
 - [v4.0.0](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
+- [Release notes](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/): Discover what's new in Weave.js
 - [v3.0.0](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
 - [v5.0.0](https://inditextech.github.io/weavejs/5.4.0/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
-- [Overview](https://inditextech.github.io/weavejs/5.4.0/main/build/): Build your visual collaborative tool with Weave.js
 - [Weave instance](https://inditextech.github.io/weavejs/5.4.0/main/build/weave/): Build your visual collaborative tool with Weave.js
+- [Overview](https://inditextech.github.io/weavejs/5.4.0/main/build/): Build your visual collaborative tool with Weave.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.4.0/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
 - [Room page](https://inditextech.github.io/weavejs/5.4.0/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
-- [Comment Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
 - [Arrow Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/arrow-tool/): Add an arrow to the canvas
+- [Comment Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
 - [Fit to Screen Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [Images Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/images-tool/): Add multiple images to the canvas
 - [Image Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/image-tool/): Add an image to the canvas
+- [Images Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/images-tool/): Add multiple images to the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/): Actions maintained by Weave.js team
 - [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/pen-tool/): Add line segments to the canvas
 - [Video Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/video-tool/): Add a video to the canvas
 - [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/arrow/): Draw an arrow on the canvas
-- [Connector](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/connector/): Draw a connected line between nodes
 - [Comment](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/comment/): Give feedback and collaborate with other users.
+- [Connector](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/connector/): Draw a connected line between nodes
 - [Frame](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/frame/): Canvas-in-canvas element
 - [Group](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/group/): Group nodes and manipulate them
-- [Layer](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/layer/): Segment and order the Stage in layers
 - [Nodes](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/): Nodes maintained by Weave.js team
+- [Layer](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/layer/): Segment and order the Stage in layers
 - [Line (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/line/): Draw a line on the canvas
 - [Measure](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/measure/): Draw measure reference distance on the canvas
 - [Polygon](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
@@ -440,8 +535,8 @@
 - [Connector Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/connector-tool/): Add connectors to the canvas
 - [Export Stage Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
 - [Frame Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
-- [Line Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/line-tool/): Add a simple line to the canvas
 - [Measure Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/measure-tool/): Add measures to the canvas
+- [Line Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/line-tool/): Add a simple line to the canvas
 - [Text Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/text-tool/): Add text to the canvas
 - [Zoom In Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
 - [Ellipse](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
@@ -450,22 +545,22 @@
 - [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
 - [Stroke](https://inditextech.github.io/weavejs/5.4.0/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Comments Renderer](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
-- [Context Menu](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [Connected Users](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/connected-users/): Get an structure with information about the connected users
+- [Context Menu](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [Plugins](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/): Plugins maintained by Weave.js team
 - [Nodes Snapping](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [Stage Drop Area](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [Stage Grid](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [Stage Keyboard Move](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
+- [Stage Grid](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [Stage minimap](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
 - [Stage Panning](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
 - [Stage Resize](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
 - [Stage Zoom](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
 - [Users Pointers](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Eraser Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Ellipse Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
+- [Eraser Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Export Node Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/export-node-tool/): Export the selected node as an image
 - [Move Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/move-tool/): Activate the panning or movement of the canvas
 - [Star Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/star-tool/): Add a star to the canvas
@@ -476,28 +571,28 @@
 - [Nodes Selection](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [Users Selector](https://inditextech.github.io/weavejs/5.4.0/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [Polygon Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [Rectangle Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [Polygon Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [Selection Tool](https://inditextech.github.io/weavejs/5.4.0/main/build/actions/selection-tool/): Activate the selection of canvas nodes
 - [Azure Web PubSub](https://inditextech.github.io/weavejs/5.4.0/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
 - [Application structure](https://inditextech.github.io/weavejs/5.3.0/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
 - [Architecture overview](https://inditextech.github.io/weavejs/5.3.0/main/architecture/): Deep dive into Weave.js architecture and design principles
-- [Glossary](https://inditextech.github.io/weavejs/5.3.0/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
 - [Contributing](https://inditextech.github.io/weavejs/5.3.0/main/contributing/): Want to collaborate? Learn how.
+- [Glossary](https://inditextech.github.io/weavejs/5.3.0/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
 - [About Weave.js](https://inditextech.github.io/weavejs/5.3.0/main/): Build collaborative canvas applications
 - [Quickstart](https://inditextech.github.io/weavejs/5.3.0/main/quickstart/): Build a real-time collaborative canvas application in minutes
 - [Requirements](https://inditextech.github.io/weavejs/5.3.0/main/requirements/): Required system dependencies and versions
 - [Roadmap](https://inditextech.github.io/weavejs/5.3.0/main/roadmap/): Future development plans and upcoming features for Weave.js
-- [Set up the backend](https://inditextech.github.io/weavejs/5.3.0/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
 - [Changelog](https://inditextech.github.io/weavejs/5.3.0/main/changelog/): Check out the latest changes to Weave.js.
+- [Set up the backend](https://inditextech.github.io/weavejs/5.3.0/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
 - [Manual installation](https://inditextech.github.io/weavejs/5.3.0/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
 - [v1.0.0](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/1.0.0/): Initial stable release of Weave.js
 - [v2.0.0](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
 - [v3.0.0](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
 - [v4.0.0](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
-- [Release notes](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/): Discover what's new in Weave.js
 - [v5.0.0](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+- [Release notes](https://inditextech.github.io/weavejs/5.3.0/main/release-notes/): Discover what's new in Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.3.0/main/build/): Build your visual collaborative tool with Weave.js
 - [Weave instance](https://inditextech.github.io/weavejs/5.3.0/main/build/weave/): Build your visual collaborative tool with Weave.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.3.0/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
@@ -507,8 +602,8 @@
 - [Fit to Screen Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [Image Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/image-tool/): Add an image to the canvas
 - [Images Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/images-tool/): Add multiple images to the canvas
-- [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/pen-tool/): Add line segments to the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/): Actions maintained by Weave.js team
+- [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/pen-tool/): Add line segments to the canvas
 - [Video Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/video-tool/): Add a video to the canvas
 - [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/arrow/): Draw an arrow on the canvas
 - [Comment](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/comment/): Give feedback and collaborate with other users.
@@ -516,9 +611,9 @@
 - [Frame](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/frame/): Canvas-in-canvas element
 - [Group](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/group/): Group nodes and manipulate them
 - [Nodes](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/): Nodes maintained by Weave.js team
-- [Line (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/line/): Draw a line on the canvas
 - [Layer](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/layer/): Segment and order the Stage in layers
 - [Measure](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/measure/): Draw measure reference distance on the canvas
+- [Line (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/line/): Draw a line on the canvas
 - [Polygon](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
 - [Stage](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/stage/): Main node to structure the canvas elements
 - [Star](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/star/): Draw a star on the canvas
@@ -544,21 +639,21 @@
 - [Stroke](https://inditextech.github.io/weavejs/5.3.0/main/build/nodes/stroke/): Draw a free-line on the canvas
 - [Comments Renderer](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
 - [Connected Users](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/connected-users/): Get an structure with information about the connected users
-- [Context Menu](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [Context Menu](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [Plugins](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/): Plugins maintained by Weave.js team
 - [Nodes Snapping](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
-- [Stage Drop Area](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [Stage Grid](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [Stage Drop Area](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [Stage Keyboard Move](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
 - [Stage minimap](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
 - [Stage Panning](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
 - [Stage Resize](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [Users Pointers](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Stage Zoom](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
+- [Users Pointers](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Ellipse Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
 - [Eraser Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [Ellipse Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
 - [Export Node Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/export-node-tool/): Export the selected node as an image
 - [Move Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/move-tool/): Activate the panning or movement of the canvas
 - [Star Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/star-tool/): Add a star to the canvas
@@ -569,9 +664,9 @@
 - [Nodes Selection](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [Users Selector](https://inditextech.github.io/weavejs/5.3.0/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
 - [Rectangle Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Polygon Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
 - [Selection Tool](https://inditextech.github.io/weavejs/5.3.0/main/build/actions/selection-tool/): Activate the selection of canvas nodes
 - [Azure Web PubSub](https://inditextech.github.io/weavejs/5.3.0/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
 - [Application structure](https://inditextech.github.io/weavejs/5.2.2/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
@@ -603,12 +698,12 @@
 - [Video Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/video-tool/): Add a video to the canvas
 - [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/arrow/): Draw an arrow on the canvas
 - [Comment](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/comment/): Give feedback and collaborate with other users.
-- [Frame](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/frame/): Canvas-in-canvas element
 - [Connector](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/connector/): Draw a connected line between nodes
+- [Frame](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/frame/): Canvas-in-canvas element
 - [Group](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/group/): Group nodes and manipulate them
 - [Nodes](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/): Nodes maintained by Weave.js team
-- [Line (deprecated)](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/line/): Draw a line on the canvas
 - [Layer](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/layer/): Segment and order the Stage in layers
+- [Line (deprecated)](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/line/): Draw a line on the canvas
 - [Measure](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/measure/): Draw measure reference distance on the canvas
 - [Polygon](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
 - [Stage](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/stage/): Main node to structure the canvas elements
@@ -628,14 +723,14 @@
 - [Stage minimap](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
 - [Stage Panning](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
 - [Stage Resize](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [Stage Zoom](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
 - [Users Pointers](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [Stage Zoom](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
 - [Users Presence](https://inditextech.github.io/weavejs/5.2.2/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
 - [Stores](https://inditextech.github.io/weavejs/5.2.2/main/build/stores/): Stores maintained by Weave.js team
 - [Standalone](https://inditextech.github.io/weavejs/5.2.2/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
 - [WebSockets](https://inditextech.github.io/weavejs/5.2.2/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
-- [Room page](https://inditextech.github.io/weavejs/5.2.2/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.2.2/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
+- [Room page](https://inditextech.github.io/weavejs/5.2.2/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
 - [Align Nodes Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/align-nodes-tool/): Select nodes and align among them
 - [Brush Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
 - [Connector Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/connector-tool/): Add connectors to the canvas
@@ -657,8 +752,8 @@
 - [Eraser Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Export Node Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/export-node-tool/): Export the selected node as an image
 - [Move Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/move-tool/): Activate the panning or movement of the canvas
-- [Star Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/star-tool/): Add a star to the canvas
 - [Stroke Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/stroke-tool/): Add a simple line to the canvas
+- [Star Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/star-tool/): Add a star to the canvas
 - [Zoom Out Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
 - [Stroke Single](https://inditextech.github.io/weavejs/5.2.2/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.2.2/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
@@ -689,11 +784,25 @@
 - [Arrow Tool (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/arrow-tool/): Add an arrow to the canvas
 - [Comment Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
 - [Fit to Screen Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [Image Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/image-tool/): Add an image to the canvas
 - [Images Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/images-tool/): Add multiple images to the canvas
+- [Image Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/image-tool/): Add an image to the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/): Actions maintained by Weave.js team
 - [Pen Tool (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/pen-tool/): Add line segments to the canvas
 - [Video Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/video-tool/): Add a video to the canvas
+- [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/arrow/): Draw an arrow on the canvas
+- [Comment](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/comment/): Give feedback and collaborate with other users.
+- [Connector](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/connector/): Draw a connected line between nodes
+- [Frame](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/frame/): Canvas-in-canvas element
+- [Group](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/group/): Group nodes and manipulate them
+- [Nodes](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/): Nodes maintained by Weave.js team
+- [Layer](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/layer/): Segment and order the Stage in layers
+- [Line (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/line/): Draw a line on the canvas
+- [Measure](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/measure/): Draw measure reference distance on the canvas
+- [Polygon](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
+- [Stage](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/stage/): Main node to structure the canvas elements
+- [Star](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/star/): Draw a star on the canvas
+- [Text](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/text/): Draw &amp; edit text on the canvas
+- [Video](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/video/): Render a video on the canvas
 - [Comments Renderer](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
 - [Connected Users](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/connected-users/): Get an structure with information about the connected users
 - [Copy &amp; Paste Nodes](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
@@ -702,49 +811,35 @@
 - [Nodes Selection](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [Nodes Snapping](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [Stage Drop Area](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [Stage Grid](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [Stage Keyboard Move](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
-- [Stage Panning](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
+- [Stage Grid](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [Stage minimap](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
+- [Stage Panning](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
 - [Stage Resize](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
 - [Stage Zoom](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
 - [Users Pointers](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [Users Presence](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Arrow (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/arrow/): Draw an arrow on the canvas
-- [Comment](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/comment/): Give feedback and collaborate with other users.
-- [Connector](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/connector/): Draw a connected line between nodes
-- [Frame](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/frame/): Canvas-in-canvas element
-- [Group](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/group/): Group nodes and manipulate them
-- [Layer](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/layer/): Segment and order the Stage in layers
-- [Nodes](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/): Nodes maintained by Weave.js team
-- [Line (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/line/): Draw a line on the canvas
-- [Measure](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/measure/): Draw measure reference distance on the canvas
-- [Polygon](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
-- [Stage](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/stage/): Main node to structure the canvas elements
-- [Star](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/star/): Draw a star on the canvas
-- [Text](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/text/): Draw &amp; edit text on the canvas
-- [Video](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/video/): Render a video on the canvas
 - [Stores](https://inditextech.github.io/weavejs/5.2.1/main/build/stores/): Stores maintained by Weave.js team
-- [WebSockets](https://inditextech.github.io/weavejs/5.2.1/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
 - [Standalone](https://inditextech.github.io/weavejs/5.2.1/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
+- [WebSockets](https://inditextech.github.io/weavejs/5.2.1/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
 - [Set up the frontend](https://inditextech.github.io/weavejs/5.2.1/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
 - [Room page](https://inditextech.github.io/weavejs/5.2.1/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
-- [Brush Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
 - [Align Nodes Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/align-nodes-tool/): Select nodes and align among them
+- [Brush Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
 - [Connector Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/connector-tool/): Add connectors to the canvas
-- [Export Stage Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
 - [Frame Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
-- [Line Tool (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/line-tool/): Add a simple line to the canvas
 - [Measure Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/measure-tool/): Add measures to the canvas
+- [Line Tool (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/line-tool/): Add a simple line to the canvas
 - [Text Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/text-tool/): Add text to the canvas
 - [Zoom In Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [Nodes Multi-selection Feedback](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
-- [Users Selector](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
+- [Export Stage Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
 - [Ellipse](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
 - [Image](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/image/): Render images on the canvas
 - [Rectangle](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/rectangle/): Draw a rectangle on the canvas
 - [Regular Polygon (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
 - [Stroke](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/stroke/): Draw a free-line on the canvas
+- [Nodes Multi-selection Feedback](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
+- [Users Selector](https://inditextech.github.io/weavejs/5.2.1/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
 - [Enter Room page](https://inditextech.github.io/weavejs/5.2.1/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
 - [Ellipse Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
 - [Eraser Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
@@ -756,8 +851,8 @@
 - [Stroke Single](https://inditextech.github.io/weavejs/5.2.1/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
 - [Fit to Selection Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
 - [Polygon Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
-- [Rectangle Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Regular Polygon Tool (deprecated)](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [Rectangle Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
 - [Selection Tool](https://inditextech.github.io/weavejs/5.2.1/main/build/actions/selection-tool/): Activate the selection of canvas nodes
 - [Azure Web PubSub](https://inditextech.github.io/weavejs/5.2.1/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
 
@@ -768,6 +863,11 @@
 - [useWeaveEvents](https://inditextech.github.io/weavejs/prerelease/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
 - [useWeave](https://inditextech.github.io/weavejs/prerelease/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
 - [WeaveProvider](https://inditextech.github.io/weavejs/prerelease/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/react/): Getting started with Weave.js React Helper library API
+- [Setup](https://inditextech.github.io/weavejs/5.7.0/react/setup/): React Helper library API setup
+- [useWeaveEvents](https://inditextech.github.io/weavejs/5.7.0/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
+- [useWeave](https://inditextech.github.io/weavejs/5.7.0/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
+- [WeaveProvider](https://inditextech.github.io/weavejs/5.7.0/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/react/): Getting started with Weave.js React Helper library API
 - [Setup](https://inditextech.github.io/weavejs/5.6.0/react/setup/): React Helper library API setup
 - [useWeaveEvents](https://inditextech.github.io/weavejs/5.6.0/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
@@ -775,9 +875,9 @@
 - [useWeave](https://inditextech.github.io/weavejs/5.6.0/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
 - [Overview](https://inditextech.github.io/weavejs/5.4.2/react/): Getting started with Weave.js React Helper library API
 - [Setup](https://inditextech.github.io/weavejs/5.4.2/react/setup/): React Helper library API setup
-- [useWeaveEvents](https://inditextech.github.io/weavejs/5.4.2/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
 - [useWeave](https://inditextech.github.io/weavejs/5.4.2/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
 - [WeaveProvider](https://inditextech.github.io/weavejs/5.4.2/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
+- [useWeaveEvents](https://inditextech.github.io/weavejs/5.4.2/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
 - [Overview](https://inditextech.github.io/weavejs/5.4.1/react/): Getting started with Weave.js React Helper library API
 - [Setup](https://inditextech.github.io/weavejs/5.4.1/react/setup/): React Helper library API setup
 - [useWeaveEvents](https://inditextech.github.io/weavejs/5.4.1/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
@@ -885,12 +985,91 @@
 - [Low-level State Manipulation](https://inditextech.github.io/weavejs/prerelease/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
 - [Events](https://inditextech.github.io/weavejs/prerelease/sdk/api-reference/weave/events/): Weave instance emitted events
 - [Weave](https://inditextech.github.io/weavejs/prerelease/sdk/api-reference/weave/): API reference for Weave class
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/sdk/): Getting started with Weave.js SDK API
+- [Setup](https://inditextech.github.io/weavejs/5.7.0/sdk/setup/): Weave.js SDK API setup
+- [Events](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/events/): API reference for Weave emitted events
+- [WeaveCommentsRendererPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
+- [WeaveConnectedUsersPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
+- [WeaveContextMenuPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [WeaveCopyPasteNodesPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy and paste the nodes
+- [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
+- [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
+- [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [WeavePlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
+- [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+- [WeaveStageMinimapPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
+- [WeaveStagePanningPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
+- [WeaveStageResizePlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
+- [WeaveStageZoomPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
+- [WeaveUsersPointersPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [WeaveUsersPresencePlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
+- [Low-level State Manipulation](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
+- [Events](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/weave/events/): Weave instance emitted events
+- [WeaveAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/action/): Blueprint for the Action API
+- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
+- [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
+- [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
+- [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
+- [WeaveExportStageToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
+- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
+- [WeaveFitToSelectionToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
+- [WeaveFrameToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
+- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/image-tool/): Add an image to the canvas
+- [WeaveImagesToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
+- [WeaveLineToolAction (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
+- [WeaveMoveToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
+- [WeavePenToolAction (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
+- [WeavePolygonToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [WeaveRegularPolygonToolAction (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [WeaveSelectionToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
+- [WeaveTextToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/text-tool/): Add text to the canvas
+- [WeaveVideoToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/video-tool/): Add a video to the canvas
+- [WeaveZoomOutToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
+- [Plugins](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/): Plugins API Reference
+- [WeaveNodesEdgeSnappingPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
+- [WeaveNodesMultiSelectionFeedbackPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
+- [WeaveUsersSelectionPlugin](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
+- [Weave](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/weave/): API reference for Weave class
+- [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
+- [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
+- [WeaveEraserToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [Actions](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/): Actions API Reference
+- [WeaveMeasureToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
+- [WeaveStarToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/star-tool/): Add a star to the canvas
+- [WeaveStrokeToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
+- [WeaveZoomInToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [WeaveRectangleToolAction](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
+- [WeaveArrowNode (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
+- [WeaveCommentNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/comment/): Comment node API Reference
+- [WeaveConnectorNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/connector/): Connector node API Reference
+- [WeaveEllipseNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
+- [WeaveFrameNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/frame/): Frame node API Reference
+- [WeaveImageNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/image/): Image node API Reference
+- [WeaveLayerNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/layer/): Layer node API Reference
+- [WeaveMeasureNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/measure/): Measure node API Reference
+- [WeavePolygonNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/polygon/): Polygon node API Reference
+- [WeaveStageNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/stage/): Stage node API Reference
+- [WeaveTextV2Node](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/text-v2/): Text node with native on-canvas editing API Reference
+- [WeaveTextNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/text/): Text node API Reference
+- [WeaveGroupNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/group/): Group node API Reference
+- [Nodes](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/): Nodes API Reference
+- [WeaveLineNode (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/line/): Line node API Reference
+- [WeaveRectangleNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
+- [WeaveStarNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/star/): Ellipse node API Reference
+- [WeaveRegularPolygonNode (deprecated)](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
+- [WeaveStrokeSingleNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
+- [WeaveStrokeNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/stroke/): Stroke node API Reference
+- [WeaveNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/node/): Blueprint for the Node API
+- [WeaveVideoNode](https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/video/): Video node API Reference
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/sdk/): Getting started with Weave.js SDK API
 - [Setup](https://inditextech.github.io/weavejs/5.6.0/sdk/setup/): Weave.js SDK API setup
 - [Events](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/events/): API reference for Weave emitted events
-- [WeaveAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/action/): Blueprint for the Action API
-- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
 - [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
+- [WeaveAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/action/): Blueprint for the Action API
 - [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
 - [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
 - [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
@@ -898,20 +1077,20 @@
 - [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveFitToSelectionToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
 - [WeaveFrameToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
-- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/image-tool/): Add an image to the canvas
 - [WeaveImagesToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
+- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/image-tool/): Add an image to the canvas
 - [WeaveLineToolAction (deprecated)](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
 - [WeaveMoveToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
 - [WeavePenToolAction (deprecated)](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
-- [WeavePolygonToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [WeaveRegularPolygonToolAction (deprecated)](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [WeavePolygonToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
 - [WeaveSelectionToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
 - [WeaveTextToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/text-tool/): Add text to the canvas
-- [WeaveVideoToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/video-tool/): Add a video to the canvas
 - [WeaveZoomOutToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
+- [WeaveVideoToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/video-tool/): Add a video to the canvas
 - [WeaveArrowNode (deprecated)](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
-- [WeaveCommentNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/comment/): Comment node API Reference
 - [WeaveConnectorNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/connector/): Connector node API Reference
+- [WeaveCommentNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/comment/): Comment node API Reference
 - [WeaveEllipseNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
 - [WeaveFrameNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/frame/): Frame node API Reference
 - [WeaveImageNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/image/): Image node API Reference
@@ -925,27 +1104,27 @@
 - [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
 - [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
 - [WeaveEraserToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
-- [Actions](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/): Actions API Reference
 - [WeaveMeasureToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
-- [WeaveStarToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/star-tool/): Add a star to the canvas
+- [Actions](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/): Actions API Reference
 - [WeaveStrokeToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
+- [WeaveStarToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/star-tool/): Add a star to the canvas
 - [WeaveZoomInToolAction](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
 - [WeaveGroupNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/group/): Group node API Reference
 - [Nodes](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/): Nodes API Reference
 - [WeaveLineNode (deprecated)](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/line/): Line node API Reference
 - [WeaveRectangleNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
 - [WeaveStarNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/star/): Ellipse node API Reference
-- [WeaveCommentsRendererPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
 - [WeaveConnectedUsersPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
-- [WeaveCopyPasteNodesPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [WeaveCommentsRendererPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
 - [WeaveContextMenuPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [WeaveCopyPasteNodesPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
 - [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [WeavePlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
 - [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+- [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [WeaveStageMinimapPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
 - [WeaveStagePanningPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
 - [WeaveStageResizePlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
@@ -959,8 +1138,8 @@
 - [WeaveStrokeSingleNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
 - [WeaveStrokeNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/stroke/): Stroke node API Reference
 - [Plugins](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/): Plugins API Reference
-- [WeaveNodesEdgeSnappingPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
 - [WeaveNodesMultiSelectionFeedbackPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
+- [WeaveNodesEdgeSnappingPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
 - [WeaveUsersSelectionPlugin](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
 - [WeaveVideoNode](https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/video/): Video node API Reference
 - [Overview](https://inditextech.github.io/weavejs/5.4.2/sdk/): Getting started with Weave.js SDK API
@@ -969,18 +1148,18 @@
 - [Low-level State Manipulation](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
 - [Events](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/weave/events/): Weave instance emitted events
 - [WeaveAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/action/): Blueprint for the Action API
-- [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
 - [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
-- [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
+- [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
 - [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
+- [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
 - [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
 - [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
 - [WeaveExportStageToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
-- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveFitToSelectionToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [WeaveImagesToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
-- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/image-tool/): Add an image to the canvas
+- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveFrameToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
+- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/image-tool/): Add an image to the canvas
+- [WeaveImagesToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
 - [WeaveLineToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
 - [WeaveMoveToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
 - [WeavePenToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
@@ -988,22 +1167,22 @@
 - [WeaveSelectionToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
 - [WeaveTextToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/text-tool/): Add text to the canvas
 - [WeaveVideoToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/video-tool/): Add a video to the canvas
-- [WeaveZoomOutToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
 - [WeaveArrowNode (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
+- [WeaveZoomOutToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
 - [WeaveCommentNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/comment/): Comment node API Reference
 - [WeaveConnectorNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/connector/): Connector node API Reference
 - [WeaveEllipseNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
 - [WeaveFrameNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/frame/): Frame node API Reference
 - [WeaveImageNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/image/): Image node API Reference
 - [WeaveLayerNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/layer/): Layer node API Reference
-- [WeaveNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/node/): Blueprint for the Node API
 - [WeaveMeasureNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/measure/): Measure node API Reference
+- [WeaveNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/node/): Blueprint for the Node API
 - [WeaveStageNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/stage/): Stage node API Reference
 - [WeaveTextNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/text/): Text node API Reference
 - [WeaveCommentsRendererPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
 - [WeaveConnectedUsersPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
-- [WeaveContextMenuPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [WeaveCopyPasteNodesPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [WeaveContextMenuPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
 - [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
@@ -1020,14 +1199,14 @@
 - [Weave](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/weave/): API reference for Weave class
 - [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
 - [WeaveEraserToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
-- [WeaveMeasureToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/): Actions API Reference
+- [WeaveMeasureToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
 - [WeaveRectangleToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
 - [WeaveStarToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/star-tool/): Add a star to the canvas
 - [WeaveStrokeToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
 - [WeaveZoomInToolAction](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [Nodes](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/): Nodes API Reference
 - [WeaveGroupNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/group/): Group node API Reference
+- [Nodes](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/): Nodes API Reference
 - [WeaveLineNode (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/line/): Line node API Reference
 - [WeaveRectangleNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
 - [WeaveStarNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/star/): Ellipse node API Reference
@@ -1038,31 +1217,31 @@
 - [WeaveRegularPolygonToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
 - [WeavePolygonNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/polygon/): Polygon node API Reference
 - [WeaveRegularPolygonNode (deprecated)](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
-- [WeaveStrokeNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/stroke/): Stroke node API Reference
 - [WeaveStrokeSingleNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
+- [WeaveStrokeNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/stroke/): Stroke node API Reference
 - [WeaveVideoNode](https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/video/): Video node API Reference
 - [Overview](https://inditextech.github.io/weavejs/5.4.1/sdk/): Getting started with Weave.js SDK API
 - [Setup](https://inditextech.github.io/weavejs/5.4.1/sdk/setup/): Weave.js SDK API setup
 - [Events](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/events/): API reference for Weave emitted events
 - [Low-level State Manipulation](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
 - [Events](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/weave/events/): Weave instance emitted events
-- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
 - [WeaveAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/action/): Blueprint for the Action API
 - [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
 - [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
 - [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
 - [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
 - [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
-- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveExportStageToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
+- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveFitToSelectionToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/image-tool/): Add an image to the canvas
 - [WeaveFrameToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
+- [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/image-tool/): Add an image to the canvas
 - [WeaveImagesToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
 - [WeaveLineToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
 - [WeaveMoveToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
-- [WeavePenToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
 - [WeavePolygonToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [WeavePenToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
 - [WeaveSelectionToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
 - [WeaveTextToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/text-tool/): Add text to the canvas
 - [WeaveVideoToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/video-tool/): Add a video to the canvas
@@ -1093,8 +1272,8 @@
 - [WeaveStagePanningPlugin](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
 - [WeaveStageResizePlugin](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
 - [WeaveStageZoomPlugin](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
-- [WeaveUsersPresencePlugin](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
 - [WeaveUsersPointersPlugin](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [WeaveUsersPresencePlugin](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
 - [Weave](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/weave/): API reference for Weave class
 - [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
 - [WeaveEraserToolAction](https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
@@ -1122,16 +1301,16 @@
 - [Overview](https://inditextech.github.io/weavejs/5.4.0/sdk/): Getting started with Weave.js SDK API
 - [Setup](https://inditextech.github.io/weavejs/5.4.0/sdk/setup/): Weave.js SDK API setup
 - [Events](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/events/): API reference for Weave emitted events
-- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
 - [WeaveAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/action/): Blueprint for the Action API
 - [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
 - [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
 - [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
+- [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
 - [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
 - [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
-- [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
-- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveExportStageToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
+- [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
 - [WeaveFitToSelectionToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
 - [WeaveFrameToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
 - [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/actions/image-tool/): Add an image to the canvas
@@ -1177,9 +1356,9 @@
 - [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
 - [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
-- [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [WeavePlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
 - [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
 - [WeaveStageMinimapPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
 - [WeaveStagePanningPlugin](https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
@@ -1200,12 +1379,12 @@
 - [Overview](https://inditextech.github.io/weavejs/5.3.0/sdk/): Getting started with Weave.js SDK API
 - [Setup](https://inditextech.github.io/weavejs/5.3.0/sdk/setup/): Weave.js SDK API setup
 - [Events](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/events/): API reference for Weave emitted events
-- [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
-- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
 - [WeaveAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/action/): Blueprint for the Action API
-- [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
+- [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
+- [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
 - [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
 - [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
+- [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
 - [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
 - [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
 - [WeaveExportStageToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
@@ -1213,8 +1392,8 @@
 - [WeaveFitToSelectionToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
 - [WeaveFrameToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
 - [WeaveImageToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/image-tool/): Add an image to the canvas
-- [WeaveLineToolAction (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
 - [WeaveImagesToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
+- [WeaveLineToolAction (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
 - [WeaveMoveToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
 - [WeavePenToolAction (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
 - [WeavePolygonToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
@@ -1222,22 +1401,22 @@
 - [WeaveTextToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/text-tool/): Add text to the canvas
 - [WeaveVideoToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/video-tool/): Add a video to the canvas
 - [WeaveZoomOutToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
-- [Events](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/weave/events/): Weave instance emitted events
 - [Low-level State Manipulation](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
+- [Events](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/weave/events/): Weave instance emitted events
 - [WeaveEraserToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
 - [Actions](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/): Actions API Reference
 - [WeaveMeasureToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
 - [WeaveRectangleToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
-- [WeaveStrokeToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
 - [WeaveStarToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/star-tool/): Add a star to the canvas
+- [WeaveStrokeToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
 - [WeaveZoomInToolAction](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
 - [WeaveArrowNode (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
 - [WeaveCommentNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/comment/): Comment node API Reference
 - [WeaveConnectorNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/connector/): Connector node API Reference
-- [WeaveFrameNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/frame/): Frame node API Reference
 - [WeaveEllipseNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
-- [WeaveLayerNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/layer/): Layer node API Reference
+- [WeaveFrameNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/frame/): Frame node API Reference
 - [WeaveImageNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/image/): Image node API Reference
+- [WeaveLayerNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/layer/): Layer node API Reference
 - [WeaveMeasureNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/measure/): Measure node API Reference
 - [WeaveNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/node/): Blueprint for the Node API
 - [WeaveStageNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/stage/): Stage node API Reference
@@ -1246,17 +1425,17 @@
 - [WeaveContextMenuPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [WeaveCopyPasteNodesPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
-- [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
-- [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [WeavePlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
-- [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+- [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
 - [WeaveStageMinimapPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
 - [WeaveStagePanningPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
 - [WeaveStageResizePlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [WeaveUsersPointersPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [WeaveStageZoomPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
+- [WeaveUsersPointersPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [WeaveUsersPresencePlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
 - [Weave](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/weave/): API reference for Weave class
 - [WeaveRegularPolygonToolAction (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
@@ -1265,11 +1444,11 @@
 - [WeaveLineNode (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/line/): Line node API Reference
 - [WeaveRectangleNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
 - [WeaveStarNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/star/): Ellipse node API Reference
-- [WeaveTextNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/text/): Text node API Reference
 - [WeaveStrokeNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/stroke/): Stroke node API Reference
+- [WeaveTextNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/text/): Text node API Reference
 - [Plugins](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/): Plugins API Reference
-- [WeaveNodesMultiSelectionFeedbackPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
 - [WeaveNodesEdgeSnappingPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
+- [WeaveNodesMultiSelectionFeedbackPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
 - [WeaveUsersSelectionPlugin](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
 - [WeavePolygonNode](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/polygon/): Polygon node API Reference
 - [WeaveRegularPolygonNode (deprecated)](https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
@@ -1280,11 +1459,11 @@
 - [Events](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/events/): API reference for Weave emitted events
 - [WeaveAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/action/): Blueprint for the Action API
 - [WeaveAlignNodesToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
-- [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
 - [WeaveArrowToolAction (deprecated)](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveBrushToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
+- [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
 - [WeaveConnectorToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
 - [WeaveEllipseToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
-- [WeaveCommentToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
 - [WeaveExportNodesToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
 - [WeaveExportStageToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
 - [WeaveFitToScreenToolAction](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
@@ -1307,12 +1486,12 @@
 - [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
 - [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
 - [WeavePlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
-- [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
 - [WeaveStageMinimapPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
-- [WeaveStageResizePlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
 - [WeaveStagePanningPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
+- [WeaveStageResizePlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
 - [WeaveStageZoomPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
 - [WeaveUsersPointersPlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
 - [WeaveUsersPresencePlugin](https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
@@ -1383,8 +1562,8 @@
 - [WeaveContextMenuPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
 - [WeaveCopyPasteNodesPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
 - [WeaveNodesDistanceSnappingPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
-- [WeavePlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
 - [WeaveNodesSnappingPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [WeavePlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
 - [WeaveStageDropAreaPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
 - [WeaveStageGridPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
 - [WeaveStageKeyboardMovePlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
@@ -1415,8 +1594,8 @@
 - [WeaveStageNode](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/nodes/stage/): Stage node API Reference
 - [Plugins](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/): Plugins API Reference
 - [WeaveNodesEdgeSnappingPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
-- [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [WeaveNodesMultiSelectionFeedbackPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
+- [WeaveNodesSelectionPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
 - [WeaveUsersSelectionPlugin](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
 - [Weave](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/weave/): API reference for Weave class
 - [WeaveRegularPolygonToolAction (deprecated)](https://inditextech.github.io/weavejs/5.2.1/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
@@ -1438,10 +1617,14 @@
 - [Setup](https://inditextech.github.io/weavejs/prerelease/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
 - [WeaveStoreAzureWebPubsub](https://inditextech.github.io/weavejs/prerelease/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
 - [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/prerelease/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
+- [Setup](https://inditextech.github.io/weavejs/5.7.0/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
+- [WeaveStoreAzureWebPubsub](https://inditextech.github.io/weavejs/5.7.0/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
+- [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/5.7.0/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 - [Setup](https://inditextech.github.io/weavejs/5.6.0/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
-- [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/5.6.0/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 - [WeaveStoreAzureWebPubsub](https://inditextech.github.io/weavejs/5.6.0/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
+- [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/5.6.0/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 - [Setup](https://inditextech.github.io/weavejs/5.4.2/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
 - [Overview](https://inditextech.github.io/weavejs/5.4.2/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
 - [WeaveStoreAzureWebPubsub](https://inditextech.github.io/weavejs/5.4.2/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
@@ -1452,8 +1635,8 @@
 - [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/5.4.1/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 - [Setup](https://inditextech.github.io/weavejs/5.4.0/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
 - [Overview](https://inditextech.github.io/weavejs/5.4.0/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
-- [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/5.4.0/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 - [WeaveStoreAzureWebPubsub](https://inditextech.github.io/weavejs/5.4.0/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
+- [WeaveAzureWebPubsubServer](https://inditextech.github.io/weavejs/5.4.0/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 - [Setup](https://inditextech.github.io/weavejs/5.3.0/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
 - [Overview](https://inditextech.github.io/weavejs/5.3.0/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
 - [WeaveStoreAzureWebPubsub](https://inditextech.github.io/weavejs/5.3.0/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
@@ -1472,6 +1655,9 @@
 - [Overview](https://inditextech.github.io/weavejs/prerelease/store-standalone/): Getting started with Weave.js Standalone store
 - [Setup](https://inditextech.github.io/weavejs/prerelease/store-standalone/setup/): Standalone Store API setup
 - [WeaveStoreStandalone](https://inditextech.github.io/weavejs/prerelease/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/store-standalone/): Getting started with Weave.js Standalone store
+- [Setup](https://inditextech.github.io/weavejs/5.7.0/store-standalone/setup/): Standalone Store API setup
+- [WeaveStoreStandalone](https://inditextech.github.io/weavejs/5.7.0/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/store-standalone/): Getting started with Weave.js Standalone store
 - [Setup](https://inditextech.github.io/weavejs/5.6.0/store-standalone/setup/): Standalone Store API setup
 - [WeaveStoreStandalone](https://inditextech.github.io/weavejs/5.6.0/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
@@ -1500,6 +1686,10 @@
 - [Setup](https://inditextech.github.io/weavejs/prerelease/store-websockets/setup/): WebSockets Store API setup
 - [WeaveStoreWebsockets](https://inditextech.github.io/weavejs/prerelease/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
 - [WeaveWebsocketsServer](https://inditextech.github.io/weavejs/prerelease/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/store-websockets/): Getting started with Weave.js Websockets store
+- [Setup](https://inditextech.github.io/weavejs/5.7.0/store-websockets/setup/): WebSockets Store API setup
+- [WeaveStoreWebsockets](https://inditextech.github.io/weavejs/5.7.0/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
+- [WeaveWebsocketsServer](https://inditextech.github.io/weavejs/5.7.0/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/store-websockets/): Getting started with Weave.js Websockets store
 - [Setup](https://inditextech.github.io/weavejs/5.6.0/store-websockets/setup/): WebSockets Store API setup
 - [WeaveStoreWebsockets](https://inditextech.github.io/weavejs/5.6.0/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
@@ -1518,8 +1708,8 @@
 - [WeaveWebsocketsServer](https://inditextech.github.io/weavejs/5.4.0/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
 - [Overview](https://inditextech.github.io/weavejs/5.3.0/store-websockets/): Getting started with Weave.js Websockets store
 - [Setup](https://inditextech.github.io/weavejs/5.3.0/store-websockets/setup/): WebSockets Store API setup
-- [WeaveWebsocketsServer](https://inditextech.github.io/weavejs/5.3.0/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
 - [WeaveStoreWebsockets](https://inditextech.github.io/weavejs/5.3.0/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
+- [WeaveWebsocketsServer](https://inditextech.github.io/weavejs/5.3.0/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
 - [Overview](https://inditextech.github.io/weavejs/5.2.2/store-websockets/): Getting started with Weave.js Websockets store
 - [Setup](https://inditextech.github.io/weavejs/5.2.2/store-websockets/setup/): WebSockets Store API setup
 - [WeaveStoreWebsockets](https://inditextech.github.io/weavejs/5.2.2/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
@@ -1535,16 +1725,20 @@
 - [Setup](https://inditextech.github.io/weavejs/prerelease/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/prerelease/types/api-reference/constants/): Constants definitions for Weave.js
 - [Types](https://inditextech.github.io/weavejs/prerelease/types/api-reference/types/): TypeScript types definitions for Weave.js
+- [Overview](https://inditextech.github.io/weavejs/5.7.0/types/): Getting started with Weave.js TypeScript types
+- [Setup](https://inditextech.github.io/weavejs/5.7.0/types/setup/): Weave.js TypeScript types definitions setup
+- [Constants](https://inditextech.github.io/weavejs/5.7.0/types/api-reference/constants/): Constants definitions for Weave.js
+- [Types](https://inditextech.github.io/weavejs/5.7.0/types/api-reference/types/): TypeScript types definitions for Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.6.0/types/): Getting started with Weave.js TypeScript types
 - [Setup](https://inditextech.github.io/weavejs/5.6.0/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/5.6.0/types/api-reference/constants/): Constants definitions for Weave.js
 - [Types](https://inditextech.github.io/weavejs/5.6.0/types/api-reference/types/): TypeScript types definitions for Weave.js
-- [Setup](https://inditextech.github.io/weavejs/5.4.2/types/setup/): Weave.js TypeScript types definitions setup
 - [Overview](https://inditextech.github.io/weavejs/5.4.2/types/): Getting started with Weave.js TypeScript types
+- [Setup](https://inditextech.github.io/weavejs/5.4.2/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/5.4.2/types/api-reference/constants/): Constants definitions for Weave.js
 - [Types](https://inditextech.github.io/weavejs/5.4.2/types/api-reference/types/): TypeScript types definitions for Weave.js
-- [Setup](https://inditextech.github.io/weavejs/5.4.1/types/setup/): Weave.js TypeScript types definitions setup
 - [Overview](https://inditextech.github.io/weavejs/5.4.1/types/): Getting started with Weave.js TypeScript types
+- [Setup](https://inditextech.github.io/weavejs/5.4.1/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/5.4.1/types/api-reference/constants/): Constants definitions for Weave.js
 - [Types](https://inditextech.github.io/weavejs/5.4.1/types/api-reference/types/): TypeScript types definitions for Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.4.0/types/): Getting started with Weave.js TypeScript types
@@ -1555,10 +1749,10 @@
 - [Setup](https://inditextech.github.io/weavejs/5.3.0/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/5.3.0/types/api-reference/constants/): Constants definitions for Weave.js
 - [Types](https://inditextech.github.io/weavejs/5.3.0/types/api-reference/types/): TypeScript types definitions for Weave.js
-- [Setup](https://inditextech.github.io/weavejs/5.2.2/types/setup/): Weave.js TypeScript types definitions setup
 - [Overview](https://inditextech.github.io/weavejs/5.2.2/types/): Getting started with Weave.js TypeScript types
-- [Types](https://inditextech.github.io/weavejs/5.2.2/types/api-reference/types/): TypeScript types definitions for Weave.js
+- [Setup](https://inditextech.github.io/weavejs/5.2.2/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/5.2.2/types/api-reference/constants/): Constants definitions for Weave.js
+- [Types](https://inditextech.github.io/weavejs/5.2.2/types/api-reference/types/): TypeScript types definitions for Weave.js
 - [Overview](https://inditextech.github.io/weavejs/5.2.1/types/): Getting started with Weave.js TypeScript types
 - [Setup](https://inditextech.github.io/weavejs/5.2.1/types/setup/): Weave.js TypeScript types definitions setup
 - [Constants](https://inditextech.github.io/weavejs/5.2.1/types/api-reference/constants/): Constants definitions for Weave.js

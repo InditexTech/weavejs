@@ -72,7 +72,7 @@
 
 <title>WeaveNode | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/node/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/node/">
     <link rel="prev" href="../image/">
     <link rel="next" href="../layer/">
     <meta name="description" content="Blueprint for the Node API">
@@ -116,7 +116,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.6.0</span>
+    <span class="dt-tag__label">5.7.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -125,9 +125,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.6.0</span>
+      <span class="version__label">5.7.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/nodes/node/">
+      <span class="version__label">5.6.0</span>
+    </a>
     <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/node/">
       <span class="version__label">5.4.2</span>
     </a>
@@ -165,7 +168,7 @@
   </div>
 </header>
 
-<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.6.0.json">
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.7.0.json">
   <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
     <div class="dt-overlay__content"></div>
     <div class="dt-modal dt-modal--small search-dialog__panel">
@@ -248,7 +251,7 @@
 
 <div class="body">
 
-<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.6.0" data-module="sdk">
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.7.0" data-module="sdk">
   <div class="side-menu__header">
     <div class="side-menu__header-start">
       <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
@@ -552,6 +555,15 @@
       <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
         href="../text/">
         <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../text-v2/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextV2Node</span></span>
       </a>
     </div>
 
@@ -1078,7 +1090,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.6.0</span>
+    <span class="dt-tag__label">5.7.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -1087,9 +1099,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.6.0</span>
+      <span class="version__label">5.7.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/nodes/node/">
+      <span class="version__label">5.6.0</span>
+    </a>
     <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/node/">
       <span class="version__label">5.4.2</span>
     </a>
@@ -1432,7 +1447,42 @@ stage.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This method destroys the Konva instance rendered, that represents a node.</p>
+<p>This method destroys the Konva instance rendered, that represents a node. It also removes the instance
+listeners registered for the node and its descendants with <code>setNodeInstanceListener</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setnodeinstancelistener"><a class="anchor" href="#setnodeinstancelistener"></a>setNodeInstanceListener</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">protected</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> setNodeInstanceListener</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">T</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  event</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  callback</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">payload</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">T</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  key</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">event</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Registers a Weave.js instance listener on behalf of a rendered node. Custom nodes that listen to instance
+events (for example <code>onZoomChange</code> or <code>onNodesChange</code>) from <code>onRender</code> should use it instead of
+<code>instance.addEventListener</code>, which leaves the listener registered after the node is re-rendered or destroyed.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Only one listener is kept per node and <code>key</code>: registering again with the same key replaces the previous
+listener.</p>
+</li>
+<li>
+<p><code>key</code> defaults to the event name. Pass an explicit key to keep several listeners for the same event, or to
+avoid replacing the <code>onNodesChange</code> and <code>onSelectionState</code> listeners that <code>setupDefaultNodeEvents</code> registers.</p>
+</li>
+<li>
+<p>The listeners are removed when the node is destroyed, including the nodes destroyed with a container.
+Locking a node removes only the default <code>onNodesChange</code> and <code>onSelectionState</code> listeners.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
@@ -1559,7 +1609,7 @@ node is coded and look for how it uses the <code>updatePosition</code> callback.
       </div>
       <div class="page-footer__contribute-buttons">
 
-<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.6.0/docs/src/modules/sdk/pages/api-reference/nodes/node.adoc">
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.7.0/docs/src/modules/sdk/pages/api-reference/nodes/node.adoc">
   <span class="dt-button__content">
     Propose a change
     <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>

@@ -1,0 +1,1744 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>WeaveTextV2Node | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/text-v2/">
+    <link rel="prev" href="../text/">
+    <link rel="next" href="../video/">
+    <meta name="description" content="Text node with native on-canvas editing API Reference">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../../../../_/favicon.ico">
+  </head>
+  <body class="article">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../../../../">
+        <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">5.7.0</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <a class="version" href="../../../../../prerelease/sdk/api-reference/nodes/text-v2/">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </a>
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">5.7.0</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </span>
+    <a class="version is-missing" href="../../../../../5.6.0/">
+      <span class="version__label">5.6.0</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.4.2/">
+      <span class="version__label">5.4.2</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.4.1/">
+      <span class="version__label">5.4.1</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.4.0/">
+      <span class="version__label">5.4.0</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.3.0/">
+      <span class="version__label">5.3.0</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.2.2/">
+      <span class="version__label">5.2.2</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.2.1/">
+      <span class="version__label">5.2.1</span>
+    </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.7.0.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="body">
+
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.7.0" data-module="sdk">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../../../../">
+    <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently SDK">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-code"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../main/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-azure-web-pubsub/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Introduction</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../setup/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Setup</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">API Reference</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../weave/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Weave</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Weave">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../weave/events/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Events</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Nodes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../comment/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../connector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveConnectorNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../ellipse/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveEllipseNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../frame/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFrameNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../group/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveGroupNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../image/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveImageNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../node/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../layer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveLayerNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../measure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveMeasureNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePolygonNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../rectangle/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRectangleNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stage/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../star/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStarNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stroke/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStrokeNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stroke-single/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStrokeSingleNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../text/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="./" aria-current="page">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextV2Node</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../video/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveVideoNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../arrow/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveArrowNode (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../line/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveLineNode (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../regular-polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRegularPolygonNode (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../plugins/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Plugins</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Plugins">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/plugin/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/comments-renderer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentsRendererPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/connected-users/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveConnectedUsersPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/context-menu/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveContextMenuPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/copy-paste-nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCopyPasteNodesPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-selection/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesSelectionPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-multi-selection-feedback/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesMultiSelectionFeedbackPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesSnappingPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-edge-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesEdgeSnappingPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-distance-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesDistanceSnappingPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-drop-area/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageDropAreaPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-grid/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageGridPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-keyboard-move/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageKeyboardMovePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-minimap/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageMinimapPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-panning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStagePanningPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-resize/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageResizePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-zoom/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageZoomPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/users-pointers/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveUsersPointersPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/users-presence/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveUsersPresencePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/users-selector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveUsersSelectionPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../actions/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Actions</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Actions">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/action/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/align-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveAlignNodesToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/brush-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/comment-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/connector-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveConnectorToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/eraser-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveEraserToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/ellipse-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveEllipseToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/export-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveExportNodesToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/export-stage-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveExportStageToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/fit-to-screen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFitToScreenToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/fit-to-selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFitToSelectionToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/frame-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFrameToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/image-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveImageToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/images-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveImagesToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/measure-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveMeasureToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/move-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveMoveToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePolygonToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/rectangle-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRectangleToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveSelectionToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/star-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStarToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/stroke-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStrokeToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/text-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/video-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveVideoToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/zoom-in-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveZoomInToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/zoom-out-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveZoomOutToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/arrow-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveArrowToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/line-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveLineToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/pen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePenToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/regular-polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRegularPolygonToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../state-api/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">State Api</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">5.7.0</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <a class="version" href="../../../../../prerelease/sdk/api-reference/nodes/text-v2/">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </a>
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">5.7.0</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </span>
+    <a class="version is-missing" href="../../../../../5.6.0/">
+      <span class="version__label">5.6.0</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.4.2/">
+      <span class="version__label">5.4.2</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.4.1/">
+      <span class="version__label">5.4.1</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.4.0/">
+      <span class="version__label">5.4.0</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.3.0/">
+      <span class="version__label">5.3.0</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.2.2/">
+      <span class="version__label">5.2.2</span>
+    </a>
+    <a class="version is-missing" href="../../../../../5.2.1/">
+      <span class="version__label">5.2.1</span>
+    </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+
+<main class="article">
+
+<div class="hero">
+  <div class="dt-grid-layout dt-grid-layout--with-margin hero__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full hero__row">
+      <div class="hero__main">
+
+<nav class="dt-breadcrumbs" aria-label="Breadcrumb">
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../../../"><span class="dt-breadcrumb-item__content">Weave.js</span></a>
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../"><span class="dt-breadcrumb-item__content">Nodes</span></a>
+  <div class="dt-breadcrumb-item dt-breadcrumb-item--active" aria-current="page"><span class="dt-breadcrumb-item__content">WeaveTextV2Node</span></div>
+</nav>
+        <h1 class="hero__title dt-text dt-text--title-xl">WeaveTextV2Node</h1>
+        <p class="hero__excerpt dt-text dt-text--body-l">Text node with native on-canvas editing API Reference</p>
+      </div>
+      <div class="hero__aside">
+        <button class="dt-button dt-button--ghost dt-button--icon-only toc-toggle" type="button" aria-controls="on-this-page" aria-expanded="true" hidden>
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-panel-left"></use></svg></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="content dt-grid-layout dt-grid-layout--with-margin">
+
+<aside id="on-this-page" class="toc" data-title="On this page" data-levels="4">
+  <div class="toc-menu"></div>
+</aside>
+
+<article class="doc">
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/text-v2/text-v2.ts">WeaveTextV2Node</a>
+class represents a text element on the Weave.js canvas, with editing drawn natively on the canvas
+instead of a DOM textarea overlay. It is a drop-in replacement for
+<a href="../text/" class="xref page">WeaveTextNode</a>; the existing class is unchanged and stays available.</p>
+</div>
+<div class="paragraph">
+<p>Built on a <code class="dt-mono">Konva.Shape</code> with its own layout engine, it keeps the editing and idle appearance
+identical, and supports opt-in rich text.</p>
+</div>
+<div class="paragraph">
+<p>The class extends the <a href="../node/" class="xref page">WeaveNode</a> class</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="type"><a class="anchor" href="#type"></a>Type</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This node <code>nodeType</code> property value is <code>text</code>, the same as <code class="dt-mono">WeaveTextNode</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Existing documents load and render without migration. Register <code class="dt-mono">WeaveTextV2Node</code> <strong>instead of</strong>
+<code class="dt-mono">WeaveTextNode</code>: a Weave instance holds one handler per node type, so both cannot be registered
+together.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import"><a class="anchor" href="#import"></a>Import</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveTextV2Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "@inditextech/weave-sdk"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="instantiation"><a class="anchor" href="#instantiation"></a>Instantiation</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveTextV2Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  config:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    edition:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">outline:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">color:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#0074ff"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">width:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">padding:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } },</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    sizeWarning:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">threshold:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 200000</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">});</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="differences-from-weavetextnode"><a class="anchor" href="#differences-from-weavetextnode"></a>Differences from WeaveTextNode</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Renders through <code class="dt-mono">WeaveTextV2Shape</code> (a <code class="dt-mono">Konva.Shape</code>) with Konva.Text-compatible getters
+(<code class="dt-mono">text()</code>, <code class="dt-mono">fontSize()</code>, <code class="dt-mono">getTextWidth()</code>, &#8230;&#8203;). The <code class="dt-mono">onEnterTextNodeEditMode</code>
+and <code class="dt-mono">onExitTextNodeEditMode</code> event payload <code>node</code> is a <code class="dt-mono">WeaveTextV2Shape</code>, not a
+<code class="dt-mono">Konva.Text</code>.</p>
+</li>
+<li>
+<p>Editing happens on the canvas: a hidden proxy textarea handles typing, IME and clipboard, and the
+caret and selection are painted on the utility layer, together with an outline of the text box
+(useful with fixed width or height). There is no DOM overlay.</p>
+</li>
+<li>
+<p>Entering edit mode on existing text selects all of it (like Figma), so typing replaces it; a newly
+created node starts with the caret.</p>
+</li>
+<li>
+<p>Selection supports click, drag, double-click (word), triple-click (paragraph), arrows,
+<kbd>Home</kbd>/<kbd>End</kbd> and <kbd>Up</kbd>/<kbd>Down</kbd> on visual lines.</p>
+</li>
+<li>
+<p>Undo/redo is local to the edit session (typing, deletion, paste and IME composition each coalesce
+into one step). Leaving edit mode commits a single <code class="dt-mono">updateNode</code>, skipped when the text is
+unchanged. While editing, keydown does not propagate to the page, so app-level undo does not fire;
+<code>window.weaveTextEditing</code> holds the editing node id.</p>
+</li>
+<li>
+<p>The pointer is a text cursor (I-beam) over the text box while editing and the default cursor
+outside it, also while dragging a selection. Elements with <code class="dt-mono">data-weave-text-edit-keep</code> and touch
+pointers keep their own cursor. It is restored when the session ends.</p>
+</li>
+<li>
+<p>Clipboard is plain text only. Large pastes are laid out in time slices.</p>
+</li>
+<li>
+<p>While editing, the stage pans to keep the caret in view; the margin is <code class="dt-mono">edition.followPadding</code>.</p>
+</li>
+<li>
+<p>A pointer press inside an element with the attribute <code class="dt-mono">data-weave-text-edit-keep</code> does not end
+the edit session, so an app toolbar or sidebar can apply formatting commands to the live selection.
+Mouse-down on such an element keeps focus on the editor, except on form fields (<code>input</code>,
+<code>textarea</code>, <code>select</code>, <code>contenteditable</code>), which take focus normally. Portaled popups (for example a
+font picker) need the attribute too.</p>
+</li>
+<li>
+<p>All four layouts (<code>smart</code>, <code>auto-all</code>, <code>auto-height</code>, <code>fixed</code>) keep their behavior. Auto-sized
+layouts measure from the engine and no longer depend on the zoom level.</p>
+</li>
+<li>
+<p><a href="../../actions/text-tool/" class="xref page">WeaveTextToolAction</a> works with it unchanged.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="content-model"><a class="anchor" href="#content-model"></a>Content model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Content is stored as <code>blocks</code> (paragraphs) of <code>runs</code> (<code>{ t, m }</code>: text and marks). The <code>text</code> prop
+stays as a derived mirror. A node without <code>blocks</code> is synthesized from <code>text</code> on load without
+rewriting the document; a whole-text <code>link</code> becomes a full-range <code>link</code> mark.</p>
+</div>
+<div class="paragraph">
+<p>Marks are <code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>, <code>color</code>, <code>size</code> and <code>family</code> <code>lineHeight</code> (a multiplier of the run font size, clamped to 0.5 to 4) and <code>link</code> (a per-run URL). <code>size</code> is a ratio of the node <code>fontSize</code>, so resizing the node
+or calling <code class="dt-mono">setBaseFontSize</code> scales every run. Blocks may carry <code>kind</code> (<code>ul</code> or <code>ol</code>), <code>depth</code>
+and <code>start</code> to form lists, and <code>align</code> (<code>left</code>, <code>center</code> or <code>right</code>) for the paragraph. Documents without marks and lists are byte-identical to before.</p>
+</div>
+<div class="paragraph">
+<p>Marks and lists already present in a document always render and are preserved when the text is
+edited, whatever <code>richText.enabled</code> is, so every client shows the same document.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rich-text"><a class="anchor" href="#rich-text"></a>Rich text</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Rich text is switched on <strong>per node</strong> with the boolean attribute <code class="dt-mono">richText</code>. Nodes without the
+attribute follow <code class="dt-mono">config.richText.enabled</code> (default <code>false</code>), so you can offer a plain and a rich
+text tool in the same app (see <a href="../../actions/text-tool/" class="xref page">WeaveTextToolAction</a>).
+Turning it off for a node only removes the commands: marks and lists already in it still render. The toolbar is yours: the node only
+exposes commands, a format query and events.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getNodeHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextV2Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"text"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">toggleMark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"bold"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                       </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// whole text, or the editor selection</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">applyMark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"color"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"#ff0000"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">start:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">end:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 5</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> });</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">applyMark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"size"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">24</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                    </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// px</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">toggleList</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"ul"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">indent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setBaseFontSize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">32</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                      </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// scales every run</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> format</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getSelectionFormat</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>While the node is being edited the commands act on the editor selection (the <code>range</code> argument is
+ignored) and each one is a single session-undo entry. At a collapsed caret, mark commands set the
+marks of the next typed text.</p>
+</li>
+<li>
+<p>On a selected node that is not being edited they act on <code>range</code> (UTF-16 offsets into <code>text</code>,
+default: the whole text) and are one <code class="dt-mono">updateNode</code>, so one Weave undo step. This lets an
+application edit text from a modal.</p>
+</li>
+<li>
+<p>When rich text is off for the node every command returns <code>false</code> and does nothing. <code class="dt-mono">isRich(node)</code>
+reports it, so a toolbar can show or hide itself. <code class="dt-mono">isRichTextEnabled()</code> without arguments returns
+the handler default (<code>config.richText.enabled</code>).</p>
+</li>
+</ul>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">applyMark(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set a mark (<code>undefined</code> clears it). <code>size</code> is in px and stored as a ratio.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">toggleMark(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toggle a boolean mark (<code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>): off when the whole range has it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setAlign(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Align every paragraph the range touches (<code>undefined</code> goes back to the node <code>align</code>). Alignment is per
+paragraph, never per line.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">toggleList(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toggle <code>ul</code> / <code>ol</code> on the blocks of the range.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">indent(node</code> / <code class="dt-mono">outdent(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Change list depth. Outdent at depth 0 removes the list marker.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setRunLink(node</code> / <code class="dt-mono">removeRunLink(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link a range to an absolute http(s) URL (others return <code>false</code>), or remove it. Same as
+<code class="dt-mono">applyMark</code> with <code>link</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setBaseFontSize(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the node <code>fontSize</code>. Event reason <code>base-size</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">getSelectionFormat(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Per mark (including <code>lineHeight</code> and <code>align</code>) `{ state: 'all'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'none'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'some', value? }`, <code>size</code> in px, and <code>list: { kind, depth? }</code>.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>When editing with rich text enabled: <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>B</kbd>, <kbd>I</kbd>, <kbd>U</kbd> toggle marks;
+<kbd>Enter</kbd> continues a list item (and the formatting of the text before it) and exits on an empty one; <kbd>Backspace</kbd> at the start of an item
+outdents it or removes the marker; <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change the depth. Pasting inserts
+plain text with the marks at the caret. With it disabled, <kbd>Enter</kbd> in a list item still creates
+an item with the same <code>kind</code> and <code>depth</code>.</p>
+</div>
+<div class="paragraph">
+<p>Link runs are drawn with <code>link.defaultColor</code> and an underline; the hovered run uses <code>link.hoverColor</code>
+and the cursor becomes a pointer only over the run. <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + click opens it, as does a
+click on an already-selected node. Only http(s) URLs render and open. A node-level <code>link</code> (see
+<a href="../text/#hyperlinks" class="xref page">Hyperlinks</a>) takes precedence. Links render
+whatever <code>richText.enabled</code> is; creating and removing them is a command.</p>
+</div>
+<div class="paragraph">
+<p>A line is as tall as its tallest run: the <code>lineHeight</code> mark of a run, or the node <code>lineHeight</code>,
+times the run font size. Only the lines that contain the marked text change height, and a smaller
+value next to a taller run on the same line has no visible effect. Empty paragraphs use the node
+<code>lineHeight</code>. The node <code>align</code> and <code>lineHeight</code> are defaults: changing them does not clear paragraph
+or run values. Vertical alignment (<code>verticalAlign</code>) stays a setting of the whole node.</p>
+</div>
+<div class="paragraph">
+<p>Lists show markers in a gutter (<code>disc</code>, <code>circle</code>, <code>square</code>; <code>1.</code>, <code>a.</code>, <code>i.</code> by depth). Numbering is
+continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
+item; <code>start</code> sets the first number. Markers are not part of <code>text</code>.</p>
+</div>
+<div class="paragraph">
+<p>Images export with the formatting. Exporting to PDF rasterizes each frame, so it follows the image.
+Register every font family you use in runs on the server as well.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="parameters"><a class="anchor" href="#parameters"></a>Parameters</h2>
+<div class="sectionbody">
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">DeepPartial&lt;WeaveTextV2Properties&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config parameters for the node.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration"><a class="anchor" href="#configuration"></a>Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Same properties as <a href="../text/" class="xref page">WeaveTextNode</a>, except <code>edition</code>, plus:</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code class="dt-mono">edition.borderSize</code> does not exist on <code class="dt-mono">WeaveTextV2Node</code>: there is no DOM textarea border to
+size. Passing it is a type error. Use <code class="dt-mono">edition.outline</code> instead.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition.outline.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Draw an outline of the text box while editing.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition.outline.color</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#0074ff</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Outline colour.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition.outline.width</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Outline width in screen pixels (constant across zoom levels).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition.outline.padding</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gap between the text box and the outline, in screen pixels.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition.followPadding</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ top: 40, right: 40, bottom: 40, left: 40 }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">While editing, the stage pans to keep the caret inside the container. This is the margin kept
+between the caret and each edge, in screen pixels. Raise a side when app UI (toolbars, sidebars)
+covers that edge.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">richText.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default for nodes without a <code>richText</code> attribute: formatting commands, shortcuts and list key rules.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">richText.indentStep</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.5</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List indent per depth, as a multiple of <code>fontSize</code>. The total indent is limited so at least 4 times
+<code>fontSize</code> stays for text in fixed-width nodes. Must be the same on every client.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">sizeWarning.threshold</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>200000</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Serialized size of <code>blocks</code> (characters) above which the <code class="dt-mono">onTextSizeWarning</code> event is emitted.
+Content is never truncated.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="events"><a class="anchor" href="#events"></a>Events</h2>
+<div class="sectionbody">
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Event</th>
+<th class="tableblock halign-left valign-top">Payload</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onEnterTextNodeEditMode</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ node: WeaveTextV2Shape }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An edit session started.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onExitTextNodeEditMode</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ node: WeaveTextV2Shape }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An edit session ended and its content was committed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTextSelectionChange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ node, start, end, format }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The selection, caret or content changed while editing (throttled).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTextFormatChange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">`+{ node, format, reason: 'command'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'undo'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'redo'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'base-size' }+`</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A format command, undo, redo or base size change ran.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTextSizeWarning</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ node: WeaveTextV2Shape, size: number, threshold: number }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The serialized <code>blocks</code> grew past <code>sizeWarning.threshold</code>. Emitted once per crossing.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hyperlinks"><a class="anchor" href="#hyperlinks"></a>Hyperlinks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Same behavior and methods as <a href="../text/#hyperlinks" class="xref page">WeaveTextNode</a>:
+<code class="dt-mono">getLink</code>, <code class="dt-mono">setLink</code> and <code class="dt-mono">removeLink</code>. Removing the link also removes the link
+underline. Link hover colour and the pointer cursor only show while <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> is held, and
+<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + click opens the URL. While it is held the blue hover halo of the node is hidden.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="exports"><a class="anchor" href="#exports"></a>Exports</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code class="dt-mono">WeaveTextV2Node</code>, <code class="dt-mono">WeaveTextV2Shape</code>, <code class="dt-mono">TextLayoutEngine</code>, <code class="dt-mono">TextEditSession</code>,
+<code class="dt-mono">TextEditModel</code> and the related types. <code class="dt-mono">TextEditSession</code> works on a <code class="dt-mono">TextEditTarget</code>
+and a <code class="dt-mono">TextEditHost</code>, so other shapes can reuse the layout engine and the editor. The pure model
+functions (<code class="dt-mono">applyMark</code>, <code class="dt-mono">toggleList</code>, <code class="dt-mono">listMarkers</code>, <code class="dt-mono">getSelectionFormat</code>, &#8230;&#8203;) and
+<code class="dt-mono">clearSyntheticItalicCache</code> are exported too.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="server-side"><a class="anchor" href="#server-side"></a>Server side</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Measurement and painting work on the node-canvas backend (<code>setupCanvasBackend()</code>) and were also
+verified on the skia-canvas backend (<code>setupSkiaBackend()</code>). Register fonts in your app; they are not
+registered by the SDK.</p>
+</div>
+<div class="sect2">
+<h3 id="italic-on-the-server"><a class="anchor" href="#italic-on-the-server"></a>Italic on the server</h3>
+<div class="paragraph">
+<p>Browsers slant (synthesize) italic text when a font family has no italic file. skia-canvas and
+node-canvas do not: the text comes out upright. <code class="dt-mono">WeaveTextV2Shape</code> detects this on the server by
+rendering a small probe with the run&#8217;s font, and when the italic does not render slanted it applies
+the same slant browsers use (a shear of about 14 degrees, on the glyphs only). Families that have a
+real italic file are drawn with it, unchanged. It works the same on both backends and never runs in a
+browser. Layout is not affected: wrapping and line breaks are identical to the canvas.</p>
+</div>
+<div class="paragraph">
+<p>The result is cached per font. If you register fonts after the first render, call
+<code class="dt-mono">clearSyntheticItalicCache()</code> so it is probed again.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The slant is close to, but not pixel-identical with, the one Chrome draws. Server images of
+text with italic runs in families without an italic file now come out slanted instead of upright.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+
+
+<footer class="page-footer">
+  <div class="page-footer__nav">
+
+<div class="dt-grid-layout dt-grid-layout--with-margin pagination">
+  <div class="dt-grid-layout__item dt-grid-layout__item--span-full pagination__row">
+    <div class="pagination__buttons">
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-icon pagination__prev" href="../text/">
+      <span class="dt-button__content">
+        <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-left"></use></svg></span>
+        <span class="pagination__label-full">WeaveTextNode</span>
+        <span class="pagination__label-short">Prev</span>
+      </span>
+    </a>
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action pagination__next" href="../video/">
+      <span class="dt-button__content">
+        <span class="pagination__label-full">WeaveVideoNode</span>
+        <span class="pagination__label-short">Next</span>
+        <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-right"></use></svg></span>
+      </span>
+    </a>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="dt-grid-layout dt-grid-layout--with-margin page-footer__feedback">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full page-footer__contribute">
+      <div class="page-footer__contribute-copy">
+        <p class="dt-text dt-text--title-s">Help us make these docs great!</p>
+        <p class="dt-text dt-text--body-m">See something that is wrong or unclear? Collaborate with us! Submit a pull request</p>
+      </div>
+      <div class="page-footer__contribute-buttons">
+
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.7.0/docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc">
+  <span class="dt-button__content">
+    Propose a change
+    <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
+  </span>
+</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../../../../">
+        <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/build/stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-azure-web-pubsub/">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>

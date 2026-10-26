@@ -72,7 +72,7 @@
 
 <title>WeaveRectangleNode | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/rectangle/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.7.0/sdk/api-reference/nodes/rectangle/">
     <link rel="prev" href="../polygon/">
     <link rel="next" href="../stage/">
     <meta name="description" content="Rectangle node API Reference">
@@ -116,7 +116,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.6.0</span>
+    <span class="dt-tag__label">5.7.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -125,9 +125,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.6.0</span>
+      <span class="version__label">5.7.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/nodes/rectangle/">
+      <span class="version__label">5.6.0</span>
+    </a>
     <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/rectangle/">
       <span class="version__label">5.4.2</span>
     </a>
@@ -165,7 +168,7 @@
   </div>
 </header>
 
-<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.6.0.json">
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.7.0.json">
   <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
     <div class="dt-overlay__content"></div>
     <div class="dt-modal dt-modal--small search-dialog__panel">
@@ -248,7 +251,7 @@
 
 <div class="body">
 
-<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.6.0" data-module="sdk">
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.7.0" data-module="sdk">
   <div class="side-menu__header">
     <div class="side-menu__header-start">
       <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
@@ -552,6 +555,15 @@
       <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
         href="../text/">
         <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../text-v2/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextV2Node</span></span>
       </a>
     </div>
 
@@ -1078,7 +1090,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.6.0</span>
+    <span class="dt-tag__label">5.7.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -1087,9 +1099,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.6.0</span>
+      <span class="version__label">5.7.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/nodes/rectangle/">
+      <span class="version__label">5.6.0</span>
+    </a>
     <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/rectangle/">
       <span class="version__label">5.4.2</span>
     </a>
@@ -1186,6 +1201,37 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 </div>
 </div>
 <div class="sect1">
+<h2 id="label-engine"><a class="anchor" href="#label-engine"></a>Label engine</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default the label is rendered with Konva&#8217;s text and edited through a DOM textarea overlay (<code>legacy</code>).
+Set <code>config.label.engine</code> to <code>native</code> to render the label with the on-canvas text engine and edit it
+with the native editing session instead: no DOM overlay, and caret and selection are drawn on the canvas.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveRectangleNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">config:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">label:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">engine:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "native"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } } });</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both engines read and write the same <code>labelText</code> and <code>label*</code> props, so clients using different engines
+can edit the same document. The <code>native</code> engine enables rich text in labels (bold, italic, underline, lists, alignment). Formatted content is stored in the optional <code>labelBlocks</code> prop, and <code>labelText</code> always holds the plain text, so the <code>legacy</code> engine shows the plain text.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="label-edit-events"><a class="anchor" href="#label-edit-events"></a>Label edit events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With the <code>native</code> label engine the node emits <code>onEnterShapeLabelEditMode</code> when a label edit session starts and
+<code>onExitShapeLabelEditMode</code> when it ends. Exit receives <code>{ node: Konva.Group }</code>; enter also receives the live
+<code>session</code>, so an app can build a formatting toolbar by running format commands on it. While editing,
+<code>onShapeLabelFormatChange</code> receives <code>{ node, format }</code> whenever the selection format changes.
+The <code>legacy</code> engine does not emit them.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="type"><a class="anchor" href="#type"></a>Type</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -1220,8 +1266,13 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 <div class="content">
 <pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TransformerConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveShapeLabelConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  engine</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"legacy"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"native"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// default "legacy"</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveRectangleProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  transform</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  label</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Partial</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveShapeLabelConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveRectangleNodeParams</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
@@ -1242,6 +1293,7 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelLineHeight</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelPaddingX</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelPaddingY</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelBlocks</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextBlock</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// rich content written by the native engine</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
 </div>
 </div>
@@ -1514,7 +1566,7 @@ They map directly to <code>WeaveShapeLabelProps</code> and are all optional — 
       </div>
       <div class="page-footer__contribute-buttons">
 
-<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.6.0/docs/src/modules/sdk/pages/api-reference/nodes/rectangle.adoc">
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.7.0/docs/src/modules/sdk/pages/api-reference/nodes/rectangle.adoc">
   <span class="dt-button__content">
     Propose a change
     <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
