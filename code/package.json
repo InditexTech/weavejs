@@ -32,7 +32,7 @@
     "reset": "nx reset",
     "test": "nx run-many -t test --no-tui && npm run test:merge-coverage",
     "test:merge-coverage": "shx mkdir -p coverage && npx lcov-result-merger 'packages/**/reports/vite-coverage/**/lcov.info' coverage/lcov.info --prepend-source-files --prepend-path-fix '../..'",
-    "unpublish": "nx run-many --skip-nx-cache -t unpublish --no-tui",
+    "unpublish": "nx run-many -t unpublish --no-tui",
     "verdaccio:setup": "node ./verdaccio.setup.js",
     "verify": "npm ci && nx run-many -t verify --no-tui",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false --stage-changes=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
