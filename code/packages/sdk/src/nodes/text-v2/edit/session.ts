@@ -148,6 +148,9 @@ export class TextEditSession {
       capture: true,
     });
     window.addEventListener('pointermove', this.onPointerMove, { signal });
+    // Entered with the mouse over the node (double click, new text): the
+    // I-beam shows before the first move.
+    this.host.container.style.cursor = 'text';
     window.addEventListener('pointerup', this.onPointerUp, { signal });
     window.addEventListener('mousedown', this.onMouseDown, {
       signal,
@@ -182,6 +185,9 @@ export class TextEditSession {
     this.abort.abort();
     clearInterval(this.blinkTimer);
     clearTimeout(this.pendingTimer);
+    if (this.host.container.style.cursor === 'text') {
+      this.host.container.style.cursor = 'default';
+    }
     this.textarea?.remove();
     this.textarea = null;
     const layer = this.overlay?.getLayer();
@@ -649,7 +655,25 @@ export class TextEditSession {
     return n;
   }
 
+  /**
+   * I-beam over the text box, like a text field. The canvas has no element to
+   * give the browser a cursor, so it is set on the stage container; anything
+   * outside the box (where a click leaves edit mode) gets the default one.
+   */
+  private updateCursor(e: PointerEvent) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    if (this.isKeepTarget(e)) return; // the host UI owns its own cursors
+    const style = this.host.container.style;
+    const over = this.dragging || this.isInside(this.toLocal(e));
+    if (over) {
+      if (style.cursor !== 'text') style.cursor = 'text';
+    } else if (style.cursor === 'text') {
+      style.cursor = 'default';
+    }
+  }
+
   private onPointerMove = (e: PointerEvent) => {
+    this.updateCursor(e);
     if (!this.dragging) return;
     const local = this.toLocal(e);
     const offset = offsetFromPoint(

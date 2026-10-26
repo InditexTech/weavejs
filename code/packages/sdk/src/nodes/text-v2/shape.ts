@@ -16,6 +16,10 @@ import {
   type TextWrap,
 } from './layout/engine';
 import {
+  SYNTHETIC_ITALIC_SKEW,
+  needsSyntheticItalic,
+} from './layout/synthetic-italic';
+import {
   blocksToText,
   isSafeLink,
   resolveBlocks,
@@ -505,11 +509,37 @@ export class WeaveTextV2Shape extends Konva.Shape {
     const color = this.runColor(line, seg);
     const isLink = !this.attrs.link && isSafeLink(seg.m?.link);
     const offset = Math.round(seg.fontSize / 4);
-    this.paintSegment(ctx, seg, x, y, color);
+    this.paintGlyphs(ctx, seg, x, y, color);
     if (seg.m?.underline || isLink) {
       this.strokeSegment(ctx, seg, x, y + offset, color);
     }
     if (seg.m?.strike) this.strokeSegment(ctx, seg, x, y - offset, color);
+  }
+
+  /** Glyphs of a run; slanted here when the server canvas has no italic face. */
+  private paintGlyphs(
+    ctx: Konva.Context,
+    seg: LayoutSegment,
+    x: number,
+    y: number,
+    color: string | undefined
+  ) {
+    if (!needsSyntheticItalic(seg.font)) {
+      this.paintSegment(ctx, seg, x, y, color);
+      return;
+    }
+    // shear around the baseline so the line does not shift
+    ctx.save();
+    ctx.transform(
+      1,
+      0,
+      -SYNTHETIC_ITALIC_SKEW,
+      1,
+      SYNTHETIC_ITALIC_SKEW * y,
+      0
+    );
+    this.paintSegment(ctx, seg, x, y, color);
+    ctx.restore();
   }
 
   private strokeDecoration(ctx: Konva.Context, line: LayoutLine, y: number) {

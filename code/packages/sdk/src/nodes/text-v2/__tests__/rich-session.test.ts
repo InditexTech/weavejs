@@ -218,3 +218,78 @@ describe('Enter regressions', () => {
     expect(b[1].runs).toEqual([{ t: 'x', m: { bold: true } }]);
   });
 });
+
+describe('edit cursor', () => {
+  const move = (x: number, y: number, init: PointerEventInit = {}) => {
+    const e = new MouseEvent('pointermove', {
+      clientX: x,
+      clientY: y,
+      bubbles: true,
+      ...init,
+    });
+    Object.defineProperty(e, 'pointerType', {
+      value: init.pointerType ?? 'mouse',
+    });
+    window.dispatchEvent(e);
+  };
+
+  it('shows the text cursor over the box, the default one outside', () => {
+    const c = make([{ runs: [{ t: 'hello' }] }]);
+    const style = c.container.style;
+    expect(style.cursor).toBe('text'); // set on entry
+    move(2000, 2000); // far outside the 300px wide box
+    expect(style.cursor).toBe('default');
+    move(10, 5);
+    expect(style.cursor).toBe('text');
+  });
+
+  it('keeps it while dragging a selection outside the box', () => {
+    const c = make([{ runs: [{ t: 'hello' }] }]);
+    const down = new MouseEvent('pointerdown', {
+      clientX: 10,
+      clientY: 5,
+      bubbles: true,
+      button: 0,
+    });
+    Object.defineProperty(down, 'pointerType', { value: 'mouse' });
+    window.dispatchEvent(down);
+    move(2000, 2000);
+    expect(c.container.style.cursor).toBe('text');
+    window.dispatchEvent(new MouseEvent('pointerup'));
+    move(2000, 2000);
+    expect(c.container.style.cursor).toBe('default');
+  });
+
+  it('leaves the cursor to the host UI over keep-targets and for touch', () => {
+    const c = make([{ runs: [{ t: 'hello' }] }]);
+    const keep = document.createElement('div');
+    keep.setAttribute('data-weave-text-edit-keep', '');
+    document.body.appendChild(keep);
+    c.container.style.cursor = 'text';
+    const e = new MouseEvent('pointermove', {
+      clientX: 2000,
+      clientY: 2000,
+      bubbles: true,
+    });
+    Object.defineProperty(e, 'pointerType', { value: 'mouse' });
+    keep.dispatchEvent(e);
+    expect(c.container.style.cursor).toBe('text');
+    c.container.style.cursor = 'grab';
+    move(10, 5, { pointerType: 'touch' });
+    expect(c.container.style.cursor).toBe('grab');
+    keep.remove();
+  });
+
+  it('restores the default cursor when the session ends', () => {
+    const c = make([{ runs: [{ t: 'hello' }] }]);
+    c.session.destroy();
+    expect(c.container.style.cursor).toBe('default');
+  });
+
+  it('does not overwrite a cursor set by someone else after the session', () => {
+    const c = make([{ runs: [{ t: 'hello' }] }]);
+    c.container.style.cursor = 'grab';
+    c.session.destroy();
+    expect(c.container.style.cursor).toBe('grab');
+  });
+});

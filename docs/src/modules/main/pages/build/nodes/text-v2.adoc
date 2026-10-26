@@ -39,6 +39,7 @@ The xref:main:build/actions/text-tool.adoc[Text Tool] works with either node.
 
 * Entering edit mode on existing text selects all of it, as in Figma, so typing replaces it. A node
 you just created starts with the caret.
+* The mouse pointer is a text cursor (I-beam) over the text box while editing, and the default one outside it.
 * An outline of the text box is drawn while editing. It is especially useful when the width or the
 height are fixed.
 * Click, drag, double-click (word), triple-click (paragraph), the arrow keys, kbd:[Home],

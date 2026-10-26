@@ -273,3 +273,18 @@ and a mono:[TextEditHost], so other shapes can reuse the layout engine and the e
 Measurement and painting work on the node-canvas backend (`setupCanvasBackend()`) and were also
 verified on the skia-canvas backend (`setupSkiaBackend()`). Register fonts in your app; they are not
 registered by the SDK.
+
+=== Italic on the server
+
+Browsers slant (synthesize) italic text when a font family has no italic file. skia-canvas and
+node-canvas do not: the text comes out upright. mono:[WeaveTextV2Shape] detects this on the server by
+rendering a small probe with the run's font, and when the italic does not render slanted it applies
+the same slant browsers use (a shear of about 14 degrees, on the glyphs only). Families that have a
+real italic file are drawn with it, unchanged. It works the same on both backends and never runs in a
+browser. Layout is not affected: wrapping and line breaks are identical to the canvas.
+
+The result is cached per font. If you register fonts after the first render, call
+mono:[clearSyntheticItalicCache()] so it is probed again.
+
+NOTE: The slant is close to, but not pixel-identical with, the one Chrome draws. Server images of
+text with italic runs in families without an italic file now come out slanted instead of upright.
