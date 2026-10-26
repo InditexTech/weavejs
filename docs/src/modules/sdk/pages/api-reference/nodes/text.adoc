@@ -199,3 +199,9 @@ removeLink(nodeInstance: WeaveElementInstance): void
 
 Removes the link from a text node. The node's original `fill`/`textDecoration` reappear
 immediately, since they were never altered while the link was set.
+
+== Native on-canvas editing
+
+mono:[WeaveTextNode] edits through a DOM textarea overlay. For editing drawn natively on the canvas,
+use xref:sdk:api-reference/nodes/text-v2.adoc[WeaveTextV2Node], a drop-in replacement that keeps the same
+node type.

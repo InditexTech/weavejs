@@ -52,3 +52,8 @@ that it contains.
 * `auto-height`: makes the node auto-adjust its height accordingly to the text that it contains.
 The width is fixed and defined by the end user.
 * `fixed`: makes the node fixed on both its width & height.
+
+== Native on-canvas editing
+
+This node edits through a DOM textarea overlay. To edit directly on the canvas, use
+xref:main:build/nodes/text-v2.adoc[Text (native editing)], a drop-in replacement for this node.
