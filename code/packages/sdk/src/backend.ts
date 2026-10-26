@@ -6,19 +6,19 @@ import { WEAVE_KONVA_BACKEND } from '@inditextech/weave-types';
 import { loadNativeBackend } from './utils/native-backend';
 
 export const setupSkiaBackend = async (): Promise<void> => {
-  globalThis._weave_serverSideBackend = WEAVE_KONVA_BACKEND.SKIA;
   await loadNativeBackend(
     'skia-canvas',
     'setupSkiaBackend',
     () => import('konva/skia-backend')
   );
+  globalThis._weave_serverSideBackend = WEAVE_KONVA_BACKEND.SKIA;
 };
 
 export const setupCanvasBackend = async (): Promise<void> => {
-  globalThis._weave_serverSideBackend = WEAVE_KONVA_BACKEND.CANVAS;
   await loadNativeBackend(
     'canvas',
     'setupCanvasBackend',
     () => import('konva/canvas-backend')
   );
+  globalThis._weave_serverSideBackend = WEAVE_KONVA_BACKEND.CANVAS;
 };
