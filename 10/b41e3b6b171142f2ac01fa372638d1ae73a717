@@ -1,0 +1,29 @@
+code/packages/sdk/src/nodes/__tests__/node.test.ts
+  s_04c0657600bfd3::t_3e880958a19b9c 1087,1100,1103,1116
+code/packages/sdk/src/nodes/node.ts
+  s_04c0657600bfd3::t_1a90119276d2e4 1033-1034,1152
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-paint.test.ts
+  s_04c0657600bfd3::t_a6c4bd04c0f300 84-118
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_04c0657600bfd3::t_e79b1d7d26ccd4 242-252
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/keyboard-hover.test.ts
+  s_04c0657600bfd3::t_8135e1fd657e76 1-60
+code/packages/sdk/src/plugins/nodes-selection/events/keyboard.ts
+  s_04c0657600bfd3::t_c7c555c484a537 39-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "10b41e3b6b171142f2ac01fa372638d1ae73a717",
+  "prompts": {},
+  "sessions": {
+    "s_04c0657600bfd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9bc5058dffeuO0Rfa8MiDOdnh",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
