@@ -451,7 +451,7 @@ describe('5 — onRender: load branches', () => {
 
     expect(mock.updateNode).toHaveBeenCalled();
     const videoCalls = createElSpy.mock.calls.filter(([tag]) => tag === 'video');
-    expect(videoCalls.length).toBe(0);
+    expect(videoCalls).toHaveLength(0);
   });
 });
 
@@ -1556,7 +1556,7 @@ describe('22 — loadPlaceholder: event handlers', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (node as any).loadPlaceholder(defaultProps(), group);
 
-    expect(createImgSpy.mock.calls.length).toBe(callsBefore);
+    expect(createImgSpy.mock.calls).toHaveLength(callsBefore);
   });
 
   it('22.2 urlTransformer used when configured', () => {

@@ -172,11 +172,9 @@ export function handleClickOrTap(
   // regardless of selection state. Skipped on shift-click, which is a
   // multi-select gesture, not a per-node interaction.
   if (!e.evt.shiftKey) {
-    const wasSelectedBeforeThisClick =
-      tr
-        .nodes()
-        .findIndex((node) => node.getAttrs().id === nodeTargeted.getAttrs().id) !==
-      -1;
+    const wasSelectedBeforeThisClick = tr
+      .nodes()
+      .some((node) => node.getAttrs().id === nodeTargeted.getAttrs().id);
     nodeTargeted.click({
       wasSelected: wasSelectedBeforeThisClick,
       ctrlOrMetaPressed: isCtrlOrCmdPressed,

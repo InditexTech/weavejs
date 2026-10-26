@@ -56,7 +56,7 @@ const removeListenersOfKonvaNode = (
   if (!listeners) {
     return;
   }
-  for (const [key, listener] of [...listeners.entries()]) {
+  for (const [key, listener] of listeners.entries()) {
     if (keys && !keys.includes(key)) {
       continue;
     }
@@ -1244,8 +1244,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
-  async onRegister(): Promise<void> {
-    return;
+  onRegister(): Promise<void> {
+    return Promise.resolve();
   }
 
   abstract initialize?(): void;

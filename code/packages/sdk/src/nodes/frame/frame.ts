@@ -27,7 +27,7 @@ import { mergeExceptArrays } from '@/utils/utils';
 import { GroupFrame } from './group-frame';
 
 export class WeaveFrameNode extends WeaveNode {
-  private config: WeaveFrameProperties;
+  private readonly config: WeaveFrameProperties;
   protected nodeType: string = WEAVE_FRAME_NODE_TYPE;
   initialize = undefined;
 

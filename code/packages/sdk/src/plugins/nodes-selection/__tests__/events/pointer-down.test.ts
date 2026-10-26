@@ -475,5 +475,16 @@ describe('handlePointerDown', () => {
     // isContainerEmptyArea=true → falls through to area selection
     expect(ctx.setAreaSelecting).toHaveBeenCalledWith(true);
   });
-});
 
+  it('leaves selection and drag untouched when the target owns its drag', () => {
+    const ctx = makeCtx();
+    const target = makeTarget({ ownsDrag: true });
+    const e = makeEvent({}, target);
+    handlePointerDown(ctx, e);
+    expect(ctx.setAreaSelecting).toHaveBeenCalledWith(false);
+    expect(ctx.getEdgePanning().stop).toHaveBeenCalled();
+    expect(ctx.getAreaSelector().hide).toHaveBeenCalled();
+    expect(ctx.selectNone).not.toHaveBeenCalled();
+    expect(ctx.armDrag).not.toHaveBeenCalled();
+  });
+});

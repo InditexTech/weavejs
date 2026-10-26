@@ -371,7 +371,7 @@ describe('WeaveMeasureNode', () => {
       const childrenBefore = group.getChildren().length;
       createHandlers(node, group);
       // Added: moveFromCircle, crosshairFrom, moveToCircle, crosshairTo, moveSeparationRect
-      expect(group.getChildren().length).toBe(childrenBefore + 5);
+      expect(group.getChildren()).toHaveLength(childrenBefore + 5);
       expect(group.findOne('#moveFromCircle-test-measure')).toBeInstanceOf(Konva.Circle);
       expect(group.findOne('#crosshairFrom-test-measure')).toBeInstanceOf(Konva.Group);
       expect(group.findOne('#moveToCircle-test-measure')).toBeInstanceOf(Konva.Circle);
@@ -385,7 +385,7 @@ describe('WeaveMeasureNode', () => {
       createHandlers(node, group);
       const childrenAfterFirst = group.getChildren().length;
       createHandlers(node, group);
-      expect(group.getChildren().length).toBe(childrenAfterFirst);
+      expect(group.getChildren()).toHaveLength(childrenAfterFirst);
     });
 
     it('7.3 moveFromCircle.dragstart: cancels bubble, hides circles/rect, shows crosshairFrom', () => {
@@ -678,7 +678,7 @@ describe('WeaveMeasureNode', () => {
 
       destroyHandlers(node, group);
 
-      expect(group.getChildren().length).toBe(childrenBefore - 5);
+      expect(group.getChildren()).toHaveLength(childrenBefore - 5);
       expect(group.findOne('#moveFromCircle-test-measure')).toBeFalsy();
       expect(group.findOne('#moveToCircle-test-measure')).toBeFalsy();
       expect(group.findOne('#crosshairFrom-test-measure')).toBeFalsy();
@@ -956,6 +956,15 @@ describe('WeaveMeasureNode', () => {
       expect(group.getAttrs().separation).toBe(0);
       expect(mock.updateNode).toHaveBeenCalled();
     });
+  });
+});
+
+describe('WeaveMeasureNode hover', () => {
+  it('is not hoverable', () => {
+    const { node } = makeNode();
+    const group = node.onRender(defaultProps()) as Konva.Group;
+
+    expect(group.canBeHovered()).toBe(false);
   });
 });
 

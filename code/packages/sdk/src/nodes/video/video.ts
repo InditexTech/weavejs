@@ -24,7 +24,7 @@ import { isServer, mergeExceptArrays } from '@/utils/utils';
 import type { WeaveStageZoomPluginOnZoomChangeEvent } from '@/plugins/stage-zoom/types';
 
 export class WeaveVideoNode extends WeaveNode {
-  private config: WeaveVideoProperties;
+  private readonly config: WeaveVideoProperties;
   private videoIconImage!: HTMLImageElement | undefined;
   private videoState!: Record<string, WeaveVideoState>;
   private videoSourceFrameId!: Record<string, number>;
@@ -56,7 +56,7 @@ export class WeaveVideoNode extends WeaveNode {
     this.videoIconImage = undefined;
   }
 
-  private async loadPlaceholder(
+  private loadPlaceholder(
     params: WeaveElementAttributes,
     video: Konva.Group
   ) {
@@ -639,7 +639,7 @@ export class WeaveVideoNode extends WeaveNode {
         playing: true,
         paused: false,
       };
-      this.videoSource[videoId]?.play?.();
+      this.videoSource[videoId]?.play?.()?.catch?.(() => {});
       this.anim.start();
       this.instance.emitEvent<WeaveVideoOnVideoPlayEvent>('onVideoPlay', {
         nodeId: videoId,
