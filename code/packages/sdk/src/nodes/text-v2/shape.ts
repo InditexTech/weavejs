@@ -477,42 +477,39 @@ export class WeaveTextV2Shape extends Konva.Shape {
       ctx.setAttr('font', mk.font);
       this.fillText(ctx, mk.text, mk.x, y, mk.color);
     }
-    for (const seg of line.segments) {
-      ctx.setAttr('font', seg.font);
-      const x = line.offsetX + seg.x;
-      const isLink = !this.attrs.link && isSafeLink(seg.m?.link);
-      let color =
-        typeof seg.m?.color === 'string' ? (seg.m.color as string) : undefined;
-      if (isLink) {
-        color =
-          this.hoveredRun === `${line.paragraph}:${seg.run}`
-            ? this.linkStyle.hoverColor
-            : this.linkStyle.color;
-      }
-      this.paintSegment(ctx, seg, x, y, color);
-      if (seg.m?.underline || isLink) {
-        this.strokeSegment(
-          ctx,
-          seg,
-          x,
-          y + Math.round(seg.fontSize / 4),
-          color
-        );
-      }
-      if (seg.m?.strike) {
-        this.strokeSegment(
-          ctx,
-          seg,
-          x,
-          y - Math.round(seg.fontSize / 4),
-          color
-        );
-      }
-    }
+    for (const seg of line.segments) this.paintRun(ctx, line, seg, y);
     if (decoration.includes('line-through')) {
       this.strokeDecoration(ctx, line, y - Math.round(fontSize / 4));
     }
     ctx.restore();
+  }
+
+  /** Colour of a run: link colours win, then the `color` mark. */
+  private runColor(line: LayoutLine, seg: LayoutSegment): string | undefined {
+    if (!this.attrs.link && isSafeLink(seg.m?.link)) {
+      return this.hoveredRun === `${line.paragraph}:${seg.run}`
+        ? this.linkStyle.hoverColor
+        : this.linkStyle.color;
+    }
+    return typeof seg.m?.color === 'string' ? seg.m.color : undefined;
+  }
+
+  private paintRun(
+    ctx: Konva.Context,
+    line: LayoutLine,
+    seg: LayoutSegment,
+    y: number
+  ) {
+    ctx.setAttr('font', seg.font);
+    const x = line.offsetX + seg.x;
+    const color = this.runColor(line, seg);
+    const isLink = !this.attrs.link && isSafeLink(seg.m?.link);
+    const offset = Math.round(seg.fontSize / 4);
+    this.paintSegment(ctx, seg, x, y, color);
+    if (seg.m?.underline || isLink) {
+      this.strokeSegment(ctx, seg, x, y + offset, color);
+    }
+    if (seg.m?.strike) this.strokeSegment(ctx, seg, x, y - offset, color);
   }
 
   private strokeDecoration(ctx: Konva.Context, line: LayoutLine, y: number) {
