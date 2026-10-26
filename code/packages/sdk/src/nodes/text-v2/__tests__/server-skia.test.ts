@@ -130,4 +130,74 @@ describe.skipIf(!hasSkia)('WeaveTextV2Shape on the skia-canvas backend', () => {
     }
     expect(red).toBeGreaterThan(20);
   });
+  it('keeps italic runs italic (font shorthand parsed by skia)', async () => {
+    await import('konva/skia-backend');
+    const { default: Konva } = await import('konva');
+    const { FontLibrary } = await import('skia-canvas');
+    const { WeaveTextV2Shape } = await import('../shape');
+
+    // Set WEAVE_TEST_FONTS_DIR to also run with fonts registered by family
+    // (like the backend does).
+    const dir = process.env.WEAVE_TEST_FONTS_DIR;
+    if (dir) {
+      FontLibrary.use('TestArial', [
+        `${dir}/ARIAL.TTF`,
+        `${dir}/ARIALBD.TTF`,
+        `${dir}/ARIALI 1.TTF`,
+        `${dir}/ARIALBI.TTF`,
+      ]);
+    }
+    const family = dir ? 'TestArial' : 'sans-serif';
+
+    const ink = (italic: boolean) => {
+      const stage = new Konva.Stage({ width: 240, height: 70 });
+      const layer = new Konva.Layer();
+      stage.add(layer);
+      const shape = new WeaveTextV2Shape({
+        fontSize: 40,
+        fontFamily: family,
+        fill: '#000000',
+      });
+      shape.setBlocks([
+        {
+          runs: [{ t: 'HIIIlll', ...(italic ? { m: { italic: true } } : {}) }],
+        },
+      ]);
+      layer.add(shape);
+      layer.draw();
+      const ctx = (
+        layer.getCanvas()._canvas as unknown as {
+          getContext(t: string): {
+            getImageData(...a: number[]): { data: Uint8ClampedArray };
+          };
+        }
+      ).getContext('2d');
+      const d = ctx.getImageData(0, 0, 240, 70).data;
+      const rowEdge = (y: number) => {
+        for (let x = 0; x < 240; x++) {
+          if (d[(y * 240 + x) * 4 + 3] > 100) return x;
+        }
+        return -1;
+      };
+      let first = -1;
+      let last = -1;
+      for (let y = 0; y < 70; y++) {
+        if (rowEdge(y) >= 0) {
+          if (first < 0) first = y;
+          last = y;
+        }
+      }
+      const height = last - first;
+      // left edge a little below the top and a little above the bottom
+      return {
+        top: rowEdge(first + Math.round(height * 0.2)),
+        bottom: rowEdge(first + Math.round(height * 0.8)),
+      };
+    };
+    const upright = ink(false);
+    const slanted = ink(true);
+    // upright text has the same left edge on every row; italic is sheared
+    expect(upright.top).toBe(upright.bottom);
+    expect(slanted.top - slanted.bottom).toBeGreaterThan(2);
+  });
 });

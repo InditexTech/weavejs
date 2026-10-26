@@ -124,7 +124,13 @@ export function normalizeFontFamily(fontFamily: string): string {
 }
 
 export function fontString(s: TextLayoutStyle): string {
-  return `${s.fontStyle} ${s.fontVariant} ${s.fontSize}px ${normalizeFontFamily(
+  // Leave out `normal` keywords: skia-canvas (server side) parses
+  // `italic normal 20px X` as a regular font and silently drops the italic,
+  // while `italic 20px X` works everywhere.
+  const keywords = `${s.fontStyle} ${s.fontVariant}`
+    .split(/\s+/)
+    .filter((token) => token !== '' && token !== 'normal');
+  return `${[...keywords, `${s.fontSize}px`].join(' ')} ${normalizeFontFamily(
     s.fontFamily
   )}`;
 }

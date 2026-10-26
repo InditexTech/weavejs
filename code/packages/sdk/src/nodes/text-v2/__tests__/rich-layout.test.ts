@@ -3,7 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { TextLayoutEngine, type TextLayoutStyle } from '../layout/engine';
+import {
+  TextLayoutEngine,
+  fontString,
+  type TextLayoutStyle,
+} from '../layout/engine';
 import type { WeaveTextBlock } from '../model';
 
 const style: TextLayoutStyle = {
@@ -213,5 +217,27 @@ describe('paragraph align and per-run line height', () => {
       bounds
     );
     expect(l.lines[0].height).toBe(10);
+  });
+});
+
+describe('font shorthand', () => {
+  it('has no `normal` keywords (skia-canvas drops italic when they follow it)', () => {
+    const f = (fontStyle: string, fontVariant = 'normal') =>
+      fontString({ ...style, fontStyle, fontVariant, fontSize: 20 });
+    expect(f('normal')).toBe('20px Arial');
+    expect(f('italic')).toBe('italic 20px Arial');
+    expect(f('bold')).toBe('bold 20px Arial');
+    expect(f('italic bold')).toBe('italic bold 20px Arial');
+    expect(f('italic', 'small-caps')).toBe('italic small-caps 20px Arial');
+    expect(f('normal', 'normal')).not.toMatch(/normal/);
+  });
+
+  it('runs resolve to the italic font', () => {
+    const l = new TextLayoutEngine(measurer).layout(
+      [{ runs: [{ t: 'it', m: { italic: true, bold: true } }] }],
+      style,
+      bounds
+    );
+    expect(l.lines[0].segments[0].font).toBe('italic bold 10px Arial');
   });
 });
