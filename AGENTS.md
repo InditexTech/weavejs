@@ -102,24 +102,24 @@ npx skills@latest add InditexTech/docouture --all
 | doc page          | derived from          | status |
 | ----------------- | --------------------- | ------ |
 | index.adoc (home) | manual (hand-written) | —      |
-| main:build/actions/rectangle-tool.adoc | `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| main:build/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| main:build/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| main:build/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/rectangle-tool.adoc | `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
-| main:build/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | updated for unreleased changes |
-| sdk:api-reference/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | updated for unreleased changes |
-| sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | updated for unreleased changes |
-| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | updated for unreleased changes |
-| main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
-| sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
-| main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | updated for unreleased changes |
-| sdk:api-reference/nodes/rectangle.adoc | `code/packages/sdk/src/nodes/rectangle/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | updated for unreleased changes |
-| sdk:api-reference/nodes/ellipse.adoc | `code/packages/sdk/src/nodes/ellipse/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | updated for unreleased changes |
-| sdk:api-reference/nodes/polygon.adoc | `code/packages/sdk/src/nodes/polygon/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | updated for unreleased changes |
-| sdk:api-reference/nodes/node.adoc | `code/packages/sdk/src/nodes/node.ts` (`setNodeInstanceListener`) | updated for unreleased changes |
+| main:build/actions/rectangle-tool.adoc | `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/rectangle-tool.adoc | `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | released in 5.7.0 |
+| sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | released in 5.7.0 |
+| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | released in 5.7.0 |
+| main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.0 |
+| sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.0 |
+| main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/rectangle.adoc | `code/packages/sdk/src/nodes/rectangle/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/ellipse.adoc | `code/packages/sdk/src/nodes/ellipse/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/polygon.adoc | `code/packages/sdk/src/nodes/polygon/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/node.adoc | `code/packages/sdk/src/nodes/node.ts` (`setNodeInstanceListener`) | released in 5.7.0 |
