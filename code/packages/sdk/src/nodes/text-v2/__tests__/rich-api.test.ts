@@ -362,6 +362,31 @@ describe('rich text API', () => {
     });
   });
 
+  describe('regressions', () => {
+    it('removing a node link does not leave the underline behind', () => {
+      const { node, mock } = makeNode();
+      // nodes made by the text tool have no `textDecoration` attribute
+      const props = defaultProps();
+      delete props.textDecoration;
+      const shape = node.onRender(props) as WeaveTextV2Shape;
+      node.setLink(shape, 'https://example.com');
+      const linked = mock.updateNode.mock.calls[0][0];
+      const again = node.onRender(linked.props) as WeaveTextV2Shape;
+      node.removeLink(again);
+      const removed = mock.updateNode.mock.calls[1][0];
+      expect(removed.props.link).toBeUndefined();
+      expect(removed.props.textDecoration || '').toBe('');
+    });
+
+    it('setBlocks(undefined) does not throw', () => {
+      const { node } = makeNode();
+      const shape = node.onRender(defaultProps()) as WeaveTextV2Shape;
+      expect(() => shape.setBlocks(undefined)).not.toThrow();
+      expect(() => shape.setAttrs({ blocks: undefined })).not.toThrow();
+      expect(shape.text()).toBe('Hello World');
+    });
+  });
+
   describe('run links', () => {
     const URL1 = 'https://example.com';
     const linked = () => {

@@ -424,7 +424,22 @@ export class TextEditSession {
     ) {
       s++;
     }
-    const inserted = newText.slice(p, newText.length - s);
+    let inserted = newText.slice(p, newText.length - s);
+    // A pure insertion is ambiguous when it repeats the text next to it (e.g.
+    // a new line before an existing one): anchor it at the caret instead.
+    if (s + p === oldText.length && inserted !== '') {
+      const q = ta.selectionEnd - inserted.length;
+      if (
+        q >= 0 &&
+        q < p &&
+        newText.slice(q, q + inserted.length) === inserted &&
+        oldText.slice(0, q) + inserted + oldText.slice(q) === newText
+      ) {
+        s = oldText.length - q;
+        p = q;
+        inserted = newText.slice(p, newText.length - s);
+      }
+    }
     const inputType = (e as InputEvent).inputType ?? '';
     const kind = this.editKindFor(inputType);
 

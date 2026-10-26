@@ -147,6 +147,7 @@ export class TextEditModel {
     end = Math.max(start, Math.min(end, len));
     if (start === end && text === '') return false;
     this.record(kind, start);
+    const carried = this.storedMarks ?? marksAtOffset(this.blocks, start);
     this.blocks = replaceRange(
       this.blocks,
       start,
@@ -155,6 +156,15 @@ export class TextEditModel {
       this.storedMarks ?? undefined
     );
     this.storedMarks = null;
+    // A new line starts empty, so it has nothing to inherit from: keep the
+    // formatting going by storing the marks it was split from (not links).
+    if (text.endsWith('\n') && carried) {
+      const { link: _link, ...rest } = carried;
+      const next = cleanMarks(rest);
+      if (next && !marksAtOffset(this.blocks, start + text.length)) {
+        this.storedMarks = next;
+      }
+    }
     this.anchor = this.focus = start + text.length;
     this.lastEditEnd = this.focus;
     this.desiredX = null;

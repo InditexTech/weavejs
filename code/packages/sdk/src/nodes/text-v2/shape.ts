@@ -177,7 +177,12 @@ export class WeaveTextV2Shape extends Konva.Shape {
   }
 
   /** Replace content with blocks, keeping the `text` mirror in sync. */
-  setBlocks(blocks: WeaveTextBlock[]): this {
+  setBlocks(blocks: WeaveTextBlock[] | undefined): this {
+    // Konva's setAttrs calls this for every key present, even `undefined`.
+    if (!Array.isArray(blocks)) {
+      this._setAttr('blocks', undefined);
+      return this;
+    }
     this._setAttr('blocks', blocks);
     this._setAttr('text', blocksToText(blocks));
     return this;

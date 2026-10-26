@@ -173,3 +173,48 @@ describe('rich text session', () => {
     expect(c.session.getFormat().bold.state).toBe('all');
   });
 });
+
+describe('Enter regressions', () => {
+  const enterAtEndOfFirst = (c: ReturnType<typeof setup>) => {
+    c.session.model.setSelection(6, 6);
+    c.ta.value = 'Item A\n\nPlain B';
+    c.ta.setSelectionRange(7, 7);
+    c.ta.dispatchEvent(
+      new InputEvent('input', { inputType: 'insertLineBreak' })
+    );
+  };
+
+  it('flag off: Enter before another block keeps kind and depth', () => {
+    const c = make(
+      [
+        { kind: 'ul', depth: 1, runs: [{ t: 'Item A' }] },
+        { runs: [{ t: 'Plain B' }] },
+      ],
+      false
+    );
+    enterAtEndOfFirst(c);
+    const b = c.session.model.getBlocks();
+    expect(b.map((x) => [x.kind ?? null, x.depth ?? 0])).toEqual([
+      ['ul', 1],
+      ['ul', 1],
+      [null, 0],
+    ]);
+  });
+
+  it('Enter continues the marks of the previous text', () => {
+    const c = make([
+      { runs: [{ t: 'bold', m: { bold: true, link: 'https://a.b' } }] },
+    ]);
+    c.session.model.setSelection(4, 4);
+    c.ta.value = 'bold\n';
+    c.ta.setSelectionRange(5, 5);
+    c.ta.dispatchEvent(
+      new InputEvent('input', { inputType: 'insertLineBreak' })
+    );
+    c.ta.value = 'bold\nx';
+    c.ta.setSelectionRange(6, 6);
+    c.ta.dispatchEvent(new InputEvent('input', { inputType: 'insertText' }));
+    const b = c.session.model.getBlocks();
+    expect(b[1].runs).toEqual([{ t: 'x', m: { bold: true } }]);
+  });
+});
