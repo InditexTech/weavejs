@@ -18,6 +18,7 @@ import {
   applyLabelBlocksState,
   getShapeLabelSchemaFields,
 } from '@/nodes/shared/shape-label.utils';
+import { commitShapeLabel } from '@/nodes/shared/shape-label.edit-shared';
 import { createShapeLabelEngine } from '@/nodes/shared/shape-label.engine';
 import type { WeaveShapeLabelEngine } from '@/nodes/shared/shape-label.types';
 import {
@@ -255,19 +256,16 @@ export class WeavePolygonNode extends WeaveNode {
     props: WeaveElementAttributes
   ): void {
     const onCommit = (
-        labelText: string,
-        labelBlocks?: WeaveElementAttributes['labelBlocks']
-      ) => {
-      const updatedGroup = this.instance
-        .getStage()
-        .findOne<Konva.Group>(`#${props.id}`);
-      if (!updatedGroup) return;
-      updatedGroup.setAttr('labelBlocks', labelBlocks);
-      const serialized = this.serialize(updatedGroup);
-      serialized.props.labelText = labelText;
-      serialized.props.labelBlocks = labelBlocks;
-      this.instance.updateNode(serialized);
-    };
+      labelText: string,
+      labelBlocks?: WeaveElementAttributes['labelBlocks']
+    ) =>
+      commitShapeLabel(
+        this.instance,
+        (g) => this.serialize(g),
+        `${props.id}`,
+        labelText,
+        labelBlocks
+      );
 
     const currentLabelTextBounds = this.getLabelTextBounds(polygon);
 

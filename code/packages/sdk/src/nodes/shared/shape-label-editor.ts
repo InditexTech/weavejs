@@ -9,6 +9,10 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import { getTopmostShadowHost, isInShadowDOM } from '@/utils/utils';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import {
+  acquireLabelEditLock,
+  fitLabelHeight,
+} from './shape-label.edit-shared';
+import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
   WEAVE_STAGE_SHAPE_LABEL_EDITION_MODE,
@@ -172,16 +176,7 @@ export class WeaveShapeLabelEditor implements WeaveShapeLabelEngine {
     // enable auto-height. Only `attrs.height === undefined` triggers the auto
     // computation: `fontSize * lineCount * lineHeight + padding*2`.
     if (labelText !== '') {
-      labelNode.setAttr('height', undefined);
-      const measuredHeight = labelNode.height();
-      // Restore to at least textBounds.height (needed for verticalAlign: 'middle')
-      labelNode.height(Math.max(textBounds.height, measuredHeight));
-
-      if (growCallback && measuredHeight > textBounds.height) {
-        const paddingY =
-          nextProps.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
-        growCallback(measuredHeight + paddingY * 2);
-      }
+      fitLabelHeight(labelNode, nextProps, textBounds, growCallback);
     }
   }
 
@@ -207,12 +202,7 @@ export class WeaveShapeLabelEditor implements WeaveShapeLabelEngine {
       return;
     }
 
-    const lockAcquired = this.instance.setMutexLock({
-      nodeIds: [group.id()],
-      operation: 'label-edit',
-    });
-
-    if (!lockAcquired) {
+    if (!acquireLabelEditLock(this.instance, group)) {
       return;
     }
 

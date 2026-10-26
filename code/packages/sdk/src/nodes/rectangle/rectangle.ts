@@ -17,6 +17,7 @@ import type {
   WeaveRectangleProperties,
 } from './types';
 import { mergeExceptArrays } from '@/index';
+import { commitShapeLabel } from '@/nodes/shared/shape-label.edit-shared';
 import { createShapeLabelEngine } from '@/nodes/shared/shape-label.engine';
 import type { WeaveShapeLabelEngine } from '@/nodes/shared/shape-label.types';
 import {
@@ -147,19 +148,14 @@ export class WeaveRectangleNode extends WeaveNode {
       const onCommit = (
         labelText: string,
         labelBlocks?: WeaveElementAttributes['labelBlocks']
-      ) => {
-        const updatedGroup = this.instance
-          .getStage()
-          .findOne<Konva.Group>(`#${props.id}`);
-        if (!updatedGroup) {
-          return;
-        }
-        updatedGroup.setAttr('labelBlocks', labelBlocks);
-        const serialized = this.serialize(updatedGroup);
-        serialized.props.labelText = labelText;
-        serialized.props.labelBlocks = labelBlocks;
-        this.instance.updateNode(serialized);
-      };
+      ) =>
+        commitShapeLabel(
+          this.instance,
+          (g) => this.serialize(g),
+          `${props.id}`,
+          labelText,
+          labelBlocks
+        );
 
       // Re-derive bounds from live attrs so a resized rectangle uses the
       // correct dimensions when the edit overlay is shown.

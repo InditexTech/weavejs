@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { createStageCoordinateMapper } from './edit/stage-coordinates';
 import Konva from 'konva';
 import merge from 'lodash/merge';
 import { z } from 'zod';
@@ -381,25 +382,13 @@ export class WeaveTextV2Node extends WeaveNode {
 
     const stage = this.instance.getStage();
     const container = stage.container();
-    const rect = () => container.getBoundingClientRect();
 
     this.session = new TextEditSession(
       this.editTarget(shape),
       {
         utilityLayer: this.instance.getUtilityLayer(),
         container,
-        clientToStage: (cx, cy) => {
-          const r = rect();
-          const sx = r.width ? stage.width() / r.width : 1;
-          const sy = r.height ? stage.height() / r.height : 1;
-          return { x: (cx - r.left) * sx, y: (cy - r.top) * sy };
-        },
-        stageToContainer: (p) => {
-          const r = rect();
-          const sx = r.width ? r.width / stage.width() : 1;
-          const sy = r.height ? r.height / stage.height() : 1;
-          return { x: p.x * sx, y: p.y * sy };
-        },
+        ...createStageCoordinateMapper(stage),
         revealCaret: (p) => {
           const box = container;
           const w = box.clientWidth;

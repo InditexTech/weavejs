@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { createStageCoordinateMapper } from '@/nodes/text-v2/edit/stage-coordinates';
 import Konva from 'konva';
 import type { Weave } from '@/weave';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
-import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import { WeaveTextV2Shape } from '@/nodes/text-v2/shape';
 import { blocksToText, hasMarks, type WeaveTextBlock } from '@/nodes/text-v2/model';
@@ -16,6 +16,12 @@ import {
   type TextEditHost,
   type TextEditTarget,
 } from '@/nodes/text-v2/edit/session';
+import {
+  acquireLabelEditLock,
+  fitLabelHeight,
+  resumeNodesSelection,
+  suspendNodesSelection,
+} from './shape-label.edit-shared';
 import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
@@ -133,15 +139,7 @@ export class WeaveShapeLabelNativeEditor implements WeaveShapeLabelEngine {
     if (blocks) labelNode.setBlocks(blocks);
 
     if (labelText !== '') {
-      labelNode.setAttr('height', undefined);
-      const measuredHeight = labelNode.height();
-      labelNode.height(Math.max(textBounds.height, measuredHeight));
-
-      if (growCallback && measuredHeight > textBounds.height) {
-        const paddingY =
-          nextProps.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
-        growCallback(measuredHeight + paddingY * 2);
-      }
+      fitLabelHeight(labelNode, nextProps, textBounds, growCallback);
     }
   }
 
@@ -175,11 +173,7 @@ export class WeaveShapeLabelNativeEditor implements WeaveShapeLabelEngine {
     const shape = group.findOne<WeaveTextV2Shape>(`#${labelId(group.id())}`);
     if (!shape) return;
 
-    const lockAcquired = this.instance.setMutexLock({
-      nodeIds: [group.id()],
-      operation: 'label-edit',
-    });
-    if (!lockAcquired) return;
+    if (!acquireLabelEditLock(this.instance, group)) return;
 
     this.editing = true;
     this.editingGroup = group;
@@ -190,33 +184,15 @@ export class WeaveShapeLabelNativeEditor implements WeaveShapeLabelEngine {
 
     shape.visible(true);
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      this.instance.disablePlugin('nodesSelection');
-      tr.hide();
-    }
+    suspendNodesSelection(this.instance);
 
     const stage = this.instance.getStage();
     const container = stage.container();
-    const rect = () => container.getBoundingClientRect();
 
     const host: TextEditHost = {
       utilityLayer: this.instance.getUtilityLayer(),
       container,
-      clientToStage: (cx, cy) => {
-        const r = rect();
-        const sx = r.width ? stage.width() / r.width : 1;
-        const sy = r.height ? stage.height() / r.height : 1;
-        return { x: (cx - r.left) * sx, y: (cy - r.top) * sy };
-      },
-      stageToContainer: (p) => {
-        const r = rect();
-        const sx = r.width ? r.width / stage.width() : 1;
-        const sy = r.height ? r.height / stage.height() : 1;
-        return { x: p.x * sx, y: p.y * sy };
-      },
+      ...createStageCoordinateMapper(stage),
       caretColor: '#000000',
       selectionColor: WEAVE_TEXT_V2_SELECTION_COLOR,
       selectAllOnStart: true,
@@ -364,18 +340,6 @@ export class WeaveShapeLabelNativeEditor implements WeaveShapeLabelEngine {
       );
     }
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      this.instance.enablePlugin('nodesSelection');
-      if (editedGroupId) {
-        requestAnimationFrame(() => {
-          const liveGroup = this.instance
-            .getStage()
-            .findOne<Konva.Group>(`#${editedGroupId}`);
-          if (liveGroup) selectionPlugin.setSelectedNodes([liveGroup]);
-        });
-      }
-    }
+    resumeNodesSelection(this.instance, editedGroupId);
   }
 }
