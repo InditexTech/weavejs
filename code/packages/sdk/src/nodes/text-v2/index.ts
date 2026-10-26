@@ -7,10 +7,12 @@ export { WeaveTextV2Shape } from './shape';
 export type { TextV2ShapeConfig } from './shape';
 export * from './model';
 export { TextLayoutEngine } from './layout/engine';
+export { clearSyntheticItalicCache } from './layout/synthetic-italic';
 export type {
   TextLayout,
   LayoutLine,
   LayoutSegment,
+  LayoutMarker,
   TextLayoutStyle,
   TextLayoutBounds,
   TextMeasurer,

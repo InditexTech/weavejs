@@ -9,7 +9,7 @@ instead of a DOM textarea overlay. It is a drop-in replacement for
 xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode]; the existing class is unchanged and stays available.
 
 Built on a mono:[Konva.Shape] with its own layout engine, it keeps the editing and idle appearance
-identical, and is the foundation for rich text.
+identical, and supports opt-in rich text.
 
 The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
 
@@ -60,7 +60,16 @@ const node = new WeaveTextV2Node({
   into one step). Leaving edit mode commits a single mono:[updateNode], skipped when the text is
   unchanged. While editing, keydown does not propagate to the page, so app-level undo does not fire;
   `window.weaveTextEditing` holds the editing node id.
+* The pointer is a text cursor (I-beam) over the text box while editing and the default cursor
+  outside it, also while dragging a selection. Elements with mono:[data-weave-text-edit-keep] and touch
+  pointers keep their own cursor. It is restored when the session ends.
 * Clipboard is plain text only. Large pastes are laid out in time slices.
+* While editing, the stage pans to keep the caret in view; the margin is mono:[edition.followPadding].
+* A pointer press inside an element with the attribute mono:[data-weave-text-edit-keep] does not end
+  the edit session, so an app toolbar or sidebar can apply formatting commands to the live selection.
+  Mouse-down on such an element keeps focus on the editor, except on form fields (`input`,
+  `textarea`, `select`, `contenteditable`), which take focus normally. Portaled popups (for example a
+  font picker) need the attribute too.
 * All four layouts (`smart`, `auto-all`, `auto-height`, `fixed`) keep their behavior. Auto-sized
   layouts measure from the engine and no longer depend on the zoom level.
 * xref:sdk:api-reference/actions/text-tool.adoc[WeaveTextToolAction] works with it unchanged.
@@ -71,8 +80,99 @@ Content is stored as `blocks` (paragraphs) of `runs` (`{ t, m }`: text and marks
 stays as a derived mirror. A node without `blocks` is synthesized from `text` on load without
 rewriting the document; a whole-text `link` becomes a full-range `link` mark.
 
-Marks already present in a document are preserved when the text is edited, but they are not
-rendered yet and cannot be created from the editor: rich formatting is out of scope for now.
+Marks are `bold`, `italic`, `underline`, `strike`, `color`, `size` and `family` `lineHeight` (a multiplier of the run font size, clamped to 0.5 to 4) and `link` (a per-run URL). `size` is a ratio of the node `fontSize`, so resizing the node
+or calling mono:[setBaseFontSize] scales every run. Blocks may carry `kind` (`ul` or `ol`), `depth`
+and `start` to form lists, and `align` (`left`, `center` or `right`) for the paragraph. Documents without marks and lists are byte-identical to before.
+
+Marks and lists already present in a document always render and are preserved when the text is
+edited, whatever `richText.enabled` is, so every client shows the same document.
+
+== Rich text
+
+Rich text is switched on *per node* with the boolean attribute mono:[richText]. Nodes without the
+attribute follow mono:[config.richText.enabled] (default `false`), so you can offer a plain and a rich
+text tool in the same app (see xref:sdk:api-reference/actions/text-tool.adoc[WeaveTextToolAction]).
+Turning it off for a node only removes the commands: marks and lists already in it still render. The toolbar is yours: the node only
+exposes commands, a format query and events.
+
+[source,ts]
+----
+const handler = instance.getNodeHandler<WeaveTextV2Node>("text");
+
+handler.toggleMark(node, "bold");                       // whole text, or the editor selection
+handler.applyMark(node, "color", "#ff0000", { start: 0, end: 5 });
+handler.applyMark(node, "size", 24);                    // px
+handler.toggleList(node, "ul");
+handler.indent(node);
+handler.setBaseFontSize(node, 32);                      // scales every run
+const format = handler.getSelectionFormat(node);
+----
+
+* While the node is being edited the commands act on the editor selection (the `range` argument is
+ignored) and each one is a single session-undo entry. At a collapsed caret, mark commands set the
+marks of the next typed text.
+* On a selected node that is not being edited they act on `range` (UTF-16 offsets into `text`,
+default: the whole text) and are one mono:[updateNode], so one Weave undo step. This lets an
+application edit text from a modal.
+* When rich text is off for the node every command returns `false` and does nothing. mono:[isRich(node)]
+reports it, so a toolbar can show or hide itself. mono:[isRichTextEnabled()] without arguments returns
+the handler default (`config.richText.enabled`).
+
+[cols="1,3"]
+|===
+|Method |Description
+
+|mono:[applyMark(node, key, value, range?)]
+|Set a mark (`undefined` clears it). `size` is in px and stored as a ratio.
+
+|mono:[toggleMark(node, key, range?)]
+|Toggle a boolean mark (`bold`, `italic`, `underline`, `strike`): off when the whole range has it.
+
+|mono:[setAlign(node, align, range?)]
+|Align every paragraph the range touches (`undefined` goes back to the node `align`). Alignment is per
+paragraph, never per line.
+
+|mono:[toggleList(node, kind, range?)]
+|Toggle `ul` / `ol` on the blocks of the range.
+
+|mono:[indent(node, range?)] / mono:[outdent(node, range?)]
+|Change list depth. Outdent at depth 0 removes the list marker.
+
+|mono:[setRunLink(node, url, range?)] / mono:[removeRunLink(node, range?)]
+|Link a range to an absolute http(s) URL (others return `false`), or remove it. Same as
+mono:[applyMark] with `link`.
+
+|mono:[setBaseFontSize(node, px)]
+|Set the node `fontSize`. Event reason `base-size`.
+
+|mono:[getSelectionFormat(node, range?)]
+|Per mark (including `lineHeight` and `align`) `{ state: 'all' | 'none' | 'some', value? }`, `size` in px, and `list: { kind, depth? }`.
+|===
+
+When editing with rich text enabled: kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I], kbd:[U] toggle marks;
+kbd:[Enter] continues a list item (and the formatting of the text before it) and exits on an empty one; kbd:[Backspace] at the start of an item
+outdents it or removes the marker; kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change the depth. Pasting inserts
+plain text with the marks at the caret. With it disabled, kbd:[Enter] in a list item still creates
+an item with the same `kind` and `depth`.
+
+Link runs are drawn with `link.defaultColor` and an underline; the hovered run uses `link.hoverColor`
+and the cursor becomes a pointer only over the run. kbd:[Ctrl]/kbd:[Cmd] + click opens it, as does a
+click on an already-selected node. Only http(s) URLs render and open. A node-level `link` (see
+xref:sdk:api-reference/nodes/text.adoc#hyperlinks[Hyperlinks]) takes precedence. Links render
+whatever `richText.enabled` is; creating and removing them is a command.
+
+A line is as tall as its tallest run: the `lineHeight` mark of a run, or the node `lineHeight`,
+times the run font size. Only the lines that contain the marked text change height, and a smaller
+value next to a taller run on the same line has no visible effect. Empty paragraphs use the node
+`lineHeight`. The node `align` and `lineHeight` are defaults: changing them does not clear paragraph
+or run values. Vertical alignment (`verticalAlign`) stays a setting of the whole node.
+
+Lists show markers in a gutter (`disc`, `circle`, `square`; `1.`, `a.`, `i.` by depth). Numbering is
+continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
+item; `start` sets the first number. Markers are not part of `text`.
+
+Images export with the formatting. Exporting to PDF rasterizes each frame, so it follows the image.
+Register every font family you use in runs on the server as well.
 
 == Parameters
 
@@ -113,6 +213,21 @@ size. Passing it is a type error. Use mono:[edition.outline] instead.
 |`0`
 |Gap between the text box and the outline, in screen pixels.
 
+|mono:[edition.followPadding]
+|`{ top: 40, right: 40, bottom: 40, left: 40 }`
+|While editing, the stage pans to keep the caret inside the container. This is the margin kept
+between the caret and each edge, in screen pixels. Raise a side when app UI (toolbars, sidebars)
+covers that edge.
+
+|mono:[richText.enabled]
+|`false`
+|Default for nodes without a `richText` attribute: formatting commands, shortcuts and list key rules.
+
+|mono:[richText.indentStep]
+|`1.5`
+|List indent per depth, as a multiple of `fontSize`. The total indent is limited so at least 4 times
+`fontSize` stays for text in fixed-width nodes. Must be the same on every client.
+
 |mono:[sizeWarning.threshold]
 |`200000`
 |Serialized size of `blocks` (characters) above which the mono:[onTextSizeWarning] event is emitted.
@@ -133,6 +248,14 @@ Content is never truncated.
 |`+{ node: WeaveTextV2Shape }+`
 |An edit session ended and its content was committed.
 
+|mono:[onTextSelectionChange]
+|`+{ node, start, end, format }+`
+|The selection, caret or content changed while editing (throttled).
+
+|mono:[onTextFormatChange]
+|`+{ node, format, reason: 'command' | 'undo' | 'redo' | 'base-size' }+`
+|A format command, undo, redo or base size change ran.
+
 |mono:[onTextSizeWarning]
 |`+{ node: WeaveTextV2Shape, size: number, threshold: number }+`
 |The serialized `blocks` grew past `sizeWarning.threshold`. Emitted once per crossing.
@@ -141,16 +264,35 @@ Content is never truncated.
 == Hyperlinks
 
 Same behavior and methods as xref:sdk:api-reference/nodes/text.adoc#hyperlinks[WeaveTextNode]:
-mono:[getLink], mono:[setLink] and mono:[removeLink].
+mono:[getLink], mono:[setLink] and mono:[removeLink]. Removing the link also removes the link
+underline. Link hover colour and the pointer cursor only show while kbd:[Ctrl]/kbd:[Cmd] is held, and
+kbd:[Ctrl]/kbd:[Cmd] + click opens the URL. While it is held the blue hover halo of the node is hidden.
 
 == Exports
 
 mono:[WeaveTextV2Node], mono:[WeaveTextV2Shape], mono:[TextLayoutEngine], mono:[TextEditSession],
 mono:[TextEditModel] and the related types. mono:[TextEditSession] works on a mono:[TextEditTarget]
-and a mono:[TextEditHost], so other shapes can reuse the layout engine and the editor.
+and a mono:[TextEditHost], so other shapes can reuse the layout engine and the editor. The pure model
+functions (mono:[applyMark], mono:[toggleList], mono:[listMarkers], mono:[getSelectionFormat], ...) and
+mono:[clearSyntheticItalicCache] are exported too.
 
 == Server side
 
 Measurement and painting work on the node-canvas backend (`setupCanvasBackend()`) and were also
 verified on the skia-canvas backend (`setupSkiaBackend()`). Register fonts in your app; they are not
 registered by the SDK.
+
+=== Italic on the server
+
+Browsers slant (synthesize) italic text when a font family has no italic file. skia-canvas and
+node-canvas do not: the text comes out upright. mono:[WeaveTextV2Shape] detects this on the server by
+rendering a small probe with the run's font, and when the italic does not render slanted it applies
+the same slant browsers use (a shear of about 14 degrees, on the glyphs only). Families that have a
+real italic file are drawn with it, unchanged. It works the same on both backends and never runs in a
+browser. Layout is not affected: wrapping and line breaks are identical to the canvas.
+
+The result is cached per font. If you register fonts after the first render, call
+mono:[clearSyntheticItalicCache()] so it is probed again.
+
+NOTE: The slant is close to, but not pixel-identical with, the one Chrome draws. Server images of
+text with italic runs in families without an italic file now come out slanted instead of upright.

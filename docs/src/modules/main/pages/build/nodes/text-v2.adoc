@@ -39,6 +39,7 @@ The xref:main:build/actions/text-tool.adoc[Text Tool] works with either node.
 
 * Entering edit mode on existing text selects all of it, as in Figma, so typing replaces it. A node
 you just created starts with the caret.
+* The mouse pointer is a text cursor (I-beam) over the text box while editing, and the default one outside it.
 * An outline of the text box is drawn while editing. It is especially useful when the width or the
 height are fixed.
 * Click, drag, double-click (word), triple-click (paragraph), the arrow keys, kbd:[Home],
@@ -46,7 +47,13 @@ kbd:[End] and kbd:[Up] / kbd:[Down] move and select as expected, and IME composi
 * kbd:[Ctrl]/kbd:[Cmd] + kbd:[Z] undoes your typing while you edit, without touching the rest of the
 canvas history. Leaving edit mode (kbd:[Esc] or clicking outside) saves everything as one undoable
 step.
-* Copy and paste use plain text.
+* Copy and paste use plain text; pasted text takes the formatting at the caret.
+* The canvas pans to follow the caret when you type past the edge of the view. Configure the margin
+with `edition.followPadding` (default 40 px per side), for example to keep the caret clear of your
+toolbars.
+* To build a formatting toolbar that keeps the editor open, add the attribute
+`data-weave-text-edit-keep` to the toolbar element (and to any portaled popup it opens). Clicks on it
+then no longer end editing and rich text commands apply to the current selection.
 
 == Customize the outline
 
@@ -62,6 +69,83 @@ new WeaveTextV2Node({
 ----
 
 NOTE: `edition.borderSize` from the Text node does not exist here. Use `edition.outline`.
+
+== Rich text
+
+Turn on formatting per selection (bold, italic, underline, strikethrough, colour, size, line height, font
+family and links), per-paragraph alignment and bulleted or numbered lists with nesting:
+
+[source,ts]
+----
+new WeaveTextV2Node({
+  config: { richText: { enabled: true, indentStep: 1.5 } },
+});
+----
+
+While editing, kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I] and kbd:[U] work, kbd:[Enter] continues a list
+and kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change its depth. The toolbar is yours: call the node
+commands (for example from a modal; `setRunLink` adds a URL to a range) and listen to `onTextSelectionChange` and `onTextFormatChange`.
+Formatting survives move, resize, copy, duplicate, undo and image export.
+
+Rich text is decided per node (the `richText` attribute); `richText.enabled` is only the default for
+nodes without it. To offer a plain and a rich Text Tool, see xref:main:build/actions/text-tool.adoc[Text Tool].
+
+Per-paragraph alignment (`setAlign`), per-selection line height and links per range (`setRunLink`) are
+also commands. On a server render (skia-canvas or node-canvas) italic text in fonts without an italic
+file is slanted like in the browser; see the reference.
+
+Lists and marks already in a document render for everyone, even when rich text is off.
+
+See xref:sdk:api-reference/nodes/text-v2.adoc#_rich_text[the reference] for the commands.
+
+== Plain and rich text nodes together
+
+You do not have to choose one or the other. A single registered mono:[WeaveTextV2Node] handles both,
+because whether a node is rich is a property of the node (the boolean attribute `richText`), not of
+the handler. Both kinds use the same `text` node type, live in the same document and can sit side by
+side on the same canvas.
+
+[cols="1,2,2"]
+|===
+| |Plain node |Rich node
+
+|`richText` attribute |absent or `false` |`true`
+|Formatting commands, shortcuts and list key rules |off |on
+|Whole-node style (font, size, colour, alignment) |yes |yes
+|Marks, lists and links already in the document |rendered |rendered
+|===
+
+The simplest way to offer both is two Text Tools. Register the node once and the action twice, with
+different names, and give the second one the `richText` prop:
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [..., new WeaveTextV2Node()],
+  actions: [
+    ...,
+    new WeaveTextToolAction(), // <.>
+    new WeaveTextToolAction({ name: "richTextTool", props: { richText: true } }), // <.>
+  ],
+});
+
+instance.triggerAction("textTool");     // creates a plain node
+instance.triggerAction("richTextTool"); // creates a rich node
+----
+<.> The existing tool: plain nodes.
+<.> A second tool whose nodes are created with `richText: true`.
+
+Notes:
+
+* `config.richText.enabled` is only the default for nodes that have no `richText` attribute, such as
+documents created before this feature. Leave it `false` if you want plain nodes by default.
+* Your toolbar can read `handler.isRich(node)` to show formatting controls only for rich nodes. On a
+plain node every formatting command returns `false` and does nothing.
+* Switching a node's `richText` to `false` does not remove its formatting: marks and lists stay and
+still render, only the commands go away. Switching it to `true` makes an existing plain node
+editable with the formatting commands.
+* `richText.indentStep` is read by the handler, not the node, so use the same value on every client.
 
 == Large texts
 

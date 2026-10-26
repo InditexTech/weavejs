@@ -1084,7 +1084,7 @@ describe('WeaveNode', () => {
   });
 
   describe('10 — handleMouseout', () => {
-    it('10.1 ctrlKey returns false without hiding hover state', () => {
+    it('10.1 ctrlKey returns false and hides the hover state', () => {
       const { node } = makeNode();
       const group = createRenderableGroup();
       const hideHoverStateSpy = vi.spyOn(getPrivateNode(node), 'hideHoverState');
@@ -1097,10 +1097,10 @@ describe('WeaveNode', () => {
       );
 
       expect(result).toBe(false);
-      expect(hideHoverStateSpy).not.toHaveBeenCalled();
+      expect(hideHoverStateSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('10.2 metaKey returns false', () => {
+    it('10.2 metaKey returns false and hides the hover state', () => {
       const { node } = makeNode();
       const group = createRenderableGroup();
       const hideHoverStateSpy = vi.spyOn(getPrivateNode(node), 'hideHoverState');
@@ -1113,7 +1113,7 @@ describe('WeaveNode', () => {
       );
 
       expect(result).toBe(false);
-      expect(hideHoverStateSpy).not.toHaveBeenCalled();
+      expect(hideHoverStateSpy).toHaveBeenCalledTimes(1);
     });
 
     it('10.3 hides hover state when real node exists', () => {

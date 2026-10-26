@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text node: rich text formatting, enabled via node config
+
 ### Fixed
 
 - [#1229](https://github.com/InditexTech/weavejs/issues/1229) Nx caches the publish and unpublish targets, so a cache hit skips the actual publish

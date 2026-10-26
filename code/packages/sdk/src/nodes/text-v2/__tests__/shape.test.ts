@@ -171,6 +171,21 @@ describe('WeaveTextV2Shape facade', () => {
       spy.mockRestore();
     });
 
+    it('visible range covers the full viewport at pixelRatio 2', () => {
+      const { s, layer } = build();
+      layer.getCanvas().setPixelRatio(2);
+      const ctx = layer.getContext();
+      layer.clear();
+      const range = (
+        s as unknown as {
+          visibleRange(c: unknown): { y1: number; y2: number } | null;
+        }
+      ).visibleRange(ctx);
+      // 40px stage height: range must span ~40 local px, not ~20
+      expect(range).not.toBeNull();
+      expect(range!.y2 - range!.y1).toBeGreaterThanOrEqual(39);
+    });
+
     it('paints every line when exported from a node outside the stage viewport', () => {
       const { s } = build();
       // far outside the 100x40 stage: stage-based culling dropped lines here

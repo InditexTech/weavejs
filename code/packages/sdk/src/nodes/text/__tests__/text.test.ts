@@ -1195,7 +1195,7 @@ describe('WeaveTextNode', () => {
       expect(result.props.textDecoration).toBe('');
     });
 
-    it('13.8 link present but no capture yet — fill/textDecoration pass through as-is (nothing to restore from)', () => {
+    it('13.8 link present but no capture yet — fill passes through, the link underline is never persisted', () => {
       const { node } = makeNode();
       const instance = new Konva.Text({
         id: 'text-abc',
@@ -1206,7 +1206,8 @@ describe('WeaveTextNode', () => {
       });
       const result = node.serialize(instance);
       expect(result.props.fill).toBe('#1155ccff');
-      expect(result.props.textDecoration).toBe('underline');
+      // nothing was captured, so the forced underline must not leak into state
+      expect(result.props.textDecoration).toBe('');
     });
   });
 
