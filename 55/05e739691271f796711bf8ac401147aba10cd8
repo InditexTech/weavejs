@@ -1,0 +1,35 @@
+code/packages/sdk/src/nodes/connector/__tests__/connector.listeners.test.ts
+  s_4dca8408c69d3d::t_53ad4957b10ccd 1-151
+code/packages/sdk/src/nodes/frame/frame.ts
+  s_4dca8408c69d3d::t_3fe0dabff66d26 30
+code/packages/sdk/src/nodes/image/image.ts
+  s_4dca8408c69d3d::t_e823a7ddd9d543 1116,1192,1281
+code/packages/sdk/src/nodes/measure/__tests__/measure.test.ts
+  s_4dca8408c69d3d::t_1ccd04cb116056 374,388,681,962-970
+code/packages/sdk/src/nodes/node.ts
+  s_4dca8408c69d3d::t_43d3b583ccea99 59,1247-1248
+code/packages/sdk/src/nodes/video/__tests__/video.test.ts
+  s_4dca8408c69d3d::t_8bfde241b858da 454,1559
+code/packages/sdk/src/nodes/video/video.ts
+  s_4dca8408c69d3d::t_8baa70306fc430 27,59,642
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/pointer-down.test.ts
+  s_4dca8408c69d3d::t_234f15c48e29b3 479-490
+code/packages/sdk/src/plugins/nodes-selection/events/click-tap.ts
+  s_4dca8408c69d3d::t_57bf674583df07 175-177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "5505e739691271f796711bf8ac401147aba10cd8",
+  "prompts": {},
+  "sessions": {
+    "s_4dca8408c69d3d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e8729c66bffeCiFqgByZpUgfcS",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
