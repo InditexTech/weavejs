@@ -98,6 +98,55 @@ Lists and marks already in a document render for everyone, even when rich text i
 
 See xref:sdk:api-reference/nodes/text-v2.adoc#_rich_text[the reference] for the commands.
 
+== Plain and rich text nodes together
+
+You do not have to choose one or the other. A single registered mono:[WeaveTextV2Node] handles both,
+because whether a node is rich is a property of the node (the boolean attribute `richText`), not of
+the handler. Both kinds use the same `text` node type, live in the same document and can sit side by
+side on the same canvas.
+
+[cols="1,2,2"]
+|===
+| |Plain node |Rich node
+
+|`richText` attribute |absent or `false` |`true`
+|Formatting commands, shortcuts and list key rules |off |on
+|Whole-node style (font, size, colour, alignment) |yes |yes
+|Marks, lists and links already in the document |rendered |rendered
+|===
+
+The simplest way to offer both is two Text Tools. Register the node once and the action twice, with
+different names, and give the second one the `richText` prop:
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [..., new WeaveTextV2Node()],
+  actions: [
+    ...,
+    new WeaveTextToolAction(), // <.>
+    new WeaveTextToolAction({ name: "richTextTool", props: { richText: true } }), // <.>
+  ],
+});
+
+instance.triggerAction("textTool");     // creates a plain node
+instance.triggerAction("richTextTool"); // creates a rich node
+----
+<.> The existing tool: plain nodes.
+<.> A second tool whose nodes are created with `richText: true`.
+
+Notes:
+
+* `config.richText.enabled` is only the default for nodes that have no `richText` attribute, such as
+documents created before this feature. Leave it `false` if you want plain nodes by default.
+* Your toolbar can read `handler.isRich(node)` to show formatting controls only for rich nodes. On a
+plain node every formatting command returns `false` and does nothing.
+* Switching a node's `richText` to `false` does not remove its formatting: marks and lists stay and
+still render, only the commands go away. Switching it to `true` makes an existing plain node
+editable with the formatting commands.
+* `richText.indentStep` is read by the handler, not the node, so use the same value on every client.
+
 == Large texts
 
 There is no size limit. When the serialized content passes `sizeWarning.threshold` (200000 characters
