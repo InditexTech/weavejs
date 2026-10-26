@@ -21,8 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#1215](https://github.com/InditexTech/weavejs/issues/1215) Some node types register per-render event listeners that are never removed
-- Frame node: dragging a node over a frame no longer highlights the frame border, because the highlight was applied to a background rect with no stroke instead of the visible border
-- Measure node: dragging its handles moved the whole node, and selecting it showed the transformer border and anchors. The measure is no longer hoverable
 - [#1214](https://github.com/InditexTech/weavejs/issues/1214) Grouping and ungrouping leak the event listeners of the moved nodes' descendants
 - [#1229](https://github.com/InditexTech/weavejs/issues/1229) Nx caches the publish and unpublish targets, so a cache hit skips the actual publish
 - [#1227](https://github.com/InditexTech/weavejs/issues/1227) Harden the SonarCloud, release preview and OSS compliance workflows
