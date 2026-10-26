@@ -7,6 +7,7 @@ import type { TextLayout } from '../layout/engine';
 import {
   getSelectionFormat,
   type WeaveTextBlock,
+  type WeaveTextBlockAlign,
   type WeaveTextListKind,
   type WeaveTextMarkKey,
   type WeaveTextSelectionFormat,
@@ -509,6 +510,10 @@ export class TextEditSession {
 
   toggleList(kind: WeaveTextListKind) {
     if (this.model.toggleList(kind)) this.afterFormat('command');
+  }
+
+  setAlign(align: WeaveTextBlockAlign | undefined) {
+    if (this.model.setAlign(align)) this.afterFormat('command');
   }
 
   indent() {

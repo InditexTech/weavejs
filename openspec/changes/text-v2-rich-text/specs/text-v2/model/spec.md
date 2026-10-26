@@ -34,6 +34,20 @@ The model SHALL provide pure operations to apply or toggle a mark over a range, 
 - **WHEN** bold is applied to half a run
 - **THEN** the run is split and normalized with adjacent equal runs merged
 
+### Requirement: Paragraph alignment
+Blocks SHALL support an optional `align` (`left` | `center` | `right`). A block without it SHALL use the node `align`. Splitting or editing a block SHALL preserve it.
+
+#### Scenario: Enter keeps alignment
+- **WHEN** Enter is pressed in a centered paragraph
+- **THEN** the new block is centered
+
+### Requirement: Line height mark
+Runs SHALL support a `lineHeight` mark, a positive multiplier of the run font size. Invalid values SHALL be ignored on read and new values clamped to 0.5 to 4.
+
+#### Scenario: Invalid value
+- **WHEN** a run carries `lineHeight` 0 or NaN
+- **THEN** the node line height is used
+
 ### Requirement: Stored marks
 A collapsed caret SHALL be able to hold stored marks that override inheritance for the next inserted text until the selection moves.
 

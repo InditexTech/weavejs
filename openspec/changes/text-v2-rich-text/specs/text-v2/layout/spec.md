@@ -27,6 +27,24 @@ List blocks SHALL be laid out with an indent of `depth * indentStep` (`indentSte
 - **WHEN** text in one list item changes
 - **THEN** only that paragraph is relaid out
 
+### Requirement: Paragraph alignment layout
+Each line SHALL be aligned by its paragraph `align`, falling back to the node `align`; the indent of list items SHALL stay on the left. Changing `align` SHALL NOT relay out wrapping.
+
+#### Scenario: Mixed alignment
+- **WHEN** two paragraphs have different `align`
+- **THEN** their lines are positioned accordingly and cached paragraph layouts are reused
+
+### Requirement: Per-run line height
+A line's height SHALL be the maximum over its runs of `(run.lineHeight ?? node lineHeight) * run font size`, with one shared baseline. Culling and the fixed-height cut-off SHALL use real line heights. Vertical alignment SHALL remain a node-wide setting based on the total content height.
+
+#### Scenario: Mixed line heights on one line
+- **WHEN** a line contains runs with line heights 1.0 and 1.5
+- **THEN** the line box uses the larger resulting height
+
+#### Scenario: Lower value on part of a line
+- **WHEN** a smaller line height is set on a run sharing a line with a taller run
+- **THEN** the line height does not shrink
+
 ### Requirement: Link runs
 Runs with a safe `link` mark SHALL render with the link colour and an underline, and the hovered link run SHALL use the hover colour; the legacy node-level `link` SHALL take precedence when set. Links SHALL render regardless of `richText.enabled`.
 

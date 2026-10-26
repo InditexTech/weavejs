@@ -41,6 +41,13 @@
 - [x] 7.2 `WeaveTextToolAction` `{ name, props }`
 - [x] 7.3 Tests, docs (text-v2 pages, text-tool pages) and AGENTS.md ledger
 
+## 8. Paragraph alignment and line height
+
+- [x] 8.1 Model: block `align`, `lineHeight` mark (clamp, invalid ignored), `setAlign`, format query
+- [x] 8.2 Engine: per-line align from block, per-run line height max, real heights for culling and cut-off
+- [x] 8.3 Session and node API: `setAlign`, `applyMark('lineHeight')`; schema
+- [x] 8.4 Tests and docs (text-v2 pages)
+
 ## 6. Per-run link
 
 - [x] 6.1 Model: `isSafeLink`; link in selection format query

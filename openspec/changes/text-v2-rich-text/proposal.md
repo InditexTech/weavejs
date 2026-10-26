@@ -12,6 +12,7 @@ Designers build presentation boards where one text block needs mixed styling and
 - Public command API usable in an active session and on a selected non-editing node (whole text or a range): `applyMark`, `toggleMark`, `toggleList`, `indent`, `outdent`, `setBaseFontSize`, `getSelectionFormat` (tri-state), events `onTextSelectionChange` / `onTextFormatChange`. Sizes are px at the API.
 - Formatting survives move, resize, copy, paste, duplicate, undo/redo and image export. PDF is raster (spike), so it follows image export.
 - Plain-text paste inheriting caret marks. Docs.
+- Paragraph alignment (`align` on a block, left/center/right) and per-selection line height (a `lineHeight` mark, multiplier of the run font size). A line is as tall as its tallest run. Both render on all clients; commands are gated by rich text. Vertical alignment stays a node setting.
 - Per-run link: link colour and underline per run, hover and pointer cursor only over the run, Ctrl/Cmd+click (or click on a selected node) opens it, http(s) only; `applyMark('link')`, `setRunLink`, `removeRunLink`. The legacy node-level `link` is unchanged and wins when both exist.
 - Non-goals: HTML paste, bidi, collab `Y.Text`, shape-label adoption, global layout scheduler.
 

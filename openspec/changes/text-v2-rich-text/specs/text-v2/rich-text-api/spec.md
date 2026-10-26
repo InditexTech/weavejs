@@ -40,8 +40,15 @@ The node SHALL expose `setRunLink` and `removeRunLink` (and `applyMark(node, 'li
 - **WHEN** the user Ctrl/Cmd+clicks a link run
 - **THEN** the URL opens in a new tab
 
+### Requirement: Alignment and line height commands
+The node SHALL expose `setAlign(node, align, range?)` (every paragraph touched by the range) and accept `lineHeight` in `applyMark`. They SHALL follow the same rules as other commands: gated by rich text, one session-undo entry while editing, one `updateNode` otherwise. A whole-node `align` or `lineHeight` change SHALL NOT clear paragraph or run overrides.
+
+#### Scenario: Align a selection
+- **WHEN** `setAlign(node, 'center', range)` covers two paragraphs
+- **THEN** both are centered
+
 ### Requirement: Selection format query
-`getSelectionFormat` SHALL return per mark `all` | `none` | `some`, with resolved values (size in px) when uniform, and list kind and depth.
+`getSelectionFormat` SHALL return per mark `all` | `none` | `some`, with resolved values (size in px) when uniform, `lineHeight`, paragraph `align` (`all` | `none` | `some` with the value when uniform), and list kind and depth.
 
 #### Scenario: Mixed
 - **WHEN** only part of the selection is bold

@@ -29,10 +29,12 @@ import {
   getSelectionFormat,
   indentBlocks,
   outdentBlocks,
+  setBlockAlign,
   sizeToRatio,
   toggleList,
   toggleMark,
   type WeaveTextBlock,
+  type WeaveTextBlockAlign,
   type WeaveTextListKind,
   type WeaveTextMarkKey,
   type WeaveTextSelectionFormat,
@@ -383,14 +385,14 @@ export class WeaveTextV2Node extends WeaveNode {
             p.x < f.left
               ? f.left - p.x
               : p.x > w - f.right
-                ? w - f.right - p.x
-                : 0;
+              ? w - f.right - p.x
+              : 0;
           const dy =
             p.y < f.top
               ? f.top - p.y
               : p.y > h - f.bottom
-                ? h - f.bottom - p.y
-                : 0;
+              ? h - f.bottom - p.y
+              : 0;
           if (!dx && !dy) return;
           stage.x(stage.x() + dx);
           stage.y(stage.y() + dy);
@@ -996,6 +998,27 @@ export class WeaveTextV2Node extends WeaveNode {
     );
   }
 
+  /** Align every paragraph touched by the range (default: all). */
+  setAlign(
+    nodeInstance: WeaveElementInstance,
+    align: WeaveTextBlockAlign | undefined,
+    range?: { start: number; end: number }
+  ): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    if (align !== undefined && !['left', 'center', 'right'].includes(align)) {
+      return false;
+    }
+    const session = this.activeSession(shape);
+    if (session) {
+      session.setAlign(align);
+      return true;
+    }
+    return this.commandOnNode(shape, range, (b, s, e) =>
+      setBlockAlign(b, s, e, align)
+    );
+  }
+
   indent(
     nodeInstance: WeaveElementInstance,
     range?: { start: number; end: number }
@@ -1094,6 +1117,7 @@ export class WeaveTextV2Node extends WeaveNode {
           .optional()
           .describe('Ratio of the node fontSize (1 is omitted).'),
         family: z.string().optional(),
+        lineHeight: z.number().positive().optional(),
         link: z
           .string()
           .url()
@@ -1108,6 +1132,7 @@ export class WeaveTextV2Node extends WeaveNode {
       kind: z.enum(['ul', 'ol']).optional(),
       depth: z.number().int().min(0).optional(),
       start: z.number().int().min(1).optional(),
+      align: z.enum(['left', 'center', 'right']).optional(),
     });
     return base.extend({
       props: base.shape.props.extend({

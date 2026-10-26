@@ -9,6 +9,8 @@ import {
   listMarkers,
   outdentBlocks,
   queryMark,
+  setBlockAlign,
+  getSelectionFormat,
   ratioToSize,
   replaceRange,
   sizeToRatio,
@@ -143,5 +145,46 @@ describe('lists', () => {
       '\u25E6',
       '\u25AA',
     ]);
+  });
+});
+
+describe('paragraph align and line height', () => {
+  it('aligns the paragraphs a range touches and reports it', () => {
+    const b = setBlockAlign(
+      [
+        { runs: [{ t: 'ab' }] },
+        { runs: [{ t: 'cd' }] },
+        { runs: [{ t: 'e' }] },
+      ],
+      0,
+      4,
+      'center'
+    );
+    expect(b.map((x) => x.align)).toEqual(['center', 'center', undefined]);
+    expect(getSelectionFormat(b, 0, 4, 16).align).toEqual({
+      state: 'all',
+      value: 'center',
+    });
+    expect(getSelectionFormat(b, 0, 7, 16).align.state).toBe('some');
+    expect(setBlockAlign(b, 0, 4, undefined)[0].align).toBeUndefined();
+  });
+
+  it('Enter keeps the alignment', () => {
+    const b = replaceRange(
+      [{ align: 'right', runs: [{ t: 'ab' }] }],
+      1,
+      1,
+      '\n'
+    );
+    expect(b.map((x) => x.align)).toEqual(['right', 'right']);
+  });
+
+  it('clamps lineHeight and ignores invalid values', () => {
+    const base: WeaveTextBlock[] = [{ runs: [{ t: 'abc' }] }];
+    expect(applyMark(base, 0, 3, 'lineHeight', 10)[0].runs[0].m).toEqual({
+      lineHeight: 4,
+    });
+    expect(applyMark(base, 0, 3, 'lineHeight', 0)).toEqual(base);
+    expect(applyMark(base, 0, 3, 'lineHeight', NaN)).toEqual(base);
   });
 });

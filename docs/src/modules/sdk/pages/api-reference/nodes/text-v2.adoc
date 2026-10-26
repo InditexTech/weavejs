@@ -77,9 +77,9 @@ Content is stored as `blocks` (paragraphs) of `runs` (`{ t, m }`: text and marks
 stays as a derived mirror. A node without `blocks` is synthesized from `text` on load without
 rewriting the document; a whole-text `link` becomes a full-range `link` mark.
 
-Marks are `bold`, `italic`, `underline`, `strike`, `color`, `size` and `family` and `link` (a per-run URL). `size` is a ratio of the node `fontSize`, so resizing the node
+Marks are `bold`, `italic`, `underline`, `strike`, `color`, `size` and `family` `lineHeight` (a multiplier of the run font size, clamped to 0.5 to 4) and `link` (a per-run URL). `size` is a ratio of the node `fontSize`, so resizing the node
 or calling mono:[setBaseFontSize] scales every run. Blocks may carry `kind` (`ul` or `ol`), `depth`
-and `start` to form lists. Documents without marks and lists are byte-identical to before.
+and `start` to form lists, and `align` (`left`, `center` or `right`) for the paragraph. Documents without marks and lists are byte-identical to before.
 
 Marks and lists already present in a document always render and are preserved when the text is
 edited, whatever `richText.enabled` is, so every client shows the same document.
@@ -124,6 +124,10 @@ reports it, so a toolbar can show or hide itself.
 |mono:[toggleMark(node, key, range?)]
 |Toggle a boolean mark (`bold`, `italic`, `underline`, `strike`): off when the whole range has it.
 
+|mono:[setAlign(node, align, range?)]
+|Align every paragraph the range touches (`undefined` goes back to the node `align`). Alignment is per
+paragraph, never per line.
+
 |mono:[toggleList(node, kind, range?)]
 |Toggle `ul` / `ol` on the blocks of the range.
 
@@ -138,7 +142,7 @@ mono:[applyMark] with `link`.
 |Set the node `fontSize`. Event reason `base-size`.
 
 |mono:[getSelectionFormat(node, range?)]
-|Per mark `{ state: 'all' | 'none' | 'some', value? }`, `size` in px, and `list: { kind, depth? }`.
+|Per mark (including `lineHeight` and `align`) `{ state: 'all' | 'none' | 'some', value? }`, `size` in px, and `list: { kind, depth? }`.
 |===
 
 When editing with rich text enabled: kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I], kbd:[U] toggle marks;
@@ -152,6 +156,12 @@ and the cursor becomes a pointer only over the run. kbd:[Ctrl]/kbd:[Cmd] + click
 click on an already-selected node. Only http(s) URLs render and open. A node-level `link` (see
 xref:sdk:api-reference/nodes/text.adoc#hyperlinks[Hyperlinks]) takes precedence. Links render
 whatever `richText.enabled` is; creating and removing them is a command.
+
+A line is as tall as its tallest run: the `lineHeight` mark of a run, or the node `lineHeight`,
+times the run font size. Only the lines that contain the marked text change height, and a smaller
+value next to a taller run on the same line has no visible effect. Empty paragraphs use the node
+`lineHeight`. The node `align` and `lineHeight` are defaults: changing them does not clear paragraph
+or run values. Vertical alignment (`verticalAlign`) stays a setting of the whole node.
 
 Lists show markers in a gutter (`disc`, `circle`, `square`; `1.`, `a.`, `i.` by depth). Numbering is
 continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower

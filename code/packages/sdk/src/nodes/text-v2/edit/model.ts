@@ -11,9 +11,11 @@ import {
   marksAtOffset,
   outdentBlocks,
   queryMark,
+  setBlockAlign,
   replaceRange,
   toggleList,
   type WeaveTextBlock,
+  type WeaveTextBlockAlign,
   type WeaveTextListKind,
   type WeaveTextMarkKey,
   type WeaveTextMarks,
@@ -244,6 +246,11 @@ export class TextEditModel {
   toggleList(kind: WeaveTextListKind): boolean {
     const { start, end } = this.getSelection();
     return this.commitFormat(toggleList(this.blocks, start, end, kind));
+  }
+
+  setAlign(align: WeaveTextBlockAlign | undefined): boolean {
+    const { start, end } = this.getSelection();
+    return this.commitFormat(setBlockAlign(this.blocks, start, end, align));
   }
 
   indent(): boolean {

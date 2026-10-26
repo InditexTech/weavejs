@@ -6,6 +6,7 @@ import Konva from 'konva';
 import {
   blockText,
   listMarkers,
+  runLineHeight,
   runRatio,
   type WeaveTextBlock,
   type WeaveTextMarks,
@@ -89,6 +90,8 @@ export type LayoutLine = {
   /** Indent of the text (list blocks), already included in `offsetX`. */
   indent: number;
   marker?: LayoutMarker;
+  /** Resolved paragraph alignment. */
+  align: TextAlign;
   segments: LayoutSegment[];
   lastInParagraph: boolean;
 };
@@ -220,6 +223,7 @@ type ParagraphEntry = {
   graphemes: string[];
   runOf: number[]; // run index per grapheme
   fonts: string[]; // canvas font per run
+  lineHeights: number[]; // line height multiplier per run
   sizes: number[]; // px size per run
   lines: ParagraphLine[];
 };
@@ -266,13 +270,9 @@ function wordWrapIndex(
   return Math.max(seg.lastIndexOf(' '), seg.lastIndexOf('-')) + 1;
 }
 
-function applyAlign(
-  lines: LayoutLine[],
-  align: TextAlign,
-  width: number,
-  padding: number
-) {
+function applyAlign(lines: LayoutLine[], width: number, padding: number) {
   for (const line of lines) {
+    const align = line.align;
     if (align === 'left') {
       line.offsetX = line.indent;
       continue;
@@ -432,7 +432,6 @@ export class TextLayoutEngine {
         indent,
         marker: markers[p],
         y: contentHeight,
-        lineHeightPx,
         maxHeightPx: fixedHeight ? maxHeightPx : undefined,
       });
       contentHeight = emitted.y;
@@ -452,7 +451,7 @@ export class TextLayoutEngine {
       ? (bounds.height as number)
       : contentHeight + padding * 2;
 
-    applyAlign(lines, style.align, width, padding);
+    applyAlign(lines, width, padding);
 
     return {
       lines,
@@ -477,11 +476,10 @@ export class TextLayoutEngine {
       indent: number;
       marker: string | null;
       y: number;
-      lineHeightPx: number;
       maxHeightPx: number | undefined;
     }
   ): { stopped: boolean; maxWidth: number; y: number } {
-    const { style, indent, lineHeightPx, maxHeightPx } = opts;
+    const { style, indent, maxHeightPx } = opts;
     let { y } = opts;
     let maxWidth = 0;
     let first = true;
@@ -516,13 +514,14 @@ export class TextLayoutEngine {
         baseline: pl.baseline,
         indent,
         marker,
+        align: block.align ?? style.align,
         segments,
         lastInParagraph: pl.lastInParagraph,
       });
       y += pl.height;
       maxWidth = Math.max(maxWidth, pl.measuredWidth + indent);
       // Konva stops emitting lines once the fixed height is full.
-      if (maxHeightPx !== undefined && y + lineHeightPx > maxHeightPx) {
+      if (maxHeightPx !== undefined && y + pl.height > maxHeightPx) {
         return { stopped: true, maxWidth, y };
       }
     }
@@ -617,6 +616,7 @@ export class TextLayoutEngine {
     const baseFont = fontString(style);
     for (const line of entry.lines) {
       let size = 0;
+      let height = 0;
       let asc = 0;
       let desc = 0;
       const seen = new Set<number>();
@@ -625,17 +625,19 @@ export class TextLayoutEngine {
         if (seen.has(r)) continue;
         seen.add(r);
         size = Math.max(size, entry.sizes[r]);
+        height = Math.max(height, entry.lineHeights[r] * entry.sizes[r]);
         const m = this.metrics(entry.fonts[r], entry.sizes[r]);
         asc = Math.max(asc, m.ascent);
         desc = Math.max(desc, m.descent);
       }
       if (seen.size === 0) {
         size = style.fontSize;
+        height = style.lineHeight * size;
         const m = this.metrics(baseFont, style.fontSize);
         asc = m.ascent;
         desc = m.descent;
       }
-      line.height = style.lineHeight * size;
+      line.height = height;
       line.baseline = (asc - desc) / 2 + line.height / 2;
     }
   }
@@ -653,11 +655,15 @@ export class TextLayoutEngine {
       r.m ? fontString(runStyle(style, r.m)) : baseFont
     );
     const sizes = block.runs.map((r) => style.fontSize * runRatio(r.m));
+    const lineHeights = block.runs.map(
+      (r) => runLineHeight(r.m) ?? style.lineHeight
+    );
     const entry: ParagraphEntry = {
       sig,
       graphemes,
       runOf,
       fonts,
+      lineHeights,
       sizes,
       lines: [],
     };

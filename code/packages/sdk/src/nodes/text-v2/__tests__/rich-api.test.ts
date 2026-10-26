@@ -314,6 +314,54 @@ describe('rich text API', () => {
     });
   });
 
+  describe('align and line height', () => {
+    it('setAlign works on a node and is gated by rich text', () => {
+      const { node, mock } = makeNode(rich);
+      const shape = node.onRender(defaultProps()) as WeaveTextV2Shape;
+      expect(node.setAlign(shape, 'center', { start: 0, end: 3 })).toBe(true);
+      expect(shape.getBlocks()[0].align).toBe('center');
+      expect(mock.updateNode).toHaveBeenCalledTimes(1);
+      expect(node.setAlign(shape, 'justify' as never)).toBe(false);
+      expect(node.getSelectionFormat(shape).align.value).toBe('center');
+      const off = makeNode();
+      const plain = off.node.onRender(defaultProps()) as WeaveTextV2Shape;
+      expect(off.node.setAlign(plain, 'right')).toBe(false);
+    });
+
+    it('lineHeight mark via applyMark; node values do not clear overrides', () => {
+      const { node } = makeNode(rich);
+      const shape = node.onRender(defaultProps()) as WeaveTextV2Shape;
+      node.applyMark(shape, 'lineHeight', 2, { start: 0, end: 5 });
+      node.setAlign(shape, 'right');
+      shape.lineHeight(1.2);
+      shape.align('left');
+      expect(shape.getBlocks()[0].align).toBe('right');
+      expect(shape.getBlocks()[0].runs[0].m).toEqual({ lineHeight: 2 });
+      expect(shape.ensureLayout().lines[0].align).toBe('right');
+      expect(
+        node.getSelectionFormat(shape, { start: 0, end: 5 }).lineHeight
+      ).toEqual({ state: 'all', value: 2 });
+    });
+
+    it('schema accepts align and lineHeight', () => {
+      const ok = WeaveTextV2Node.getSchema().safeParse({
+        id: 'a',
+        type: 'text',
+        key: 'a',
+        props: {
+          id: 'a',
+          nodeType: 'text',
+          width: 10,
+          fontVariant: 'normal',
+          blocks: [
+            { align: 'center', runs: [{ t: 'x', m: { lineHeight: 1.5 } }] },
+          ],
+        },
+      });
+      expect(ok.success).toBe(true);
+    });
+  });
+
   describe('run links', () => {
     const URL1 = 'https://example.com';
     const linked = () => {

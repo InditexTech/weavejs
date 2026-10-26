@@ -16,6 +16,8 @@ export type WeaveTextMarks = {
   /** Ratio of the node base `fontSize` (1 is omitted). */
   size?: number;
   family?: string;
+  /** Multiplier of the run font size (clamped 0.5 to 4). */
+  lineHeight?: number;
   link?: string;
   [mark: string]: unknown;
 };
@@ -28,9 +30,24 @@ export type WeaveTextMarkKey =
   | 'color'
   | 'size'
   | 'family'
+  | 'lineHeight'
   | 'link';
 
 export type WeaveTextListKind = 'ul' | 'ol';
+export type WeaveTextBlockAlign = 'left' | 'center' | 'right';
+
+export const MIN_LINE_HEIGHT = 0.5;
+export const MAX_LINE_HEIGHT = 4;
+
+/** Valid `lineHeight` mark of a run, or undefined (use the node value). */
+export function runLineHeight(
+  m: WeaveTextMarks | undefined
+): number | undefined {
+  const v = m?.lineHeight;
+  return typeof v === 'number' && Number.isFinite(v) && v > 0
+    ? Math.min(MAX_LINE_HEIGHT, Math.max(MIN_LINE_HEIGHT, v))
+    : undefined;
+}
 
 export type WeaveTextRun = { t: string; m?: WeaveTextMarks };
 export type WeaveTextBlock = {
@@ -38,6 +55,7 @@ export type WeaveTextBlock = {
   kind?: WeaveTextListKind;
   depth?: number;
   start?: number;
+  align?: WeaveTextBlockAlign;
 };
 
 /** Only absolute http(s) URLs are links (same rule as the legacy node). */
@@ -56,6 +74,7 @@ function blockFields(block: WeaveTextBlock | undefined, withStart: boolean) {
   if (!block) return out;
   if (block.kind) out.kind = block.kind;
   if (block.depth) out.depth = block.depth;
+  if (block.align) out.align = block.align;
   if (withStart && block.start !== undefined) out.start = block.start;
   return out;
 }
@@ -352,6 +371,11 @@ export function applyMark(
   value: unknown
 ): WeaveTextBlock[] {
   if (start >= end) return blocks;
+  if (key === 'lineHeight' && value !== undefined) {
+    const lh = runLineHeight({ lineHeight: value as number });
+    if (lh === undefined) return blocks;
+    value = lh;
+  }
   const spans = blockSpans(blocks);
   return blocks.map((block, i) => {
     const s = spans[i];
@@ -458,6 +482,23 @@ export function toggleList(
   return mapBlocks(blocks, idx, (b) =>
     allSame ? stripList(b) : { ...b, kind }
   );
+}
+
+/** Set (or clear with `undefined`) the alignment of the blocks in a range. */
+export function setBlockAlign(
+  blocks: WeaveTextBlock[],
+  start: number,
+  end: number,
+  align: WeaveTextBlockAlign | undefined
+): WeaveTextBlock[] {
+  const idx = blockIndicesInRange(blocks, start, end);
+  return mapBlocks(blocks, idx, (b) => {
+    if (align === undefined) {
+      const { align: _a, ...rest } = b;
+      return rest;
+    }
+    return { ...b, align };
+  });
 }
 
 /** Increase depth of list blocks in the range (non-list blocks untouched). */
@@ -571,6 +612,9 @@ export type WeaveTextSelectionFormat = {
   color: MarkQuery;
   family: MarkQuery;
   link: MarkQuery;
+  lineHeight: MarkQuery;
+  /** Paragraph alignment of the blocks in the range. */
+  align: { state: MarkState; value?: WeaveTextBlockAlign };
   /** `value` in px (ratio * base); `none` reports the base size. */
   size: MarkQuery;
   list: { kind: WeaveTextListKind | 'none' | 'mixed'; depth?: number };
@@ -639,7 +683,24 @@ export function getSelectionFormat(
     color: q('color'),
     family: q('family'),
     link: q('link'),
+    lineHeight: q('lineHeight'),
+    align: alignQuery(blocks, start, end),
     size,
     list,
   };
+}
+
+function alignQuery(
+  blocks: WeaveTextBlock[],
+  start: number,
+  end: number
+): { state: MarkState; value?: WeaveTextBlockAlign } {
+  const idx = blockIndicesInRange(blocks, start, end);
+  const vals = idx.map((i) => blocks[i].align);
+  const set = vals.filter((v) => v !== undefined);
+  if (set.length === 0) return { state: 'none' };
+  if (set.length < vals.length || set.some((v) => v !== set[0])) {
+    return { state: 'some' };
+  }
+  return { state: 'all', value: set[0] };
 }

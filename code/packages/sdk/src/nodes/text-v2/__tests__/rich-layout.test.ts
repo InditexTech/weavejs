@@ -135,3 +135,83 @@ describe('lists', () => {
     expect(e.getLastRelaidCount()).toBe(1);
   });
 });
+
+describe('paragraph align and per-run line height', () => {
+  it('aligns each paragraph by its own value without relayout', () => {
+    const e = engine();
+    const blocks: WeaveTextBlock[] = [
+      { align: 'center', runs: [{ t: 'ab' }] },
+      { align: 'right', runs: [{ t: 'ab' }] },
+      { runs: [{ t: 'ab' }] },
+    ];
+    const l = e.layout(blocks, style, { ...bounds, width: 100 });
+    expect(l.lines.map((x) => x.offsetX)).toEqual([45, 90, 0]);
+    const again = [
+      { ...blocks[0], align: 'left' as const },
+      blocks[1],
+      blocks[2],
+    ];
+    e.layout(again, style, { ...bounds, width: 100 });
+    expect(e.getLastRelaidCount()).toBe(0);
+  });
+
+  it('keeps the list indent on the left when aligned', () => {
+    const l = engine().layout(
+      [{ kind: 'ul', align: 'right', runs: [{ t: 'ab' }] }],
+      style,
+      { ...bounds, width: 100 }
+    );
+    expect(l.lines[0].offsetX).toBe(100 - 10);
+    expect(l.lines[0].marker?.x).toBe(0);
+  });
+
+  it('uses the tallest run line height on a line', () => {
+    const l = engine().layout(
+      [
+        {
+          runs: [
+            { t: 'a', m: { lineHeight: 1 } },
+            { t: 'b', m: { lineHeight: 2 } },
+          ],
+        },
+      ],
+      style,
+      bounds
+    );
+    expect(l.lines[0].height).toBe(20);
+  });
+
+  it('a lower value next to a taller run does not shrink the line', () => {
+    const l = engine().layout(
+      [{ runs: [{ t: 'a' }, { t: 'b', m: { lineHeight: 0.5 } }] }],
+      { ...style, lineHeight: 1.5 },
+      bounds
+    );
+    expect(l.lines[0].height).toBe(15);
+  });
+
+  it('only the lines holding the marked text change height', () => {
+    const l = engine().layout(
+      [
+        {
+          runs: [{ t: 'aaaa ', m: { lineHeight: 2 } }, { t: 'bbbb cccc' }],
+        },
+      ],
+      style,
+      { ...bounds, width: 25 }
+    );
+    expect(l.lines.length).toBeGreaterThan(1);
+    expect(l.lines[0].height).toBe(20);
+    expect(l.lines.at(-1)!.height).toBe(10);
+    expect(l.contentHeight).toBe(l.lines.reduce((a, x) => a + x.height, 0));
+  });
+
+  it('invalid lineHeight falls back to the node value', () => {
+    const l = engine().layout(
+      [{ runs: [{ t: 'a', m: { lineHeight: 0 } }] }],
+      style,
+      bounds
+    );
+    expect(l.lines[0].height).toBe(10);
+  });
+});

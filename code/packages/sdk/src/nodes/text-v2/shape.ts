@@ -379,9 +379,11 @@ export class WeaveTextV2Shape extends Konva.Shape {
     const canvas = ctx.getCanvas();
     // The native transform maps to device px (it includes the pixel ratio),
     // so use the backing store size, not the CSS size from getWidth().
-    const backing = (canvas as unknown as {
-      _canvas?: { width: number; height: number };
-    })._canvas;
+    const backing = (
+      canvas as unknown as {
+        _canvas?: { width: number; height: number };
+      }
+    )._canvas;
     const w = backing?.width ?? canvas.getWidth() * canvas.getPixelRatio();
     const h = backing?.height ?? canvas.getHeight() * canvas.getPixelRatio();
     if (!(w > 0) || !(h > 0)) return null;
@@ -412,7 +414,6 @@ export class WeaveTextV2Shape extends Konva.Shape {
     if (layout.lines.length === 0) return;
 
     const padding = self.padding();
-    const lineHeightPx = layout.lineHeightPx;
 
     let baseline: CanvasTextBaseline = 'middle';
     if (!Konva.legacyTextRendering) baseline = 'alphabetic';
@@ -430,8 +431,8 @@ export class WeaveTextV2Shape extends Konva.Shape {
       // line-level culling (local coords, with one line of slack)
       if (
         range &&
-        (alignY + padding + line.y + line.height < range.y1 - lineHeightPx ||
-          alignY + padding + line.y > range.y2 + lineHeightPx)
+        (alignY + padding + line.y + line.height < range.y1 - line.height ||
+          alignY + padding + line.y > range.y2 + line.height)
       ) {
         continue;
       }

@@ -71,8 +71,8 @@ NOTE: `edition.borderSize` from the Text node does not exist here. Use `edition.
 
 == Rich text
 
-Turn on formatting per selection (bold, italic, underline, strikethrough, colour, size, font
-family and links) and bulleted or numbered lists with nesting:
+Turn on formatting per selection (bold, italic, underline, strikethrough, colour, size, line height, font
+family and links), per-paragraph alignment and bulleted or numbered lists with nesting:
 
 [source,ts]
 ----
