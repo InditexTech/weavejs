@@ -1,0 +1,156 @@
+= WeaveTextV2Node
+:description: Text node with native on-canvas editing API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/text-v2/text-v2.ts[WeaveTextV2Node]
+class represents a text element on the Weave.js canvas, with editing drawn natively on the canvas
+instead of a DOM textarea overlay. It is a drop-in replacement for
+xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode]; the existing class is unchanged and stays available.
+
+Built on a mono:[Konva.Shape] with its own layout engine, it keeps the editing and idle appearance
+identical, and is the foundation for rich text.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `text`, the same as mono:[WeaveTextNode].
+
+[NOTE]
+====
+Existing documents load and render without migration. Register mono:[WeaveTextV2Node] *instead of*
+mono:[WeaveTextNode]: a Weave instance holds one handler per node type, so both cannot be registered
+together.
+====
+
+== Import
+
+[source,ts]
+----
+import { WeaveTextV2Node } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+const node = new WeaveTextV2Node({
+  config: {
+    edition: { outline: { color: "#0074ff", width: 1, padding: 0 } },
+    sizeWarning: { threshold: 200000 },
+  },
+});
+----
+
+== Differences from WeaveTextNode
+
+* Renders through mono:[WeaveTextV2Shape] (a mono:[Konva.Shape]) with Konva.Text-compatible getters
+  (mono:[text()], mono:[fontSize()], mono:[getTextWidth()], ...). The mono:[onEnterTextNodeEditMode]
+  and mono:[onExitTextNodeEditMode] event payload `node` is a mono:[WeaveTextV2Shape], not a
+  mono:[Konva.Text].
+* Editing happens on the canvas: a hidden proxy textarea handles typing, IME and clipboard, and the
+  caret and selection are painted on the utility layer, together with an outline of the text box
+  (useful with fixed width or height). There is no DOM overlay.
+* Entering edit mode on existing text selects all of it (like Figma), so typing replaces it; a newly
+  created node starts with the caret.
+* Selection supports click, drag, double-click (word), triple-click (paragraph), arrows,
+  kbd:[Home]/kbd:[End] and kbd:[Up]/kbd:[Down] on visual lines.
+* Undo/redo is local to the edit session (typing, deletion, paste and IME composition each coalesce
+  into one step). Leaving edit mode commits a single mono:[updateNode], skipped when the text is
+  unchanged. While editing, keydown does not propagate to the page, so app-level undo does not fire;
+  `window.weaveTextEditing` holds the editing node id.
+* Clipboard is plain text only. Large pastes are laid out in time slices.
+* All four layouts (`smart`, `auto-all`, `auto-height`, `fixed`) keep their behavior. Auto-sized
+  layouts measure from the engine and no longer depend on the zoom level.
+* xref:sdk:api-reference/actions/text-tool.adoc[WeaveTextToolAction] works with it unchanged.
+
+== Content model
+
+Content is stored as `blocks` (paragraphs) of `runs` (`{ t, m }`: text and marks). The `text` prop
+stays as a derived mirror. A node without `blocks` is synthesized from `text` on load without
+rewriting the document; a whole-text `link` becomes a full-range `link` mark.
+
+Marks already present in a document are preserved when the text is edited, but they are not
+rendered yet and cannot be created from the editor: rich formatting is out of scope for now.
+
+== Parameters
+
+[cols="1,1,1,1,3"]
+|===
+|Name |Type |Required |Default |Description
+
+| mono:[config] | mono:[DeepPartial<WeaveTextV2Properties>] | |  | Config parameters for the node.
+|===
+
+== Configuration
+
+Same properties as xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode], except `edition`, plus:
+
+[WARNING]
+====
+mono:[edition.borderSize] does not exist on mono:[WeaveTextV2Node]: there is no DOM textarea border to
+size. Passing it is a type error. Use mono:[edition.outline] instead.
+====
+
+[cols="1,1,3"]
+|===
+|Property |Default |Description
+
+|mono:[edition.outline.enabled]
+|`true`
+|Draw an outline of the text box while editing.
+
+|mono:[edition.outline.color]
+|`#0074ff`
+|Outline colour.
+
+|mono:[edition.outline.width]
+|`1`
+|Outline width in screen pixels (constant across zoom levels).
+
+|mono:[edition.outline.padding]
+|`0`
+|Gap between the text box and the outline, in screen pixels.
+
+|mono:[sizeWarning.threshold]
+|`200000`
+|Serialized size of `blocks` (characters) above which the mono:[onTextSizeWarning] event is emitted.
+Content is never truncated.
+|===
+
+== Events
+
+[cols="1,2,3"]
+|===
+|Event |Payload |Description
+
+|mono:[onEnterTextNodeEditMode]
+|`+{ node: WeaveTextV2Shape }+`
+|An edit session started.
+
+|mono:[onExitTextNodeEditMode]
+|`+{ node: WeaveTextV2Shape }+`
+|An edit session ended and its content was committed.
+
+|mono:[onTextSizeWarning]
+|`+{ node: WeaveTextV2Shape, size: number, threshold: number }+`
+|The serialized `blocks` grew past `sizeWarning.threshold`. Emitted once per crossing.
+|===
+
+== Hyperlinks
+
+Same behavior and methods as xref:sdk:api-reference/nodes/text.adoc#hyperlinks[WeaveTextNode]:
+mono:[getLink], mono:[setLink] and mono:[removeLink].
+
+== Exports
+
+mono:[WeaveTextV2Node], mono:[WeaveTextV2Shape], mono:[TextLayoutEngine], mono:[TextEditSession],
+mono:[TextEditModel] and the related types. mono:[TextEditSession] works on a mono:[TextEditTarget]
+and a mono:[TextEditHost], so other shapes can reuse the layout engine and the editor.
+
+== Server side
+
+Measurement and painting work on the node-canvas backend (`setupCanvasBackend()`) and were also
+verified on the skia-canvas backend (`setupSkiaBackend()`). Register fonts in your app; they are not
+registered by the SDK.

@@ -17,7 +17,7 @@ across all connected users in real time.
 
 This action needs registered on the Weave instance the following element:
 
-* xref:main:build/nodes/text.adoc[Text] node
+* xref:main:build/nodes/text.adoc[Text] node, or xref:main:build/nodes/text-v2.adoc[Text (native editing)] if you registered `WeaveTextV2Node` instead (both use the `text` type, so register only one)
 
 == Usage
 

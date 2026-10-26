@@ -21,6 +21,7 @@
 ** xref:sdk:api-reference/nodes/stroke.adoc[WeaveStrokeNode]
 ** xref:sdk:api-reference/nodes/stroke-single.adoc[WeaveStrokeSingleNode]
 ** xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode]
+** xref:sdk:api-reference/nodes/text-v2.adoc[WeaveTextV2Node]
 ** xref:sdk:api-reference/nodes/video.adoc[WeaveVideoNode]
 ** xref:sdk:api-reference/nodes/arrow.adoc[WeaveArrowNode (deprecated)]
 ** xref:sdk:api-reference/nodes/line.adoc[WeaveLineNode (deprecated)]
