@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#1226](https://github.com/InditexTech/weavejs/issues/1226) Shape label: opt-in `native` label engine (`config.label.engine`) for rectangle, ellipse and polygon, using the native-canvas text engine and editor session with rich text (optional `labelBlocks` prop). The `legacy` engine stays the default
 - [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text node: rich text formatting, enabled via node config
 
 ### Fixed

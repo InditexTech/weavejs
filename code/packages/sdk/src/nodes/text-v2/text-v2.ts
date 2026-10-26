@@ -275,11 +275,29 @@ export class WeaveTextV2Node extends WeaveNode {
 
   // ---- edit mode -----------------------------------------------------------
 
+  /**
+   * Enter typed into another editor (a shape label session or any text
+   * field) must keep its default action (a new line).
+   */
+  private isEditingElsewhere(e: KeyboardEvent): boolean {
+    const sessions = (window as Window & {
+      weaveTextEditing?: Record<string, string>;
+    }).weaveTextEditing;
+    if (sessions && Object.keys(sessions).length > 0) return true;
+    const t = e.target;
+    return (
+      t instanceof HTMLTextAreaElement ||
+      t instanceof HTMLInputElement ||
+      (t instanceof HTMLElement && t.isContentEditable)
+    );
+  }
+
   private readonly handleKeyPress = (e: KeyboardEvent) => {
     if (
       e.code !== 'Enter' ||
       this.instance.getActiveAction() !== SELECTION_TOOL_ACTION_NAME ||
-      this.editing
+      this.editing ||
+      this.isEditingElsewhere(e)
     ) {
       return;
     }

@@ -11,7 +11,7 @@ The shape label editor (`nodes/shared/shape-label-editor.ts`, used by rectangle,
 - Add a **native** engine: label rendered as `WeaveTextV2Shape`, edited via `TextEditSession`, no DOM overlay, rotation and vertical alignment from the session target, live shape growth through `setBlocks`/`onChange` with a bounded convergence loop.
 - Add an optional per-node-type config on rectangle, ellipse and polygon to select the engine (`legacy` default, `native` opt-in).
 - Make `shape-label.utils.ts` min-size helpers work against a shared label-node interface instead of `Konva.Text` only.
-- No persisted schema change: both engines read/write `labelText` and the `label*` props. Native flattens to plain text on commit.
+- Native labels have rich text enabled. Additive optional `labelBlocks` persists rich content; `labelText` stays the plain mirror and the legacy engine ignores `labelBlocks`. No other schema change.
 - No **BREAKING** changes. Legacy removal is deferred to a separate deprecation change.
 
 ## Capabilities
@@ -25,6 +25,6 @@ The shape label editor (`nodes/shared/shape-label-editor.ts`, used by rectangle,
 
 - Code: `code/packages/sdk/src/nodes/shared/shape-label-editor.ts`, `shape-label.utils.ts`, `shape-label.constants.ts`, `shape-label.types.ts`; `nodes/rectangle`, `nodes/ellipse`, `nodes/polygon` (config + engine wiring); new native engine file(s).
 - Tests: existing `shape-label-editor.test.ts` and `shape-label.utils.test.ts` must pass unmodified on legacy; new native suite and shared contract test.
-- Public API: additive config option and exported interface only.
+- Public API: additive config option, optional `labelBlocks` prop and exported interface only.
 - Docs: node pages for rectangle, ellipse, polygon (config option).
 - Server-side export: labels must render in both engines (to verify for `WeaveTextV2Shape` in the node backend).

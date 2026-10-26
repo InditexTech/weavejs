@@ -17,22 +17,23 @@ import type {
   WeaveRectangleProperties,
 } from './types';
 import { mergeExceptArrays } from '@/index';
-import { WeaveShapeLabelEditor } from '@/nodes/shared/shape-label-editor';
+import { createShapeLabelEngine } from '@/nodes/shared/shape-label.engine';
+import type { WeaveShapeLabelEngine } from '@/nodes/shared/shape-label.types';
 import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
 } from '@/nodes/shared/shape-label.constants';
-import { computeRectangleLabelMinSize, spreadLabelProps, getShapeLabelSchemaFields } from '@/nodes/shared/shape-label.utils';
+import { computeRectangleLabelMinSize, spreadLabelProps, getShapeLabelSchemaFields, applyLabelBlocksState } from '@/nodes/shared/shape-label.utils';
 
 export class WeaveRectangleNode extends WeaveNode {
   private config: WeaveRectangleProperties;
   protected nodeType: string = WEAVE_RECTANGLE_NODE_TYPE;
   initialize = undefined;
-  private _shapeLabelEditor: WeaveShapeLabelEditor | undefined;
+  private _shapeLabelEditor: WeaveShapeLabelEngine | undefined;
   private _transforming = false;
 
-  private get shapeLabelEditor(): WeaveShapeLabelEditor {
-    return (this._shapeLabelEditor ??= new WeaveShapeLabelEditor(this.instance));
+  private get shapeLabelEditor(): WeaveShapeLabelEngine {
+    return (this._shapeLabelEditor ??= createShapeLabelEngine(this.instance, this.config.label));
   }
 
   constructor(params?: WeaveRectangleNodeParams) {
@@ -44,6 +45,7 @@ export class WeaveRectangleNode extends WeaveNode {
       transform: {
         ...config?.transform,
       },
+      label: { ...config?.label },
     };
   }
 
@@ -142,15 +144,20 @@ export class WeaveRectangleNode extends WeaveNode {
         return;
       }
 
-      const onCommit = (labelText: string) => {
+      const onCommit = (
+        labelText: string,
+        labelBlocks?: WeaveElementAttributes['labelBlocks']
+      ) => {
         const updatedGroup = this.instance
           .getStage()
           .findOne<Konva.Group>(`#${props.id}`);
         if (!updatedGroup) {
           return;
         }
+        updatedGroup.setAttr('labelBlocks', labelBlocks);
         const serialized = this.serialize(updatedGroup);
         serialized.props.labelText = labelText;
+        serialized.props.labelBlocks = labelBlocks;
         this.instance.updateNode(serialized);
       };
 
@@ -348,7 +355,7 @@ export class WeaveRectangleNode extends WeaveNode {
     prevNodeState: WeaveStateElement,
     nextProps: WeaveElementAttributes
   ): WeaveStateElement {
-    return mergeExceptArrays(prevNodeState, {
+    const next = mergeExceptArrays(prevNodeState, {
       props: {
         x: nextProps.x,
         y: nextProps.y,
@@ -363,6 +370,7 @@ export class WeaveRectangleNode extends WeaveNode {
         ...spreadLabelProps(nextProps),
       },
     });
+    return applyLabelBlocksState(next, nextProps);
   }
 
   static getSchema() {

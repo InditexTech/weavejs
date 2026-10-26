@@ -9,13 +9,13 @@
 - Reuse text-v2 layout and session unchanged.
 
 **Non-Goals:**
-- Schema changes, `labelBlocks`, rich-text toolbar for labels, shape geometry changes, removing legacy.
+- Rich-text toolbar UI for labels, shape geometry changes, removing legacy.
 
 ## Decisions
 
 1. **Strategy seam.** Extract `ShapeLabelEngine` from the existing public methods; `WeaveShapeLabelEditor` implements it untouched (legacy). New `WeaveShapeLabelNativeEditor` implements it. Alternative (subclass or flag inside one class) rejected: mixes two lifecycles in 756 lines.
 2. **Selection by node config**, default `legacy`. Mirrors node-level config used elsewhere (`config.transform`). Alternative persisted `labelEngine` prop rejected: schema leak and migration.
-3. **Plain-text persistence.** Native wraps `labelText` in blocks for the session and flattens back on commit. Rich labels are a follow-up adding an additive field.
+3. **Rich labels, additive persistence.** Native runs the session with rich text on. Commit writes `labelText` (plain mirror) and, only for formatted content, optional `labelBlocks`. Render uses `labelBlocks` only while it matches `labelText`, so a legacy client editing plain text cannot leave stale formatting visible. State updates clear `labelBlocks` explicitly when absent.
 4. **Native target.** `getContentOffset` supplies padding and vertical align; `getAbsoluteTransform` supplies rotation; `setBlocks` re-lays out and calls `growCallback`. The convergence loop re-measures layout synchronously (grow -> re-layout -> compare), MAX 5 passes plus final corrective grow, same as legacy.
 5. **Label node typing.** `shape-label.utils.ts` depends on a minimal `LabelNode` interface (text, height, clone, getClientRect) satisfied by both `Konva.Text` and `WeaveTextV2Shape`.
 6. **Hide during edit.** Native hides the label node while a session runs unless the session paints content itself; verify against text-v2 behavior.

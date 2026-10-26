@@ -13,9 +13,12 @@ import {
   WEAVE_SHAPE_LABEL_DEFAULTS,
   WEAVE_STAGE_SHAPE_LABEL_EDITION_MODE,
 } from './shape-label.constants';
-import type { WeaveShapeLabelTextBounds } from './shape-label.types';
+import type {
+  WeaveShapeLabelEngine,
+  WeaveShapeLabelTextBounds,
+} from './shape-label.types';
 
-export class WeaveShapeLabelEditor {
+export class WeaveShapeLabelEditor implements WeaveShapeLabelEngine {
   private readonly instance: Weave;
   private editing: boolean = false;
   private editingGroup: Konva.Group | null = null;

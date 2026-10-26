@@ -11,8 +11,8 @@ Rectangle, ellipse and polygon nodes SHALL accept an optional config selecting t
 - **WHEN** the node config sets the engine to `native`
 - **THEN** its label renders with `WeaveTextV2Shape` and edits through `TextEditSession`
 
-### Requirement: No schema or contract change
-Both engines SHALL read and write the same `labelText` and `label*` props, keep the label child id `labelId(id)`, the `'label-edit'` mutex operation and `WEAVE_STAGE_SHAPE_LABEL_EDITION_MODE`. No new persisted field SHALL be added.
+### Requirement: Additive contract
+Both engines SHALL read and write the same `labelText` and `label*` props, keep the label child id `labelId(id)`, the `'label-edit'` mutex operation and `WEAVE_STAGE_SHAPE_LABEL_EDITION_MODE`. The only new persisted field SHALL be the optional `labelBlocks`, ignored by the legacy engine.
 
 #### Scenario: Mixed engines
 - **WHEN** one client uses `legacy` and another `native` on the same document
@@ -39,12 +39,20 @@ In `native`, the label SHALL stay inside the shape's text bounds with `labelPadd
 - **WHEN** typed text needs more height than the text bounds
 - **THEN** the shape grows to fit and shrinks back, down to its original height, when text is removed
 
-### Requirement: Native commit flattens to plain text
-On commit the native engine SHALL persist the plain-text content as `labelText`.
+### Requirement: Native labels support rich text
+In `native`, the edit session SHALL run with rich text enabled (marks, shortcuts, lists, alignment). On commit `labelText` SHALL be the plain mirror of the content, and `labelBlocks` SHALL be persisted only when the content has marks, lists or alignment; otherwise it SHALL be cleared. A stored `labelBlocks` SHALL be rendered only while its plain text equals `labelText`.
 
-#### Scenario: Commit
-- **WHEN** edit ends with changed content
-- **THEN** `labelText` equals the plain text of the edited blocks
+#### Scenario: Commit rich content
+- **WHEN** the user bolds a word and commits
+- **THEN** `labelText` is the plain text and `labelBlocks` holds the bold run
+
+#### Scenario: Commit plain content
+- **WHEN** the user commits content with no formatting
+- **THEN** `labelText` is set and `labelBlocks` is cleared
+
+#### Scenario: Stale blocks
+- **WHEN** a client edits `labelText` without updating `labelBlocks`
+- **THEN** the label renders the plain `labelText`
 
 ### Requirement: Label min-size helpers are engine-agnostic
 The min-size helpers SHALL work with labels from either engine.
@@ -59,3 +67,10 @@ Export SHALL render labels in both engines.
 #### Scenario: Export with native label
 - **WHEN** a shape with a native label is exported server-side
 - **THEN** the label text appears in the output
+
+### Requirement: Native label edit events
+The native engine SHALL emit `onEnterShapeLabelEditMode` (with the shape node and the live edit session) when a session starts, `onShapeLabelFormatChange` (node and selection format) while the selection format changes, and `onExitShapeLabelEditMode` (node) when it ends. The legacy engine SHALL NOT emit them.
+
+#### Scenario: Toolbar hook
+- **WHEN** a native label edit starts and the user selects bold text
+- **THEN** enter fires with the session, and format change fires with the bold format
