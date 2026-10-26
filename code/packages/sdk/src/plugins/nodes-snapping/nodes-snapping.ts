@@ -97,32 +97,32 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     super.register(instance);
 
     const hooks = this.instance.getHooks();
-    hooks.hook('weave:onNodeDragStart', ({ node }: { node: Konva.Node }) => {
-      let containerId = '';
-      if (node.getAttrs().containerId) {
-        containerId = node.id();
+    // Custom guides belong to a container (e.g. a frame) and are drawn from its
+    // position at render time: hide them while the container is dragged and
+    // draw them again once it dropped, so they never stay behind. (These used
+    // to listen to `weave:onNodeDrag*`, which nothing ever emits.)
+    const guidedContainers = (nodes: Konva.Node[]) =>
+      nodes.filter(
+        (node) =>
+          node.getAttrs().containerId &&
+          this.snappingManagerCustomGuides.isCustomGuidesVisible(node.id())
+      );
+    hooks.hook(
+      'weave:onTransformerDragStart',
+      ({ nodes }: { nodes: Konva.Node[] }) => {
+        for (const node of guidedContainers(nodes)) {
+          this.snappingManagerCustomGuides.hideCustomGuides(node.id());
+        }
       }
-
-      if (
-        node &&
-        this.snappingManagerCustomGuides.isCustomGuidesVisible(containerId)
-      ) {
-        this.snappingManagerCustomGuides.hideCustomGuides(node.id());
+    );
+    hooks.hook(
+      'weave:onTransformerDragEnd',
+      ({ nodes }: { nodes: Konva.Node[] }) => {
+        for (const node of guidedContainers(nodes)) {
+          this.snappingManagerCustomGuides.renderCustomGuides(node.id());
+        }
       }
-    });
-    hooks.hook('weave:onNodeDragEnd', ({ node }: { node: Konva.Node }) => {
-      let containerId = '';
-      if (node.getAttrs().containerId) {
-        containerId = node.id();
-      }
-
-      if (
-        node &&
-        this.snappingManagerCustomGuides.isCustomGuidesVisible(containerId)
-      ) {
-        this.snappingManagerCustomGuides.renderCustomGuides(node.id());
-      }
-    });
+    );
 
     return this;
   }
