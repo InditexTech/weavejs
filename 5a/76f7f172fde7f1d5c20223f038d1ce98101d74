@@ -1,0 +1,23 @@
+code/CHANGELOG.md
+  s_4dca8408c69d3d::t_ccee15887f8244 23-25
+code/packages/sdk/src/nodes/frame/__tests__/frame.test.ts
+  s_4dca8408c69d3d::t_d90260778f0797 443-458
+code/packages/sdk/src/nodes/frame/frame.ts
+  s_4dca8408c69d3d::t_74ca82e8d59ec2 331-334,344-347
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "5a76f7f172fde7f1d5c20223f038d1ce98101d74",
+  "prompts": {},
+  "sessions": {
+    "s_4dca8408c69d3d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e8729c66bffeCiFqgByZpUgfcS",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
