@@ -42,10 +42,43 @@ import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 // Weave instance listeners registered on behalf of each Konva node, so they can
 // be replaced when the node events are set up again and removed on destroy.
+type NodeInstanceListener = { remove: () => void };
 const nodeInstanceListeners = new WeakMap<
   Konva.Node,
-  Map<string, (payload: never) => void>
+  Map<string, NodeInstanceListener>
 >();
+
+const removeListenersOfKonvaNode = (node: Konva.Node): void => {
+  const listeners = nodeInstanceListeners.get(node);
+  if (!listeners) {
+    return;
+  }
+  for (const listener of listeners.values()) {
+    listener.remove();
+  }
+  nodeInstanceListeners.delete(node);
+};
+
+// Konva calls destroy() on every descendant of a destroyed container, so
+// hooking it guarantees the listeners are removed even when the nodes are
+// detached from their parent before the handler's onDestroy runs.
+const KONVA_DESTROY_PATCHED = Symbol.for('weave.konva.destroyPatched');
+const patchKonvaNodeDestroy = (): void => {
+  if (!Konva?.Node?.prototype) {
+    return;
+  }
+  const proto = Konva.Node.prototype as unknown as Record<symbol, unknown>;
+  if (proto[KONVA_DESTROY_PATCHED]) {
+    return;
+  }
+  const originalDestroy = Konva.Node.prototype.destroy;
+  Konva.Node.prototype.destroy = function (this: Konva.Node) {
+    removeListenersOfKonvaNode(this);
+    return originalDestroy.call(this);
+  };
+  Object.defineProperty(proto, KONVA_DESTROY_PATCHED, { value: true });
+};
+patchKonvaNodeDestroy();
 
 export const augmentKonvaNodeClass = (
   config?: WeaveNodeConfiguration
@@ -1211,13 +1244,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
       nodeInstanceListeners.set(node, listeners);
     }
 
-    const previous = listeners.get(event);
-    if (previous) {
-      this.instance.removeEventListener(event, previous);
-    }
+    listeners.get(event)?.remove();
 
-    listeners.set(event, callback as (payload: never) => void);
-    this.instance.addEventListener<T>(event, callback);
+    const instance = this.instance;
+    listeners.set(event, {
+      remove: () => instance.removeEventListener(event, callback),
+    });
+    instance.addEventListener<T>(event, callback);
   }
 
   /**
@@ -1234,15 +1267,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         : [node];
 
     for (const actNode of nodes) {
-      const listeners = nodeInstanceListeners.get(actNode);
-      if (!listeners) {
-        continue;
-      }
-
-      for (const [event, callback] of listeners) {
-        this.instance.removeEventListener(event, callback);
-      }
-      nodeInstanceListeners.delete(actNode);
+      removeListenersOfKonvaNode(actNode);
     }
   }
 
