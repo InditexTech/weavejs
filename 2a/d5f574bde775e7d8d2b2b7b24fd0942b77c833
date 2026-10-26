@@ -1,0 +1,16 @@
+code/packages/react/package.json
+  h_c93d154c7c7074 17-18,20-24
+code/packages/types/package.json
+  h_c93d154c7c7074 17-18,20-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "2ad5f574bde775e7d8d2b2b7b24fd0942b77c833",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
