@@ -27,7 +27,7 @@ export function registerKeyboardHandlers(ctx: SelectionContext): void {
         }
       }
       if (e.code === 'Backspace' || e.code === 'Delete') {
-        Promise.resolve().then(() => {
+        queueMicrotask(() => {
           ctx.removeSelectedNodes();
         });
         return;
