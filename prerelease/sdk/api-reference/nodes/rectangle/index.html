@@ -1195,6 +1195,37 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 </div>
 </div>
 <div class="sect1">
+<h2 id="label-engine"><a class="anchor" href="#label-engine"></a>Label engine</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default the label is rendered with Konva&#8217;s text and edited through a DOM textarea overlay (<code>legacy</code>).
+Set <code>config.label.engine</code> to <code>native</code> to render the label with the on-canvas text engine and edit it
+with the native editing session instead: no DOM overlay, and caret and selection are drawn on the canvas.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveRectangleNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">config:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">label:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">engine:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "native"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } } });</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both engines read and write the same <code>labelText</code> and <code>label*</code> props, so clients using different engines
+can edit the same document. The <code>native</code> engine enables rich text in labels (bold, italic, underline, lists, alignment). Formatted content is stored in the optional <code>labelBlocks</code> prop, and <code>labelText</code> always holds the plain text, so the <code>legacy</code> engine shows the plain text.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="label-edit-events"><a class="anchor" href="#label-edit-events"></a>Label edit events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With the <code>native</code> label engine the node emits <code>onEnterShapeLabelEditMode</code> when a label edit session starts and
+<code>onExitShapeLabelEditMode</code> when it ends. Exit receives <code>{ node: Konva.Group }</code>; enter also receives the live
+<code>session</code>, so an app can build a formatting toolbar by running format commands on it. While editing,
+<code>onShapeLabelFormatChange</code> receives <code>{ node, format }</code> whenever the selection format changes.
+The <code>legacy</code> engine does not emit them.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="type"><a class="anchor" href="#type"></a>Type</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -1229,8 +1260,13 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 <div class="content">
 <pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TransformerConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveShapeLabelConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  engine</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"legacy"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"native"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// default "legacy"</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveRectangleProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  transform</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  label</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Partial</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveShapeLabelConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveRectangleNodeParams</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
@@ -1251,6 +1287,7 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelLineHeight</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelPaddingX</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelPaddingY</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  labelBlocks</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextBlock</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// rich content written by the native engine</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
 </div>
 </div>
