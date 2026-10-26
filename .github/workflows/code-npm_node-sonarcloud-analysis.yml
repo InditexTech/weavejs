@@ -154,20 +154,33 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Every expression the script reads arrives through env: the branch
+          # names and the package.json version come from the pull request.
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.head_ref }}
+          PR_BASE_REF: ${{ github.base_ref }}
+          REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY_NAME: ${{ steps.version.outputs.github-repository }}
+          APP_VERSION: ${{ steps.version.outputs.app-version }}
         if: ${{ github.event_name != 'release' }}
         working-directory: code
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            SCOPE_OPTIONS="-Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }} -Dsonar.pullrequest.base=${{ github.base_ref }}"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            SCOPE_OPTIONS=(
+              "-Dsonar.pullrequest.key=$PR_NUMBER"
+              "-Dsonar.pullrequest.branch=$PR_HEAD_REF"
+              "-Dsonar.pullrequest.base=$PR_BASE_REF"
+            )
           else
-            SCOPE_OPTIONS="-Dsonar.branch.name=${{ github.ref_name }}"
+            SCOPE_OPTIONS=("-Dsonar.branch.name=$REF_NAME")
           fi
 
           npx sonar-scanner \
             -Dproject.settings=sonar-project.properties \
             -Dsonar.host.url="https://sonarcloud.io/" \
             -Dsonar.organization=inditextech \
-            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
-            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
-            -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
-            $SCOPE_OPTIONS
+            -Dsonar.projectKey=InditexTech_"$GITHUB_REPOSITORY_NAME" \
+            -Dsonar.projectName="$GITHUB_REPOSITORY_NAME" \
+            -Dsonar.projectVersion="$APP_VERSION" \
+            "${SCOPE_OPTIONS[@]}"
