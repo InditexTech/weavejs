@@ -1,0 +1,69 @@
+AGENTS.md
+  s_726a777adee655::t_5ad28f3477fcb7 122-124
+code/CHANGELOG.md
+  s_726a777adee655::t_9f83f818587cde 18
+code/packages/sdk/src/nodes/ellipse/ellipse.ts
+  s_726a777adee655::t_22b52b1763323f 17-18,23,29,32-33,45,193-196,203,206,462,477
+code/packages/sdk/src/nodes/ellipse/types.ts
+  s_726a777adee655::t_9e4c9cc60cf931 9-10,17-18
+code/packages/sdk/src/nodes/polygon/polygon.ts
+  s_726a777adee655::t_52e9a75af41b00 17-22,131,134-135,146,257-260,265,268,619-621,659,677-679,715,789
+code/packages/sdk/src/nodes/polygon/types.ts
+  s_726a777adee655::t_233ffe1ff42784 6,21-22
+code/packages/sdk/src/nodes/rectangle/rectangle.ts
+  s_726a777adee655::t_e9515660ef733a 20-21,26,32,35-36,48,147-150,157,160,358,373
+code/packages/sdk/src/nodes/rectangle/types.ts
+  s_726a777adee655::t_6385e0c7afcd2a 9-10,17-18
+code/packages/sdk/src/nodes/shared/__tests__/shape-label-engines.test.ts
+  s_726a777adee655::t_83848089c4c3ea 1-312
+code/packages/sdk/src/nodes/shared/__tests__/shape-label-server.test.ts
+  s_726a777adee655::t_d09c005563f38f 1-53
+code/packages/sdk/src/nodes/shared/shape-label-editor.ts
+  s_726a777adee655::t_79c1d81b0ee7d4 16-19,21
+code/packages/sdk/src/nodes/shared/shape-label-native-editor.ts
+  s_726a777adee655::t_883e3c6f679e32 1-381
+code/packages/sdk/src/nodes/shared/shape-label.constants.ts
+  s_726a777adee655::t_f75d17fbcc551b 9
+code/packages/sdk/src/nodes/shared/shape-label.engine.ts
+  s_726a777adee655::t_8c15fb03fc6208 1-25
+code/packages/sdk/src/nodes/shared/shape-label.types.ts
+  s_726a777adee655::t_b305dab821a839 5-12,27-28,37-90
+code/packages/sdk/src/nodes/shared/shape-label.utils.ts
+  s_726a777adee655::t_ef93e56b2a5317 8-13,22-55,70,118-120,129,149
+code/packages/sdk/src/nodes/text-v2/__tests__/enter-keypress.test.ts
+  s_726a777adee655::t_05a4c0c83912b2 1-59
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_726a777adee655::t_f47d75821ece3a 278-294,299-300
+docs/src/modules/sdk/pages/api-reference/nodes/ellipse.adoc
+  s_726a777adee655::t_3e4b44a10bf3ee 19-40,65-68,71,92
+docs/src/modules/sdk/pages/api-reference/nodes/polygon.adoc
+  s_726a777adee655::t_a3f6a27f5d6157 18-39,73-84,87
+docs/src/modules/sdk/pages/api-reference/nodes/rectangle.adoc
+  s_726a777adee655::t_270b3f52ce3563 26-47,72-75,78,99
+openspec/changes/archive/2026-10-26-shape-label-native-engine/design.md
+  s_726a777adee655::t_c979e47a159fc8 12,18
+openspec/changes/archive/2026-10-26-shape-label-native-engine/proposal.md
+  s_726a777adee655::t_8b9315df8f7d57 14,28
+openspec/changes/archive/2026-10-26-shape-label-native-engine/specs/shape-label/engine/spec.md
+  s_726a777adee655::t_261b73f2f14fb8 14-15,42-43,45-55,70-76
+openspec/changes/archive/2026-10-26-shape-label-native-engine/tasks.md
+  s_726a777adee655::t_2a425236769316 3-4,8-11,15-26,30-31,35-36,41
+openspec/specs/shape-label/engine/spec.md
+  s_726a777adee655::t_cdf0d2d66cbada 1-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "c59d26082c37d2c43f67d3a78067f1d145174774",
+  "prompts": {},
+  "sessions": {
+    "s_726a777adee655": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e87984a5cffefKErydf4xdv3Cm",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
