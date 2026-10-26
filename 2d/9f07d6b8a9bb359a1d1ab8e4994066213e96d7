@@ -1,0 +1,43 @@
+code/packages/sdk/src/nodes/__tests__/node.events.test.ts
+  s_4dca8408c69d3d::t_885f800b6457ec 1487-1559
+code/packages/sdk/src/nodes/connector/anchors.ts
+  s_4dca8408c69d3d::t_7b3d3103db66e7 5,161
+code/packages/sdk/src/nodes/connector/connector.ts
+  s_4dca8408c69d3d::t_7ea1a0526cfac4 291-292,370-371,512-518,521-522,524-536,539-541,1050
+code/packages/sdk/src/nodes/connector/line-types/curved.ts
+  s_4dca8408c69d3d::t_1f35434dfeb1ea 5,110-119
+code/packages/sdk/src/nodes/frame/__tests__/frame.test.ts
+  s_4dca8408c69d3d::t_bbc5d6e38c7d5b 9,925-952
+code/packages/sdk/src/nodes/frame/frame.ts
+  s_4dca8408c69d3d::t_365728a3a0ee59 308
+code/packages/sdk/src/nodes/image/__tests__/image.test.ts
+  s_4dca8408c69d3d::t_1f4860cb59a016 17,2302-2329
+code/packages/sdk/src/nodes/image/image.ts
+  s_4dca8408c69d3d::t_1ff3a641944191 582-583
+code/packages/sdk/src/nodes/measure/__tests__/measure.test.ts
+  s_4dca8408c69d3d::t_43baf78fcd0ee5 961-988
+code/packages/sdk/src/nodes/measure/measure.ts
+  s_4dca8408c69d3d::t_ae5dc4ab23fcb3 259-260,277-278,300-301,305-306
+code/packages/sdk/src/nodes/node.ts
+  s_4dca8408c69d3d::t_f246366a8cf99f 51-54,59-62,64-86,88-94,97-99,494,1272-1274,1279-1280,1282,1287-1288,1292-1293,1301
+code/packages/sdk/src/nodes/video/__tests__/video.test.ts
+  s_4dca8408c69d3d::t_07f253e84595a2 9,1645-1672
+code/packages/sdk/src/nodes/video/video.ts
+  s_4dca8408c69d3d::t_a8d74f7776ebe0 341-342
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "2d9f07d6b8a9bb359a1d1ab8e4994066213e96d7",
+  "prompts": {},
+  "sessions": {
+    "s_4dca8408c69d3d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e8729c66bffeCiFqgByZpUgfcS",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
