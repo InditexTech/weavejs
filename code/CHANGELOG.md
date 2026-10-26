@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1226](https://github.com/InditexTech/weavejs/issues/1226) Shape label: use the native-canvas text engine and editor session
 - [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text node: rich text formatting, enabled via node config
+- [#1224](https://github.com/InditexTech/weavejs/issues/1224) Text node: native on-canvas editing (replace DOM textarea overlay)
 
 ### Fixed
 
