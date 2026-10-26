@@ -406,7 +406,9 @@ export class WeaveTextV2Shape extends Konva.Shape {
     )._canvas;
     const w = backing?.width ?? canvas.getWidth() * canvas.getPixelRatio();
     const h = backing?.height ?? canvas.getHeight() * canvas.getPixelRatio();
-    if (!(w > 0) || !(h > 0)) return null;
+    if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) {
+      return null;
+    }
     // device px -> local coords (inverse of the current matrix)
     let y1 = Infinity;
     let y2 = -Infinity;

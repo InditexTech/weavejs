@@ -54,6 +54,13 @@ import type {
   WeaveTextV2Properties,
 } from './types';
 
+/** How far `p` is outside [min, max] (0 inside), signed towards the range. */
+function overshoot(p: number, min: number, max: number): number {
+  if (p < min) return min - p;
+  if (p > max) return max - p;
+  return 0;
+}
+
 const CORNER_ANCHORS = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 const SIDE_ANCHORS = ['middle-right', 'middle-left'];
 const CORNER_ANCHOR_SET = new Set(CORNER_ANCHORS);
@@ -381,18 +388,8 @@ export class WeaveTextV2Node extends WeaveNode {
           const h = box.clientHeight;
           if (!w || !h) return;
           const f = this.config.edition.followPadding;
-          const dx =
-            p.x < f.left
-              ? f.left - p.x
-              : p.x > w - f.right
-              ? w - f.right - p.x
-              : 0;
-          const dy =
-            p.y < f.top
-              ? f.top - p.y
-              : p.y > h - f.bottom
-              ? h - f.bottom - p.y
-              : 0;
+          const dx = overshoot(p.x, f.left, w - f.right);
+          const dy = overshoot(p.y, f.top, h - f.bottom);
           if (!dx && !dy) return;
           stage.x(stage.x() + dx);
           stage.y(stage.y() + dy);
@@ -1025,8 +1022,8 @@ export class WeaveTextV2Node extends WeaveNode {
     const shape = nodeInstance as WeaveTextV2Shape;
     if (!this.isRich(shape)) return false;
     let v = value;
-    if (key === 'link' && v !== undefined && !isValidTextLink(String(v))) {
-      return false;
+    if (key === 'link' && v !== undefined) {
+      if (typeof v !== 'string' || !isValidTextLink(v)) return false;
     }
     if (key === 'size' && typeof value === 'number') {
       v = sizeToRatio(value, shape.fontSize());

@@ -237,7 +237,7 @@ export class TextEditModel {
   setMark(key: WeaveTextMarkKey, value: unknown): boolean {
     const { start, end } = this.getSelection();
     if (start === end) {
-      const base: Record<string, unknown> = { ...(this.caretMarks() ?? {}) };
+      const base: Record<string, unknown> = { ...this.caretMarks() };
       if (value === undefined || value === false) delete base[key];
       else base[key] = value;
       this.storedMarks = cleanMarks(base) ?? {};
@@ -304,7 +304,7 @@ export class TextEditModel {
     const { start, end } = this.getSelection();
     if (start !== end) return false;
     const b = this.blockAt(start);
-    if (!b || b.start !== start || !this.blocks[b.index].kind) return false;
+    if (b?.start !== start || !this.blocks[b.index].kind) return false;
     return this.commitFormat(outdentBlocks(this.blocks, start, start));
   }
 

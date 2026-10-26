@@ -130,9 +130,8 @@ export function fontString(s: TextLayoutStyle): string {
   const keywords = `${s.fontStyle} ${s.fontVariant}`
     .split(/\s+/)
     .filter((token) => token !== '' && token !== 'normal');
-  return `${[...keywords, `${s.fontSize}px`].join(' ')} ${normalizeFontFamily(
-    s.fontFamily
-  )}`;
+  const head = [...keywords, `${s.fontSize}px`].join(' ');
+  return `${head} ${normalizeFontFamily(s.fontFamily)}`;
 }
 
 /** Style of a run: node style overridden by the run marks. */

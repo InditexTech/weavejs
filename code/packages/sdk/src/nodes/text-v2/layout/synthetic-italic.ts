@@ -22,8 +22,12 @@ const MIN_SLANT = 3;
 
 const cache = new Map<string, boolean>();
 
-const ITALIC = /(^|\s)(italic|oblique)(\s|$)/;
-const SIZE = /\d+(\.\d+)?px/;
+const SIZE = /\d+(?:\.\d+)?px/;
+
+const isItalicToken = (token: string) =>
+  token === 'italic' || token === 'oblique';
+
+const hasItalic = (font: string) => font.split(' ').some(isItalicToken);
 
 /** Forget probe results (call after registering fonts late on a server). */
 export function clearSyntheticItalicCache(): void {
@@ -67,7 +71,7 @@ function slantOf(font: string): number | null {
  * when the probe cannot tell (no ink): never guess.
  */
 export function needsSyntheticItalic(font: string): boolean {
-  if (Konva.isBrowser || !ITALIC.test(font)) return false;
+  if (Konva.isBrowser || !hasItalic(font)) return false;
   const probe = font.replace(SIZE, `${PROBE_SIZE}px`);
   const hit = cache.get(probe);
   if (hit !== undefined) return hit;
@@ -75,7 +79,10 @@ export function needsSyntheticItalic(font: string): boolean {
   try {
     const italic = slantOf(probe);
     const upright = slantOf(
-      probe.replace(/(^|\s)(italic|oblique)(?=\s)/, ' ').trim()
+      probe
+        .split(' ')
+        .filter((token) => !isItalicToken(token))
+        .join(' ')
     );
     result =
       italic !== null && upright !== null && italic - upright < MIN_SLANT;

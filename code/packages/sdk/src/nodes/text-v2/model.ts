@@ -537,7 +537,7 @@ function alpha(n: number): string {
   let v = n;
   while (v > 0) {
     v--;
-    s = String.fromCharCode(97 + (v % 26)) + s;
+    s = String.fromCodePoint(97 + (v % 26)) + s;
     v = Math.floor(v / 26);
   }
   return s;
@@ -587,7 +587,7 @@ export function listMarkers(blocks: WeaveTextBlock[]): (string | null)[] {
     stack.length = Math.min(stack.length, d + 1);
     while (stack.length < d) stack.push({ kind: b.kind, n: 0 });
     const cur = stack[d];
-    if (!cur || cur.kind !== b.kind) {
+    if (cur?.kind !== b.kind) {
       stack[d] = {
         kind: b.kind,
         n: b.kind === 'ol' ? Math.max(1, b.start ?? 1) : 0,
@@ -598,7 +598,10 @@ export function listMarkers(blocks: WeaveTextBlock[]): (string | null)[] {
     if (b.kind === 'ul') return BULLETS[d % 3];
     const n = stack[d].n;
     const style = d % 3;
-    return `${style === 0 ? n : style === 1 ? alpha(n) : roman(n)}.`;
+    let label: string | number = n;
+    if (style === 1) label = alpha(n);
+    else if (style === 2) label = roman(n);
+    return `${label}.`;
   });
 }
 
@@ -651,7 +654,7 @@ export function getSelectionFormat(
     });
   }
   let size: MarkQuery;
-  if (ratios.length === 0 || ratios.every((r) => r === ratios[0])) {
+  if (ratios.every((r) => r === ratios[0])) {
     const r = ratios[0] ?? 1;
     size = {
       state: r === 1 ? 'none' : 'all',
