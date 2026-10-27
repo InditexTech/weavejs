@@ -281,9 +281,11 @@ export class WeaveTextV2Node extends WeaveNode {
    * field) must keep its default action (a new line).
    */
   private isEditingElsewhere(e: KeyboardEvent): boolean {
-    const sessions = (window as Window & {
-      weaveTextEditing?: Record<string, string>;
-    }).weaveTextEditing;
+    const sessions = (
+      window as Window & {
+        weaveTextEditing?: Record<string, string>;
+      }
+    ).weaveTextEditing;
     if (sessions && Object.keys(sessions).length > 0) return true;
     const t = e.target;
     return (
@@ -416,7 +418,7 @@ export class WeaveTextV2Node extends WeaveNode {
         }),
         signal: this.instance.getEventsController().signal,
         onChange: (blocks) => this.checkSize(shape, blocks),
-        onRequestExit: () => this.exitEditMode(shape),
+        onRequestExit: (reason) => this.exitEditMode(shape, reason),
       },
       shape.id()
     );
@@ -452,7 +454,7 @@ export class WeaveTextV2Node extends WeaveNode {
     }
   }
 
-  private exitEditMode(shape: WeaveTextV2Shape) {
+  private exitEditMode(shape: WeaveTextV2Shape, reason?: 'escape' | 'outside') {
     const session = this.session;
     if (!session || !this.editing) return;
 
@@ -479,7 +481,8 @@ export class WeaveTextV2Node extends WeaveNode {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       this.instance.enablePlugin('nodesSelection');
-      selectionPlugin.setSelectedNodes([liveNode]);
+      // Click outside deselects; re-selecting here would flash the transformer.
+      selectionPlugin.setSelectedNodes(reason === 'outside' ? [] : [liveNode]);
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
@@ -503,7 +506,9 @@ export class WeaveTextV2Node extends WeaveNode {
       const serialized = this.serialize(live);
       if (live.text() !== '') {
         const container = live.getParent();
-        live.destroy();
+        // Keep the temporary shape until the real node is rendered, so no
+        // frame is painted without the text (addNode is async via the store).
+        this.swapOnRendered(live);
         this.instance.addNode(serialized, container?.getAttrs().id);
       } else {
         live.destroy();
@@ -513,6 +518,36 @@ export class WeaveTextV2Node extends WeaveNode {
     }
     // Shared handler: never leak the create flag into the next session.
     this.createNode = false;
+  }
+
+  /** Destroy `temp` once the real node with the same id is in the tree. */
+  private swapOnRendered(temp: WeaveTextV2Shape) {
+    const id = temp.id();
+    const timer: { id?: ReturnType<typeof setTimeout> } = {};
+
+    const finish = (real?: Konva.Node) => {
+      clearTimeout(timer.id);
+      this.instance.removeEventListener('onNodeRenderedAdded', onRendered);
+      temp.destroy();
+      if (!real) return;
+      const selection =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      const selected = selection?.getSelectedNodes?.() ?? [];
+      if (selection && selected.some((n) => n.id() === id)) {
+        selection.setSelectedNodes([real as WeaveTextV2Shape]);
+      }
+      real.getLayer()?.batchDraw();
+    };
+
+    const onRendered = (node: Konva.Node) => {
+      // createInstance fires before the node is attached: ignore it.
+      if (node === temp || node.id() !== id || !node.getParent()) return;
+      finish(node);
+    };
+
+    this.instance.addEventListener('onNodeRenderedAdded', onRendered);
+    // Never leave a ghost shape if the add is rejected or never rendered.
+    timer.id = setTimeout(() => finish(), 2000);
   }
 
   private setupTransform(text: WeaveTextV2Shape) {

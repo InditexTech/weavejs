@@ -179,6 +179,81 @@ function sliceRuns(runs: WeaveTextRun[], from: number, to: number) {
   return out;
 }
 
+/** Blocks covering the global range [start, end), keeping structure and marks. */
+export function sliceBlocks(
+  blocks: WeaveTextBlock[],
+  start: number,
+  end: number
+): WeaveTextBlock[] {
+  const out: WeaveTextBlock[] = [];
+  let pos = 0;
+  for (const block of blocks) {
+    const len = blockText(block).length;
+    const bStart = pos;
+    const bEnd = pos + len;
+    pos = bEnd + 1;
+    if (bEnd < start || bStart > end) continue;
+    const runs = normalizeRuns(
+      sliceRuns(block.runs, Math.max(start, bStart) - bStart, end - bStart)
+    );
+    out.push({
+      ...blockFields(block, true),
+      runs,
+      ...(runs.length === 0 && block.m ? { m: block.m } : {}),
+    });
+  }
+  return out;
+}
+
+/**
+ * Replace the global range [start, end) with a fragment of blocks. A single
+ * block fragment merges inline; otherwise first/last fragment blocks merge
+ * with the text before/after the range.
+ */
+export function insertBlocks(
+  blocks: WeaveTextBlock[],
+  start: number,
+  end: number,
+  fragment: WeaveTextBlock[]
+): WeaveTextBlock[] {
+  if (fragment.length === 0) return blocks;
+  const total = blocksToText(blocks).length;
+  start = Math.max(0, Math.min(start, total));
+  end = Math.max(start, Math.min(end, total));
+  const head = sliceBlocks(blocks, 0, start);
+  const tail = sliceBlocks(blocks, end, total);
+  const before = head.pop() ?? { runs: [] };
+  const after = tail.shift() ?? { runs: [] };
+  const first = fragment[0];
+  const last = fragment[fragment.length - 1];
+  const finish = (b: WeaveTextBlock): WeaveTextBlock => {
+    const runs = normalizeRuns(b.runs);
+    const { m: _m, ...rest } = b;
+    return {
+      ...rest,
+      runs,
+      ...(runs.length === 0 && b.m ? { m: b.m } : {}),
+    };
+  };
+  if (fragment.length === 1) {
+    return [
+      ...head,
+      finish({
+        ...before,
+        runs: [...before.runs, ...first.runs, ...after.runs],
+      }),
+      ...tail,
+    ];
+  }
+  return [
+    ...head,
+    finish({ ...before, runs: [...before.runs, ...first.runs] }),
+    ...fragment.slice(1, -1).map(finish),
+    finish({ ...last, runs: [...last.runs, ...after.runs] }),
+    ...tail,
+  ];
+}
+
 /** Marks of the run at (or immediately before) a local offset. */
 function marksAt(runs: WeaveTextRun[], offset: number) {
   let pos = 0;
@@ -752,4 +827,43 @@ function alignQuery(
     return { state: 'some' };
   }
   return { state: 'all', value: set[0] };
+}
+
+export const WEAVE_TEXT_MIME = 'application/x-weave-text+json';
+
+/** Defensive parse of a clipboard payload; undefined when invalid. */
+export function parseWeaveClipboard(
+  raw: string | undefined
+): WeaveTextBlock[] | undefined {
+  if (!raw) return undefined;
+  try {
+    const data = JSON.parse(raw);
+    if (data?.v !== 1 || !Array.isArray(data.blocks) || !data.blocks.length) {
+      return undefined;
+    }
+    const out: WeaveTextBlock[] = [];
+    for (const b of data.blocks.slice(0, 5000)) {
+      if (!b || !Array.isArray(b.runs)) return undefined;
+      const runs: WeaveTextRun[] = [];
+      for (const r of b.runs) {
+        if (typeof r?.t !== 'string') return undefined;
+        const m = cleanMarks(
+          r.m && typeof r.m === 'object' ? { ...r.m } : undefined
+        );
+        if (m && 'link' in m && !isSafeLink(m.link)) delete m.link;
+        runs.push({ t: r.t, ...(m && Object.keys(m).length ? { m } : {}) });
+      }
+      const block: WeaveTextBlock = { runs: normalizeRuns(runs) };
+      if (b.kind === 'ul' || b.kind === 'ol') block.kind = b.kind;
+      if (Number.isInteger(b.depth) && b.depth > 0) block.depth = b.depth;
+      if (Number.isInteger(b.start)) block.start = b.start;
+      if (['left', 'center', 'right'].includes(b.align)) block.align = b.align;
+      const em = cleanMarks(b.m && typeof b.m === 'object' ? b.m : undefined);
+      if (!block.runs.length && em) block.m = em;
+      out.push(block);
+    }
+    return out;
+  } catch {
+    return undefined;
+  }
 }

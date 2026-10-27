@@ -14,6 +14,8 @@ import {
   queryMark,
   setBlockAlign,
   replaceRange,
+  insertBlocks,
+  sliceBlocks,
   toggleList,
   type WeaveTextBlock,
   type WeaveTextBlockAlign,
@@ -77,6 +79,10 @@ export class TextEditModel {
   getSelectedText(): string {
     const { start, end } = this.getSelection();
     return this.getText().slice(start, end);
+  }
+  getSelectedBlocks(): WeaveTextBlock[] {
+    const { start, end } = this.getSelection();
+    return sliceBlocks(this.blocks, start, end);
   }
   canUndo(): boolean {
     return this.undoStack.length > 0;
@@ -167,6 +173,20 @@ export class TextEditModel {
       }
     }
     this.anchor = this.focus = start + text.length;
+    this.lastEditEnd = this.focus;
+    this.desiredX = null;
+    return true;
+  }
+
+  /** Replace the selection with rich blocks; caret ends after them. */
+  replaceSelectionWithBlocks(fragment: WeaveTextBlock[], kind: EditKind) {
+    if (fragment.length === 0) return false;
+    const { start, end } = this.getSelection();
+    const insertedLen = blocksToText(fragment).length;
+    this.record(kind, start);
+    this.blocks = insertBlocks(this.blocks, start, end, fragment);
+    this.storedMarks = null;
+    this.anchor = this.focus = start + insertedLen;
     this.lastEditEnd = this.focus;
     this.desiredX = null;
     return true;

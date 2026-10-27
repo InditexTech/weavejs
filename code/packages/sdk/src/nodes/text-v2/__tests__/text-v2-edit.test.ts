@@ -289,6 +289,26 @@ describe('WeaveTextV2Node edit lifecycle', () => {
     expect(c.instance.updateNode).toHaveBeenCalledTimes(1);
   });
 
+  it('create flow: temp shape survives until real node renders (no blink)', () => {
+    const t = setup();
+    t.shape.text('');
+    t.edit(true);
+    t.input('New');
+    t.esc();
+    expect(t.main.findOne('#t1')).toBe(t.shape);
+    const call = (t.instance.addEventListener as ReturnType<typeof vi.fn>).mock
+      .calls.filter((c) => c[0] === 'onNodeRenderedAdded')
+      .pop();
+    const handler = call![1] as (n: unknown) => void;
+    const real = new Konva.Group({ id: 't1' });
+    handler(real); // not attached yet: ignored
+    expect(t.main.findOne('#t1')).toBe(t.shape);
+    t.main.add(real);
+    handler(real);
+    expect(t.shape.isDestroyed?.() ?? t.shape.getParent()).toBeFalsy();
+    expect(t.main.findOne('#t1')).toBe(real);
+  });
+
   it('auto layouts resize live while typing (smart grows, auto-height wraps)', () => {
     const t = setup();
     t.shape.setAttrs({

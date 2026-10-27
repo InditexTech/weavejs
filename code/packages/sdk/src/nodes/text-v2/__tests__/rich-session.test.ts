@@ -12,7 +12,7 @@ import {
   type TextEditHost,
   type TextEditTarget,
 } from '../edit/session';
-import type { WeaveTextBlock } from '../model';
+import { WEAVE_TEXT_MIME, type WeaveTextBlock } from '../model';
 
 function setup(blocks: WeaveTextBlock[], richText: boolean) {
   const container = document.createElement('div');
@@ -291,5 +291,95 @@ describe('edit cursor', () => {
     c.container.style.cursor = 'grab';
     c.session.destroy();
     expect(c.container.style.cursor).toBe('grab');
+  });
+
+  describe('rich clipboard', () => {
+    const clip = (c: ReturnType<typeof setup>, type: 'copy' | 'cut') => {
+      const store: Record<string, string> = {};
+      const e = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(e, 'clipboardData', {
+        value: { setData: (k: string, v: string) => (store[k] = v) },
+      });
+      c.ta.dispatchEvent(e);
+      return { e, store };
+    };
+    const paste = (
+      c: ReturnType<typeof setup>,
+      data: Record<string, string>
+    ) => {
+      const e = new Event('paste', { bubbles: true, cancelable: true });
+      Object.defineProperty(e, 'clipboardData', {
+        value: { getData: (k: string) => data[k] ?? '' },
+      });
+      c.ta.dispatchEvent(e);
+      return e;
+    };
+    const src: WeaveTextBlock[] = [
+      { runs: [{ t: 'ab', m: { bold: true } }, { t: 'cd' }] },
+      { kind: 'ul', runs: [{ t: 'ef' }] },
+    ];
+
+    it('copy writes plain text and weave payload', () => {
+      const c = make(src);
+      c.session.model.setSelection(1, 7);
+      const { e, store } = clip(c, 'copy');
+      expect(e.defaultPrevented).toBe(true);
+      expect(store['text/plain']).toBe('bcd\nef');
+      expect(JSON.parse(store[WEAVE_TEXT_MIME]).blocks).toHaveLength(2);
+    });
+
+    it('copy with empty selection or rich off is left native', () => {
+      const c = make(src);
+      c.session.model.setSelection(2, 2);
+      expect(clip(c, 'copy').e.defaultPrevented).toBe(false);
+      const p = make(src, false);
+      p.session.model.setSelection(0, 3);
+      expect(clip(p, 'copy').e.defaultPrevented).toBe(false);
+    });
+
+    it('cut copies then deletes, undoable', () => {
+      const c = make(src);
+      c.session.model.setSelection(0, 2);
+      const { store } = clip(c, 'cut');
+      expect(store['text/plain']).toBe('ab');
+      expect(c.session.model.getText()).toBe('cd\nef');
+      c.session.undo();
+      expect(c.session.model.getText()).toBe('abcd\nef');
+    });
+
+    it('paste of weave payload keeps marks and structure; one undo', () => {
+      const a = make(src);
+      a.session.model.setSelection(1, 7);
+      const { store } = clip(a, 'copy');
+      const b = make([{ runs: [{ t: 'xy' }] }]);
+      b.session.model.setSelection(1, 1);
+      const e = paste(b, { [WEAVE_TEXT_MIME]: store[WEAVE_TEXT_MIME] });
+      expect(e.defaultPrevented).toBe(true);
+      const blocks = b.session.model.getBlocks();
+      expect(blocks).toHaveLength(2);
+      expect(blocks[0].runs.map((r) => r.t)).toEqual(['x', 'b', 'cd']);
+      expect(blocks[0].runs[1].m).toEqual({ bold: true });
+      expect(blocks[1].kind).toBe('ul');
+      expect(b.session.model.getText()).toBe('xbcd\nefy');
+      b.session.undo();
+      expect(b.session.model.getText()).toBe('xy');
+    });
+
+    it('invalid payload or rich off falls back to plain text', () => {
+      const c = make([{ runs: [{ t: 'x' }] }]);
+      c.session.model.setSelection(1, 1);
+      paste(c, { [WEAVE_TEXT_MIME]: 'garbage', 'text/plain': 'P' });
+      expect(c.session.model.getText()).toBe('xP');
+      const p = make([{ runs: [{ t: 'x' }] }], false);
+      p.session.model.setSelection(1, 1);
+      paste(p, {
+        [WEAVE_TEXT_MIME]: JSON.stringify({
+          v: 1,
+          blocks: [{ runs: [{ t: 'Z' }] }],
+        }),
+        'text/plain': 'Q',
+      });
+      expect(p.session.model.getText()).toBe('xQ');
+    });
   });
 });
