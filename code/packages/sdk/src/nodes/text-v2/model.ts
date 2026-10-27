@@ -56,6 +56,8 @@ export type WeaveTextBlock = {
   depth?: number;
   start?: number;
   align?: WeaveTextBlockAlign;
+  /** Marks of an empty block (no runs); ignored and dropped once it has text. */
+  m?: WeaveTextMarks;
 };
 
 /** Only absolute http(s) URLs are links (same rule as the legacy node). */
@@ -66,6 +68,15 @@ export function isSafeLink(value: unknown): value is string {
   } catch {
     return false;
   }
+}
+
+/** Marks an empty block carries: normalized and never a link. */
+function emptyBlockMarks(
+  m: WeaveTextMarks | undefined
+): WeaveTextMarks | undefined {
+  if (!m) return undefined;
+  const { link: _link, ...rest } = m;
+  return normalizeMarks(rest);
 }
 
 /** Block fields that describe structure (not content). */
@@ -220,7 +231,7 @@ export function replaceRange(
         const local = start - bStart;
         before = sliceRuns(block.runs, 0, local);
         startBlock = block;
-        inheritedMarks = marksAt(block.runs, local);
+        inheritedMarks = len === 0 ? block.m : marksAt(block.runs, local);
       }
       if (end >= bStart && end <= bEnd) {
         after = sliceRuns(block.runs, end - bStart, len);
@@ -240,9 +251,12 @@ export function replaceRange(
     let runs = mk(line);
     if (idx === 0) runs = [...before, ...runs];
     if (idx === lines.length - 1) runs = [...runs, ...after];
+    const normalized = normalizeRuns(runs);
+    const carried = emptyBlockMarks(inheritedMarks);
     middle.push({
       ...blockFields(startBlock, idx === 0),
-      runs: normalizeRuns(runs),
+      runs: normalized,
+      ...(normalized.length === 0 && carried ? { m: carried } : {}),
     });
   });
 
@@ -331,7 +345,9 @@ export function marksAtOffset(
 ): WeaveTextMarks | undefined {
   for (const s of blockSpans(blocks)) {
     if (offset >= s.start && offset <= s.end) {
-      return cleanMarks(marksAt(blocks[s.index].runs, offset - s.start));
+      const block = blocks[s.index];
+      if (block.runs.length === 0) return cleanMarks(block.m);
+      return cleanMarks(marksAt(block.runs, offset - s.start));
     }
   }
   return undefined;
@@ -362,6 +378,35 @@ function mapRunsInRange(
   return { ...block, runs: normalizeRuns(runs) };
 }
 
+function withEmptyMark(
+  block: WeaveTextBlock,
+  key: WeaveTextMarkKey,
+  value: unknown
+): WeaveTextBlock {
+  const { m: _m, ...rest } = block;
+  const m = normalizeMarks({ ...block.m, [key]: value });
+  return m ? { ...rest, m } : rest;
+}
+
+/**
+ * Set (or remove with `undefined`) one mark on the empty block holding the
+ * collapsed offset. Other blocks are returned untouched.
+ */
+export function applyMarkToEmptyBlock(
+  blocks: WeaveTextBlock[],
+  offset: number,
+  key: WeaveTextMarkKey,
+  value: unknown
+): WeaveTextBlock[] {
+  const span = blockSpans(blocks).find(
+    (s) => offset >= s.start && offset <= s.end
+  );
+  if (!span || blocks[span.index].runs.length > 0) return blocks;
+  return blocks.map((b, i) =>
+    i === span.index ? withEmptyMark(b, key, value) : b
+  );
+}
+
 /** Set (or remove with `undefined`) one mark over the global range. */
 export function applyMark(
   blocks: WeaveTextBlock[],
@@ -380,6 +425,7 @@ export function applyMark(
   return blocks.map((block, i) => {
     const s = spans[i];
     if (s.end <= start || s.start >= end) return block;
+    if (block.runs.length === 0) return withEmptyMark(block, key, value);
     return mapRunsInRange(
       block,
       Math.max(start, s.start) - s.start,

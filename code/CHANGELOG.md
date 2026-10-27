@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1245](https://github.com/InditexTech/weavejs/issues/1245) Rich text: new list item after Enter loses marks (size); marker and empty line render at base size
+
 ### Security
 
 - [#1243](https://github.com/InditexTech/weavejs/issues/1243) Open Dependabot security alerts need to be resolved (next, zod, @azure/msal-node, fast-uri)

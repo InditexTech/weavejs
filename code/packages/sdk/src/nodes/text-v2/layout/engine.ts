@@ -230,6 +230,7 @@ type ParagraphEntry = {
   fonts: string[]; // canvas font per run
   lineHeights: number[]; // line height multiplier per run
   sizes: number[]; // px size per run
+  emptyMarks?: WeaveTextMarks; // marks of a block with no runs
   lines: ParagraphLine[];
 };
 
@@ -347,7 +348,9 @@ export class TextLayoutEngine {
   ): string {
     return `${fontString(style)}|${style.lineHeight}|${style.letterSpacing}|${
       style.wrap
-    }|${fixedWidth ? maxWidth - indent : 'auto'}|${JSON.stringify(block.runs)}`;
+    }|${fixedWidth ? maxWidth - indent : 'auto'}|${JSON.stringify(
+      block.runs
+    )}|${block.runs.length === 0 ? JSON.stringify(block.m ?? null) : ''}`;
   }
 
   /**
@@ -494,7 +497,7 @@ export class TextLayoutEngine {
       const startChar = entry.graphemes.slice(0, pl.startG).join('').length;
       let marker: LayoutMarker | undefined;
       if (first && opts.marker) {
-        const m0 = block.runs[0]?.m;
+        const m0 = block.runs[0]?.m ?? block.m;
         const rs = runStyle(style, m0);
         const stepPx = Math.min(indent, this.stepPx(style));
         marker = {
@@ -636,9 +639,13 @@ export class TextLayoutEngine {
         desc = Math.max(desc, m.descent);
       }
       if (seen.size === 0) {
-        size = style.fontSize;
-        height = style.lineHeight * size;
-        const m = this.metrics(baseFont, style.fontSize);
+        const rs = runStyle(style, entry.emptyMarks);
+        size = rs.fontSize;
+        height = (runLineHeight(entry.emptyMarks) ?? style.lineHeight) * size;
+        const m = this.metrics(
+          entry.emptyMarks ? fontString(rs) : baseFont,
+          size
+        );
         asc = m.ascent;
         desc = m.descent;
       }
@@ -670,6 +677,7 @@ export class TextLayoutEngine {
       fonts,
       lineHeights,
       sizes,
+      ...(block.runs.length === 0 && block.m ? { emptyMarks: block.m } : {}),
       lines: [],
     };
     const n = graphemes.length;
