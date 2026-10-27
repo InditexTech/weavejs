@@ -1,0 +1,19 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/clipboard-blocks.test.ts
+  s_6edd554198cb02::t_63b82556fd4729 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "2747fd7ecdab292fa1700e0298ce30eab555fb68",
+  "prompts": {},
+  "sessions": {
+    "s_6edd554198cb02": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e834b5330ffeLVYMC1rkd9PALF",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
