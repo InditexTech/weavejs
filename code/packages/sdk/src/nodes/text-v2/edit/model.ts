@@ -8,6 +8,7 @@ import {
   blocksToText,
   cleanMarks,
   indentBlocks,
+  applyMarkToEmptyBlock,
   marksAtOffset,
   outdentBlocks,
   queryMark,
@@ -241,6 +242,14 @@ export class TextEditModel {
       if (value === undefined || value === false) delete base[key];
       else base[key] = value;
       this.storedMarks = cleanMarks(base) ?? {};
+      // An empty block also keeps the mark so marker, line and remote
+      // clients follow it.
+      const next = applyMarkToEmptyBlock(this.blocks, start, key, value);
+      if (next !== this.blocks) {
+        const stored = this.storedMarks;
+        this.commitFormat(next);
+        this.storedMarks = stored;
+      }
       return true;
     }
     return this.commitFormat(applyMark(this.blocks, start, end, key, value));
@@ -324,7 +333,7 @@ function outdentToPlain(
 ): WeaveTextBlock[] {
   return blocks.map((b, i) => {
     if (i !== index) return b;
-    const { kind: _k, depth: _d, start: _s, ...rest } = b;
+    const { kind: _k, depth: _d, start: _s, m: _m, ...rest } = b;
     return rest;
   });
 }
