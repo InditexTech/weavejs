@@ -1,0 +1,29 @@
+code/package-lock.json
+  s_bfab4f6b0c2f5f::t_0ff50cecc27ba3 234-236,239,247-249,9300-9302,17679-17681,17933,17999
+code/package.json
+  s_bfab4f6b0c2f5f::t_b9595981b834aa 93,99
+code/packages/create-backend-app/template/package.json
+  s_bfab4f6b0c2f5f::t_b92f96b9b00315 31
+code/packages/create-frontend-app/template/package.json
+  s_bfab4f6b0c2f5f::t_d7d99e13ed34fb 8,38,57,73
+code/packages/sdk/package.json
+  s_bfab4f6b0c2f5f::t_2de394e3814f9c 63
+code/packages/store-azure-web-pubsub/package.json
+  s_bfab4f6b0c2f5f::t_5ef340975c5380 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "d38db629e4241ba5022faa348618da97fd210bf9",
+  "prompts": {},
+  "sessions": {
+    "s_bfab4f6b0c2f5f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e83924eeeffeN3th7w1dm4BG4J",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
