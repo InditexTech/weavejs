@@ -63,6 +63,11 @@ export const SECTION_RULES = [
 ];
 export const FALLBACK_SECTION = 'Changed';
 
+// Issues with these labels are out of scope for the changelog (tracking
+// issues such as "Release docs X" get `internal`). They are listed in the
+// report instead of the changelog, never dropped silently.
+export const EXCLUDED_LABELS = ['internal', 'kind/internal'];
+
 // Keep a Changelog order, used only to place a section that does not exist yet.
 const SECTION_ORDER = ['Added', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security'];
 
@@ -107,6 +112,7 @@ export function buildEntries(prs, { repo }) {
   const entries = [];
   const warnings = [];
   const bypassed = [];
+  const excluded = [];
   const seen = new Set();
 
   for (const pr of prs) {
@@ -125,6 +131,11 @@ export function buildEntries(prs, { repo }) {
         continue;
       }
       seen.add(key);
+      const outOfScope = issue.labels.find((label) => EXCLUDED_LABELS.includes(label.toLowerCase()));
+      if (outOfScope) {
+        excluded.push({ ref: issueRef(issue, repo), pr: pr.number, label: outOfScope });
+        continue;
+      }
       const { section, guessed } = sectionFor(issue.labels);
       if (guessed) {
         warnings.push(
@@ -133,11 +144,61 @@ export function buildEntries(prs, { repo }) {
             `so it is filed under ${FALLBACK_SECTION}. Label the issue to change it.`
         );
       }
-      entries.push({ section, guessed, pr: pr.number, url: issue.url, line: formatEntry(issue, repo) });
+      entries.push({
+        section,
+        guessed,
+        pr: pr.number,
+        ref: issueRef(issue, repo),
+        url: issue.url,
+        line: formatEntry(issue, repo),
+      });
     }
   }
 
-  return { entries, warnings, bypassed };
+  return { entries, warnings, bypassed, excluded };
+}
+
+// Issue URL -> version of the newest released section listing it. With
+// `olderThan`, only sections below `## [olderThan]` count, so a `--dry-run`
+// of an already released range is compared with what came before it.
+export function releasedUrls(text, { olderThan } = {}) {
+  const urls = new Map();
+  let version = null;
+  let counting = olderThan === undefined;
+  for (const line of text.split('\n')) {
+    const heading = /^## \[([^\]]+)\]/.exec(line);
+    if (heading) {
+      version = heading[1].toLowerCase() === 'unreleased' ? null : heading[1];
+      if (heading[1] === olderThan) {
+        counting = true;
+        version = null;
+      }
+      continue;
+    }
+    if (version && counting) {
+      for (const url of listedUrls([line])) {
+        if (!urls.has(url)) {
+          urls.set(url, version);
+        }
+      }
+    }
+  }
+  return urls;
+}
+
+// An issue closed again by a later PR (a follow-up fix) is not listed in a
+// second release: the entry is skipped with a warning.
+export function dropReleased(result, released) {
+  const entries = [];
+  for (const entry of result.entries) {
+    const version = released.get(entry.url);
+    if (version) {
+      result.warnings.push(`${entry.ref} is already listed in the [${version}] release, so it is not listed again.`);
+    } else {
+      entries.push(entry);
+    }
+  }
+  return { ...result, entries };
 }
 
 function findUnreleased(lines) {
@@ -324,18 +385,22 @@ const COMMIT_QUERY = `query($owner: String!, $name: String!, $oid: GitObjectID!)
 
 // The limits are far above real use; hitting one fails instead of silently
 // dropping an issue or a label that picks the section.
-function assertComplete(connection, what) {
+function assertComplete(connection, what, field) {
   if (connection.pageInfo?.hasNextPage) {
-    throw new Error(`Too many ${what} to read in one page; the changelog would be incomplete.`);
+    throw new Error(
+      `Too many ${what} to read in one page, so the changelog would be incomplete. Nothing was written ` +
+        'and, in the release job, nothing was tagged or published. Raise the `first:` limit of ' +
+        `\`${field}\` in .github/scripts/changelog-from-prs.mjs and run the workflow again.`
+    );
   }
   return connection.nodes;
 }
 
 function toPullRequest(node) {
-  assertComplete(node.labels, `labels on PR #${node.number}`);
-  assertComplete(node.closingIssuesReferences, `issues closed by PR #${node.number}`);
+  assertComplete(node.labels, `labels on PR #${node.number}`, 'labels');
+  assertComplete(node.closingIssuesReferences, `issues closed by PR #${node.number}`, 'closingIssuesReferences');
   for (const issue of node.closingIssuesReferences.nodes) {
-    assertComplete(issue.labels, `labels on issue ${issue.url}`);
+    assertComplete(issue.labels, `labels on issue ${issue.url}`, 'labels');
   }
   return {
     number: node.number,
@@ -437,7 +502,7 @@ export function createGitHubClient({
       if (!commit?.associatedPullRequests) {
         throw new Error(`Commit ${oid} not found in ${repo}.`);
       }
-      return assertComplete(commit.associatedPullRequests, `pull requests for commit ${oid}`).map(toPullRequest);
+      return assertComplete(commit.associatedPullRequests, `pull requests for commit ${oid}`, 'associatedPullRequests').map(toPullRequest);
     },
   };
 }
@@ -512,6 +577,18 @@ function renderEntries(entries) {
   return out;
 }
 
+function renderExcluded(result) {
+  if (result.excluded.length === 0) {
+    return [];
+  }
+  return [
+    `**Out of scope** (labelled ${EXCLUDED_LABELS.map((label) => `\`${label}\``).join(' or ')}, no entry)`,
+    '',
+    ...result.excluded.map((item) => `- ${item.ref} (\`${item.label}\`, PR #${item.pr})`),
+    '',
+  ];
+}
+
 export function renderPullRequestReport({ pr, result, enforce }) {
   const out = ['### Changelog', ''];
   const reason = bypassReason(pr);
@@ -534,6 +611,8 @@ export function renderPullRequestReport({ pr, result, enforce }) {
       '',
       `A maintainer can waive the rule with the \`${BYPASS_LABEL}\` label, which also skips the release on merge.`
     );
+  } else if (result.entries.length === 0) {
+    out.push('The issues this PR closes get no changelog entry (see below).', '');
   } else {
     out.push(
       skipRelease
@@ -543,6 +622,9 @@ export function renderPullRequestReport({ pr, result, enforce }) {
       ...renderEntries(result.entries)
     );
     out.push('The text is the issue title, read at release time: edit the issue title or labels to change it.');
+  }
+  if (result.excluded.length > 0) {
+    out.push('', ...renderExcluded(result));
   }
   const warnings = result.warnings.filter((warning) => !warning.startsWith(`PR #${pr.number} has no linked issue`));
   if (warnings.length > 0) {
@@ -566,6 +648,7 @@ export function renderRangeReport({ from, to, prs, result, applied, orphanCommit
   if (result.warnings.length > 0) {
     out.push('**Warnings**', '', ...result.warnings.map((warning) => `- ${warning}`), '');
   }
+  out.push(...renderExcluded(result));
   if (result.bypassed.length > 0) {
     out.push('**Bypassed pull requests**', '', ...result.bypassed.map((item) => `- #${item.pr} ${item.reason}`), '');
   }
@@ -622,6 +705,13 @@ function writeReport(path, report) {
   }
 }
 
+function readChangelog(path) {
+  if (!existsSync(path)) {
+    throw new Error(`${path} does not exist.`);
+  }
+  return readFileSync(path, 'utf8');
+}
+
 function applyToChangelog(path, entries, dryRun) {
   const before = readFileSync(path, 'utf8');
   const applied = applyEntries(before, entries);
@@ -676,7 +766,10 @@ export async function main(argv = process.argv.slice(2)) {
       throw new Error(`--pr expects a pull request number, got "${values.pr}".`);
     }
     const pr = await client.pullRequest(number);
-    const result = buildEntries([pr], { repo });
+    let result = buildEntries([pr], { repo });
+    if (values.changelog) {
+      result = dropReleased(result, releasedUrls(readChangelog(values.changelog)));
+    }
     if (values.changelog && result.entries.length > 0) {
       applyToChangelog(values.changelog, result.entries, dryRun);
     }
@@ -699,20 +792,18 @@ export async function main(argv = process.argv.slice(2)) {
   const from = values.from ?? lastReleaseTag(to);
   const commits = firstParentCommits(from, to);
   const { prs, orphanCommits } = await pullRequestsForCommits(client, commits, { branch: values.branch });
-  const result = buildEntries(prs, { repo });
+  let result = buildEntries(prs, { repo });
 
   let applied = null;
   let comparison = null;
-  if (values.changelog && existsSync(values.changelog)) {
+  if (values.changelog) {
+    const text = readChangelog(values.changelog);
+    const released = dryRun ? releasedSection(text, to) : null;
+    result = dropReleased(result, releasedUrls(text, { olderThan: released ? to : undefined }));
     applied = applyToChangelog(values.changelog, result.entries, dryRun);
-    if (dryRun) {
-      const released = releasedSection(readFileSync(values.changelog, 'utf8'), to);
-      if (released) {
-        comparison = compareWithReleased(result.entries, released, to);
-      }
+    if (released) {
+      comparison = compareWithReleased(result.entries, released, to);
     }
-  } else if (values.changelog) {
-    throw new Error(`${values.changelog} does not exist.`);
   }
 
   writeReport(values.report, renderRangeReport({ from, to, prs, result, applied, orphanCommits, comparison }));

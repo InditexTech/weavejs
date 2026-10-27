@@ -132,6 +132,7 @@ As you can see to test you can repeat steps 1-3 as many times as you want.
 - Link the PR to the issue it solves: add `Closes #ISSUE_ID` to the PR description (the PR template has the line), or link the issue from the Development sidebar. A plain `#ISSUE_ID` mention does not count. GitHub only reads closing keywords on PRs to the default branch, so for a `main-*` branch use the Development sidebar.
   - Do not edit `code/CHANGELOG.md`: the release job generates one entry per linked issue, `- [#ISSUE_ID](https://github.com/InditexTech/weavejs/issues/ISSUE_ID) ISSUE_TITLE`, with the **verbatim title of the issue** at release time.
   - The section comes from the issue labels, first match wins: `security` → Security, `bug` → Fixed, `enhancement` or `kind/feature` → Added, anything else → Changed (flagged as guessed).
+  - Issues labelled `internal` or `kind/internal` (for example tracking issues like "Release docs X") get no entry, and an issue already listed in an earlier release is not listed again. Both are shown in the report.
   - To change the wording of an entry, edit the issue title; to change its section, change the issue labels.
   - The `Changelog / Linked issue` check reports the entries the PR will generate. Dependabot PRs are exempt.
 

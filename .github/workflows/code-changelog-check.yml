@@ -52,7 +52,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          ARGS=(--pr "$PR_NUMBER" --report "$GITHUB_STEP_SUMMARY")
+          # --dry-run: reads code/CHANGELOG.md to report issues already
+          # released, never writes it.
+          ARGS=(--pr "$PR_NUMBER" --changelog code/CHANGELOG.md --dry-run --report "$GITHUB_STEP_SUMMARY")
           if [[ "$CHANGELOG_LINK_ENFORCE" == 'true' ]]; then
             ARGS+=(--enforce)
           fi

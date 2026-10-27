@@ -1,6 +1,6 @@
 ## Changelog
 
-Do not edit `code/CHANGELOG.md`. The release job generates its entries from the issues that merged PRs close (`.github/scripts/changelog-from-prs.mjs`). Every PR must be linked to its issue with `Closes #<n>` in the description or from the Development sidebar; a plain `#<n>` mention does not count. The entry is the issue title, verbatim, and its section comes from the issue labels (`security` → Security, `bug` → Fixed, `enhancement` or `kind/feature` → Added, otherwise Changed). Fix an entry by editing the issue title or labels.
+Do not edit `code/CHANGELOG.md`. The release job generates its entries from the issues that merged PRs close (`.github/scripts/changelog-from-prs.mjs`). Every PR must be linked to its issue with `Closes #<n>` in the description or from the Development sidebar; a plain `#<n>` mention does not count. The entry is the issue title, verbatim, and its section comes from the issue labels (`security` → Security, `bug` → Fixed, `enhancement` or `kind/feature` → Added, otherwise Changed); issues labelled `internal` or `kind/internal` get no entry. Fix an entry by editing the issue title or labels.
 
 ## Agent skills
 

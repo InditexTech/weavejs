@@ -11,10 +11,12 @@ import {
   buildEntries,
   compareWithReleased,
   createGitHubClient,
+  dropReleased,
   formatEntry,
   normalizeTitle,
   pullRequestsForCommits,
   releasedSection,
+  releasedUrls,
   renderPullRequestReport,
   sectionFor,
 } from './changelog-from-prs.mjs';
@@ -118,6 +120,19 @@ describe('buildEntries', () => {
     assert.deepEqual(entries.map((entry) => entry.pr), [2]);
     assert.deepEqual(warnings, []);
     assert.deepEqual(bypassed.map((item) => item.pr), [1]);
+  });
+
+  it('lists internal issues as out of scope instead of writing them', () => {
+    const { entries, excluded, warnings } = buildEntries(
+      [pr(1, [issue(40, 'Release docs 5.7.0', ['internal']), issue(41, 'Tracking', ['kind/internal', 'bug']), issue(42, 'Real', ['bug'])])],
+      { repo: REPO }
+    );
+    assert.deepEqual(entries.map((entry) => entry.ref), ['#42']);
+    assert.deepEqual(excluded, [
+      { ref: '#40', pr: 1, label: 'internal' },
+      { ref: '#41', pr: 1, label: 'kind/internal' },
+    ]);
+    assert.deepEqual(warnings, []);
   });
 
   it('exempts Dependabot', () => {
@@ -224,6 +239,38 @@ describe('applyEntries', () => {
   });
 });
 
+describe('releasedUrls / dropReleased', () => {
+  const history = `${CHANGELOG.replace('[Unreleased]: ', '')}
+## [5.7.0] - 2026-10-26
+
+### Fixed
+
+- [#1147](https://github.com/InditexTech/weavejs/issues/1147) Fixed earlier
+`;
+
+  it('skips an issue that an earlier release already lists, with a warning', () => {
+    const result = buildEntries([pr(1, [issue(1147, 'Fixed earlier', ['bug']), issue(1300, 'New', ['bug'])])], { repo: REPO });
+    const kept = dropReleased(result, releasedUrls(history));
+    assert.deepEqual(kept.entries.map((entry) => entry.ref), ['#1300']);
+    assert.deepEqual(kept.warnings, ['#1147 is already listed in the [5.7.0] release, so it is not listed again.']);
+  });
+
+  it('maps each issue to the newest release listing it and ignores [Unreleased]', () => {
+    const urls = releasedUrls(
+      history.replace('## [Unreleased]\n', '## [Unreleased]\n\n- [#1300](https://github.com/InditexTech/weavejs/issues/1300) Pending\n')
+    );
+    assert.equal(urls.get('https://github.com/InditexTech/weavejs/issues/1246'), '5.7.1');
+    assert.equal(urls.get('https://github.com/InditexTech/weavejs/issues/1147'), '5.7.0');
+    assert.equal(urls.has('https://github.com/InditexTech/weavejs/issues/1300'), false);
+  });
+
+  it('with olderThan, only counts the releases below that version', () => {
+    const urls = releasedUrls(history, { olderThan: '5.7.1' });
+    assert.equal(urls.has('https://github.com/InditexTech/weavejs/issues/1246'), false);
+    assert.equal(urls.get('https://github.com/InditexTech/weavejs/issues/1147'), '5.7.0');
+  });
+});
+
 describe('releasedSection / compareWithReleased', () => {
   it('reports differences with a hand-written section', () => {
     const released = releasedSection(CHANGELOG, '5.7.1');
@@ -257,6 +304,14 @@ describe('renderPullRequestReport', () => {
     const report = renderPullRequestReport({ pr: linked, result: buildEntries([linked], { repo: REPO }), enforce: false });
     assert.match(report, /publishes no release\. These entries go into the next release/);
     assert.match(report, /\*\*Fixed\*\*\n\n- \[#9\]/);
+  });
+
+  it('says why a linked PR gets no entry when its issues are internal', () => {
+    const tracking = pr(3, [issue(40, 'Release docs 5.7.0', ['internal'])]);
+    const report = renderPullRequestReport({ pr: tracking, result: buildEntries([tracking], { repo: REPO }), enforce: true });
+    assert.match(report, /get no changelog entry \(see below\)/);
+    assert.match(report, /\*\*Out of scope\*\*.*\n\n- #40 \(`internal`, PR #3\)/);
+    assert.doesNotMatch(report, /:x:/);
   });
 });
 
@@ -331,7 +386,10 @@ describe('createGitHubClient', () => {
           },
         }),
     });
-    await assert.rejects(client.pullRequest(4), /Too many issues closed by PR #4/);
+    await assert.rejects(
+      client.pullRequest(4),
+      /Too many issues closed by PR #4 .*nothing was tagged or published\. Raise the `first:` limit of `closingIssuesReferences`/
+    );
   });
 
   it('requires a token', () => {
