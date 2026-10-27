@@ -47,7 +47,7 @@ kbd:[End] and kbd:[Up] / kbd:[Down] move and select as expected, and IME composi
 * kbd:[Ctrl]/kbd:[Cmd] + kbd:[Z] undoes your typing while you edit, without touching the rest of the
 canvas history. Leaving edit mode (kbd:[Esc] or clicking outside) saves everything as one undoable
 step.
-* Copy and paste use plain text; pasted text takes the formatting at the caret.
+* Copy, cut and paste between Text V2 nodes keep marks and lists when rich text is on. Text from any other source, or with rich text off, pastes as plain text with the formatting at the caret.
 * The canvas pans to follow the caret when you type past the edge of the view. Configure the margin
 with `edition.followPadding` (default 40 px per side), for example to keep the caret clear of your
 toolbars.
