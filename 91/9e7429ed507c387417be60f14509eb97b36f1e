@@ -1,0 +1,25 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/clipboard-blocks.test.ts
+  s_6edd554198cb02::t_e4e0e63c375046 1-49
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_6edd554198cb02::t_353f15cde8bcfb 17-18,83-86,181-194
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_6edd554198cb02::t_c4d0d7423e3a37 8-10,139-140,473-498,502-514
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_6edd554198cb02::t_1d97c75f8f9050 182-256,831-869
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "919e7429ed507c387417be60f14509eb97b36f1e",
+  "prompts": {},
+  "sessions": {
+    "s_6edd554198cb02": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e834b5330ffeLVYMC1rkd9PALF",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
