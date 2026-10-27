@@ -1,0 +1,59 @@
+---
+name: code-changelog-check
+
+# Every pull request must be linked to the issue it closes: the release job
+# generates the CHANGELOG.md entries from those issues. See
+# .github/scripts/changelog-from-prs.mjs.
+
+concurrency:
+  group: changelog-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    # `edited` because the link lives in the PR body; `labeled`/`unlabeled`
+    # because `skip-release` waives the rule.
+    types: [opened, synchronize, ready_for_review, labeled, unlabeled, edited]
+    branches: ['main', 'main-*']
+
+permissions: {}
+
+env:
+  # Warn-only until the first release with generated entries has gone
+  # through. A follow-up PR sets this to 'true' to fail unlinked PRs.
+  CHANGELOG_LINK_ENFORCE: 'false'
+
+jobs:
+  linked-issue:
+    name: Changelog / Linked issue
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version-file: code/.tool-versions
+
+      - name: Test the changelog script
+        run: node --test .github/scripts/changelog-from-prs.test.mjs
+
+      # Fork PRs get a read-only token, so the result goes to the job summary
+      # rather than a PR comment.
+      - name: Check the linked issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          ARGS=(--pr "$PR_NUMBER" --report "$GITHUB_STEP_SUMMARY")
+          if [[ "$CHANGELOG_LINK_ENFORCE" == 'true' ]]; then
+            ARGS+=(--enforce)
+          fi
+          node .github/scripts/changelog-from-prs.mjs "${ARGS[@]}"

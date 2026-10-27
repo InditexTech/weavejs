@@ -59,7 +59,7 @@ function stripStrayEscapes(text) {
   return out;
 }
 
-function normalizeInvisibleWhitespace(text) {
+export function normalizeInvisibleWhitespace(text) {
   return text.replace(ZERO_WIDTH, '').replace(SPACE_LIKE, ' ');
 }
 

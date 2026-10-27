@@ -12,7 +12,7 @@ Any pull request `labeled` to `main` branch about `code` path with `release-type
 
 ## Preconditions
 
-In case the changelog generation is desirable, a requirement for a successful run is to fill the CHANGELOG.md unreleased section with the issues that are included in the release.
+The PR should be linked to the issue it closes (`Closes #N` or the Development sidebar): the CHANGELOG.md entries are generated from the linked issues, not edited by hand. The link itself is checked by [`code-changelog-check`](code-changelog-check.md).
 
 ## Jobs
 
@@ -27,14 +27,12 @@ In case the changelog generation is desirable, a requirement for a successful ru
   - **Steps**
 
     - Checkout the repository in the specific pull request.
-    - Setup Maven and Asdf caches.
-    - Configure asdf environment with the added tools in the `.tool-versions` file.
-    - Setup JAVA_HOME env var.
+    - Setup Node from `code/.tool-versions`.
     - Get release type from a label on the pull request. It could be one of the following: `release-type/hotfix`, `release-type/multi-hotfix`, `release-type/patch`, `release-type/minor` and `release-type/major`.
     - Check the merge strategy needed, depending if it is a hotfix release and the development flow used.
-    - Check if CHANGELOG.md changes are added. If not, the workflow will throw an error and a message will be shown.
+    - Run `.github/scripts/changelog-from-prs.mjs --pr <number>` to write this PR's entries into the local `[Unreleased]` section and report them, with their sections and warnings.
     - Usage of `release-flow/keep-a-changelog-action` action to generate the `CHANGELOG.md` preview.
-    - Add a PR comment with the `CHANGELOG.md` on the open pull request.
+    - Add a PR comment with the next version, the `CHANGELOG.md` preview and the generated entries. On fork PRs, whose token cannot comment, the preview goes to the job summary.
 
 - ### `release-preview-no-code-changes`
   - Executed if ((a `release-type/*` label is added OR a `release-preview` label is added) AND the previous `dorny/paths-filter` action DOES NOT detects changes in the configured paths)
