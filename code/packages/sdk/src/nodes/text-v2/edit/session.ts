@@ -5,6 +5,9 @@
 import Konva from 'konva';
 import type { TextLayout } from '../layout/engine';
 import {
+  WEAVE_TEXT_MIME,
+  blocksToText,
+  parseWeaveClipboard,
   getSelectionFormat,
   type WeaveTextBlock,
   type WeaveTextBlockAlign,
@@ -133,6 +136,8 @@ export class TextEditSession {
     ta.addEventListener('beforeinput', this.onBeforeInput, opts);
     ta.addEventListener('input', this.onInput, opts);
     ta.addEventListener('paste', this.onPaste, opts);
+    ta.addEventListener('copy', this.onCopy, opts);
+    ta.addEventListener('cut', this.onCut, opts);
     ta.addEventListener('compositionstart', this.onCompositionStart, opts);
     ta.addEventListener('compositionend', this.onCompositionEnd, opts);
     ta.addEventListener('select', this.syncFromTextarea, opts);
@@ -465,9 +470,48 @@ export class TextEditSession {
     return 'type';
   }
 
+  private writeRich(e: ClipboardEvent): boolean {
+    const { start, end } = this.model.getSelection();
+    if (start === end || !this.host.richText || !e.clipboardData) return false;
+    e.clipboardData.setData('text/plain', this.model.getSelectedText());
+    e.clipboardData.setData(
+      WEAVE_TEXT_MIME,
+      JSON.stringify({ v: 1, blocks: this.model.getSelectedBlocks() })
+    );
+    e.preventDefault();
+    return true;
+  }
+
+  private onCopy = (e: ClipboardEvent) => {
+    e.stopPropagation();
+    this.writeRich(e);
+  };
+
+  private onCut = (e: ClipboardEvent) => {
+    e.stopPropagation();
+    if (!this.writeRich(e)) return;
+    if (this.model.replaceSelection('', 'delete')) {
+      this.syncTextarea();
+      this.afterContentChange(0);
+    }
+  };
+
   private onPaste = (e: ClipboardEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    if (this.host.richText) {
+      const blocks = parseWeaveClipboard(
+        e.clipboardData?.getData(WEAVE_TEXT_MIME)
+      );
+      if (blocks) {
+        const len = blocksToText(blocks).length;
+        if (this.model.replaceSelectionWithBlocks(blocks, 'paste')) {
+          this.syncTextarea();
+          this.afterContentChange(len);
+        }
+        return;
+      }
+    }
     const raw = e.clipboardData?.getData('text/plain') ?? '';
     if (raw === '') return;
     this.insertText(raw.replace(/\r\n?/g, '\n'), 'paste');
