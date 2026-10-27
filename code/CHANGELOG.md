@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1246](https://github.com/InditexTech/weavejs/issues/1246) Text V2: newly created node blinks when leaving first edit session
 - [#1245](https://github.com/InditexTech/weavejs/issues/1245) Rich text: new list item after Enter loses marks (size); marker and empty line render at base size
 
 ### Security
