@@ -119,8 +119,8 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | released in 5.7.0 |
 | sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | released in 5.7.0 |
 | sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | released in 5.7.0 |
-| main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.0 |
-| sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.0 |
+| main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
+| sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
 | main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
 | sdk:api-reference/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
 | sdk:api-reference/nodes/rectangle.adoc | `code/packages/sdk/src/nodes/rectangle/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |

@@ -63,7 +63,7 @@ const node = new WeaveTextV2Node({
 * The pointer is a text cursor (I-beam) over the text box while editing and the default cursor
   outside it, also while dragging a selection. Elements with mono:[data-weave-text-edit-keep] and touch
   pointers keep their own cursor. It is restored when the session ends.
-* Clipboard is plain text only. Large pastes are laid out in time slices.
+* Clipboard: with rich text on, copy and cut write `text/plain` plus a `WEAVE_TEXT_MIME` payload (`{ v: 1, blocks }`) that paste restores with marks and lists. Otherwise it is plain text. Large pastes are laid out in time slices.
 * While editing, the stage pans to keep the caret in view; the margin is mono:[edition.followPadding].
 * A pointer press inside an element with the attribute mono:[data-weave-text-edit-keep] does not end
   the edit session, so an app toolbar or sidebar can apply formatting commands to the live selection.
@@ -151,8 +151,8 @@ mono:[applyMark] with `link`.
 
 When editing with rich text enabled: kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I], kbd:[U] toggle marks;
 kbd:[Enter] continues a list item (and the formatting of the text before it) and exits on an empty one; kbd:[Backspace] at the start of an item
-outdents it or removes the marker; kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change the depth. Pasting inserts
-plain text with the marks at the caret. With it disabled, kbd:[Enter] in a list item still creates
+outdents it or removes the marker; kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change the depth. Pasting a
+`WEAVE_TEXT_MIME` payload restores its marks and lists; other text is inserted as plain text with the marks at the caret. With it disabled, kbd:[Enter] in a list item still creates
 an item with the same `kind` and `depth`.
 
 Link runs are drawn with `link.defaultColor` and an underline; the hovered run uses `link.hoverColor`
