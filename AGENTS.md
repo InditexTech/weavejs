@@ -1,3 +1,7 @@
+## Changelog
+
+Every change needs an entry in `code/CHANGELOG.md` under `[Unreleased]`, in the right Keep a Changelog subsection (Added, Changed, Fixed, Security, ...). Format: `- [#<n>](https://github.com/InditexTech/weavejs/issues/<n>) <title>`. The `<title>` is the exact GitHub issue title, verbatim. Do not rewrite or summarize it.
+
 ## Agent skills
 
 ### Issue tracker
