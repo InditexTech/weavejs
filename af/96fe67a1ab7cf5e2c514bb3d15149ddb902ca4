@@ -1,0 +1,49 @@
+code/CHANGELOG.md
+  s_2d6ff00bbd9a13::t_5b8d1ee45beba2 16-19
+code/packages/sdk/src/nodes/text-v2/__tests__/empty-block-marks.test.ts
+  s_2d6ff00bbd9a13::t_7ba6aaf4d5903e 1-126
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_2d6ff00bbd9a13::t_88c9aa273598bc 11,245-252,336
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_2d6ff00bbd9a13::t_57426118781418 233,351-353,500,642-648,680
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_2d6ff00bbd9a13::t_3490c8f17b51bc 59-60,73-81,234,254-255,258-259,348-350,381-409,428
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_2d6ff00bbd9a13::t_bbe3bf7f113f77 85
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/.openspec.yaml
+  s_2d6ff00bbd9a13::t_c0fe74e783e271 1-2
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/design.md
+  s_2d6ff00bbd9a13::t_61f1abe856384f 1-23
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/proposal.md
+  s_2d6ff00bbd9a13::t_67a9b9f5f2e79e 1-28
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/specs/text-v2/editing/spec.md
+  s_2d6ff00bbd9a13::t_ede42ff9e35898 1-16
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/specs/text-v2/layout/spec.md
+  s_2d6ff00bbd9a13::t_9c7b15d87addba 1-16
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/specs/text-v2/model/spec.md
+  s_2d6ff00bbd9a13::t_f57ca11b30b841 1-24
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/tasks.md
+  s_2d6ff00bbd9a13::t_380f75ff6affc1 1-23
+openspec/specs/text-v2/editing/spec.md
+  s_2d6ff00bbd9a13::t_d3c057fbdb568d 126-140
+openspec/specs/text-v2/layout/spec.md
+  s_2d6ff00bbd9a13::t_bfe351675c8767 116-130
+openspec/specs/text-v2/model/spec.md
+  s_2d6ff00bbd9a13::t_8b4a52df9f0f80 87-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "af96fe67a1ab7cf5e2c514bb3d15149ddb902ca4",
+  "prompts": {},
+  "sessions": {
+    "s_2d6ff00bbd9a13": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e8379b6f6ffe8wfdJBFnAVAi71",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
