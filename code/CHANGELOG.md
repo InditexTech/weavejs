@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- [#1243](https://github.com/InditexTech/weavejs/issues/1243) Open Dependabot security alerts need to be resolved (next, zod, @azure/msal-node, fast-uri)
+
 ## [5.7.0] - 2026-10-26
 
 ### Added

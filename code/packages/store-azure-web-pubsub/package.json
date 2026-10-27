@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@azure/identity": "4.13.2",
+    "@azure/msal-node": "^7.1.0",
     "@azure/web-pubsub": "1.2.0",
     "@inditextech/weave-sdk": "5.8.0-SNAPSHOT",
     "@inditextech/weave-types": "5.8.0-SNAPSHOT",
