@@ -1298,7 +1298,7 @@ rewriting the document; a whole-text <code>link</code> becomes a full-range <cod
 <div class="paragraph">
 <p>Marks are <code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>, <code>color</code>, <code>size</code> and <code>family</code> <code>lineHeight</code> (a multiplier of the run font size, clamped to 0.5 to 4) and <code>link</code> (a per-run URL). <code>size</code> is a ratio of the node <code>fontSize</code>, so resizing the node
 or calling <code class="dt-mono">setBaseFontSize</code> scales every run. Blocks may carry <code>kind</code> (<code>ul</code> or <code>ol</code>), <code>depth</code>
-and <code>start</code> to form lists, and <code>align</code> (<code>left</code>, <code>center</code> or <code>right</code>) for the paragraph. Documents without marks and lists are byte-identical to before.</p>
+and <code>start</code> to form lists, and <code>align</code> (<code>left</code>, <code>center</code> or <code>right</code>) for the paragraph. An empty block may also carry <code>m</code> (marks, never <code>link</code>) so a new list item keeps the previous item&#8217;s size and format before any text is typed; it is dropped once the block has text. Documents without marks and lists are byte-identical to before.</p>
 </div>
 <div class="paragraph">
 <p>Marks and lists already present in a document always render and are preserved when the text is
