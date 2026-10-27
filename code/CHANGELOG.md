@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.7.1] - 2026-10-27
+
 ### Fixed
 
 - [#1246](https://github.com/InditexTech/weavejs/issues/1246) Text V2: newly created node blinks when leaving first edit session
@@ -1976,7 +1978,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.7.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.7.1...HEAD
+
+[5.7.1]: https://github.com/InditexTech/weavejs/compare/5.7.0...5.7.1
 
 [5.7.0]: https://github.com/InditexTech/weavejs/compare/5.6.0...5.7.0
 
