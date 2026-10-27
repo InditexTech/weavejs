@@ -35,10 +35,9 @@ const labelBlocksSchema = z.array(
  * `labelBlocks` are replaced wholesale and cleared when the next props carry
  * none (the state merge alone would keep a stale value).
  */
-export function applyLabelBlocksState<T extends { props: Record<string, unknown> }>(
-  state: T,
-  nextProps: WeaveElementAttributes
-): T {
+export function applyLabelBlocksState<
+  T extends { props: Record<string, unknown> }
+>(state: T, nextProps: WeaveElementAttributes): T {
   if (nextProps.labelBlocks) state.props.labelBlocks = nextProps.labelBlocks;
   else delete state.props.labelBlocks;
   return state;
@@ -53,20 +52,40 @@ export function resolveLabelBlocks(
   return blocksToText(blocks) === (props.labelText ?? '') ? blocks : undefined;
 }
 
-export function spreadLabelProps(props: WeaveElementAttributes): Partial<WeaveElementAttributes> {
+export function spreadLabelProps(
+  props: WeaveElementAttributes
+): Partial<WeaveElementAttributes> {
   return {
     ...(props.labelText !== undefined && { labelText: props.labelText }),
-    ...(props.labelFontFamily !== undefined && { labelFontFamily: props.labelFontFamily }),
-    ...(props.labelFontSize !== undefined && { labelFontSize: props.labelFontSize }),
-    ...(props.labelFontStyle !== undefined && { labelFontStyle: props.labelFontStyle }),
-    ...(props.labelFontVariant !== undefined && { labelFontVariant: props.labelFontVariant }),
+    ...(props.labelFontFamily !== undefined && {
+      labelFontFamily: props.labelFontFamily,
+    }),
+    ...(props.labelFontSize !== undefined && {
+      labelFontSize: props.labelFontSize,
+    }),
+    ...(props.labelFontStyle !== undefined && {
+      labelFontStyle: props.labelFontStyle,
+    }),
+    ...(props.labelFontVariant !== undefined && {
+      labelFontVariant: props.labelFontVariant,
+    }),
     ...(props.labelFill !== undefined && { labelFill: props.labelFill }),
     ...(props.labelAlign !== undefined && { labelAlign: props.labelAlign }),
-    ...(props.labelVerticalAlign !== undefined && { labelVerticalAlign: props.labelVerticalAlign }),
-    ...(props.labelLetterSpacing !== undefined && { labelLetterSpacing: props.labelLetterSpacing }),
-    ...(props.labelLineHeight !== undefined && { labelLineHeight: props.labelLineHeight }),
-    ...(props.labelPaddingX !== undefined && { labelPaddingX: props.labelPaddingX }),
-    ...(props.labelPaddingY !== undefined && { labelPaddingY: props.labelPaddingY }),
+    ...(props.labelVerticalAlign !== undefined && {
+      labelVerticalAlign: props.labelVerticalAlign,
+    }),
+    ...(props.labelLetterSpacing !== undefined && {
+      labelLetterSpacing: props.labelLetterSpacing,
+    }),
+    ...(props.labelLineHeight !== undefined && {
+      labelLineHeight: props.labelLineHeight,
+    }),
+    ...(props.labelPaddingX !== undefined && {
+      labelPaddingX: props.labelPaddingX,
+    }),
+    ...(props.labelPaddingY !== undefined && {
+      labelPaddingY: props.labelPaddingY,
+    }),
     ...(props.labelBlocks !== undefined && { labelBlocks: props.labelBlocks }),
   };
 }
@@ -79,17 +98,30 @@ export function spreadLabelProps(props: WeaveElementAttributes): Partial<WeaveEl
  */
 export function getShapeLabelSchemaFields() {
   return {
-    labelText: z.string().optional().describe('Text label displayed inside the shape'),
-    labelFontFamily: z.string().optional().describe('Font family for the label text'),
-    labelFontSize: z.number().optional().describe('Font size for the label text in pixels'),
+    labelText: z
+      .string()
+      .optional()
+      .describe('Text label displayed inside the shape'),
+    labelFontFamily: z
+      .string()
+      .optional()
+      .describe('Font family for the label text'),
+    labelFontSize: z
+      .number()
+      .optional()
+      .describe('Font size for the label text in pixels'),
     labelFontStyle: z
       .string()
       .optional()
-      .describe('Font style for the label text (e.g. "normal", "bold", "italic", "bold italic")'),
+      .describe(
+        'Font style for the label text (e.g. "normal", "bold", "italic", "bold italic")'
+      ),
     labelFontVariant: z
       .string()
       .optional()
-      .describe('Font variant for the label text (e.g. "normal", "small-caps")'),
+      .describe(
+        'Font variant for the label text (e.g. "normal", "small-caps")'
+      ),
     labelFill: z
       .string()
       .optional()
@@ -97,27 +129,40 @@ export function getShapeLabelSchemaFields() {
     labelAlign: z
       .string()
       .optional()
-      .describe('Horizontal alignment of the label text ("left", "center", "right")'),
+      .describe(
+        'Horizontal alignment of the label text ("left", "center", "right")'
+      ),
     labelVerticalAlign: z
       .string()
       .optional()
-      .describe('Vertical alignment of the label text ("top", "middle", "bottom")'),
+      .describe(
+        'Vertical alignment of the label text ("top", "middle", "bottom")'
+      ),
     labelLetterSpacing: z
       .number()
       .optional()
       .describe('Letter spacing for the label text in pixels'),
-    labelLineHeight: z.number().optional().describe('Line height multiplier for the label text'),
+    labelLineHeight: z
+      .number()
+      .optional()
+      .describe('Line height multiplier for the label text'),
     labelPaddingX: z
       .number()
       .optional()
-      .describe('Horizontal inset (padding) in pixels applied on each side of the label'),
+      .describe(
+        'Horizontal inset (padding) in pixels applied on each side of the label'
+      ),
     labelPaddingY: z
       .number()
       .optional()
-      .describe('Vertical inset (padding) in pixels applied on top and bottom of the label'),
+      .describe(
+        'Vertical inset (padding) in pixels applied on top and bottom of the label'
+      ),
     labelBlocks: labelBlocksSchema
       .optional()
-      .describe('Rich label content (paragraphs of runs with marks); labelText is the plain mirror'),
+      .describe(
+        'Rich label content (paragraphs of runs with marks); labelText is the plain mirror'
+      ),
   };
 }
 
@@ -146,15 +191,20 @@ function extractLabelNodeContext(
 
   if (!labelText) return null;
 
-  const labelNode = group.findOne<WeaveShapeLabelNode>(`#${labelId(group.id())}`);
+  const labelNode = group.findOne<WeaveShapeLabelNode>(
+    `#${labelId(group.id())}`
+  );
   if (!labelNode) return null;
 
   const paddingX =
-    (attrs.labelPaddingX as number | undefined) ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+    (attrs.labelPaddingX as number | undefined) ??
+    WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
   const paddingY =
-    (attrs.labelPaddingY as number | undefined) ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+    (attrs.labelPaddingY as number | undefined) ??
+    WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
   const fontSize =
-    (attrs.labelFontSize as number | undefined) ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize;
+    (attrs.labelFontSize as number | undefined) ??
+    WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize;
 
   const cloneLabel = labelNode.clone({ visible: false });
   cloneLabel.height(undefined);
@@ -226,7 +276,9 @@ export function computeEllipseLabelMinSize(
   // The label text area is inscribedH minus vertical padding. To fit naturalH:
   //   radiusY * √2 - paddingY * 2 >= naturalH
   //   radiusY >= (naturalH + paddingY * 2) / √2
-  const minRadiusY = Math.ceil((naturalSize.height + paddingY * 2) / Math.SQRT2);
+  const minRadiusY = Math.ceil(
+    (naturalSize.height + paddingY * 2) / Math.SQRT2
+  );
 
   // Analogously for width: inscribedW - paddingX * 2 >= fontSize (one char minimum)
   const minRadiusX = Math.ceil((fontSize + paddingX * 2) / Math.SQRT2);
@@ -266,5 +318,35 @@ export function computePolygonLabelMinSize(
   return {
     width: (paddingX * 2 + fontSize) * stage.scaleX(),
     height: (naturalSize.height + paddingY * 2) * stage.scaleX(),
+  };
+}
+
+/**
+ * Returns the minimum bounding-box size `{ width, height }` (in Konva canvas
+ * units) that the sticky note node must have so its label text is fully visible,
+ * including padding, the dog-ear fold and author margin.
+ *
+ * Returns `{ width: 0, height: 0 }` when the label is empty.
+ *
+ * @param stage - The Konva stage.
+ * @param group - The sticky note `Konva.Group` returned by `onRender`.
+ */
+export function computeStickyNoteLabelMinSize(
+  stage: Konva.Stage,
+  group: Konva.Group
+): { width: number; height: number } {
+  const ctx = extractLabelNodeContext(group);
+  if (!ctx) return { width: 0, height: 0 };
+
+  const { paddingX, paddingY, fontSize, naturalSize } = ctx;
+  const attrs = group.getAttrs() as WeaveElementAttributes;
+  const dogEarSize = (attrs.dogEarSize as number | undefined) ?? 28;
+  const authorMargin = attrs.author ? 22 : 0;
+
+  return {
+    width: (paddingX * 2 + fontSize) * stage.scaleX(),
+    height:
+      (naturalSize.height + paddingY * 2 + dogEarSize + authorMargin) *
+      stage.scaleY(),
   };
 }

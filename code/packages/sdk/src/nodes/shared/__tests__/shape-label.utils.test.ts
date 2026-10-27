@@ -9,17 +9,18 @@ import Konva from 'konva';
 import {
   computeRectangleLabelMinSize,
   computeEllipseLabelMinSize,
+  computeStickyNoteLabelMinSize,
 } from '../shape-label.utils';
-import {
-  labelId,
-  WEAVE_SHAPE_LABEL_DEFAULTS,
-} from '../shape-label.constants';
+import { labelId, WEAVE_SHAPE_LABEL_DEFAULTS } from '../shape-label.constants';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const mockStage = { scaleX: () => 1, scaleY: () => 1 } as unknown as Konva.Stage;
+const mockStage = {
+  scaleX: () => 1,
+  scaleY: () => 1,
+} as unknown as Konva.Stage;
 
 function makeLabelNode(
   groupId: string,
@@ -155,7 +156,11 @@ describe('computeEllipseLabelMinSize', () => {
   });
 
   it('returns { 0, 0 } when labelText attr is absent', () => {
-    const group = new Konva.Group({ id: 'e-no-text', radiusX: 100, radiusY: 60 });
+    const group = new Konva.Group({
+      id: 'e-no-text',
+      radiusX: 100,
+      radiusY: 60,
+    });
     const result = computeEllipseLabelMinSize(mockStage, group);
     expect(result).toEqual({ width: 0, height: 0 });
   });
@@ -190,5 +195,47 @@ describe('computeEllipseLabelMinSize', () => {
     computeEllipseLabelMinSize(mockStage, group);
 
     expect(label!.height()).toBe(heightBefore);
+  });
+});
+
+describe('computeStickyNoteLabelMinSize', () => {
+  function makeStickyGroup(
+    id: string,
+    w: number,
+    h: number,
+    text: string,
+    author?: string
+  ) {
+    const group = new Konva.Group({
+      id,
+      width: w,
+      height: h,
+      labelText: text,
+      dogEarSize: 28,
+      author,
+    });
+    group.add(makeLabelNode(id, text, w - 20, h - 20));
+    return group;
+  }
+
+  it('returns { 0, 0 } when labelText is empty', () => {
+    const group = makeStickyGroup('s-empty', 200, 200, '');
+    const result = computeStickyNoteLabelMinSize(mockStage, group);
+    expect(result).toEqual({ width: 0, height: 0 });
+  });
+
+  it('returns minWidth at least paddingX*2 + fontSize', () => {
+    const group = makeStickyGroup('s-1', 200, 200, 'Note');
+    const { width } = computeStickyNoteLabelMinSize(mockStage, group);
+    expect(width).toBeGreaterThanOrEqual(
+      WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX * 2 +
+        WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize
+    );
+  });
+
+  it('includes dog-ear fold and author margin in minimum height calculation', () => {
+    const group = makeStickyGroup('s-2', 200, 200, 'Note text', 'jmcaamanog');
+    const { height } = computeStickyNoteLabelMinSize(mockStage, group);
+    expect(height).toBeGreaterThanOrEqual(28 + 22);
   });
 });
