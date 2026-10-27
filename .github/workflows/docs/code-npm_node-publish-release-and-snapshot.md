@@ -63,6 +63,7 @@ This workflow relies on asdf to automatically load any tool version defined on t
     - Create NPM cache folders.
     - Update the version based on the input release type.
     - Prepare committer information and configure GPG signing (gpg-agent with loopback-pinentry and preset-passphrase).
+    - Generate the `[Unreleased]` entries of CHANGELOG.md with `.github/scripts/changelog-from-prs.mjs`: one line per issue closed by the PRs merged since the last release tag (`git describe --tags --abbrev=0 --match '[0-9]*'`). Issues labelled `internal`/`kind/internal`, or already listed in an earlier release, are reported instead of written. Any error stops the job before the bump, the commit and the tag.
     - Update CHANGELOG.md and calculate next version using `release-flow/keep-a-changelog-action` action.
     - Prepare the release with `version:release` and `release:prepare` node scripts.
     - Publish the artifact with `release:perform` node script (`NPM_CONFIG_PROVENANCE` set to `true`).

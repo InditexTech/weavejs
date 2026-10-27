@@ -129,16 +129,18 @@ As you can see to test you can repeat steps 1-3 as many times as you want.
 
 - Lint your code with `npm run lint`.
 - Format your code with `npm run format`.
-- Update the CHANGELOG.md to reflect the changes you made, we follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-  - Add your entry under `## [Unreleased]`, in the `### Added` / `### Changed` / `### Fixed` section that matches your change (create the section if it isn't there yet).
-  - Format: `- [#ISSUE_ID](https://github.com/InditexTech/weavejs/issues/ISSUE_ID) ISSUE_NAME`, where `ISSUE_NAME` is the **verbatim title of the GitHub issue** (drop a generic prefix like `Feature request:`/`Bug:` if the issue has one, but otherwise don't paraphrase or summarize it).
-  - Example: `- [#1158](https://github.com/InditexTech/weavejs/issues/1158) Opt-in "fully enclosed" (contains) mode for drag-selection`
+- Link the PR to the issue it solves: add `Closes #ISSUE_ID` to the PR description (the PR template has the line), or link the issue from the Development sidebar. A plain `#ISSUE_ID` mention does not count. GitHub only reads closing keywords on PRs to the default branch, so for a `main-*` branch use the Development sidebar.
+  - Do not edit `code/CHANGELOG.md`: the release job generates one entry per linked issue, `- [#ISSUE_ID](https://github.com/InditexTech/weavejs/issues/ISSUE_ID) ISSUE_TITLE`, with the **verbatim title of the issue** at release time.
+  - The section comes from the issue labels, first match wins: `security` → Security, `bug` → Fixed, `enhancement` or `kind/feature` → Added, anything else → Changed (flagged as guessed).
+  - Issues labelled `internal` or `kind/internal` (for example tracking issues like "Release docs X") get no entry, and an issue already listed in an earlier release is not listed again. Both are shown in the report.
+  - To change the wording of an entry, edit the issue title; to change its section, change the issue labels.
+  - The `Changelog / Linked issue` check reports the entries the PR will generate. Dependabot PRs are exempt.
 
 - On the PR, depending on your change add one of the following labels:
 
-  - `skip-release`: when this PR is merged no release will be performed.
+  - `skip-release`: when this PR is merged no release will be performed, and the PR does not need a linked issue. The entries of the issues it does close go into the next release. Only maintainers can add labels.
   - `release-type/major`: when this PR is merged a major release will be performed.
-  - `release-type/minor`: when this PR is merged a major release will be performed.
+  - `release-type/minor`: when this PR is merged a minor release will be performed.
   - `release-type/patch`: when this PR is merged a patch release will be performed.
   - `release-type/hotfix`: when this PR is merged a hotfix release will be performed.
 
@@ -193,7 +195,7 @@ As you can see to test you can repeat steps 1-2 as many times as you want.
 Complete this checklist for every release, not for every individual change. You may still update it incrementally as changes are made to keep track of what is pending for the next release.
 
 1. Identify the upcoming version: the one after the latest released version, matching the `release-type/*` label of the PR.
-2. Update `code/CHANGELOG.md` with the changes included in the release.
+2. Check the entries the release will add to `code/CHANGELOG.md`: they are generated from the issues closed by the PRs merged since the last release (see the release preview comment, or run `node .github/scripts/changelog-from-prs.mjs --dry-run` with a `GITHUB_TOKEN`). Fix wording or sections in the issues, not in the file.
 3. If the release includes public API changes, document them in the relevant API reference file under `docs`.
 4. Create or update the release notes page at `docs/src/modules/main/pages/release-notes/<version>.adoc`:
    - If the page is new, add its title, description, release date, and change sections.
