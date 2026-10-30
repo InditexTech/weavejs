@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WeaveBrushInputProfile } from './types';
+
 export const BRUSH_TOOL_ACTION_NAME = 'brushTool';
+
+/** Name under which the lab plugin registers itself. */
+export const BRUSH_LAB_PLUGIN_NAME = 'brushLab';
 
 export const BRUSH_TOOL_STATE = {
   ['INACTIVE']: 'inactive',
@@ -24,7 +29,68 @@ export const PREVIEW_ID_SUFFIX = '--preview';
  */
 export const PREVIEW_HANDOVER_MAX_FRAMES = 30;
 
+export const BRUSH_INPUT_PROFILE_KEYS = [
+  'mouse',
+  'touch',
+  'pen.applePencil',
+  'pen.desktop',
+] as const;
+
+/**
+ * The legacy input profile: reproduces, point for point, what the brush tool
+ * recorded before profiles existed. Every profile starts from it.
+ */
+export const BRUSH_LEGACY_INPUT_PROFILE: WeaveBrushInputProfile = {
+  capture: {
+    source: 'legacy',
+    clock: 'now',
+    minMovePx: 0,
+    predicted: 'tail',
+    event: 'pointermove',
+  },
+  pressure: {
+    zero: 'legacy',
+    filter: 'legacy',
+    timeConstantMs: 40,
+    oneEuro: { minCutoff: 1, beta: 0.01 },
+    floor: 0.15,
+    start: 'backfill',
+    startSamples: 3,
+    end: 'backfill',
+  },
+  stabilizer: {
+    type: 'none',
+    minCutoff: 3,
+    beta: 0.01,
+    radiusPx: 4,
+    amount: 0.3,
+    zoomAware: false,
+    catchUpOnEnd: true,
+  },
+  finalize: {
+    mode: 'dp',
+    toleranceUnit: 'canvas',
+    pressureWeight: 20,
+    resampleSpacingPx: 2,
+  },
+  touchGuard: {
+    waitMs: 0,
+    movePx: 0,
+    cancelOnSecondTouch: false,
+    ignoreAfterPen: false,
+  },
+};
+
 export const BRUSH_TOOL_DEFAULT_CONFIG = {
+  input: {
+    forceProfile: null,
+    profiles: {
+      mouse: BRUSH_LEGACY_INPUT_PROFILE,
+      touch: BRUSH_LEGACY_INPUT_PROFILE,
+      'pen.applePencil': BRUSH_LEGACY_INPUT_PROFILE,
+      'pen.desktop': BRUSH_LEGACY_INPUT_PROFILE,
+    },
+  },
   interpolationSteps: 10,
   // Douglas-Peucker tolerance (in canvas units) applied once, when a stroke
   // is finalized. This is the dominant cause of a finished stroke looking

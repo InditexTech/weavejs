@@ -87,6 +87,33 @@ export default defineConfig([
   },
   {
     entry: {
+      lab: './src/index.lab.ts',
+    },
+    external: [
+      '@inditextech/weave-types',
+      'konva',
+      'yjs',
+      'canvas',
+      'skia-canvas',
+      '@inditextech/weave-sdk',
+    ],
+    format: ['es'],
+    target: 'es2023',
+    shims: true,
+    clean: false,
+    dts: true,
+    platform: 'browser',
+    plugins: [
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'dist/lab.stats.html',
+      }) as any,
+    ],
+  },
+  {
+    entry: {
       'stage-minimap.worker':
         './src/plugins/stage-minimap/stage-minimap.worker.ts',
     },
