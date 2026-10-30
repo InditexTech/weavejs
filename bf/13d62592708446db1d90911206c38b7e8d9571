@@ -1,0 +1,183 @@
+AGENTS.md
+  s_433a2258e9e25e::t_b227831ccbe264 120-123
+code/CHANGELOG.md
+  s_433a2258e9e25e::t_38da0a883aeac8 16-19
+code/packages/sdk/package.json
+  s_433a2258e9e25e::t_4d70b12f79945a 25-29
+code/packages/sdk/src/actions/brush-tool/__tests__/__snapshots__/brush-tool.golden.test.ts.snap
+  s_433a2258e9e25e::t_47efda49d415d9 1-1136
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.coalesced.test.ts
+  s_433a2258e9e25e::t_139505956302ca 1-231
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.config-io.test.ts
+  s_433a2258e9e25e::t_efb1d9710da9c6 1-116
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.event-time.test.ts
+  s_433a2258e9e25e::t_1701860b15fc9e 1-114
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.finalize.test.ts
+  s_433a2258e9e25e::t_dc422dc465308d 1-166
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.golden.test.ts
+  s_433a2258e9e25e::t_ccd5b083fdf1dd 1-53
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.input-meta.test.ts
+  s_433a2258e9e25e::t_765e1e1a636f6d 1-136
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.predicted.test.ts
+  s_433a2258e9e25e::t_b0c9d7e9d7d896 1-85
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.presets.test.ts
+  s_433a2258e9e25e::t_f797ff573246e5 1-227
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.pressure-modes.test.ts
+  s_433a2258e9e25e::t_47c25084eb9d75 1-249
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.profiles.test.ts
+  s_433a2258e9e25e::t_49db347d8b9dec 1-174
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.runtime-config.test.ts
+  s_433a2258e9e25e::t_e198e408d7168d 1-184
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.stabilizer.test.ts
+  s_433a2258e9e25e::t_d3fb42c4a62fac 1-195
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.test.ts
+  s_433a2258e9e25e::t_9a8b9a75398c85 855,859
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.touch-guard.test.ts
+  s_433a2258e9e25e::t_5dc133247af435 1-242
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.trace.test.ts
+  s_433a2258e9e25e::t_2e970f39c34094 1-89
+code/packages/sdk/src/actions/brush-tool/__tests__/shared/brush-golden.helpers.ts
+  s_433a2258e9e25e::t_812bccd81593fd 1-483
+code/packages/sdk/src/actions/brush-tool/brush-tool.ts
+  s_433a2258e9e25e::t_440e62861e9127 9,30-105,125-146,158-163,177-421,437,439-442,447-448,450-458,460-472,474,481-492,499-500,505-506,508-512,515-588,643-655,674-699,707-722,734-738,747,756-763,768-774,778-779,781,825-938,942-958,976-977,980-981,994-1002,1017,1036-1038,1041-1045,1047-1048,1056-1085,1088-1089,1101-1106,1133-1137,1150-1169,1174,1186-1196,1199-1202,1210-1220,1222,1224,1227-1241,1381-1382,1414
+code/packages/sdk/src/actions/brush-tool/constants.ts
+  s_433a2258e9e25e::t_781893faa014f7 5-6,9-11,32-83,85-93
+code/packages/sdk/src/actions/brush-tool/profiles.ts
+  s_433a2258e9e25e::t_0c91a6a90cf812 1-88
+code/packages/sdk/src/actions/brush-tool/stages/__tests__/finalize.test.ts
+  s_433a2258e9e25e::t_9bd6ef21f0acba 1-280
+code/packages/sdk/src/actions/brush-tool/stages/bezier-fit.ts
+  s_433a2258e9e25e::t_a5858521713bd8 1-251
+code/packages/sdk/src/actions/brush-tool/stages/capture.ts
+  s_433a2258e9e25e::t_13c12c3105d60c 1-157
+code/packages/sdk/src/actions/brush-tool/stages/finalize.ts
+  s_433a2258e9e25e::t_4f55ac15836359 1-188
+code/packages/sdk/src/actions/brush-tool/stages/pressure.ts
+  s_433a2258e9e25e::t_027786c9b0b23e 1-289
+code/packages/sdk/src/actions/brush-tool/stages/stabilizer.ts
+  s_433a2258e9e25e::t_6baa8d9e0fdb2e 1-212
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/descriptors.test.ts
+  s_433a2258e9e25e::t_1899dd2e5d10fc 1-115
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/docs.test.ts
+  s_433a2258e9e25e::t_ac74b23333c922 1-47
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/validate.test.ts
+  s_433a2258e9e25e::t_d8154f23387a41 1-92
+code/packages/sdk/src/actions/brush-tool/tunables/config-io.ts
+  s_433a2258e9e25e::t_425be7a5bb5a1c 1-104
+code/packages/sdk/src/actions/brush-tool/tunables/descriptors.ts
+  s_433a2258e9e25e::t_d183b77cd2c62e 1-261
+code/packages/sdk/src/actions/brush-tool/tunables/merge.ts
+  s_433a2258e9e25e::t_9a9d1998537b21 1-40
+code/packages/sdk/src/actions/brush-tool/tunables/presets.ts
+  s_433a2258e9e25e::t_d33767a5a93485 1-514
+code/packages/sdk/src/actions/brush-tool/tunables/types.ts
+  s_433a2258e9e25e::t_54c31672e8423a 1-52
+code/packages/sdk/src/actions/brush-tool/tunables/validate.ts
+  s_433a2258e9e25e::t_79056d43cbeb67 1-82
+code/packages/sdk/src/actions/brush-tool/types.ts
+  s_433a2258e9e25e::t_94a102e26987b0 14-112,116-141,145-184
+code/packages/sdk/src/index.common.ts
+  s_433a2258e9e25e::t_c4f8ee5cc83e55 140-145
+code/packages/sdk/src/index.lab.ts
+  s_433a2258e9e25e::t_92b7acf0ee890f 1-7
+code/packages/sdk/src/nodes/stroke/__tests__/__snapshots__/stroke-legacy.golden.test.ts.snap
+  s_433a2258e9e25e::t_f17b863a2c655d 1-4602
+code/packages/sdk/src/nodes/stroke/__tests__/shared/stroke-render.helpers.ts
+  s_433a2258e9e25e::t_6881c1e5d80d6a 1-167
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-legacy.golden.test.ts
+  s_433a2258e9e25e::t_1f90285dd02b6b 1-81
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look-curve.test.ts
+  s_433a2258e9e25e::t_864ef6ebeb912b 1-112
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look-preview.test.ts
+  s_433a2258e9e25e::t_3e7a09e25ecd8d 1-58
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look-width.test.ts
+  s_433a2258e9e25e::t_da5e8d9460b571 1-69
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-round.test.ts
+  s_433a2258e9e25e::t_56d6820883e5ed 1-233
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-translucent.test.ts
+  s_433a2258e9e25e::t_f19820d7e77ae2 1-124
+code/packages/sdk/src/nodes/stroke/__tests__/stroke.test.ts
+  s_433a2258e9e25e::t_e9681b8f79baa8 266-268,283-285,290-295,400,417-422,431-436,445-450,459-464,574-576,588-590,605-607,622-625,628-631,643-646,657-660,677-681,684-687,696-700,703-706,719-722,738-741,775,849-852,912-915,928-932,935-938,947-951,954-957,972,977-980,1014-1017
+code/packages/sdk/src/nodes/stroke/constants.ts
+  s_433a2258e9e25e::t_6ed778a386485f 5-6,9-24
+code/packages/sdk/src/nodes/stroke/render/__tests__/look.test.ts
+  s_433a2258e9e25e::t_9edfa637152c59 1-142
+code/packages/sdk/src/nodes/stroke/render/curve.ts
+  s_433a2258e9e25e::t_df4a580b0a8525 1-130
+code/packages/sdk/src/nodes/stroke/render/look.ts
+  s_433a2258e9e25e::t_33e8185689718f 1-106
+code/packages/sdk/src/nodes/stroke/render/round-outline.ts
+  s_433a2258e9e25e::t_c8d9fb577d39c2 1-304
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_433a2258e9e25e::t_2d13a1bf5e5995 25-28,32,135-141,145-147,165,169,177-181,220-221,236-260,292-313,335,347-348,395-543,555-568
+code/packages/sdk/src/nodes/stroke/types.ts
+  s_433a2258e9e25e::t_229af9f6bc2560 25-60
+code/packages/sdk/src/plugins/brush-lab/__tests__/brush-lab.test.ts
+  s_433a2258e9e25e::t_9f5c336a65c840 1-318
+code/packages/sdk/src/plugins/brush-lab/__tests__/device-report.test.ts
+  s_433a2258e9e25e::t_f3f14cb3fc845c 1-85
+code/packages/sdk/src/plugins/brush-lab/__tests__/ghosts.test.ts
+  s_433a2258e9e25e::t_81db8cd79fcf08 1-180
+code/packages/sdk/src/plugins/brush-lab/__tests__/metrics.test.ts
+  s_433a2258e9e25e::t_45b3fa88ea0611 1-143
+code/packages/sdk/src/plugins/brush-lab/__tests__/recorder.test.ts
+  s_433a2258e9e25e::t_19d03dbfd7f2ed 1-59
+code/packages/sdk/src/plugins/brush-lab/brush-lab.ts
+  s_433a2258e9e25e::t_509c464bd1ca41 1-527
+code/packages/sdk/src/plugins/brush-lab/constants.ts
+  s_433a2258e9e25e::t_1fde6e2a4a1fc7 1-11
+code/packages/sdk/src/plugins/brush-lab/device-report.ts
+  s_433a2258e9e25e::t_6eba3577400dfa 1-107
+code/packages/sdk/src/plugins/brush-lab/ghosts.ts
+  s_433a2258e9e25e::t_1998e4eb11cd14 1-109
+code/packages/sdk/src/plugins/brush-lab/metrics.ts
+  s_433a2258e9e25e::t_ea2cd5e72d5771 1-97
+code/packages/sdk/src/plugins/brush-lab/recorder.ts
+  s_433a2258e9e25e::t_8ab474066b6556 1-47
+code/packages/sdk/src/plugins/brush-lab/types.ts
+  s_433a2258e9e25e::t_f5a37315c7ad4a 1-97
+code/packages/sdk/tsconfig.json
+  s_433a2258e9e25e::t_249a0c5b0c1a67 20-21
+code/packages/sdk/tsdown.config.ts
+  s_433a2258e9e25e::t_2ec97b2b3ca130 88-114
+code/packages/sdk/vitest.config.ts
+  s_433a2258e9e25e::t_3665ef42d4deee 14-17
+docs/src/modules/sdk/nav.adoc
+  s_433a2258e9e25e::t_a9cb6a36ff2af6 31,55
+docs/src/modules/sdk/pages/api-reference/actions/brush-tool.adoc
+  s_433a2258e9e25e::t_b1e871ffa44576 43,47-65,77,87,91-316,324-332
+docs/src/modules/sdk/pages/api-reference/actions/brush-tuning.adoc
+  s_433a2258e9e25e::t_dfd3283a4596c7 1-250
+docs/src/modules/sdk/pages/api-reference/nodes/stroke.adoc
+  s_433a2258e9e25e::t_3c561f4eb7d9d0 103-146
+docs/src/modules/sdk/pages/api-reference/plugins/brush-lab.adoc
+  s_433a2258e9e25e::t_3212f75b66411a 1-76
+openspec/changes/brush-input-lab/.openspec.yaml
+  s_433a2258e9e25e::t_ea75a66bbe713e 1-2
+openspec/changes/brush-input-lab/design.md
+  s_433a2258e9e25e::t_7f9c36cf931eb1 1-95
+openspec/changes/brush-input-lab/proposal.md
+  s_433a2258e9e25e::t_97cee4b965974c 1-35
+openspec/changes/brush-input-lab/specs/brush-tool/input-profiles/spec.md
+  s_433a2258e9e25e::t_b7a0bd46506ad1 1-138
+openspec/changes/brush-input-lab/specs/brush-tool/pressure-sampling/spec.md
+  s_433a2258e9e25e::t_97bbfa3b303143 1-54
+openspec/changes/brush-input-lab/tasks.md
+  s_433a2258e9e25e::t_a61882645b28bc 1-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "bf13d62592708446db1d90911206c38b7e8d9571",
+  "prompts": {},
+  "sessions": {
+    "s_433a2258e9e25e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e789ecf60ffeALgZIRKm0KHjH9",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
