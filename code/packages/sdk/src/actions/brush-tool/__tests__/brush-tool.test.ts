@@ -852,11 +852,11 @@ describe('WeaveBrushToolAction', () => {
       expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.IDLE);
     });
 
-    it('9.3 state DEFINE_STROKE + isPinching=true → returns', () => {
+    it('9.3 state DEFINE_STROKE + isPinching=true → the stroke still ends, so the tool is not left stuck', () => {
       (action as unknown as R)['state'] = BRUSH_TOOL_STATE.DEFINE_STROKE;
       mockWeave.getPlugin.mockReturnValue({ isPinching: vi.fn().mockReturnValue(true) });
       handlers['pointerup']?.(makePointerEvent());
-      expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.DEFINE_STROKE);
+      expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.IDLE);
     });
 
     it('9.4 state DEFINE_STROKE + zoom plugin absent → proceeds without throw', () => {

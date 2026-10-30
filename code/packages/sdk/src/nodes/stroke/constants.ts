@@ -2,7 +2,25 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WeaveStrokeLook } from './types';
+
 export const WEAVE_STROKE_NODE_TYPE = 'stroke';
+
+/**
+ * The look equivalent to the rendering of strokes that have no look: the
+ * default of every look setting.
+ */
+export const WEAVE_STROKE_LEGACY_LOOK: WeaveStrokeLook = {
+  version: 1,
+  outline: 'legacy',
+  curve: 'uniform',
+  pressureInterp: 'catmullRom',
+  zoomAware: false,
+  spacingPx: 2,
+  edgePx: 1,
+  caps: 'separate',
+  width: { min: 0, max: 1, gamma: 1, taperStart: 0, taperEnd: 0 },
+};
 
 export const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
   // MINIMUM subdivisions per curved spline span. Live-drawn strokes have

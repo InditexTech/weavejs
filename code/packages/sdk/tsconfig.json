@@ -17,7 +17,8 @@
     ],
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@inditextech/weave-sdk": ["./src/plugins/plugin.ts"]
     },
     "noUnusedLocals": true,
     "declaration": true,

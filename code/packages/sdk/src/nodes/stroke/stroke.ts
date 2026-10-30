@@ -22,9 +22,14 @@ import type {
 } from './types';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { mergeExceptArrays } from '@/utils/utils';
+import { getCentripetalPoints } from './render/curve';
+import { halfWidthAt, readStrokeLook } from './render/look';
+import { drawRoundOutline } from './render/round-outline';
+import type { WeaveStrokeLook } from './types';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
+  private previewLook: WeaveStrokeLook | null = null;
   protected nodeType: string = WEAVE_STROKE_NODE_TYPE;
   initialize = undefined;
 
@@ -127,12 +132,19 @@ export class WeaveStrokeNode extends WeaveNode {
    */
   private getSplinePoints(
     pts: WeaveStrokePoint[],
-    resolution = this.config.splineResolution
+    resolution = this.config.splineResolution,
+    opts?: {
+      targetEdge?: number;
+      maxSteps?: number;
+      flatness?: number;
+      pressure?: 'catmullRom' | 'linear';
+    }
   ): WeaveStrokePoint[] {
     if (pts.length < 2) return [...pts];
 
-    const targetEdge = this.config.splineTargetEdge;
-    const maxSteps = this.config.splineMaxSteps;
+    const targetEdge = opts?.targetEdge ?? this.config.splineTargetEdge;
+    const maxSteps = opts?.maxSteps ?? this.config.splineMaxSteps;
+    const flatness = opts?.flatness ?? WeaveStrokeNode.SPLINE_FLATNESS_EPSILON;
     const result: WeaveStrokePoint[] = [];
 
     for (let i = -1; i < pts.length - 2; i++) {
@@ -150,14 +162,11 @@ export class WeaveStrokeNode extends WeaveNode {
       let deviation = 0;
       for (const probe of [0.25, 0.5, 0.75]) {
         const at = this.catmullRomAt(p0, p1, p2, p3, probe);
-        deviation = Math.max(
-          deviation,
-          this.distanceToSegment(at, p1, p2)
-        );
+        deviation = Math.max(deviation, this.distanceToSegment(at, p1, p2));
       }
 
       const steps =
-        deviation < WeaveStrokeNode.SPLINE_FLATNESS_EPSILON
+        deviation < flatness
           ? 1
           : Math.min(
               Math.max(Math.ceil(chord / targetEdge), resolution),
@@ -165,7 +174,11 @@ export class WeaveStrokeNode extends WeaveNode {
             );
 
       for (let s = 0; s < steps; s++) {
-        result.push(this.catmullRomAt(p0, p1, p2, p3, s / steps));
+        const q = this.catmullRomAt(p0, p1, p2, p3, s / steps);
+        if (opts?.pressure === 'linear') {
+          q.pressure = p1.pressure + (p2.pressure - p1.pressure) * (s / steps);
+        }
+        result.push(q);
       }
     }
     result.push(pts[pts.length - 1]);
@@ -204,7 +217,8 @@ export class WeaveStrokeNode extends WeaveNode {
     ctx: Konva.Context,
     leftSide: WeaveStrokePoint[],
     rightSide: WeaveStrokePoint[],
-    color: string | CanvasGradient
+    color: string | CanvasGradient,
+    mergeCaps = false
   ): void {
     const capStartL = leftSide[0];
     const capStartR = rightSide[0];
@@ -219,6 +233,31 @@ export class WeaveStrokeNode extends WeaveNode {
     for (const p of leftSide) ctx.lineTo(p.x, p.y);
     for (const p of outlineRight) ctx.lineTo(p.x, p.y);
     ctx.closePath();
+
+    if (mergeCaps) {
+      // The round ends join the polygon in the same path, wound the same way,
+      // so one fill covers both and a translucent colour is not blended twice.
+      const outline = [...leftSide, ...outlineRight];
+      let area = 0;
+      for (let i = 0; i < outline.length; i++) {
+        const a = outline[i];
+        const b = outline[(i + 1) % outline.length];
+        area += a.x * b.y - b.x * a.y;
+      }
+      for (const [a, b] of [
+        [capStartL, capStartR],
+        [capEndL!, capEndR!],
+      ]) {
+        const cx = (a.x + b.x) / 2;
+        const cy = (a.y + b.y) / 2;
+        const r = Math.hypot(a.x - b.x, a.y - b.y) / 2;
+        ctx.moveTo(cx + r, cy);
+        ctx.arc(cx, cy, r, 0, Math.PI * 2, area < 0);
+      }
+      ctx.fill();
+      return;
+    }
+
     ctx.fill();
 
     this.drawRoundCap(ctx, capStartL, capStartR, color);
@@ -250,6 +289,28 @@ export class WeaveStrokeNode extends WeaveNode {
       this.config.splineResolution
     );
 
+    this.drawCenterlineRibbon(
+      ctx,
+      centerline,
+      (_i, p) => Math.max((baseW * p.pressure) / 2, 0.5),
+      color,
+      dash,
+      false
+    );
+  }
+
+  /**
+   * Draws the offset-outline ribbon along an already prepared centerline.
+   * `halfWidth` gives the half-width at each centerline point.
+   */
+  private drawCenterlineRibbon(
+    ctx: Konva.Context,
+    centerline: WeaveStrokePoint[],
+    halfWidth: (index: number, point: WeaveStrokePoint) => number,
+    color: string | CanvasGradient,
+    dash: number[],
+    mergeCaps: boolean
+  ) {
     let dashIndex = 0;
     let dashOn = true;
     let dashRemaining = dash.length ? dash[0] : Infinity;
@@ -271,7 +332,7 @@ export class WeaveStrokeNode extends WeaveNode {
         leftSide.push(pendingEndLeft);
         rightSide.push(pendingEndRight);
       }
-      this.drawDashPolygon(ctx, leftSide, rightSide, color);
+      this.drawDashPolygon(ctx, leftSide, rightSide, color, mergeCaps);
     };
 
     for (let i = 0; i < centerline.length - 1; i++) {
@@ -283,8 +344,8 @@ export class WeaveStrokeNode extends WeaveNode {
       const nx = -dy / segLen;
       const ny = dx / segLen;
 
-      const w0 = Math.max((baseW * p0.pressure) / 2, 0.5);
-      const w1 = Math.max((baseW * p1.pressure) / 2, 0.5);
+      const w0 = halfWidth(i, p0);
+      const w1 = halfWidth(i + 1, p1);
 
       let traveled = 0;
 
@@ -331,6 +392,155 @@ export class WeaveStrokeNode extends WeaveNode {
     flushRun();
   }
 
+  /**
+   * The look a stroke is drawn with: the viewer-side preview if one is on,
+   * otherwise the look saved with the stroke. `null` draws the legacy ribbon.
+   */
+  private resolveLook(shape: Konva.Shape): WeaveStrokeLook | null {
+    return this.previewLook ?? readStrokeLook(shape.getAttrs().look);
+  }
+
+  /**
+   * Draws every stroke of this screen with `look`, without changing any saved
+   * stroke and without other users seeing it. `null` turns the preview off.
+   */
+  setLookPreview(look: unknown | null): void {
+    this.previewLook = look === null ? null : readStrokeLook(look);
+    this.redrawStrokes();
+  }
+
+  getLookPreview(): WeaveStrokeLook | null {
+    return this.previewLook;
+  }
+
+  private redrawStrokes(): void {
+    const stage = this.instance?.getStage?.();
+    if (!stage || typeof stage.find !== 'function') return;
+    const layers = new Set<Konva.Layer | null>();
+    for (const node of stage.find('.node')) {
+      if (node.getAttrs().nodeType === WEAVE_STROKE_NODE_TYPE) {
+        layers.add(node.getLayer());
+      }
+    }
+    for (const layer of layers) layer?.batchDraw();
+  }
+
+  /** Screen pixels per canvas unit at a shape. */
+  private screenScale(shape: Konva.Shape): number {
+    const scale = shape.getAbsoluteScale?.().x;
+    return typeof scale === 'number' && Number.isFinite(scale) && scale > 0
+      ? scale
+      : 1;
+  }
+
+  /**
+   * The centerline of a stroke with a look: the points resampled and joined by
+   * the look's curve. Spacing and detail are in screen pixels when the look
+   * follows the zoom, in canvas units otherwise; `scale` is screen pixels per
+   * canvas unit.
+   */
+  private buildLookCenterline(
+    look: WeaveStrokeLook,
+    scale: number,
+    pts: WeaveStrokePoint[]
+  ): WeaveStrokePoint[] {
+    const toCanvas = (px: number) => (look.zoomAware ? px / scale : px);
+    const edge = toCanvas(look.edgePx);
+    const flatness = toCanvas(WeaveStrokeNode.SPLINE_FLATNESS_EPSILON);
+    const maxSteps = look.zoomAware
+      ? Math.max(this.config.splineMaxSteps, 256)
+      : this.config.splineMaxSteps;
+
+    const filtered = this.resamplePoints(pts, toCanvas(look.spacingPx));
+
+    if (look.curve === 'centripetal') {
+      return getCentripetalPoints(filtered, {
+        edge,
+        minSteps: 2,
+        maxSteps,
+        flatness,
+        pressure: look.pressureInterp,
+      });
+    }
+    if (look.curve === 'none') {
+      return filtered;
+    }
+    return this.getSplinePoints(filtered, this.config.splineResolution, {
+      targetEdge: edge,
+      maxSteps,
+      flatness,
+      pressure: look.pressureInterp,
+    });
+  }
+
+  /**
+   * Draws a stroke that has a look: the centerline is built with the look's
+   * curve, spacing and detail, widths follow its width rule, and the outline is
+   * the legacy ribbon or the round one.
+   */
+  private drawRibbonWithLook(
+    ctx: Context,
+    shape: Konva.Shape,
+    look: WeaveStrokeLook,
+    pts: WeaveStrokePoint[],
+    baseW: number,
+    color: string | CanvasGradient,
+    dash: number[]
+  ) {
+    if (!pts) return;
+
+    if (pts.length < 2) {
+      const pt = pts[0];
+      const r = halfWidthAt(look, baseW, pt.pressure, Infinity, Infinity);
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+
+    const scale = this.screenScale(shape);
+    const centerline = this.buildLookCenterline(look, scale, pts);
+
+    // distance along the stroke, in the unit the tapers are given in
+    const unit = look.zoomAware ? scale : 1;
+    const along: number[] = [0];
+    for (let i = 1; i < centerline.length; i++) {
+      along.push(
+        along[i - 1] +
+          Math.hypot(
+            centerline[i].x - centerline[i - 1].x,
+            centerline[i].y - centerline[i - 1].y
+          ) *
+            unit
+      );
+    }
+    const total = along[along.length - 1];
+    const halfWidth = (i: number, p: WeaveStrokePoint) =>
+      halfWidthAt(look, baseW, p.pressure, along[i], total - along[i]);
+
+    if (look.outline === 'legacy') {
+      this.drawCenterlineRibbon(
+        ctx,
+        centerline,
+        halfWidth,
+        color,
+        dash,
+        look.caps === 'merged'
+      );
+      return;
+    }
+
+    // `round`, and `freehand` until it has an outline of its own
+    drawRoundOutline(
+      ctx,
+      centerline.map((p, i) => ({ x: p.x, y: p.y, r: halfWidth(i, p) })),
+      color,
+      dash,
+      scale
+    );
+  }
+
   private drawShape(ctx: Context, shape: Konva.Shape) {
     const strokeElements: WeaveStrokePoint[] = shape.getAttrs().strokeElements;
 
@@ -341,6 +551,20 @@ export class WeaveStrokeNode extends WeaveNode {
     const color = shape.getAttrs().stroke ?? 'black';
     const strokeWidth = shape.getAttrs().strokeWidth ?? 1;
     const dash = shape.getAttrs().dash ?? [];
+
+    const look = this.resolveLook(shape);
+    if (look) {
+      this.drawRibbonWithLook(
+        ctx,
+        shape,
+        look,
+        strokeElements,
+        strokeWidth,
+        color,
+        dash
+      );
+      return;
+    }
 
     this.drawRibbonWithDash(ctx, strokeElements, strokeWidth, color, dash);
   }

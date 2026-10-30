@@ -22,7 +22,6 @@ vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 // Helpers
 // ---------------------------------------------------------------------------
 
-
 function makeNode(config?: object): {
   node: WeaveStrokeNode;
   mock: ReturnType<typeof createMockInstance>;
@@ -264,7 +263,9 @@ describe('WeaveStrokeNode', () => {
       const shape = node.onRender(
         defaultProps({ width: 150, height: 80 })
       ) as Konva.Shape;
-      const hitFunc = shape.getAttr('hitFunc') as (...args: unknown[]) => unknown;
+      const hitFunc = shape.getAttr('hitFunc') as (
+        ...args: unknown[]
+      ) => unknown;
       const ctx = makeMockCtx();
 
       hitFunc(ctx, shape);
@@ -279,12 +280,19 @@ describe('WeaveStrokeNode', () => {
       const shape = node.onRender(
         defaultProps({ width: 120, height: 90 })
       ) as Konva.Shape;
-      const hitFunc = shape.getAttr('hitFunc') as (...args: unknown[]) => unknown;
+      const hitFunc = shape.getAttr('hitFunc') as (
+        ...args: unknown[]
+      ) => unknown;
       const ctx = makeMockCtx();
 
       hitFunc(ctx, shape);
 
-      expect(ctx.rect).toHaveBeenCalledWith(0, 0, shape.width(), shape.height());
+      expect(ctx.rect).toHaveBeenCalledWith(
+        0,
+        0,
+        shape.width(),
+        shape.height()
+      );
     });
   });
 
@@ -389,7 +397,7 @@ describe('WeaveStrokeNode', () => {
       node.scaleReset(shape);
 
       const pts = shape.getAttrs().strokeElements as WeaveStrokePoint[];
-      expect(pts[0].y).toBeCloseTo(60);  // 20 * 3
+      expect(pts[0].y).toBeCloseTo(60); // 20 * 3
       expect(pts[1].y).toBeCloseTo(120); // 40 * 3
     });
 
@@ -406,7 +414,12 @@ describe('WeaveStrokeNode', () => {
 
     it('7.4 width set to scaleX() * width() when result >= 5', () => {
       const { node } = makeNode();
-      const shape = makeStrokeShape({ scaleX: 2, scaleY: 1, width: 50, height: 20 });
+      const shape = makeStrokeShape({
+        scaleX: 2,
+        scaleY: 1,
+        width: 50,
+        height: 20,
+      });
 
       node.scaleReset(shape);
 
@@ -415,7 +428,12 @@ describe('WeaveStrokeNode', () => {
 
     it('7.5 height set to scaleY() * height() when result >= 5', () => {
       const { node } = makeNode();
-      const shape = makeStrokeShape({ scaleX: 1, scaleY: 3, width: 20, height: 30 });
+      const shape = makeStrokeShape({
+        scaleX: 1,
+        scaleY: 3,
+        width: 20,
+        height: 30,
+      });
 
       node.scaleReset(shape);
 
@@ -424,7 +442,12 @@ describe('WeaveStrokeNode', () => {
 
     it('7.6 width clamped to minimum 5 when product < 5', () => {
       const { node } = makeNode();
-      const shape = makeStrokeShape({ scaleX: 0.01, scaleY: 1, width: 1, height: 20 });
+      const shape = makeStrokeShape({
+        scaleX: 0.01,
+        scaleY: 1,
+        width: 1,
+        height: 20,
+      });
 
       node.scaleReset(shape);
 
@@ -433,7 +456,12 @@ describe('WeaveStrokeNode', () => {
 
     it('7.7 height clamped to minimum 5 when product < 5', () => {
       const { node } = makeNode();
-      const shape = makeStrokeShape({ scaleX: 1, scaleY: 0.01, width: 20, height: 1 });
+      const shape = makeStrokeShape({
+        scaleX: 1,
+        scaleY: 0.01,
+        width: 20,
+        height: 1,
+      });
 
       node.scaleReset(shape);
 
@@ -543,7 +571,9 @@ describe('WeaveStrokeNode', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
       // strokeElements is not set — getAttrs().strokeElements is undefined
-      const sceneFunc = shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown;
+      const sceneFunc = shape.getAttr('sceneFunc') as (
+        ...args: unknown[]
+      ) => unknown;
       const ctx = makeMockCtx();
 
       sceneFunc(ctx, shape);
@@ -555,7 +585,9 @@ describe('WeaveStrokeNode', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
       shape.setAttr('strokeElements', []);
-      const sceneFunc = shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown;
+      const sceneFunc = shape.getAttr('sceneFunc') as (
+        ...args: unknown[]
+      ) => unknown;
       const ctx = makeMockCtx();
 
       sceneFunc(ctx, shape);
@@ -570,7 +602,9 @@ describe('WeaveStrokeNode', () => {
       shape.setAttr('stroke', undefined);
       shape.setAttr('strokeWidth', undefined);
       shape.setAttr('dash', undefined);
-      const sceneFunc = shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown;
+      const sceneFunc = shape.getAttr('sceneFunc') as (
+        ...args: unknown[]
+      ) => unknown;
 
       // Must not throw — defaults allow drawRibbonWithDash to run normally
       expect(() => sceneFunc(makeMockCtx(), shape)).not.toThrow();
@@ -585,10 +619,16 @@ describe('WeaveStrokeNode', () => {
     it('10.1 1 strokeElement → draws a dot circle (ctx.arc + ctx.fill called once)', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
-      shape.setAttrs({ strokeElements: [{ x: 5, y: 5, pressure: 1 }], strokeWidth: 4 });
+      shape.setAttrs({
+        strokeElements: [{ x: 5, y: 5, pressure: 1 }],
+        strokeWidth: 4,
+      });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       expect(ctx.arc).toHaveBeenCalledOnce();
       expect(ctx.fill).toHaveBeenCalledOnce();
@@ -600,7 +640,10 @@ describe('WeaveStrokeNode', () => {
       shape.setAttrs({ strokeElements: makeLine(5), dash: [] });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       expect(ctx.fill).toHaveBeenCalled();
     });
@@ -611,7 +654,10 @@ describe('WeaveStrokeNode', () => {
       shape.setAttrs({ strokeElements: makeLine(10), dash: [] });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       // With Infinity dashRemaining, the polygon is never flushed mid-loop;
       // the final `if (dashOn && leftSide.length && rightSide.length)` fires once
@@ -628,10 +674,17 @@ describe('WeaveStrokeNode', () => {
     it('11.1 dash array causes ctx.fill() to be called for "on" segments', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
-      shape.setAttrs({ strokeElements: makeLine(20), dash: [1, 1], strokeWidth: 3 });
+      shape.setAttrs({
+        strokeElements: makeLine(20),
+        dash: [1, 1],
+        strokeWidth: 3,
+      });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       expect(ctx.fill).toHaveBeenCalled();
     });
@@ -640,10 +693,17 @@ describe('WeaveStrokeNode', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
       // Short dash on a long path forces many flush cycles
-      shape.setAttrs({ strokeElements: makeLine(20), dash: [1, 1], strokeWidth: 3 });
+      shape.setAttrs({
+        strokeElements: makeLine(20),
+        dash: [1, 1],
+        strokeWidth: 3,
+      });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       expect(ctx.fill.mock.calls.length).toBeGreaterThan(1);
     });
@@ -656,7 +716,10 @@ describe('WeaveStrokeNode', () => {
       dashedShape.setAttrs({ strokeElements: makeLine(20), dash: [1, 1] });
       const dashedCtx = makeMockCtx();
 
-      (dashedShape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(dashedCtx, dashedShape);
+      (dashedShape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        dashedCtx,
+        dashedShape
+      );
 
       // Dashed fill count is finite and > 0 (on segments drew, off segments were skipped)
       expect(dashedCtx.fill.mock.calls.length).toBeGreaterThan(0);
@@ -672,7 +735,10 @@ describe('WeaveStrokeNode', () => {
       });
 
       expect(() =>
-        (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(makeMockCtx(), shape)
+        (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+          makeMockCtx(),
+          shape
+        )
       ).not.toThrow();
     });
   });
@@ -706,7 +772,7 @@ describe('WeaveStrokeNode', () => {
       const pts: WeaveStrokePoint[] = [
         { x: 0, y: 0, pressure: 1 },
         { x: 0.5, y: 0, pressure: 1 }, // 0.5 units from first → < minDist 2 → filtered
-        { x: 20, y: 0, pressure: 1 },  // 20 units from first → kept
+        { x: 20, y: 0, pressure: 1 }, // 20 units from first → kept
       ];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (node as any).resamplePoints(pts, 2);
@@ -780,7 +846,10 @@ describe('WeaveStrokeNode', () => {
         { x: 120, y: 0, pressure: 1 },
       ];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const out = (node as any).getSplinePoints(sparse, 8) as WeaveStrokePoint[];
+      const out = (node as any).getSplinePoints(
+        sparse,
+        8
+      ) as WeaveStrokePoint[];
       let maxEdge = 0;
       for (let i = 1; i < out.length; i++) {
         maxEdge = Math.max(
@@ -840,7 +909,10 @@ describe('WeaveStrokeNode', () => {
       shape.setAttrs({ strokeElements: makeLine(3), dash: [] });
 
       expect(() =>
-        (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(makeMockCtx(), shape)
+        (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+          makeMockCtx(),
+          shape
+        )
       ).not.toThrow();
     });
   });
@@ -853,10 +925,17 @@ describe('WeaveStrokeNode', () => {
     it('15.1 solid stroke draws 2 round caps (start + end) via ctx.arc', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
-      shape.setAttrs({ strokeElements: makeLine(10), dash: [], strokeWidth: 4 });
+      shape.setAttrs({
+        strokeElements: makeLine(10),
+        dash: [],
+        strokeWidth: 4,
+      });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       // drawRoundCap calls ctx.arc once per cap; solid stroke has start + end = 2
       expect(ctx.arc).toHaveBeenCalledTimes(2);
@@ -865,10 +944,17 @@ describe('WeaveStrokeNode', () => {
     it('15.2 each arc call uses full circle (0 to 2π)', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
-      shape.setAttrs({ strokeElements: makeLine(10), dash: [], strokeWidth: 4 });
+      shape.setAttrs({
+        strokeElements: makeLine(10),
+        dash: [],
+        strokeWidth: 4,
+      });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       for (const call of ctx.arc.mock.calls) {
         const [, , , startAngle, endAngle] = call as number[];
@@ -883,12 +969,15 @@ describe('WeaveStrokeNode', () => {
       // Short path with 1 dash segment (dash larger than path length)
       shape.setAttrs({
         strokeElements: makeLine(5, 5), // 4 segments × 5px = 20px path
-        dash: [100, 100],               // first "on" segment covers entire 20px → 1 dash polygon
+        dash: [100, 100], // first "on" segment covers entire 20px → 1 dash polygon
         strokeWidth: 4,
       });
       const ctx = makeMockCtx();
 
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
 
       // One dash polygon → 2 caps
       expect(ctx.arc).toHaveBeenCalledTimes(2);
@@ -922,7 +1011,10 @@ describe('WeaveStrokeNode', () => {
       const shape = node.onRender(defaultProps()) as Konva.Shape;
       shape.setAttrs({ strokeElements: pts, dash: [], strokeWidth: 8 });
       const ctx = makeMockCtx();
-      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(
+        ctx,
+        shape
+      );
       return (ctx.lineTo.mock.calls as unknown as number[][]).map(([x, y]) => ({
         x,
         y,

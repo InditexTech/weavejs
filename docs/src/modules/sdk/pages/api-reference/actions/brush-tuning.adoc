@@ -1,0 +1,250 @@
+= Brush tuning
+:description: Settings, presets and scenarios that tune how the brush tool captures and draws strokes
+
+== Overview
+
+The xref:sdk:api-reference/actions/brush-tool.adoc[WeaveBrushToolAction] has many settings that decide how pen, finger and
+mouse input becomes a stroke. The SDK publishes them as plain data, so an application can build controls for them, validate
+values and save configurations without knowing each setting in advance. The SDK itself has no user interface.
+
+Settings come in two kinds:
+
+* *capture* settings belong to an input profile and change which points are saved for *new* strokes.
+* *draw* settings belong to a *look*. A look is saved with each stroke, so every user and every export draws that stroke the
+same way. Strokes saved without a look are drawn exactly as in earlier releases.
+
+Every default below is the value of the *legacy* preset, which reproduces the behaviour of earlier releases. Nothing changes
+until an application selects another preset.
+
+NOTE: Some modes are introduced progressively. A setting whose mode is not implemented yet behaves as the legacy mode.
+
+== Import
+
+[source,ts]
+----
+import {
+  BRUSH_TUNABLES,
+  BRUSH_PROFILE_TUNABLES,
+  BRUSH_LOOK_TUNABLES,
+  BRUSH_PROFILE_PRESETS,
+  BRUSH_LOOK_PRESETS,
+  BRUSH_SCENARIOS,
+  WeaveBrushPresetRegistry,
+  validateBrushTunablePatch,
+} from "@inditextech/weave-sdk";
+----
+
+== The list of settings
+
+Each entry of `BRUSH_TUNABLES` has this shape:
+
+[source,ts]
+----
+type WeaveBrushTunable = {
+  key: string; // dotted path of the setting, unique inside its scope
+  scope: "profile" | "look";
+  path: string[];
+  stage: "capture" | "pressure" | "stabilizer" | "finalize" | "touch" | "outline" | "curve" | "width" | "ends" | "detail";
+  group: string; // heading a control is shown under
+  kind: "capture" | "draw";
+  type: "number" | "boolean" | "enum";
+  default: number | boolean | string | null; // value of the legacy preset
+  min?: number; max?: number; step?: number; integer?: boolean;
+  options?: string[];
+  nullable?: boolean;
+  unit?: "px" | "ms" | "Hz" | "fraction" | "canvas units" | "count";
+  help: string;
+  advanced?: boolean; // show in an "advanced" section
+};
+----
+
+A value outside a setting's range or option list is invalid. `validateBrushTunablePatch(scope, patch)` returns the problems
+found in a partial profile or look; an empty list means the patch is valid.
+
+=== Input profile settings (capture)
+
+These settings live in an input profile, see xref:sdk:api-reference/actions/brush-tool.adoc#input-profiles[Input profiles].
+
+[cols="6*"]
+|===
+| Setting | Values | Default | Unit | Applied | Description
+
+| mono:[capture.source] | legacy \| coalesced | mono:[legacy] |  | capture | legacy keeps one position per event; coalesced keeps every batched pen sample with its own position.
+| mono:[capture.clock] | now \| event | mono:[now] |  | capture | Time base of time-dependent filters: processing time or the time reported by each sample.
+| mono:[capture.minMovePx] | 0 to 3 | mono:[0] | px | capture | Samples closer than this to the last recorded one are skipped.
+| mono:[capture.predicted] | off \| tail | mono:[tail] |  | capture | Draw the browser-predicted tail ahead of the pen to hide latency.
+| mono:[capture.event] | pointermove \| pointerrawupdate | mono:[pointermove] |  | capture | Event that delivers samples. pointerrawupdate lowers latency where supported. (advanced)
+| mono:[pressure.zero] | legacy \| keep \| holdLast | mono:[legacy] |  | capture | How a pen pressure of 0 is treated: legacy replaces it with 0.5, keep records it, holdLast repeats the last non-zero value.
+| mono:[pressure.filter] | legacy \| timeEma \| oneEuro \| none | mono:[legacy] |  | capture | Pressure smoothing: the legacy velocity-adaptive filter, a time-based one, the One Euro filter, or none.
+| mono:[pressure.timeConstantMs] | 1 to 500 | mono:[40] | ms | capture | Time constant of the timeEma filter; larger is smoother and slower.
+| mono:[pressure.oneEuro.minCutoff] | 0.01 to 10 | mono:[1] | Hz | capture | One Euro minimum cutoff: lower removes more jitter at slow speed. (advanced)
+| mono:[pressure.oneEuro.beta] | 0 to 1 | mono:[0.01] |  | capture | One Euro speed coefficient: higher removes more lag at high speed. (advanced)
+| mono:[pressure.floor] | 0 to 0.5 | mono:[0.15] | fraction | capture | Lowest pressure that is recorded; prevents invisible strokes.
+| mono:[pressure.start] | backfill \| average \| none | mono:[backfill] |  | capture | First point: backfill takes the next real sample, average takes the mean of the first movement readings, none keeps the contact reading.
+| mono:[pressure.startSamples] | 1 to 10 (whole) | mono:[3] | count | capture | Number of readings averaged by the average start policy. (advanced)
+| mono:[pressure.end] | backfill \| none | mono:[backfill] |  | capture | Last point: backfill takes the second-to-last pressure, none keeps the lift-off reading.
+| mono:[stabilizer.type] | none \| oneEuro \| pulledString \| streamline | mono:[none] |  | capture | Smooths the pen position while drawing.
+| mono:[stabilizer.minCutoff] | 0.1 to 20 | mono:[3] | Hz | capture | One Euro minimum cutoff: lower removes more jitter at slow speed.
+| mono:[stabilizer.beta] | 0 to 1 | mono:[0.01] |  | capture | One Euro speed coefficient: higher removes more lag at high speed.
+| mono:[stabilizer.radiusPx] | 0 to 40 | mono:[4] | px | capture | Pulled string leash length: the pen must move this far before the line follows.
+| mono:[stabilizer.amount] | 0 to 1 | mono:[0.3] | fraction | capture | Streamline strength: 0 follows the pen exactly, 1 is the strongest smoothing.
+| mono:[stabilizer.zoomAware] | true \| false | mono:[false] |  | capture | Interpret the distances in screen pixels, so the effect on screen is the same at every zoom level. Off: canvas units.
+| mono:[stabilizer.catchUpOnEnd] | true \| false | mono:[true] |  | capture | Complete the stroke at the position where the pen was lifted.
+| mono:[finalize.mode] | dp \| dpPressure \| bezierFit \| none | mono:[dp] |  | capture | How points are reduced when the stroke ends: simplification, simplification keeping pressure detail, curve fitting, or nothing.
+| mono:[finalize.tolerance] | 0 to 20 | mono:[tool-level value] |  | capture | Tolerance of the finishing step. Empty uses the tool-level tolerance.
+| mono:[finalize.toleranceUnit] | canvas \| screen | mono:[canvas] |  | capture | canvas: tolerance in canvas units. screen: in pixels, converted with the zoom when the stroke ends.
+| mono:[finalize.pressureWeight] | 0 to 200 | mono:[20] |  | capture | Distance units per pressure unit when simplification keeps pressure detail. (advanced)
+| mono:[finalize.resampleSpacingPx] | 0.5 to 20 | mono:[2] | px | capture | Spacing of the points a fitted curve is resampled to. (advanced)
+| mono:[touchGuard.waitMs] | 0 to 500 | mono:[0] | ms | capture | Wait before a finger stroke is committed, so a second finger can cancel it.
+| mono:[touchGuard.movePx] | 0 to 40 | mono:[0] | px | capture | Movement that commits the stroke before the wait ends.
+| mono:[touchGuard.cancelOnSecondTouch] | true \| false | mono:[false] |  | capture | Cancel the stroke when a second finger lands during the wait.
+| mono:[touchGuard.ignoreAfterPen] | true \| false | mono:[false] |  | capture | Finger input does not draw once a pen has been used.
+|===
+
+=== Look settings (draw)
+
+These settings live in the look saved with each stroke.
+
+
+[cols="6*"]
+|===
+| Setting | Values | Default | Unit | Applied | Description
+
+| mono:[outline] | legacy \| round \| freehand | mono:[legacy] |  | draw | Shape of the stroke: legacy ribbon, round (discs and segments, no spikes) or freehand.
+| mono:[curve] | uniform \| centripetal \| none | mono:[uniform] |  | draw | Curve through the points. centripetal does not overshoot when points are unevenly spaced.
+| mono:[pressureInterp] | catmullRom \| linear | mono:[catmullRom] |  | draw | How pressure is interpolated between points. linear never bulges.
+| mono:[zoomAware] | true \| false | mono:[false] |  | draw | Choose spacing and subdivision in screen pixels so smoothness does not depend on zoom.
+| mono:[spacingPx] | 0.5 to 10 | mono:[2] | px | draw | Minimum spacing between control points. (advanced)
+| mono:[edgePx] | 0.25 to 5 | mono:[1] | px | draw | Detail of the curve. The centripetal curve keeps every edge within a tenth of this of the true curve; the uniform curve uses it as the target length of an edge. (advanced)
+| mono:[caps] | separate \| merged | mono:[separate] |  | draw | merged draws the round ends inside the same fill, so translucent colours stay uniform.
+| mono:[width.min] | 0 to 1 | mono:[0] | fraction | draw | Width at pressure 0, as a fraction of the stroke width.
+| mono:[width.max] | 0 to 1 | mono:[1] | fraction | draw | Width at pressure 1, as a fraction of the stroke width.
+| mono:[width.gamma] | 0.2 to 3 | mono:[1] |  | draw | Response curve: below 1 reacts faster to light pressure, above 1 needs a firmer press.
+| mono:[width.taperStart] | 0 to 200 | mono:[0] | px | draw | Distance over which the start narrows; 0 for none.
+| mono:[width.taperEnd] | 0 to 200 | mono:[0] | px | draw | Distance over which the end narrows; 0 for none.
+|===
+
+== Factory presets
+
+A preset is a set of changes relative to the legacy profile or look. The factory presets are read-only. The values are
+starting points to be tuned on real hardware.
+
+
+=== Profile `mouse`
+
+[cols="3*"]
+|===
+| Preset | Id | Description
+
+| Legacy | mono:[legacy] | Behaviour of earlier releases, point for point.
+| Fixed | mono:[fixed] | Keeps every pen sample, uses event time, keeps zero pressure.
+| Stabilized | mono:[stabilized] | Fixed, plus One Euro position smoothing that follows the zoom and a Bézier-fitted finish.
+| Pulled string | mono:[pulledString] | Fixed, plus a pulled-string stabilizer.
+|===
+
+=== Profile `touch`
+
+[cols="3*"]
+|===
+| Preset | Id | Description
+
+| Legacy | mono:[legacy] | Behaviour of earlier releases, point for point.
+| Fixed | mono:[fixed] | Keeps every pen sample, uses event time, keeps zero pressure.
+| Guarded | mono:[guarded] | Fixed, plus a short wait that a second finger can cancel.
+| Smooth | mono:[smooth] | Guarded, plus One Euro position smoothing and a Bézier-fitted finish.
+|===
+
+=== Profile `pen.applePencil`
+
+[cols="3*"]
+|===
+| Preset | Id | Description
+
+| Legacy | mono:[legacy] | Behaviour of earlier releases, point for point.
+| Fixed | mono:[fixed] | Keeps every pen sample, uses event time, keeps zero pressure.
+| Smooth | mono:[smooth] | Fixed, plus One Euro smoothing of pressure and position and a Bézier-fitted finish.
+| Illustrator-like | mono:[illustrator] | Fixed, plus streamline stabilizing and a Bézier-fitted finish in screen pixels.
+|===
+
+=== Profile `pen.desktop`
+
+[cols="3*"]
+|===
+| Preset | Id | Description
+
+| Legacy | mono:[legacy] | Behaviour of earlier releases, point for point.
+| Fixed | mono:[fixed] | Keeps every pen sample, uses event time, keeps zero pressure.
+| Smooth | mono:[smooth] | Fixed, plus One Euro smoothing of pressure and position and a Bézier-fitted finish.
+| Illustrator-like | mono:[illustrator] | Fixed, plus streamline stabilizing and a Bézier-fitted finish in screen pixels.
+|===
+
+=== Look
+
+[cols="3*"]
+|===
+| Preset | Id | Description
+
+| Legacy | mono:[legacy] | No look is stored: strokes are drawn as in earlier releases.
+| Width curve | mono:[widthCurve] | Legacy outline with a minimum width and a pressure curve.
+| Round | mono:[round] | Round outline: no spikes at turns, uniform translucent colour.
+| Freehand | mono:[freehand] | Freehand outline.
+| Illustrator-like | mono:[illustrator] | Round outline with a Size ± Variation style width range.
+|===
+
+== Scenarios
+
+A scenario selects one preset for each profile and one look preset.
+
+[cols="7*"]
+|===
+| Scenario | mono:[mouse] | mono:[touch] | mono:[pen.applePencil] | mono:[pen.desktop] | Look | Description
+
+| A: legacy | legacy | legacy | legacy | legacy | legacy | Today's behaviour, identical point for point.
+| B: fixes | fixed | fixed | fixed | fixed | legacy | Every pen sample, event time and zero pressure kept.
+| C: smooth | stabilized | smooth | smooth | smooth | widthCurve | B plus smoothing and a pressure curve.
+| D: round | stabilized | smooth | smooth | smooth | round | C plus the round outline.
+| E: freehand | fixed | fixed | fixed | fixed | freehand | B plus the freehand outline.
+| F: Illustrator-like | stabilized | smooth | illustrator | illustrator | illustrator | Bézier-fitted finish, streamline stabilizing and a Size ± Variation width.
+|===
+
+Applying scenario A leaves every profile on its legacy preset and stores no look, so strokes are recorded and drawn exactly
+as in earlier releases.
+
+[source,ts]
+----
+const brush = weave.getActionHandler<WeaveBrushToolAction>("brushTool");
+
+brush.applyScenario("B");
+----
+
+== Custom presets
+
+`WeaveBrushPresetRegistry` holds the factory presets and any custom ones. A factory preset cannot be changed or removed; copy
+it under a new id and change the copy. Custom presets live in memory: the application decides whether to save them.
+
+[source,ts]
+----
+const registry = new WeaveBrushPresetRegistry();
+
+registry.copyProfilePreset("pen.desktop", "smooth", "my-wacom", "My Wacom");
+registry.setProfilePreset("pen.desktop", "my-wacom", { pressure: { floor: 0.1 } });
+
+brush.applyScenario(
+  { ...BRUSH_SCENARIOS[1], id: "mine", profiles: { ...BRUSH_SCENARIOS[1].profiles, "pen.desktop": "my-wacom" } },
+  registry
+);
+----
+
+== Saving and restoring a configuration
+
+[cols="2*"]
+|===
+| Method | Description
+
+| mono:[exportConfig()] | The four profiles and the look as a document with a `version`.
+| mono:[exportConfigJson()] | The same document as JSON text.
+| mono:[importConfig(documentOrJson)] | Restores a configuration. A document with an unsupported version or invalid values is rejected as a whole and nothing changes.
+| mono:[getLook()] / mono:[setLook(patch \| null)] | The look saved on new strokes. `null` saves no look.
+| mono:[applyScenario(idOrScenario, registry?)] | Applies a scenario. Returns `{ applied, errors }`.
+|===
+
