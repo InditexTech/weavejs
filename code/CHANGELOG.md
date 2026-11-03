@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1257](https://github.com/InditexTech/weavejs/issues/1257) Generated create-weave-*-app projects do not install, build or run without manual fixes
+
 ## [5.7.1] - 2026-10-27
 
 ### Fixed
