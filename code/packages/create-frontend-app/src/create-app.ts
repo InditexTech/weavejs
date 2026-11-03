@@ -107,8 +107,6 @@ function createPackageJson(projectName: string, options: Options): object {
         '@radix-ui/react-slot',
         '@radix-ui/react-tabs',
         '@radix-ui/react-tooltip',
-        '@react-three/fiber',
-        '@react-three/postprocessing',
         '@tanstack/react-query',
         'boring-avatars',
         'change-case',
@@ -121,11 +119,9 @@ function createPackageJson(projectName: string, options: Options): object {
         'motion',
         'next',
         'next-themes',
-        'ogl',
         'onnxruntime-web',
         'pdf-lib',
         'platform-detect',
-        'postprocessing',
         'react',
         'react-dom',
         'react-hook-form',
@@ -135,7 +131,6 @@ function createPackageJson(projectName: string, options: Options): object {
         'sonner',
         'tailwind-merge',
         'tailwindcss-animate',
-        'three',
         'uuid',
         'vaul',
         'zod',
@@ -143,13 +138,13 @@ function createPackageJson(projectName: string, options: Options): object {
       ]),
       ...pick(localVersions, [
         '@inditextech/weave-react',
+        '@inditextech/weave-renderer-konva-base',
         '@inditextech/weave-store-azure-web-pubsub',
       ]),
     };
 
     const devDependencies = {
       ...pick(versionPkg.devDependencies, [
-        '@eslint/eslintrc',
         '@tailwindcss/postcss',
         '@testing-library/dom',
         '@testing-library/react',
@@ -175,11 +170,11 @@ function createPackageJson(projectName: string, options: Options): object {
       ...versionPkg,
       name: projectName,
       scripts: {
-        build: 'next build',
-        dev: 'next dev --experimental-https',
+        build: 'next build --webpack',
+        dev: 'next dev --webpack --experimental-https',
         format:
           'prettier --write ./api ./app ./assets ./components ./lib ./store next.config.js',
-        lint: 'next lint',
+        lint: 'eslint .',
         start: 'next start',
       },
       dependencies: sortObjectKeys(dependencies),
@@ -204,8 +199,6 @@ function createPackageJson(projectName: string, options: Options): object {
       '@radix-ui/react-slot',
       '@radix-ui/react-tabs',
       '@radix-ui/react-tooltip',
-      '@react-three/fiber',
-      '@react-three/postprocessing',
       '@tanstack/react-query',
       'boring-avatars',
       'change-case',
@@ -218,11 +211,9 @@ function createPackageJson(projectName: string, options: Options): object {
       'motion',
       'next',
       'next-themes',
-      'ogl',
       'onnxruntime-web',
       'pdf-lib',
       'platform-detect',
-      'postprocessing',
       'react',
       'react-dom',
       'react-hook-form',
@@ -232,7 +223,6 @@ function createPackageJson(projectName: string, options: Options): object {
       'sonner',
       'tailwind-merge',
       'tailwindcss-animate',
-      'three',
       'uuid',
       'vaul',
       'zod',
@@ -240,13 +230,13 @@ function createPackageJson(projectName: string, options: Options): object {
     ]),
     ...pick(localVersions, [
       '@inditextech/weave-react',
+      '@inditextech/weave-renderer-konva-base',
       '@inditextech/weave-store-websockets',
     ]),
   };
 
   const devDependencies = {
     ...pick(versionPkg.devDependencies, [
-      '@eslint/eslintrc',
       '@tailwindcss/postcss',
       '@testing-library/dom',
       '@testing-library/react',
@@ -272,11 +262,11 @@ function createPackageJson(projectName: string, options: Options): object {
     ...versionPkg,
     name: projectName,
     scripts: {
-      build: 'next build',
-      dev: 'next dev --experimental-https',
+      build: 'next build --webpack',
+      dev: 'next dev --webpack --experimental-https',
       format:
         'prettier --write ./api ./app ./assets ./components ./lib ./store next.config.js',
-      lint: 'next lint',
+      lint: 'eslint .',
       start: 'next start',
     },
     dependencies: sortObjectKeys(dependencies),
