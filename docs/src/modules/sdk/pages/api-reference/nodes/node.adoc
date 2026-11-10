@@ -163,25 +163,7 @@ isLocked(instance: Konva.Node): boolean
 
 This method returns `true` if the provided node is locked.
 
-== Abstract Methods
-
-=== create
-
-[source,ts]
-----
-create(key: string, props: WeaveElementAttributes): WeaveStateElement
-----
-
-This method creates a JSON model of the node, based on the previous explained model.
-
-=== onAdd
-
-[source,ts]
-----
-onAdd(props: WeaveElementAttributes): WeaveElementInstance
-----
-
-This method is called when a node instance is added to the stage via the internal reconciler.
+== Required Methods
 
 === onRender
 
@@ -200,13 +182,55 @@ stage.
 
 [source,ts]
 ----
-updateInstance(
+onUpdate(
   nodeInstance: WeaveElementInstance,
   nextProps: WeaveElementAttributes
 ): void
 ----
 
 This method updates a rendered instance of Konva, that represents a node.
+
+== Optional Hooks
+
+=== initialize
+
+[source,ts]
+----
+initialize?(): void
+----
+
+This method resets the internal state of the node. It's called each time the Weave instance
+is reset, for example when switching rooms. Built-in nodes also call it from their constructor.
+
+== Overridable Methods
+
+=== create
+
+[source,ts]
+----
+create(key: string, props: WeaveElementAttributes): WeaveStateElement
+----
+
+This method creates a JSON model of the node, based on the previous explained model.
+
+=== onRegister
+
+[source,ts]
+----
+onRegister(): Promise<void>
+----
+
+This method is called when the node is registered on the Weave instance. It returns a promise,
+by default already resolved.
+
+=== onAdd
+
+[source,ts]
+----
+onAdd(nodeInstance: WeaveElementInstance): void
+----
+
+This method is called when a node instance is added to the stage via the internal reconciler.
 
 === onDestroy
 
@@ -217,6 +241,27 @@ onDestroy(nodeInstance: WeaveElementInstance): void
 
 This method destroys the Konva instance rendered, that represents a node. It also removes the instance
 listeners registered for the node and its descendants with `setNodeInstanceListener`.
+
+=== onDestroyInstance
+
+[source,ts]
+----
+onDestroyInstance(): void
+----
+
+This method is called when the Weave.js instance is destroyed, is useful for cleanup purposes.
+
+=== serialize
+
+[source,ts]
+----
+serialize(instance: WeaveElementInstance): WeaveStateElement
+----
+
+This method returns the JSON model representation of the provided Konva instance
+that is handled by this Node definition. It's a serialization from Konva instance to JSON model.
+
+== Protected Methods
 
 === setNodeInstanceListener
 
@@ -240,25 +285,6 @@ listener.
 avoid replacing the `onNodesChange` and `onSelectionState` listeners that `setupDefaultNodeEvents` registers.
 * The listeners are removed when the node is destroyed, including the nodes destroyed with a container.
 Locking a node removes only the default `onNodesChange` and `onSelectionState` listeners.
-
-=== onDestroyInstance
-
-[source,ts]
-----
-onDestroyInstance(): void
-----
-
-This method is called when the Weave.js instance is destroyed, is useful for cleanup purposes.
-
-=== toNode
-
-[source,ts]
-----
-serialize(instance: WeaveElementInstance): WeaveStateElement
-----
-
-This method returns the JSON model representation of the provided Konva instance
-that is handled by this Node definition. It's a serialization from Konva instance to JSON model.
 
 == Konva.Node Augmentation
 

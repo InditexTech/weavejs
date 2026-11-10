@@ -26,6 +26,11 @@ export default defineConfig({
     include: ['**/*.test.ts'],
     exclude: ['**/node_modules/**'],
 
+    typecheck: {
+      enabled: true,
+      tsconfig: './src/__tests__/types/tsconfig.json',
+    },
+
     reporters: ['default', 'json'],
     outputFile: {
       json: 'reports/test-report/test-report.json',

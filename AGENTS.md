@@ -129,3 +129,8 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/nodes/ellipse.adoc | `code/packages/sdk/src/nodes/ellipse/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
 | sdk:api-reference/nodes/polygon.adoc | `code/packages/sdk/src/nodes/polygon/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
 | sdk:api-reference/nodes/node.adoc | `code/packages/sdk/src/nodes/node.ts` (`setNodeInstanceListener`) | released in 5.7.0 |
+| sdk:api-reference/actions/action.adoc | `code/packages/sdk/src/actions/action.ts` | released in 5.8.0 |
+| sdk:api-reference/plugins/plugin.adoc | `code/packages/sdk/src/plugins/plugin.ts` | released in 5.8.0 |
+| sdk:api-reference/nodes/node.adoc (hooks) | `code/packages/sdk/src/nodes/node.ts` | released in 5.8.0 |
+| types:api-reference/types.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| sdk:api-reference/weave/index.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |

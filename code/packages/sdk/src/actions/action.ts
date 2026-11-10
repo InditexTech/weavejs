@@ -113,13 +113,13 @@ export abstract class WeaveAction implements WeaveActionBase {
     );
   }
 
-  abstract initialize?(): void;
+  initialize?(): void;
 
-  abstract onInit?(): void;
+  onInit?(): void;
 
   abstract trigger(cancelAction: () => void, params?: unknown): unknown;
 
-  abstract onPropsChange?(): void;
+  onPropsChange?(): void;
 
-  abstract cleanup?(): void;
+  cleanup?(): void;
 }
