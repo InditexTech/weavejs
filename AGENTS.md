@@ -134,3 +134,5 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/nodes/node.adoc (hooks) | `code/packages/sdk/src/nodes/node.ts` | released in 5.8.0 |
 | types:api-reference/types.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
 | sdk:api-reference/weave/index.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| main:build/nodes/frame.adoc (edge selection) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | unreleased |
+| sdk:api-reference/nodes/frame.adoc (`edgeHitWidth`) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | unreleased |

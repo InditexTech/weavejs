@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#1263](https://github.com/InditexTech/weavejs/issues/1263) Artboard selection: allow selecting an artboard by clicking any of its edges, not only the top bar
+
 ### Fixed
 
 - [#1256](https://github.com/InditexTech/weavejs/issues/1256) Optional lifecycle hooks declared abstract force every custom node, action and plugin to implement them
