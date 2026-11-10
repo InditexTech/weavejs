@@ -11,6 +11,10 @@ export default defineConfig({
 
     alias: {
       ['@']: path.resolve(__dirname, './src'),
+      ['@inditextech/weave-sdk']: path.resolve(
+        __dirname,
+        './src/plugins/plugin.ts'
+      ),
     },
 
     environmentOptions: {

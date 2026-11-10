@@ -100,3 +100,47 @@ const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
   isEraser: false,
 };
 ----
+
+== Stroke look
+
+A stroke can carry a mono:[look] attribute that says how it is drawn. The look is saved with the stroke, so every viewer and every export draws it the same way. A stroke without a look, or with a look whose mono:[version] is not mono:[1], is drawn exactly as in earlier releases.
+
+[source,ts]
+----
+type WeaveStrokeLook = {
+  version: 1;
+  outline: 'legacy' | 'round' | 'freehand';
+  curve: 'uniform' | 'centripetal' | 'none';
+  pressureInterp: 'catmullRom' | 'linear';
+  zoomAware: boolean;
+  spacingPx: number;
+  edgePx: number;
+  caps: 'separate' | 'merged';
+  width: { min: number; max: number; gamma: number; taperStart: number; taperEnd: number };
+};
+----
+
+Missing or invalid fields fall back to the legacy values, and numbers are clamped to a safe range.
+
+[cols="1,3"]
+|===
+| Field | Effect
+
+| mono:[outline] | mono:[legacy] is the offset ribbon of earlier releases. mono:[round] draws the union of the tangent quads between neighbours, merged into one polygon where the path bends only slightly, with a disc at every real bend and at the ends, in one fill. Turns, reversals and ends are round and a translucent colour stays uniform. mono:[freehand] currently draws like mono:[round]; it has no outline of its own yet.
+| mono:[curve] | mono:[uniform] is the earlier Catmull-Rom curve. mono:[centripetal] does not overshoot or form cusps when points are unevenly spaced. mono:[none] joins the points with straight edges.
+| mono:[pressureInterp] | mono:[linear] never leaves the range of the two neighbouring pressures. mono:[catmullRom] is smooth and clamped to that range.
+| mono:[zoomAware] | Spacing and subdivision are in screen pixels, so no facet shows at high zoom. Tapers are measured in screen pixels too.
+| mono:[caps] | With the mono:[legacy] outline, mono:[separate] draws the round ends over the fill, as before. mono:[merged] puts them in the same fill, so a translucent colour is not darker at the ends.
+| mono:[width] | Half-width is the stroke width times a fraction between mono:[min] and mono:[max], following pressure raised to mono:[gamma], narrowing over mono:[taperStart] and mono:[taperEnd]. The defaults reproduce the earlier width.
+|===
+
+=== Viewer-side preview
+
+[source,ts]
+----
+const stroke = weave.getNodeHandler<WeaveStrokeNode>('stroke');
+stroke.setLookPreview({ version: 1, outline: 'round' });  // draw every stroke with this look
+stroke.setLookPreview(null);                              // back to the saved looks
+----
+
+The preview only changes how this screen draws. It does not change any saved stroke and other users do not see it.
