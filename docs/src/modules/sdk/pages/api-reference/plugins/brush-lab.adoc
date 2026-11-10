@@ -1,0 +1,76 @@
+= WeaveBrushLabPlugin
+:description: Opt-in plugin to measure and compare brush settings on real pen devices
+
+== Overview
+
+mono:[WeaveBrushLabPlugin] helps tune the xref:sdk:api-reference/actions/brush-tool.adoc[brush tool] on real hardware. It listens to the brush tool, reports what the device sends, draws overlays of the captured samples and measures every stroke.
+
+The plugin is opt in. It lives in its own entry point, mono:[@inditextech/weave-sdk/lab], so applications that do not import it carry none of its code.
+
+IMPORTANT: The lab keeps everything it records *in memory only*. It never stores, uploads or downloads recordings, and it adds no node to the document. Ghosts and metrics are gone when the page is reloaded.
+
+== Import
+
+[source,ts]
+----
+import { WeaveBrushLabPlugin } from "@inditextech/weave-sdk/lab";
+
+const lab = new WeaveBrushLabPlugin({ maxGhosts: 5 });
+----
+
+Register it with the other plugins. The brush tool finds it by the name mono:[brushLab]. While the plugin is enabled, strokes also save an mono:[inputMeta] attribute that says which profile, preset and scenario drew them.
+
+== Methods
+
+[cols="1,3"]
+|===
+| Method | Description
+
+| mono:[enable()] / mono:[disable()] | Turns the lab on or off. Off hides its layer and stops listening.
+| mono:[getDeviceReport()] | Pointer type, resolved profile, sample rate, samples per event, pressure range, tilt, predicted-event support, zoom, frames per second and warnings.
+| mono:[setOverlay(name, on)] | Switches an overlay: mono:[raw], mono:[stabilized], mono:[final] or mono:[pressure].
+| mono:[getLastMetrics()] | Metrics of the last stroke.
+| mono:[compareLast(scenarioId)] | Draws the last stroke as it was drawn (black) and again through the chosen brush (scenario id, red), labelled. Choosing another brush replaces the first.
+| mono:[clearGhosts()] | Forgets the kept strokes and removes the comparison.
+| mono:[setMaxGhosts(n)] | Number of strokes kept for ghosts, 5 by default. The oldest are dropped.
+|===
+
+== Device report
+
+The report is built from pointer events. A mono:[penReportsAsMouse] warning appears when a pointer that says it is a mouse sends pressure or tilt, as a pen does when the driver does not use the pointer API (for example Windows Ink off).
+
+== Overlays
+
+Overlays are drawn on a layer of the lab, not in the document.
+
+* *raw* one dot per sample the device reported, where it landed.
+* *stabilized* one dot per sample after stabilizing.
+* *final* the points kept after the stroke is finished.
+* *pressure* the pressure along the stroke.
+
+== Metrics
+
+After each stroke the plugin emits mono:[onBrushLabMetrics] with:
+
+[cols="1,3"]
+|===
+| Field | Meaning
+
+| mono:[samples] | Samples reported by the device, predicted ones left out.
+| mono:[points] | Points kept after finishing.
+| mono:[droppedDuplicates] | Consecutive samples at the same position.
+| mono:[effectiveRateHz] | Samples per second.
+| mono:[jitter] | Mean distance of a raw sample from the line through its neighbours.
+| mono:[lag] | Mean distance between raw and stabilized samples.
+| mono:[movedOnFinish] | Largest distance a point moved when the stroke was finished.
+| mono:[widthRoughness] | Mean change of width between neighbouring points.
+| mono:[drawMs] | Time spent processing and finishing the stroke.
+|===
+
+== Comparing brushes
+
+While enabled, the lab records the pointer events of every gesture itself, whatever brush is active: every coalesced sample of every event, with its time, in drawing coordinates. mono:[compareLast()] replays the last gesture through the chosen brush: the capture it uses (all coalesced samples, or the last sample of each event), its minimum move, its stabilizer and its finishing step, and draws the resulting line. Each coalesced sample keeps its own time, as the brush reads it, and a stabilized stroke is completed where the pen was lifted when its mono:[stabilizer.catchUpOnEnd] is on, as the brush does. Predicted samples are not replayed.
+
+NOTE: Only positions are replayed. Width, pressure smoothing and the outline are not, so a comparison shows how each brush places and simplifies the line, not how it looks when drawn.
+
+The last mono:[maxGhosts] recordings (5 by default) are kept in memory, the oldest are dropped, and the comparison is removed when the next stroke starts.

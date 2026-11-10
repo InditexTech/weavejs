@@ -40,10 +40,29 @@ new WeaveBrushToolAction(params?: WeaveBrushToolActionParams);
 type WeaveBrushToolActionProperties = {
   interpolationSteps: number; // Number of steps for interpolation
   simplifyTolerance: number; // Douglas-Peucker tolerance applied on stroke finalize
+  input: WeaveBrushInputConfig; // Input profiles, see "Input profiles"
 };
 
 type WeaveBrushToolActionParams = {
-  config: Partial<WeaveBrushToolActionProperties>;
+  config: WeaveBrushToolActionConfig; // every field is optional, profiles accept partial objects
+};
+
+type WeaveBrushInputProfileKey =
+  | "mouse"
+  | "touch"
+  | "pen.applePencil"
+  | "pen.desktop";
+
+type WeaveBrushInputConfig = {
+  resolveProfile?: (info: WeaveBrushPointerInfo) => WeaveBrushInputProfileKey;
+  forceProfile?: WeaveBrushInputProfileKey | null;
+  profiles: Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>;
+};
+
+type WeaveBrushPointerInfo = {
+  pointerType: string; // "mouse" | "touch" | "pen" | ""
+  platform: string; // "ipad" | "ios" | "mac" | "windows" | "android" | "linux" | "unknown"
+  persistentDeviceId?: number; // only where the browser reports it
 };
 ----
 
@@ -55,7 +74,7 @@ For `WeaveBrushToolActionParams`:
 |===
 | Property | Type | Required | Description
 
-| mono:[config] | mono:[Partial<WeaveBrushToolActionProperties>] | label:green[Required] | Config parameters for the tool.
+| mono:[config] | mono:[WeaveBrushToolActionConfig] | label:green[Required] | Config parameters for the tool. Every field is optional; a partial profile is merged over the legacy profile.
 |===
 
 For `WeaveBrushToolActionProperties`:
@@ -65,8 +84,235 @@ For `WeaveBrushToolActionProperties`:
 | Property | Type | Required | Default | Description
 
 | mono:[interpolationSteps] | mono:[number] |  | mono:[10] | Number of interpolation steps for smooth curve on touch devices.
+| mono:[input] | mono:[WeaveBrushInputConfig] |  | legacy profiles | Per-device input profiles, see <<Input profiles>>.
 | mono:[simplifyTolerance] | mono:[number] |  | mono:[0.5] | Tolerance, in canvas units, of the Douglas-Peucker simplification applied once when a stroke is finalized. While a stroke is being drawn every recorded sample is rendered; on release the point list is simplified before being persisted, so this value governs how much fidelity a finished stroke gives up. Lower values keep a finished stroke closer to the path drawn, at the cost of more points stored per stroke.
 |===
+
+== Input profiles
+
+The tool resolves one input profile for each stroke, from the first event of the stroke, and uses it until the stroke ends.
+A profile groups the settings for capturing samples, pressure, position stabilizing, finishing the stroke and (for fingers)
+a gesture guard.
+
+[cols="3*"]
+|===
+| Profile | Chosen when | Typical device
+
+| mono:[mouse] | pointer type `mouse`, or any unknown or empty pointer type | Mouse, trackpad
+| mono:[touch] | pointer type `touch` | Finger
+| mono:[pen.applePencil] | pointer type `pen` on an iPad | Apple Pencil
+| mono:[pen.desktop] | pointer type `pen` on any other platform | Wacom, Surface Pen, other desktop pens
+|===
+
+NOTE: A tablet whose driver does not expose pen input to the browser (for example Wacom with _Use Windows Ink_ turned off on
+Windows) reports itself as a `mouse`, with a constant pressure. The tool cannot tell, and uses the `mouse` profile.
+
+Every profile starts as the *legacy* profile, which reproduces the behaviour the tool had before profiles existed, point for
+point. Without any `input` configuration, strokes are recorded exactly as in earlier releases.
+
+=== Choosing the profile
+
+The profile is chosen in this order:
+
+. `forceProfile`, when set.
+. `resolveProfile`, when the application provides it. A resolver that throws or returns an unknown key is ignored.
+. The automatic choice from the table above.
+
+[source,ts]
+----
+new WeaveBrushToolAction({
+  config: {
+    input: {
+      // Treat every pen as a desktop pen.
+      resolveProfile: (info) => (info.pointerType === "pen" ? "pen.desktop" : "mouse"),
+    },
+  },
+});
+----
+
+=== Profile settings
+
+[cols="3*"]
+|===
+| Group | Setting | Legacy value
+
+| mono:[capture] | mono:[source] `legacy` \| `coalesced`; mono:[clock] `now` \| `event`; mono:[minMovePx]; mono:[predicted] `off` \| `tail`; mono:[event] `pointermove` \| `pointerrawupdate` | `legacy`, `now`, `0`, `tail`, `pointermove`
+| mono:[pressure] | mono:[zero] `legacy` \| `keep` \| `holdLast`; mono:[filter] `legacy` \| `timeEma` \| `oneEuro` \| `none`; mono:[timeConstantMs]; mono:[oneEuro]; mono:[floor]; mono:[start] `backfill` \| `average` \| `none`; mono:[startSamples]; mono:[end] `backfill` \| `none` | `legacy`, `legacy`, `40`, `{ minCutoff: 1, beta: 0.01 }`, `0.15`, `backfill`, `3`, `backfill`
+| mono:[stabilizer] | mono:[type] `none` \| `oneEuro` \| `pulledString` \| `streamline`; mono:[minCutoff]; mono:[beta]; mono:[radiusPx]; mono:[amount]; mono:[zoomAware]; mono:[catchUpOnEnd] | `none`
+| mono:[finalize] | mono:[mode] `dp` \| `dpPressure` \| `bezierFit` \| `none`; mono:[tolerance]; mono:[toleranceUnit] `canvas` \| `screen`; mono:[pressureWeight]; mono:[resampleSpacingPx] | `dp`, the tool-level mono:[simplifyTolerance], `canvas`
+| mono:[touchGuard] | mono:[waitMs]; mono:[movePx]; mono:[cancelOnSecondTouch]; mono:[ignoreAfterPen] | no wait, no guard
+|===
+
+NOTE: The modes other than the legacy ones are introduced progressively. A setting whose mode is not implemented yet behaves
+as the legacy mode. Everything below is implemented except `capture.event`, which still reads pointer moves.
+
+=== Capture and pressure modes
+
+==== Capturing every pen sample
+
+With `capture.source: "legacy"` the tool records one position per pointer event. A pen reports many samples between two
+animation frames and browsers deliver them batched ("coalesced") in a single event, so the legacy mode discards most of the
+path: only the event's final position is kept, and every other sample in the batch lands on it.
+
+With `capture.source: "coalesced"` every batched sample becomes a stroke point at its *own* position, pressure and time,
+in the order reported. An event without a batch is one sample. Positions are computed from each sample's client coordinates
+and the container's transform, so zoomed, panned and nested containers are handled and no shared stage state is changed.
+
+* `capture.minMovePx` skips samples closer than this many screen pixels to the last recorded one.
+* `capture.predicted: "tail"` draws the browser's predicted position ahead of the pen as a provisional point. It is replaced
+by the next real samples and removed when the stroke ends. `"off"` never draws it.
+* `capture.clock: "event"` measures the time between samples with the time each sample's own event reports, instead of the
+time the tool happens to process it. Processing a batch in one step then does not change the smoothing; with `"now"` all
+samples of a batch look simultaneous. Where an event reports no usable time, the processing time is used.
++
+When the profile has a stabilizer (`stabilizer.type` is not `none`) predicted samples are skipped: the stabilizer keeps a state that follows the pen, and a guess that is dropped on the next real sample would still bend it, and with it the real line.
+
+==== Zero pressure
+
+[cols="2*"]
+|===
+| `pressure.zero` | A pen reporting a pressure of 0
+
+| `legacy` | Replaced by 0.5. This makes the width jump up as the pen lifts.
+| `keep` | Recorded as 0, then limited by `pressure.floor`.
+| `holdLast` | Replaced by the last non-zero reading, or 0.5 when there is none.
+|===
+
+Mouse, trackpad and finger input never report pressure and always record 0.5, whatever this setting says.
+
+==== Pressure filters
+
+[cols="2*"]
+|===
+| `pressure.filter` | Behaviour
+
+| `legacy` | Velocity-adaptive smoothing. Its factor depends on how fast the pen moves and on how often events arrive, so the same stroke is smoothed differently at 133 Hz and at 240 Hz.
+| `timeEma` | Exponential smoothing with the time constant `pressure.timeConstantMs`. The result does not depend on the report rate.
+| `oneEuro` | One Euro filter: smooths slow changes and follows fast ones. Tune `pressure.oneEuro.minCutoff` first (lower removes jitter, adds lag), then `pressure.oneEuro.beta` (higher removes lag at speed).
+| `none` | Readings are recorded as reported, limited by `pressure.floor`.
+|===
+
+The first movement reading of a stroke seeds every filter; the pointer-down reading never does, because it is frequently an
+unreliable contact spike. Filter state is never carried over from the previous stroke, and a non-finite reading is recorded
+as 0.5 and cannot corrupt the filter.
+
+==== First and last point
+
+[cols="2*"]
+|===
+| `pressure.start` | First point's pressure
+
+| `backfill` | Replaced by the first real movement reading.
+| `average` | Replaced by the mean of the first `pressure.startSamples` movement readings, refined as each arrives.
+| `none` | Left as the contact reading.
+|===
+
+Predicted samples never change the first point. `pressure.end: "backfill"` gives the last point the pressure of the one
+before it, because a lift-off reading is as unreliable as the contact reading; `"none"` keeps it.
+
+=== Stabilizing the pen position
+
+`stabilizer.type` smooths the pen position while drawing. It never changes the pointer-down position, and every type starts
+from it.
+
+[cols="2*"]
+|===
+| `stabilizer.type` | Behaviour
+
+| `none` | Positions are recorded as reported.
+| `oneEuro` | One Euro filter on the position: slow movement is smoothed, fast movement is followed closely. See <<Tuning the One Euro filter>>.
+| `pulledString` | The recorded point is held back on a leash of `stabilizer.radiusPx`. It only moves when the pen pulls the string taut, so tiny movements leave no mark and tight curves are rounded.
+| `streamline` | The recorded point eases towards the pen with a time constant proportional to `stabilizer.amount` (0 follows the pen exactly, 1 is about 80 ms). The result does not depend on how often samples arrive.
+|===
+
+Distances are *screen pixels* when `stabilizer.zoomAware` is on, so the effect on screen is the same at every zoom level. With
+it off they are canvas units, and a stroke drawn zoomed out is smoothed more strongly on screen than one drawn zoomed in.
+
+A stabilized stroke lags behind the pen. With `stabilizer.catchUpOnEnd` on, the stroke is completed at the position where the
+pen was lifted. With it off the stroke ends where the stabilizer had reached.
+
+==== Tuning the One Euro filter
+
+The filter has two settings, `stabilizer.minCutoff` and `stabilizer.beta`. Tune them in this order:
+
+. Set `beta` to `0` and `minCutoff` to about `1`.
+. Hold the pen almost still, or move it slowly, and lower `minCutoff` until the jitter is gone. Lower values remove more jitter
+and add more lag.
+. Move the pen quickly in different directions and raise `beta` until the line keeps up. Start with a very small value
+(`0.001`) and change it by factors of 10. Higher values remove more lag at speed.
+
+A slow-speed jitter problem means `minCutoff` is too high; a high-speed lag problem means `beta` is too low. With `beta: 0` the
+filter is a plain low-pass filter and lags by about `speed / (2 * pi * minCutoff)`: at 400 px/s and 1 Hz that is 64 px.
+
+=== Finishing a stroke
+
+When a stroke ends its points are reduced before they are saved. `finalize.mode` selects how:
+
+[cols="2*"]
+|===
+| `finalize.mode` | Behaviour
+
+| `none` | Every recorded point is kept.
+| `dp` | Douglas-Peucker simplification of the positions (the legacy mode). Pressure is ignored, so a change of pressure along a straight path is lost.
+| `dpPressure` | The same, but a point is also kept when its pressure differs from the pressure interpolated along the reduced path by more than `finalize.tolerance / finalize.pressureWeight`.
+| `bezierFit` | Fits smooth cubic Bézier curves through the stroke, within the tolerance, and samples them back to points every `finalize.resampleSpacingPx`. The first and last points are kept exactly. Hand shake smaller than the tolerance disappears and the line is smooth, like the Fidelity setting of vector drawing tools.
+|===
+
+`finalize.tolerance` is in canvas units with `finalize.toleranceUnit: "canvas"` (the legacy behaviour; empty uses
+`simplifyTolerance`). With `"screen"` it is in pixels, converted with the zoom in force when the stroke ends, so the same
+setting gives the same on-screen fidelity at every zoom level. `finalize.pressureWeight` is then in pixels per unit of pressure.
+
+NOTE: `bezierFit` changes the stroke a little when the pen lifts, because the live stroke shows the recorded points and the
+saved stroke is the fitted curve. Keep the tolerance small, or use a stabilizer while drawing, to keep that change small.
+
+=== Fingers: the touch guard
+
+A finger that touches down may be the start of a pinch or a pan rather than a stroke. The `touch` profile can hold a finger
+stroke back until it is clear:
+
+* `touchGuard.waitMs` is how long to wait, and `touchGuard.movePx` how far (screen pixels) the finger may move, before the
+stroke is committed. Whichever comes first commits it. With both at `0`, the default, strokes start immediately.
+* While waiting, a second finger landing cancels the stroke without leaving any mark (`touchGuard.cancelOnSecondTouch`).
+* Once committed, the stroke starts at the point where the finger first touched down and the path held back during the wait is
+kept, so nothing is lost.
+* A finger that lifts before the wait ends draws a dot.
+* `touchGuard.ignoreAfterPen` stops finger input from drawing once a pen has been used, until the tool is activated again.
+
+The guard needs `capture.source: "coalesced"` to keep the held-back path; otherwise the stroke starts at the touch-down point
+and continues from the current position.
+
+A stroke that is in progress when a pinch begins ends when the finger that drew it lifts. Another finger lifting, for example
+the second finger of the pinch, does not end it.
+
+=== Recording how a stroke was drawn
+
+While the lab plugin is active, each new stroke carries an `inputMeta` property with the `profile` that drew it, the `preset`
+that profile held (`legacy`, a preset id, `custom` when it was changed on its own, or `imported`) and the `scenario` in force.
+Without the plugin no such property is saved. `getPresetId(key)` and `getScenarioId()` expose the same values.
+
+=== Changing a profile at runtime
+
+The action exposes methods to read and change profiles while the application is running, without recreating the tool.
+A change applies from the *next* stroke; a stroke in progress keeps the configuration it started with.
+
+[cols="2*"]
+|===
+| Method | Description
+
+| mono:[getInputProfile(key)] | Returns a copy of a profile's current configuration.
+| mono:[setInputProfile(key, patch)] | Merges a partial configuration into a profile. Returns `{ applied, errors }`.
+| mono:[setForcedProfile(key \| null)] | Forces a profile for every stroke, or restores automatic resolution with `null`.
+| mono:[setProfileResolver(resolver \| undefined)] | Replaces the automatic resolution, or restores it with `undefined`.
+| mono:[getActiveProfileKey()] | Key of the profile of the stroke in progress, or of the last stroke.
+|===
+
+[source,ts]
+----
+const brush = weave.getActionHandler<WeaveBrushToolAction>("brushTool");
+
+brush.setInputProfile("pen.desktop", { pressure: { floor: 0.05 } });
+brush.setForcedProfile("pen.desktop");
+----
 
 == Default values
 
@@ -75,5 +321,14 @@ For `WeaveBrushToolActionProperties`:
 const BRUSH_TOOL_DEFAULT_CONFIG = {
   interpolationSteps: 10,
   simplifyTolerance: 0.5,
+  input: {
+    forceProfile: null,
+    profiles: {
+      mouse: BRUSH_LEGACY_INPUT_PROFILE,
+      touch: BRUSH_LEGACY_INPUT_PROFILE,
+      "pen.applePencil": BRUSH_LEGACY_INPUT_PROFILE,
+      "pen.desktop": BRUSH_LEGACY_INPUT_PROFILE,
+    },
+  },
 };
 ----

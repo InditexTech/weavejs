@@ -117,8 +117,10 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | released in 5.7.0 |
 | sdk:api-reference/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | released in 5.7.0 |
 | sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | released in 5.7.0 |
-| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | released in 5.7.0 |
-| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants,stroke}.ts`, `render/*` (stroke look, `setLookPreview`) | updated for brush-input-lab, unreleased |
+| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants,profiles}.ts`, `code/packages/sdk/src/actions/brush-tool/brush-tool.ts` (input profiles, `setInputProfile`) | updated for brush-input-lab, unreleased |
+| sdk:api-reference/actions/brush-tuning.adoc | `code/packages/sdk/src/actions/brush-tool/tunables/*` (descriptors, presets, scenarios, config export), `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` (`WeaveStrokeLook`) | new for brush-input-lab, unreleased |
+| sdk:api-reference/plugins/brush-lab.adoc | `code/packages/sdk/src/plugins/brush-lab/*`, `code/packages/sdk/src/index.lab.ts` | new for brush-input-lab, unreleased |
 | main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
 | sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
 | main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
@@ -127,3 +129,8 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/nodes/ellipse.adoc | `code/packages/sdk/src/nodes/ellipse/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
 | sdk:api-reference/nodes/polygon.adoc | `code/packages/sdk/src/nodes/polygon/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
 | sdk:api-reference/nodes/node.adoc | `code/packages/sdk/src/nodes/node.ts` (`setNodeInstanceListener`) | released in 5.7.0 |
+| sdk:api-reference/actions/action.adoc | `code/packages/sdk/src/actions/action.ts` | released in 5.8.0 |
+| sdk:api-reference/plugins/plugin.adoc | `code/packages/sdk/src/plugins/plugin.ts` | released in 5.8.0 |
+| sdk:api-reference/nodes/node.adoc (hooks) | `code/packages/sdk/src/nodes/node.ts` | released in 5.8.0 |
+| types:api-reference/types.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| sdk:api-reference/weave/index.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
