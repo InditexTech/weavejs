@@ -1448,7 +1448,13 @@ or run values. Vertical alignment (<code>verticalAlign</code>) stays a setting o
 <div class="paragraph">
 <p>Lists show markers in a gutter (<code>disc</code>, <code>circle</code>, <code>square</code>; <code>1.</code>, <code>a.</code>, <code>i.</code> by depth). Numbering is
 continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
-item; <code>start</code> sets the first number. Markers are not part of <code>text</code>.</p>
+item; <code>start</code> sets the first number. Markers are not part of <code>text</code>. With centre or right alignment the
+marker stays attached to the first line of its item.</p>
+</div>
+<div class="paragraph">
+<p>Press <kbd>Shift</kbd>+<kbd>Enter</kbd> inside a list item to add another paragraph to it: a continuation block
+(<code>cont: true</code>) with the item indent and no marker. It does not break the numbering. <kbd>Enter</kbd> in a
+continuation starts a new item, and <kbd>Backspace</kbd> at its start merges it into the previous paragraph.</p>
 </div>
 <div class="paragraph">
 <p>Images export with the formatting. Exporting to PDF rasterizes each frame, so it follows the image.
