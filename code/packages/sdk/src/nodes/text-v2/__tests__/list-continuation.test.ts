@@ -9,6 +9,7 @@ import {
   blocksToText,
   indentBlocks,
   listMarkers,
+  parseWeaveClipboard,
   toggleList,
   type WeaveTextBlock,
 } from '../model';
@@ -119,5 +120,11 @@ describe('list continuation blocks', () => {
     );
     expect(l.lines[1].marker).toBeUndefined();
     expect(l.lines[1].offsetX).toBe(l.lines[0].offsetX);
+  });
+
+  it('keeps the continuation flag through the clipboard payload', () => {
+    const blocks = [item('a'), item('b', { cont: true })];
+    const parsed = parseWeaveClipboard(JSON.stringify({ v: 1, blocks }));
+    expect(parsed?.map((b) => !!b.cont)).toEqual([false, true]);
   });
 });

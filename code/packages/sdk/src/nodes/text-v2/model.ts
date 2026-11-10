@@ -231,7 +231,7 @@ export function insertBlocks(
   const before = head.pop() ?? { runs: [] };
   const after = tail.shift() ?? { runs: [] };
   const first = fragment[0];
-  const last = fragment[fragment.length - 1];
+  const last = fragment.at(-1) as WeaveTextBlock;
   const finish = (b: WeaveTextBlock): WeaveTextBlock => {
     const runs = normalizeRuns(b.runs);
     const { m: _m, ...rest } = b;
@@ -851,6 +851,43 @@ function alignQuery(
 
 export const WEAVE_TEXT_MIME = 'application/x-weave-text+json';
 
+const CLIPBOARD_MAX_BLOCKS = 5000;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RawJson = any; // untrusted clipboard JSON, validated field by field
+const BLOCK_ALIGNS = ['left', 'center', 'right'];
+
+function parseClipboardRun(r: RawJson): WeaveTextRun | undefined {
+  if (typeof r?.t !== 'string') return undefined;
+  const m = cleanMarks(r.m && typeof r.m === 'object' ? { ...r.m } : undefined);
+  if (m && 'link' in m && !isSafeLink(m.link)) delete m.link;
+  return { t: r.t, ...(m && Object.keys(m).length ? { m } : {}) };
+}
+
+function parseClipboardRuns(raw: RawJson[]): WeaveTextRun[] | undefined {
+  const runs: WeaveTextRun[] = [];
+  for (const r of raw) {
+    const run = parseClipboardRun(r);
+    if (!run) return undefined;
+    runs.push(run);
+  }
+  return runs;
+}
+
+function parseClipboardBlock(b: RawJson): WeaveTextBlock | undefined {
+  if (!b || !Array.isArray(b.runs)) return undefined;
+  const runs = parseClipboardRuns(b.runs);
+  if (!runs) return undefined;
+  const block: WeaveTextBlock = { runs: normalizeRuns(runs) };
+  if (b.kind === 'ul' || b.kind === 'ol') block.kind = b.kind;
+  if (Number.isInteger(b.depth) && b.depth > 0) block.depth = b.depth;
+  if (Number.isInteger(b.start)) block.start = b.start;
+  if (b.cont === true) block.cont = true;
+  if (BLOCK_ALIGNS.includes(b.align)) block.align = b.align;
+  const em = cleanMarks(b.m && typeof b.m === 'object' ? b.m : undefined);
+  if (!block.runs.length && em) block.m = em;
+  return block;
+}
+
 /** Defensive parse of a clipboard payload; undefined when invalid. */
 export function parseWeaveClipboard(
   raw: string | undefined
@@ -862,24 +899,9 @@ export function parseWeaveClipboard(
       return undefined;
     }
     const out: WeaveTextBlock[] = [];
-    for (const b of data.blocks.slice(0, 5000)) {
-      if (!b || !Array.isArray(b.runs)) return undefined;
-      const runs: WeaveTextRun[] = [];
-      for (const r of b.runs) {
-        if (typeof r?.t !== 'string') return undefined;
-        const m = cleanMarks(
-          r.m && typeof r.m === 'object' ? { ...r.m } : undefined
-        );
-        if (m && 'link' in m && !isSafeLink(m.link)) delete m.link;
-        runs.push({ t: r.t, ...(m && Object.keys(m).length ? { m } : {}) });
-      }
-      const block: WeaveTextBlock = { runs: normalizeRuns(runs) };
-      if (b.kind === 'ul' || b.kind === 'ol') block.kind = b.kind;
-      if (Number.isInteger(b.depth) && b.depth > 0) block.depth = b.depth;
-      if (Number.isInteger(b.start)) block.start = b.start;
-      if (['left', 'center', 'right'].includes(b.align)) block.align = b.align;
-      const em = cleanMarks(b.m && typeof b.m === 'object' ? b.m : undefined);
-      if (!block.runs.length && em) block.m = em;
+    for (const b of data.blocks.slice(0, CLIPBOARD_MAX_BLOCKS)) {
+      const block = parseClipboardBlock(b);
+      if (!block) return undefined;
       out.push(block);
     }
     return out;
