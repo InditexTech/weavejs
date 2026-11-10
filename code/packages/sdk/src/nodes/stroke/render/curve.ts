@@ -125,6 +125,6 @@ export function getCentripetalPoints(
     }
   }
 
-  out.push(pts[pts.length - 1]);
+  out.push(pts.at(-1)!);
   return out;
 }

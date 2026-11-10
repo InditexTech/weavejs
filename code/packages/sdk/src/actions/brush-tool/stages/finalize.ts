@@ -121,7 +121,9 @@ export function fitAndResample(
   tolerance: number,
   spacing: number
 ): WeaveStrokePoint[] {
-  if (points.length < 3 || !(tolerance > 0)) return points;
+  if (points.length < 3 || Number.isNaN(tolerance) || tolerance <= 0) {
+    return points;
+  }
 
   // Consecutive duplicates have no direction; the fit works on distinct points.
   const distinct = points.filter(
@@ -150,7 +152,7 @@ export function fitAndResample(
     }
   }
 
-  const end = distinct[distinct.length - 1];
+  const end = distinct.at(-1)!;
   out.push({ x: end.x, y: end.y, pressure: end.pressure });
   return out;
 }

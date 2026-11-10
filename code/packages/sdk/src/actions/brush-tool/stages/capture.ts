@@ -76,7 +76,7 @@ export function captureLegacySamples(
 
   const predictedEvents = evt.getPredictedEvents ? evt.getPredictedEvents() : [];
   if (predictedEvents.length > 0) {
-    const last = predictedEvents[predictedEvents.length - 1];
+    const last = predictedEvents.at(-1)!;
     samples.push({
       pressure: deps.predictedPressure(
         deps.rawPressure(last.pointerType, last.pressure, false)
@@ -141,7 +141,7 @@ export function captureCoalescedSamples(
   if (samples.length > 0 && cfg.predicted === 'tail') {
     const predictedEvents = evt.getPredictedEvents ? evt.getPredictedEvents() : [];
     if (predictedEvents.length > 0) {
-      const last = predictedEvents[predictedEvents.length - 1];
+      const last = predictedEvents.at(-1)!;
       samples.push({
         pressure: deps.predictedPressure(
           deps.rawPressure(last.pointerType, last.pressure, false)

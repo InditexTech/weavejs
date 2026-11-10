@@ -168,7 +168,7 @@ export function runGesture(
       x: () => (attrs['x'] as number) ?? 0,
       y: () => (attrs['y'] as number) ?? 0,
       destroy: () => {
-        if (strokeNode && strokeNode.getAttrs() === attrs) strokeNode = undefined;
+        if (strokeNode?.getAttrs() === attrs) strokeNode = undefined;
       },
     };
   }
@@ -187,7 +187,7 @@ export function runGesture(
     },
     findOne: (selector: string) => {
       const id = selector.slice(1);
-      return strokeNode && strokeNode.getAttrs()['id'] === id
+      return strokeNode?.getAttrs()['id'] === id
         ? strokeNode
         : undefined;
     },
@@ -405,8 +405,9 @@ function pen60Coalesced(): Gesture {
   const sample = (k: number): Sample => {
     const p = cursive(k, total, 200, 200);
     const t = k / total;
-    const pressure =
-      t < 0.1 ? 0.1 + t * 5 : t > 0.9 ? Math.max(0, (1 - t) * 5) : 0.45;
+    let pressure = 0.45;
+    if (t < 0.1) pressure = 0.1 + t * 5;
+    else if (t > 0.9) pressure = Math.max(0, (1 - t) * 5);
     return { x: p.x, y: p.y, pressure };
   };
   const first = sample(0);
@@ -415,7 +416,7 @@ function pen60Coalesced(): Gesture {
   ];
   for (let f = 0; f < frames; f++) {
     const co = [1, 2, 3].map((j) => sample(f * per + j));
-    const last = co[co.length - 1];
+    const last = co.at(-1)!;
     steps.push({
       type: 'move',
       t: (f + 1) * 16.67,

@@ -21,12 +21,10 @@ type NavigatorLike = {
  * a Mac with multi-touch is an iPad.
  */
 export function detectBrushPlatform(nav?: NavigatorLike | null): string {
-  const source =
-    nav === undefined
-      ? typeof navigator === 'undefined'
-        ? null
-        : (navigator as NavigatorLike)
-      : nav;
+  let source: NavigatorLike | null | undefined = nav;
+  if (nav === undefined) {
+    source = typeof navigator === 'undefined' ? null : (navigator as NavigatorLike);
+  }
   if (!source) return 'unknown';
   const ua = source.userAgent ?? '';
   const platform = source.platform ?? '';

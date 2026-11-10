@@ -73,7 +73,7 @@ export function thinRoundPoints(pts: RoundPoint[]): RoundPoint[] {
     }
   }
 
-  out.push(pts[pts.length - 1]);
+  out.push(pts.at(-1)!);
   return out;
 }
 
@@ -188,7 +188,10 @@ export function appendRoundPath(
   let prev: { a: number[]; b: number[] } | null = null;
 
   const flush = () => {
-    if (left.length >= 2) polygon([...left, ...right.reverse()]);
+    if (left.length >= 2) {
+      right.reverse();
+      polygon([...left, ...right]);
+    }
     left = [];
     right = [];
     prev = null;
@@ -237,18 +240,22 @@ export function appendRoundPath(
   }
 }
 
+const isNotPositive = (v: number) => Number.isNaN(v) || v <= 0;
+
+const positiveOrEpsilon = (v: number) => (isNotPositive(v) ? Number.EPSILON : v);
+
 /** Splits a centerline into the runs the dash pattern draws. */
 export function splitRoundRuns(
   pts: RoundPoint[],
   dash: number[]
 ): RoundPoint[][] {
-  if (!dash.length || dash.every((d) => !(d > 0))) return [pts];
+  if (!dash.length || dash.every(isNotPositive)) return [pts];
 
   const runs: RoundPoint[][] = [];
   let index = 0;
   let on = true;
   let remaining = dash[0];
-  let current: RoundPoint[] = on ? [pts[0]] : [];
+  let current: RoundPoint[] = [pts[0]];
 
   for (let i = 1; i < pts.length; i++) {
     let a = pts[i - 1];
@@ -272,9 +279,8 @@ export function splitRoundRuns(
       on = !on;
       index = (index + 1) % dash.length;
       segment -= remaining;
-      remaining = dash[index];
+      remaining = positiveOrEpsilon(dash[index]);
       a = cut;
-      if (!(remaining > 0)) remaining = Number.EPSILON;
     }
     remaining -= segment;
     if (on) current.push(b);

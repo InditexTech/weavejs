@@ -23,7 +23,7 @@ const WINDOW_MS = 2000;
  */
 export class DeviceReporter {
   private pointerType: string | null = null;
-  private times: number[] = [];
+  private readonly times: number[] = [];
   private samples = 0;
   private events = 0;
   private minPressure = Infinity;
@@ -81,7 +81,7 @@ export class DeviceReporter {
 
   report(): WeaveBrushLabDeviceReport {
     const first = this.times[0];
-    const last = this.times[this.times.length - 1];
+    const last = this.times.at(-1)!;
     const span = last - first;
     const warnings: WeaveBrushLabWarning[] = [];
     if (this.penAsMouse) warnings.push('penReportsAsMouse');

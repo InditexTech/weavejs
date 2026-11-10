@@ -162,6 +162,6 @@ export function densify(
       });
     }
   }
-  out.push({ ...poly[poly.length - 1], pressure });
+  out.push({ ...poly.at(-1)!, pressure });
   return out;
 }

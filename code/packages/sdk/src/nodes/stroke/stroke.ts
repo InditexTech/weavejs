@@ -16,6 +16,7 @@ import {
 } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type {
+  WeaveStrokeLook,
   WeaveStrokeNodeParams,
   WeaveStrokePoint,
   WeaveStrokeProperties,
@@ -25,7 +26,6 @@ import { mergeExceptArrays } from '@/utils/utils';
 import { getCentripetalPoints } from './render/curve';
 import { halfWidthAt, readStrokeLook } from './render/look';
 import { drawRoundOutline } from './render/round-outline';
-import type { WeaveStrokeLook } from './types';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
@@ -225,7 +225,8 @@ export class WeaveStrokeNode extends WeaveNode {
     const capEndL = leftSide.at(-1);
     const capEndR = rightSide.at(-1);
 
-    const outlineRight = rightSide.reverse();
+    rightSide.reverse();
+    const outlineRight = rightSide;
 
     ctx.beginPath();
     ctx.fillStyle = color;
@@ -404,7 +405,7 @@ export class WeaveStrokeNode extends WeaveNode {
    * Draws every stroke of this screen with `look`, without changing any saved
    * stroke and without other users seeing it. `null` turns the preview off.
    */
-  setLookPreview(look: unknown | null): void {
+  setLookPreview(look: unknown): void {
     this.previewLook = look === null ? null : readStrokeLook(look);
     this.redrawStrokes();
   }
@@ -515,7 +516,7 @@ export class WeaveStrokeNode extends WeaveNode {
             unit
       );
     }
-    const total = along[along.length - 1];
+    const total = along.at(-1)!;
     const halfWidth = (i: number, p: WeaveStrokePoint) =>
       halfWidthAt(look, baseW, p.pressure, along[i], total - along[i]);
 

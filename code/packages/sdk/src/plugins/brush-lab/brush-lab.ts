@@ -61,19 +61,19 @@ export class WeaveBrushLabPlugin
   extends WeavePlugin
   implements WeaveBrushTraceSink
 {
-  private overlays: WeaveBrushLabOverlays = {
+  private readonly overlays: WeaveBrushLabOverlays = {
     raw: false,
     stabilized: false,
     final: false,
     pressure: false,
   };
-  private reporter = new DeviceReporter();
-  private recordings = new RecordingStore(BRUSH_LAB_DEFAULT_MAX_GHOSTS);
+  private readonly reporter = new DeviceReporter();
+  private readonly recordings = new RecordingStore(BRUSH_LAB_DEFAULT_MAX_GHOSTS);
   private current: CurrentStroke | null = null;
   private last: LastStroke | null = null;
   private lastMetrics: WeaveBrushLabMetrics | null = null;
   private compareScenario: string | null = null;
-  private recorder = new GestureRecorder();
+  private readonly recorder = new GestureRecorder();
   private listeners: [string, (e: PointerEvent) => void, boolean][] = [];
   private frameHandle: number | null = null;
 
@@ -400,66 +400,76 @@ export class WeaveBrushLabPlugin
     layer.destroyChildren();
 
     const r = this.markerRadius();
-    const last = this.last;
+    if (this.last) this.drawStrokeOverlays(layer, this.last, r);
+    this.drawComparison(layer, r);
 
-    if (last) {
-      const real = last.samples.filter((s) => !s.predicted);
-      if (this.overlays.raw) {
-        for (const s of real) {
-          layer.add(
-            new Konva.Circle({
-              x: s.raw.x,
-              y: s.raw.y,
-              radius: r,
-              fill: '#ef4444',
-              name: 'lab-raw',
-            })
-          );
-        }
-      }
-      if (this.overlays.stabilized) {
-        for (const s of real) {
-          layer.add(
-            new Konva.Circle({
-              x: s.stabilized.x,
-              y: s.stabilized.y,
-              radius: r,
-              fill: '#2563eb',
-              name: 'lab-stabilized',
-            })
-          );
-        }
-      }
-      if (this.overlays.final) {
-        for (const p of last.finalPoints) {
-          layer.add(
-            new Konva.Circle({
-              x: p.x,
-              y: p.y,
-              radius: r * 1.5,
-              stroke: '#16a34a',
-              strokeWidth: r / 2,
-              name: 'lab-final',
-            })
-          );
-        }
-      }
-      if (this.overlays.pressure && last.finalPoints.length > 1) {
-        const bottom = Math.max(...last.finalPoints.map((p) => p.y)) + 30 * r;
-        const flat: number[] = [];
-        for (const p of last.finalPoints)
-          flat.push(p.x, bottom - p.pressure * 20 * r);
+    layer.moveToTop();
+    layer.batchDraw();
+  }
+
+  private drawStrokeOverlays(
+    layer: Konva.Layer,
+    last: LastStroke,
+    r: number
+  ): void {
+    const real = last.samples.filter((s) => !s.predicted);
+    if (this.overlays.raw) {
+      for (const s of real) {
         layer.add(
-          new Konva.Line({
-            points: flat,
-            stroke: '#a855f7',
-            strokeWidth: r,
-            name: 'lab-pressure',
+          new Konva.Circle({
+            x: s.raw.x,
+            y: s.raw.y,
+            radius: r,
+            fill: '#ef4444',
+            name: 'lab-raw',
           })
         );
       }
     }
+    if (this.overlays.stabilized) {
+      for (const s of real) {
+        layer.add(
+          new Konva.Circle({
+            x: s.stabilized.x,
+            y: s.stabilized.y,
+            radius: r,
+            fill: '#2563eb',
+            name: 'lab-stabilized',
+          })
+        );
+      }
+    }
+    if (this.overlays.final) {
+      for (const p of last.finalPoints) {
+        layer.add(
+          new Konva.Circle({
+            x: p.x,
+            y: p.y,
+            radius: r * 1.5,
+            stroke: '#16a34a',
+            strokeWidth: r / 2,
+            name: 'lab-final',
+          })
+        );
+      }
+    }
+    if (this.overlays.pressure && last.finalPoints.length > 1) {
+      const bottom = Math.max(...last.finalPoints.map((p) => p.y)) + 30 * r;
+      const flat: number[] = [];
+      for (const p of last.finalPoints)
+        flat.push(p.x, bottom - p.pressure * 20 * r);
+      layer.add(
+        new Konva.Line({
+          points: flat,
+          stroke: '#a855f7',
+          strokeWidth: r,
+          name: 'lab-pressure',
+        })
+      );
+    }
+  }
 
+  private drawComparison(layer: Konva.Layer, r: number): void {
     const recording = this.recordings.last();
     if (recording && this.compareScenario) {
       const scenario = BRUSH_SCENARIOS.find(
@@ -520,8 +530,5 @@ export class WeaveBrushLabPlugin
         }
       }
     }
-
-    layer.moveToTop();
-    layer.batchDraw();
   }
 }

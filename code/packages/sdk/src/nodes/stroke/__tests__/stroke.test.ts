@@ -795,7 +795,7 @@ describe('WeaveStrokeNode', () => {
       ];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (node as any).getSplinePoints(pts, 4);
-      expect(result.length).toBe(2);
+      expect(result).toHaveLength(2);
       expect(result[result.length - 1]).toEqual(pts[pts.length - 1]);
     });
 

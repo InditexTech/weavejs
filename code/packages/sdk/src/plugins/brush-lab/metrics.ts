@@ -32,19 +32,45 @@ export type StrokeMetricsInput = {
   drawMs: number;
 };
 
+function countDuplicates(real: LabRecordedSample[]): number {
+  let count = 0;
+  for (let i = 1; i < real.length; i++) {
+    if (dist(real[i].raw, real[i - 1].raw) === 0) count++;
+  }
+  return count;
+}
+
+function distanceToPolyline(p: LabPressurePoint, line: LabPressurePoint[]): number {
+  if (line.length === 1) return dist(p, line[0]);
+  let best = Infinity;
+  for (let i = 1; i < line.length; i++) {
+    best = Math.min(best, distanceToSegment(p, line[i - 1], line[i]));
+  }
+  return best;
+}
+
+function measureMovedOnFinish(
+  before: LabPressurePoint[],
+  final: LabPressurePoint[]
+): number {
+  if (final.length === 0) return 0;
+  let moved = 0;
+  for (const p of before) {
+    moved = Math.max(moved, distanceToPolyline(p, final));
+  }
+  return moved;
+}
+
 /** Measures a finished stroke from what the brush tool reported. */
 export function computeStrokeMetrics(
   input: StrokeMetricsInput
 ): Omit<WeaveBrushLabMetrics, 'profile' | 'preset' | 'scenario'> {
   const real = input.samples.filter((s) => !s.predicted);
 
-  let droppedDuplicates = 0;
-  for (let i = 1; i < real.length; i++) {
-    if (dist(real[i].raw, real[i - 1].raw) === 0) droppedDuplicates++;
-  }
+  const droppedDuplicates = countDuplicates(real);
 
   const spanMs =
-    real.length > 1 ? real[real.length - 1].time - real[0].time : 0;
+    real.length > 1 ? real.at(-1)!.time - real[0].time : 0;
   const effectiveRateHz = spanMs > 0 ? ((real.length - 1) / spanMs) * 1000 : 0;
 
   const jitters: number[] = [];
@@ -56,23 +82,10 @@ export function computeStrokeMetrics(
 
   const lag = mean(real.map((s) => dist(s.raw, s.stabilized)));
 
-  let movedOnFinish = 0;
-  if (input.finalPoints.length > 0) {
-    for (const p of input.beforeFinalize) {
-      let best = Infinity;
-      if (input.finalPoints.length === 1) {
-        best = dist(p, input.finalPoints[0]);
-      } else {
-        for (let i = 1; i < input.finalPoints.length; i++) {
-          best = Math.min(
-            best,
-            distanceToSegment(p, input.finalPoints[i - 1], input.finalPoints[i])
-          );
-        }
-      }
-      movedOnFinish = Math.max(movedOnFinish, best);
-    }
-  }
+  const movedOnFinish = measureMovedOnFinish(
+    input.beforeFinalize,
+    input.finalPoints
+  );
 
   const steps: number[] = [];
   for (let i = 1; i < input.finalPoints.length; i++) {

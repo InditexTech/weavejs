@@ -30,19 +30,73 @@ export type WeaveBrushConfigParseResult =
 const isObject = (v: unknown): v is Record<string, unknown> =>
   v !== null && typeof v === 'object' && !Array.isArray(v);
 
+type ParsedProfiles = Partial<Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>>;
+
+function parseProfiles(
+  raw: unknown,
+  errors: string[]
+): ParsedProfiles {
+  const profiles: ParsedProfiles = {};
+  if (raw === undefined) return profiles;
+  if (!isObject(raw)) {
+    errors.push('"profiles" must be an object');
+    return profiles;
+  }
+  for (const [key, value] of Object.entries(raw)) {
+    if (!(BRUSH_INPUT_PROFILE_KEYS as readonly string[]).includes(key)) {
+      errors.push(`Unknown profile "${key}"`);
+      continue;
+    }
+    const problems = validateBrushTunablePatch('profile', value);
+    if (problems.length > 0) {
+      errors.push(...problems.map((p) => `${key}: ${p}`));
+    } else {
+      profiles[key as WeaveBrushInputProfileKey] = resolveBrushProfilePatch(value as never);
+    }
+  }
+  return profiles;
+}
+
+function parseLook(
+  raw: unknown,
+  errors: string[]
+): WeaveStrokeLook | null | undefined {
+  if (raw === undefined || raw === null) return raw;
+  if (!isObject(raw)) {
+    errors.push('"look" must be an object or null');
+    return undefined;
+  }
+  const { version, ...settings } = raw;
+  if (version !== WEAVE_STROKE_LEGACY_LOOK.version) {
+    errors.push(`Unsupported look version "${String(version)}"`);
+    return undefined;
+  }
+  const problems = validateBrushTunablePatch('look', settings);
+  if (problems.length > 0) {
+    errors.push(...problems.map((p) => `look: ${p}`));
+    return undefined;
+  }
+  return mergeData(WEAVE_STROKE_LEGACY_LOOK, settings);
+}
+
+function readDocument(input: unknown): unknown {
+  if (typeof input !== 'string') return input;
+  try {
+    return JSON.parse(input);
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Reads and validates a configuration document, given as an object or as JSON
  * text. Nothing is applied: the result holds fully resolved values, or every
  * problem found.
  */
 export function parseBrushConfigDocument(input: unknown): WeaveBrushConfigParseResult {
-  let doc = input;
-  if (typeof input === 'string') {
-    try {
-      doc = JSON.parse(input);
-    } catch {
-      return { ok: false, errors: ['The document is not valid JSON'] };
-    }
+  const doc = readDocument(input);
+  if (typeof input === 'string' && doc === undefined) {
+    return { ok: false, errors: ['The document is not valid JSON'] };
   }
 
   if (!isObject(doc)) {
@@ -58,47 +112,8 @@ export function parseBrushConfigDocument(input: unknown): WeaveBrushConfigParseR
   }
 
   const errors: string[] = [];
-  const profiles: Partial<Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>> = {};
-
-  if (doc['profiles'] !== undefined) {
-    if (!isObject(doc['profiles'])) {
-      errors.push('"profiles" must be an object');
-    } else {
-      for (const [key, value] of Object.entries(doc['profiles'])) {
-        if (!(BRUSH_INPUT_PROFILE_KEYS as readonly string[]).includes(key)) {
-          errors.push(`Unknown profile "${key}"`);
-          continue;
-        }
-        const problems = validateBrushTunablePatch('profile', value);
-        if (problems.length > 0) {
-          errors.push(...problems.map((p) => `${key}: ${p}`));
-        } else {
-          profiles[key as WeaveBrushInputProfileKey] = resolveBrushProfilePatch(value as never);
-        }
-      }
-    }
-  }
-
-  let look: WeaveStrokeLook | null | undefined;
-  if (doc['look'] !== undefined) {
-    if (doc['look'] === null) {
-      look = null;
-    } else if (!isObject(doc['look'])) {
-      errors.push('"look" must be an object or null');
-    } else {
-      const { version, ...settings } = doc['look'];
-      if (version !== WEAVE_STROKE_LEGACY_LOOK.version) {
-        errors.push(`Unsupported look version "${String(version)}"`);
-      } else {
-        const problems = validateBrushTunablePatch('look', settings);
-        if (problems.length > 0) {
-          errors.push(...problems.map((p) => `look: ${p}`));
-        } else {
-          look = mergeData(WEAVE_STROKE_LEGACY_LOOK, settings);
-        }
-      }
-    }
-  }
+  const profiles = parseProfiles(doc['profiles'], errors);
+  const look = parseLook(doc['look'], errors);
 
   return errors.length > 0 ? { ok: false, errors } : { ok: true, profiles, look };
 }

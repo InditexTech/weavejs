@@ -120,8 +120,8 @@ export type WeaveBrushToolActionConfig = Partial<
   Omit<WeaveBrushToolActionProperties, 'input'>
 > & {
   input?: {
-    resolveProfile?: WeaveBrushInputConfig['resolveProfile'];
-    forceProfile?: WeaveBrushInputConfig['forceProfile'];
+    resolveProfile?: NonNullable<WeaveBrushInputConfig['resolveProfile']>;
+    forceProfile?: Exclude<WeaveBrushInputConfig['forceProfile'], undefined>;
     profiles?: {
       [K in WeaveBrushInputProfileKey]?: DeepPartial<WeaveBrushInputProfile>;
     };

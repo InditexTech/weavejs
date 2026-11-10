@@ -13,17 +13,25 @@ import {
   type WeaveBrushToolActionParams,
   type WeaveBrushToolActionProperties,
   type WeaveBrushToolActionState,
+  type WeaveBrushTraceSink,
+  type WeaveBrushInputConfig,
+  type WeaveBrushInputProfile,
+  type WeaveBrushInputProfileKey,
+  type WeaveBrushInputProfilePatch,
+  type WeaveBrushSetResult,
+  type WeaveStrokeInputMeta,
 } from './types';
 import {
   BRUSH_TOOL_ACTION_NAME,
   BRUSH_TOOL_DEFAULT_CONFIG,
+  BRUSH_LAB_PLUGIN_NAME,
   BRUSH_TOOL_STATE,
   PREVIEW_HANDOVER_MAX_FRAMES,
   PREVIEW_ID_SUFFIX,
 } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
-import type { WeaveStrokePoint } from '@/nodes/stroke/types';
+import type { WeaveStrokeLook, WeaveStrokePoint } from '@/nodes/stroke/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { mergeExceptArrays } from '@/utils/utils';
@@ -62,19 +70,6 @@ import {
   type WeaveStrokeLookPatch,
 } from './tunables/presets';
 import { WEAVE_STROKE_LEGACY_LOOK } from '@/nodes/stroke/constants';
-import type { WeaveStrokeLook } from '@/nodes/stroke/types';
-import {
-  BRUSH_LAB_PLUGIN_NAME,
-} from './constants';
-import type {
-  WeaveBrushTraceSink,
-  WeaveBrushInputConfig,
-  WeaveBrushInputProfile,
-  WeaveBrushInputProfileKey,
-  WeaveBrushInputProfilePatch,
-  WeaveBrushSetResult,
-  WeaveStrokeInputMeta,
-} from './types';
 
 type MousePointInfo = ReturnType<Weave['getMousePointer']>;
 
@@ -337,7 +332,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     const resolved =
       typeof scenario === 'string' ? getBrushScenario(scenario) : scenario;
     if (!resolved) {
-      return { applied: false, errors: [`Unknown scenario "${scenario}"`] };
+      return { applied: false, errors: [`Unknown scenario "${scenario as string}"`] };
     }
 
     const errors: string[] = [];
@@ -381,38 +376,37 @@ export class WeaveBrushToolAction extends WeaveAction {
    */
   private get pressureState(): PressureState {
     if (!this.pressureStateView) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const self = this;
+      const host = () => this;
       this.pressureStateView = {
         get lastSmoothedPressure() {
-          return self.lastSmoothedPressure;
+          return host().lastSmoothedPressure;
         },
         set lastSmoothedPressure(v: number) {
-          self.lastSmoothedPressure = v;
+          host().lastSmoothedPressure = v;
         },
         get hasPressureSample() {
-          return self.hasPressureSample;
+          return host().hasPressureSample;
         },
         set hasPressureSample(v: boolean) {
-          self.hasPressureSample = v;
+          host().hasPressureSample = v;
         },
         get lastPointerPos() {
-          return self.lastPointerPos;
+          return host().lastPointerPos;
         },
         set lastPointerPos(v: { x: number; y: number } | null) {
-          self.lastPointerPos = v;
+          host().lastPointerPos = v;
         },
         get lastPointerTime() {
-          return self.lastPointerTime;
+          return host().lastPointerTime;
         },
         set lastPointerTime(v: number) {
-          self.lastPointerTime = v;
+          host().lastPointerTime = v;
         },
         get predictedCount() {
-          return self.predictedCount;
+          return host().predictedCount;
         },
         set predictedCount(v: number) {
-          self.predictedCount = v;
+          host().predictedCount = v;
         },
         lastDerivative: 0,
         lastNonZeroPressure: null,
@@ -638,38 +632,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     );
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
-      if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
-
-      // A second finger while a finger stroke waits to be committed: it is a
-      // gesture, not a stroke.
-      if (
-        this.pendingTouch &&
-        e.evt.pointerType === 'touch' &&
-        e.evt.pointerId !== this.pendingTouch.pointerId
-      ) {
-        if (this.activeProfile.touchGuard.cancelOnSecondTouch) {
-          this.cancelPendingTouch();
-        }
-        return;
-      }
-
-      if (this.state !== BRUSH_TOOL_STATE.IDLE) {
-        return;
-      }
-
-      if (this.getZoomPlugin()?.isPinching()) {
-        return;
-      }
-
-      if (this.isSpacePressed) {
-        return;
-      }
-
-      if (e?.evt?.button !== 0) {
-        return;
-      }
-
-      if (e.evt.pointerType === 'touch' && this.penActive) return;
+      if (this.shouldIgnorePointerDown(e)) return;
 
       if (e.evt.pointerType === 'pen') {
         this.penActive = true;
@@ -886,12 +849,42 @@ export class WeaveBrushToolAction extends WeaveAction {
     }
   }
 
+  /**
+   * Whether a pointer down must not start a stroke: the tool is not ready, the
+   * press belongs to a gesture, or the pointer is not the main button.
+   */
+  private shouldIgnorePointerDown(
+    e: Konva.KonvaEventObject<PointerEvent>
+  ): boolean {
+    if (this.state === BRUSH_TOOL_STATE.INACTIVE) return true;
+
+    // A second finger while a finger stroke waits to be committed: it is a
+    // gesture, not a stroke.
+    if (
+      this.pendingTouch &&
+      e.evt.pointerType === 'touch' &&
+      e.evt.pointerId !== this.pendingTouch.pointerId
+    ) {
+      if (this.activeProfile.touchGuard.cancelOnSecondTouch) {
+        this.cancelPendingTouch();
+      }
+      return true;
+    }
+
+    if (this.state !== BRUSH_TOOL_STATE.IDLE) return true;
+    if (this.getZoomPlugin()?.isPinching()) return true;
+    if (this.isSpacePressed) return true;
+    if (e?.evt?.button !== 0) return true;
+
+    return e.evt.pointerType === 'touch' && this.penActive;
+  }
+
   /** Holds a move of the waiting finger, and commits once it has moved enough. */
   private handlePendingTouchMove(
     e: Konva.KonvaEventObject<PointerEvent>
   ): void {
     const pending = this.pendingTouch;
-    if (!pending || e.evt.pointerId !== pending.pointerId) return;
+    if (e.evt.pointerId !== pending?.pointerId) return;
 
     const guard = this.activeProfile.touchGuard;
 
@@ -944,14 +937,13 @@ export class WeaveBrushToolAction extends WeaveAction {
     // The stabilizer continues from the pointer-down position. Time and zoom
     // are read lazily, so a profile without a stabilizer costs nothing.
     if (mousePoint) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const self = this;
+      const host = () => this;
       this.stabilizer.seed(mousePoint, {
         get now() {
-          return self.sampleTime(time);
+          return host().sampleTime(time);
         },
         get zoom() {
-          return self.instance.getStage().scaleX();
+          return host().instance.getStage().scaleX();
         },
       });
       this.lastRawPoint = { x: mousePoint.x, y: mousePoint.y };
@@ -1045,71 +1037,12 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     for (const sample of samples) {
       if (sample.isPredicted && skipPredicted) continue;
-
-      // Each sample carries its own position: without this every sample in
-      // a coalesced burst would read the same (last dispatched) pointer
-      // position and append duplicate points.
-      if (sample.sourceEvent) {
-        stage.setPointersPositions(sample.sourceEvent);
-      }
-
-      // A captured sample already carries its own position; otherwise it is
-      // the stage's current pointer position.
-      const mousePoint =
-        sample.point ??
-        this.instance.getMousePointerRelativeToContainer(this.measureContainer)
-          .mousePoint;
-
-      // The stabilizer reads time and zoom lazily, so a profile without one
-      // costs nothing per sample.
-      if (!sample.isPredicted) {
-        this.lastRawPoint = { x: mousePoint.x, y: mousePoint.y };
-      }
-
-      const sampleTime = (): number => this.sampleTime(sample.time);
-      const stabilized = this.stabilizer.apply(mousePoint, {
-        get now() {
-          return sampleTime();
-        },
-        get zoom() {
-          return stage.scaleX();
-        },
-      });
-
-      sink?.onSample({
-        raw: { x: mousePoint.x, y: mousePoint.y },
-        stabilized: { x: stabilized.x, y: stabilized.y },
-        pressure: sample.pressure,
-        time: sampleTime(),
-        predicted: sample.isPredicted,
-      });
-
-      const currentPoint: WeaveStrokePoint = {
-        x: stabilized.x - tempStroke.x(),
-        y: stabilized.y - tempStroke.y(),
-        pressure: sample.pressure,
-      };
-
-      if (!sample.isPredicted && this.predictedCount > 0) {
-        newStrokeElements = newStrokeElements.slice(
-          0,
-          -1 * this.predictedCount
-        );
-        this.predictedCount = 0;
-      }
-
-      applyStartPolicy(
+      newStrokeElements = this.appendMovementSample(
+        sample,
         newStrokeElements,
-        currentPoint,
-        sample.isPredicted,
-        this.activeProfile.pressure
+        tempStroke,
+        sink
       );
-
-      newStrokeElements.push(currentPoint);
-
-      if (sample.isPredicted) {
-        this.predictedCount++;
-      }
     }
 
     const box = this.getBoundingBox(newStrokeElements);
@@ -1137,6 +1070,84 @@ export class WeaveBrushToolAction extends WeaveAction {
     });
   }
 
+  /** Adds one sample to `elements` and reports it to the trace sink. */
+  private appendMovementSample(
+    sample: CapturedSample,
+    elements: WeaveStrokePoint[],
+    tempStroke: Konva.Line,
+    sink: WeaveBrushTraceSink | null
+  ): WeaveStrokePoint[] {
+    const stage = this.instance.getStage();
+    let result = elements;
+
+    // Each sample carries its own position: without this every sample in
+    // a coalesced burst would read the same (last dispatched) pointer
+    // position and append duplicate points.
+    if (sample.sourceEvent) {
+      stage.setPointersPositions(sample.sourceEvent);
+    }
+
+    // A captured sample already carries its own position; otherwise it is
+    // the stage's current pointer position.
+    const mousePoint =
+      sample.point ??
+      this.instance.getMousePointerRelativeToContainer(this.measureContainer!)
+        .mousePoint;
+
+    // The stabilizer reads time and zoom lazily, so a profile without one
+    // costs nothing per sample.
+    if (!sample.isPredicted) {
+      this.lastRawPoint = { x: mousePoint.x, y: mousePoint.y };
+    }
+
+    const sampleTime = (): number => this.sampleTime(sample.time);
+    const stabilized = this.stabilizer.apply(mousePoint, {
+      get now() {
+        return sampleTime();
+      },
+      get zoom() {
+        return stage.scaleX();
+      },
+    });
+
+    sink?.onSample({
+      raw: { x: mousePoint.x, y: mousePoint.y },
+      stabilized: { x: stabilized.x, y: stabilized.y },
+      pressure: sample.pressure,
+      time: sampleTime(),
+      predicted: sample.isPredicted,
+    });
+
+    const currentPoint: WeaveStrokePoint = {
+      x: stabilized.x - tempStroke.x(),
+      y: stabilized.y - tempStroke.y(),
+      pressure: sample.pressure,
+    };
+
+    if (!sample.isPredicted && this.predictedCount > 0) {
+      result = result.slice(
+        0,
+        -1 * this.predictedCount
+      );
+      this.predictedCount = 0;
+    }
+
+    applyStartPolicy(
+      result,
+      currentPoint,
+      sample.isPredicted,
+      this.activeProfile.pressure
+    );
+
+    result.push(currentPoint);
+
+    if (sample.isPredicted) {
+      this.predictedCount++;
+    }
+
+    return result;
+  }
+
   private handleMovement(
     pressure: number,
     predictedEvent?: PointerEvent,
@@ -1159,7 +1170,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     if (cfg.type === 'none' || !cfg.catchUpOnEnd) return null;
     if (!this.lastRawPoint || elements.length === 0) return null;
 
-    const last = elements[elements.length - 1];
+    const last = elements.at(-1)!;
     const x = this.lastRawPoint.x - tempStroke.x();
     const y = this.lastRawPoint.y - tempStroke.y();
     if (x === last.x && y === last.y) return null;

@@ -53,8 +53,8 @@ export function replayRecording(
   // A stabilized stroke lags the pen: the brush completes it where the pen
   // was lifted.
   const cfg = profile.stabilizer;
-  const lastRaw = kept[kept.length - 1].point;
-  const lastOut = points[points.length - 1];
+  const lastRaw = kept.at(-1)!.point;
+  const lastOut = points.at(-1)!;
   if (
     cfg.type !== 'none' &&
     cfg.catchUpOnEnd &&
@@ -92,7 +92,7 @@ export class RecordingStore {
   }
 
   last(): LabRecording | undefined {
-    return this.items[this.items.length - 1];
+    return this.items.at(-1);
   }
 
   clear(): void {

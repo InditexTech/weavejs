@@ -94,9 +94,9 @@ function windowTangent(
 function chordLengthParameterize(pts: Vec[], first: number, last: number): number[] {
   const u = [0];
   for (let i = first + 1; i <= last; i++) {
-    u.push(u[u.length - 1] + length(sub(pts[i], pts[i - 1])));
+    u.push(u.at(-1)! + length(sub(pts[i], pts[i - 1])));
   }
-  const total = u[u.length - 1] || 1;
+  const total = u.at(-1) || 1;
   return u.map((v) => v / total);
 }
 
@@ -168,16 +168,18 @@ function maxError(
   return { error: max, split };
 }
 
+type FitParams = { errorSq: number; window: number };
+
 function fitCubic(
   pts: Vec[],
   first: number,
   last: number,
   tHat1: Vec,
   tHat2: Vec,
-  errorSq: number,
-  window: number,
+  params: FitParams,
   out: FittedSegment[]
 ): void {
+  const { errorSq, window } = params;
   if (last - first === 1) {
     const d = length(sub(pts[last], pts[first])) / 3;
     out.push({
@@ -221,8 +223,8 @@ function fitCubic(
 
   const center = windowTangent(pts, split, first, last, window, true, true);
   const back = scale(center, -1);
-  fitCubic(pts, first, split, tHat1, back, errorSq, window, out);
-  fitCubic(pts, split, last, center, tHat2, errorSq, window, out);
+  fitCubic(pts, first, split, tHat1, back, params, out);
+  fitCubic(pts, split, last, center, tHat2, params, out);
 }
 
 /**
@@ -243,8 +245,7 @@ export function fitCurve(points: Vec[], tolerance: number): FittedSegment[] {
     last,
     windowTangent(points, 0, 0, last, window, false, true),
     scale(windowTangent(points, last, 0, last, window, true, false), -1),
-    tolerance * tolerance,
-    window,
+    { errorSq: tolerance * tolerance, window },
     out
   );
   return out;

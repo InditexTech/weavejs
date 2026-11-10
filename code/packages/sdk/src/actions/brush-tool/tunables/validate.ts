@@ -5,6 +5,26 @@
 import { getBrushTunable } from './descriptors';
 import type { WeaveBrushTunable } from './types';
 
+function validateNumber(
+  tunable: WeaveBrushTunable,
+  value: unknown,
+  name: string
+): string | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return `${name} must be a finite number`;
+  }
+  if (tunable.integer && !Number.isInteger(value)) {
+    return `${name} must be a whole number`;
+  }
+  if (tunable.min !== undefined && value < tunable.min) {
+    return `${name} must be at least ${tunable.min}`;
+  }
+  if (tunable.max !== undefined && value > tunable.max) {
+    return `${name} must be at most ${tunable.max}`;
+  }
+  return null;
+}
+
 /**
  * Checks a value against a descriptor. Returns a message when the value is
  * invalid, or `null` when it is accepted.
@@ -26,21 +46,8 @@ export function validateBrushTunableValue(
       return typeof value === 'string' && tunable.options?.includes(value)
         ? null
         : `${name} must be one of: ${tunable.options?.join(', ')}`;
-    case 'number': {
-      if (typeof value !== 'number' || !Number.isFinite(value)) {
-        return `${name} must be a finite number`;
-      }
-      if (tunable.integer && !Number.isInteger(value)) {
-        return `${name} must be a whole number`;
-      }
-      if (tunable.min !== undefined && value < tunable.min) {
-        return `${name} must be at least ${tunable.min}`;
-      }
-      if (tunable.max !== undefined && value > tunable.max) {
-        return `${name} must be at most ${tunable.max}`;
-      }
-      return null;
-    }
+    case 'number':
+      return validateNumber(tunable, value, name);
   }
 }
 
