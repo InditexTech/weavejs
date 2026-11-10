@@ -89,6 +89,27 @@ describe('lists', () => {
     expect(l.lines[2].marker).toBeUndefined();
   });
 
+  it('indents plain paragraphs by depth without markers', () => {
+    const blocks: WeaveTextBlock[] = [
+      { depth: 2, runs: [{ t: 'x' }] },
+      { runs: [{ t: 'y' }] },
+    ];
+    const l = engine().layout(blocks, style, bounds);
+    expect(l.lines[0].indent).toBe(30);
+    expect(l.lines[0].offsetX).toBe(30);
+    expect(l.lines[0].marker).toBeUndefined();
+    expect(l.lines[1].indent).toBe(0);
+    const at = (indentStep: number) =>
+      engine().layout(blocks, { ...style, indentStep }, bounds).lines[0].indent;
+    expect(at(3)).toBe(60);
+    const deep = engine().layout(
+      [{ depth: 50, runs: [{ t: 'x' }] }],
+      style,
+      { ...bounds, width: 100 }
+    );
+    expect(deep.lines[0].indent).toBe(60);
+  });
+
   it('keeps text and offsets free of markers', () => {
     const l = engine().layout(items, style, bounds);
     expect(l.lines[0].text).toBe('one');

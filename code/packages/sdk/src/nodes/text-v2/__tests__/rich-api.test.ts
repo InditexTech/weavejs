@@ -213,6 +213,22 @@ describe('rich text API', () => {
     expect(shape.getBlocks()[0].depth).toBeUndefined();
   });
 
+  it('indents plain paragraphs with and without range', () => {
+    const { node } = makeNode(rich);
+    const shape = node.onRender(
+      defaultProps({ blocks: [{ runs: [{ t: 'a' }] }, { runs: [{ t: 'b' }] }] })
+    ) as WeaveTextV2Shape;
+    node.indent(shape, { start: 2, end: 2 });
+    expect(shape.getBlocks().map((b) => b.depth)).toEqual([undefined, 1]);
+    node.indent(shape);
+    expect(shape.getBlocks().map((b) => b.depth)).toEqual([1, 2]);
+    expect(node.getSelectionFormat(shape).indent).toEqual({ state: 'all' });
+    node.outdent(shape);
+    node.outdent(shape);
+    node.outdent(shape);
+    expect(shape.getBlocks().map((b) => b.depth)).toEqual([undefined, undefined]);
+  });
+
   it('setBaseFontSize scales runs through the ratio', () => {
     const { node, mock } = makeNode(rich);
     const shape = node.onRender(defaultProps()) as WeaveTextV2Shape;

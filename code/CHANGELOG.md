@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#1262](https://github.com/InditexTech/weavejs/issues/1262) Text indentation: apply to a single paragraph line, not only to bulleted lists
+
 ### Fixed
 
 - [#1256](https://github.com/InditexTech/weavejs/issues/1256) Optional lifecycle hooks declared abstract force every custom node, action and plugin to implement them

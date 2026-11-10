@@ -136,7 +136,7 @@ paragraph, never per line.
 |Toggle `ul` / `ol` on the blocks of the range.
 
 |mono:[indent(node, range?)] / mono:[outdent(node, range?)]
-|Change list depth. Outdent at depth 0 removes the list marker.
+|Change the depth of every block in the range, list items and plain paragraphs. A plain paragraph is indented by `depth` steps (see mono:[richText.indentStep]); outdent at depth 0 does nothing on a paragraph and removes the marker on a list item.
 
 |mono:[setRunLink(node, url, range?)] / mono:[removeRunLink(node, range?)]
 |Link a range to an absolute http(s) URL (others return `false`), or remove it. Same as
@@ -146,12 +146,12 @@ mono:[applyMark] with `link`.
 |Set the node `fontSize`. Event reason `base-size`.
 
 |mono:[getSelectionFormat(node, range?)]
-|Per mark (including `lineHeight` and `align`) `{ state: 'all' | 'none' | 'some', value? }`, `size` in px, and `list: { kind, depth? }`.
+|Per mark (including `lineHeight` and `align`) `{ state: 'all' | 'none' | 'some', value? }`, `size` in px, `list: { kind, depth? }` for list items and `indent: { state: 'all' | 'none' | 'some', depth? }` for the paragraph depth of plain (non-list) blocks. The two never include each other's blocks.
 |===
 
 When editing with rich text enabled: kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I], kbd:[U] toggle marks;
 kbd:[Enter] continues a list item (and the formatting of the text before it) and exits on an empty one; kbd:[Backspace] at the start of an item
-outdents it or removes the marker; kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change the depth. Pasting a
+outdents it or removes the marker, and at the start of an indented paragraph outdents it by one level; kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change the depth of list items and paragraphs (a collapsed caret indents the whole paragraph). Pasting a
 `WEAVE_TEXT_MIME` payload restores its marks and lists; other text is inserted as plain text with the marks at the caret. With it disabled, kbd:[Enter] in a list item still creates
 an item with the same `kind` and `depth`.
 
@@ -170,6 +170,8 @@ or run values. Vertical alignment (`verticalAlign`) stays a setting of the whole
 Lists show markers in a gutter (`disc`, `circle`, `square`; `1.`, `a.`, `i.` by depth). Numbering is
 continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
 item; `start` sets the first number. Markers are not part of `text`.
+
+Plain paragraphs can be indented too: each level moves every line of the paragraph (wrapped lines included) one `indentStep` to the right, with no marker. The indent is kept when you edit, press kbd:[Enter], copy and paste, and renders for everyone even when rich text is off. Clients on an older version show these paragraphs without indent.
 
 Images export with the formatting. Exporting to PDF rasterizes each frame, so it follows the image.
 Register every font family you use in runs on the server as well.
@@ -225,7 +227,7 @@ covers that edge.
 
 |mono:[richText.indentStep]
 |`1.5`
-|List indent per depth, as a multiple of `fontSize`. The total indent is limited so at least 4 times
+|List and paragraph indent per depth, as a multiple of `fontSize`. The total indent is limited so at least 4 times
 `fontSize` stays for text in fixed-width nodes. Must be the same on every client.
 
 |mono:[sizeWarning.threshold]

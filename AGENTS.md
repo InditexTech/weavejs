@@ -133,4 +133,6 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/plugins/plugin.adoc | `code/packages/sdk/src/plugins/plugin.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/node.adoc (hooks) | `code/packages/sdk/src/nodes/node.ts` | released in 5.8.0 |
 | types:api-reference/types.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| main:build/nodes/text-v2.adoc (paragraph indent) | `code/packages/sdk/src/nodes/text-v2/{model.ts,layout/engine.ts,edit/model.ts}` | unreleased |
+| sdk:api-reference/nodes/text-v2.adoc (paragraph indent, `getSelectionFormat().indent`) | `code/packages/sdk/src/nodes/text-v2/{model.ts,layout/engine.ts,edit/model.ts}` | unreleased |
 | sdk:api-reference/weave/index.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |

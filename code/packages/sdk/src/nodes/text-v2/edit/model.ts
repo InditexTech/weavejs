@@ -327,13 +327,16 @@ export class TextEditModel {
 
   /**
    * Backspace at the start of a list item outdents it, or removes the
-   * marker at depth 0. Returns false when the key is not handled here.
+   * marker at depth 0; at the start of an indented plain paragraph it
+   * outdents it. Returns false when the key is not handled here.
    */
   backspaceInList(): boolean {
     const { start, end } = this.getSelection();
     if (start !== end) return false;
     const b = this.blockAt(start);
-    if (b?.start !== start || !this.blocks[b.index].kind) return false;
+    if (b?.start !== start) return false;
+    const block = this.blocks[b.index];
+    if (!block.kind && !block.depth) return false;
     return this.commitFormat(outdentBlocks(this.blocks, start, start));
   }
 
