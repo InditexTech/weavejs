@@ -40,7 +40,7 @@ B: Actions are registered
 C: getName() is called on each action
 D: Rendering cycle begins
 E: First render
-F: init() is called on each action
+F: onInit() is called on each action
 [*] --> A
 A --> B
 state B {
@@ -157,17 +157,7 @@ getProps(): WeaveElementAttributes
 
 This method return the action props, normally propagating from the underlying main node.
 
-== Abstract Methods
-
-=== init
-
-[source,ts]
-----
-init?(): void
-----
-
-This method initializes the action, ideal to initialize all necessary Konva elements needed
-and their events.
+== Required Methods
 
 === trigger
 
@@ -180,6 +170,35 @@ This method triggers the action, as parameters receives:
 
 * *cancelAction*: a callback that allows to cancel the action.
 * *params*: are the params provided by the user when the action is triggered.
+
+== Optional Hooks
+
+=== initialize
+
+[source,ts]
+----
+initialize?(): void
+----
+
+This method resets the internal state of the action. It's called each time the Weave instance
+is reset, for example when switching rooms. Built-in actions also call it from their constructor.
+
+=== onInit
+
+[source,ts]
+----
+onInit?(): void
+----
+
+This method is called once after the Weave instance is set up, and is the ideal place to
+initialize all necessary Konva elements needed and their events.
+
+.initialize vs onInit
+[NOTE]
+====
+Use `initialize` to (re)set state that must start clean every time the Weave instance is reset,
+and `onInit` to create elements and register events once the instance is ready.
+====
 
 === onPropsChange
 
