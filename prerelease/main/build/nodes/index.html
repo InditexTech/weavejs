@@ -1490,6 +1490,18 @@ actual canvas instance (Konva element) of the node and the new props.</p>
 can be sent over the wire for sync with other peers or to persist the model server-side.</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="initialize"><a class="anchor" href="#initialize"></a>initialize</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">initialize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>initialize</code> method is optional, and is called each time the Weave instance is reset, for example
+when switching rooms. It&#8217;s a good place to reset the node internal state. Create the Konva elements in <code>onRender</code>.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="konva-node-augmentation"><a class="anchor" href="#konva-node-augmentation"></a>Konva.Node Augmentation</h3>

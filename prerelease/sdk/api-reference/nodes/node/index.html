@@ -1391,30 +1391,8 @@ not that is visible on the viewport.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="abstract-methods"><a class="anchor" href="#abstract-methods"></a>Abstract Methods</h2>
+<h2 id="required-methods"><a class="anchor" href="#required-methods"></a>Required Methods</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="create"><a class="anchor" href="#create"></a>create</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">create</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">key</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">props</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementAttributes</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveStateElement</span></span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This method creates a JSON model of the node, based on the previous explained model.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="onadd"><a class="anchor" href="#onadd"></a>onAdd</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">onAdd</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">props</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementAttributes</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span></span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This method is called when a node instance is added to the stage via the internal reconciler.</p>
-</div>
-</div>
 <div class="sect2">
 <h3 id="onrender"><a class="anchor" href="#onrender"></a>onRender</h3>
 <div class="listingblock">
@@ -1435,7 +1413,7 @@ stage.</p>
 <h3 id="onupdate"><a class="anchor" href="#onupdate"></a>onUpdate</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">updateInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span></span>
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">onUpdate</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  nodeInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  nextProps</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementAttributes</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
@@ -1443,6 +1421,62 @@ stage.</p>
 </div>
 <div class="paragraph">
 <p>This method updates a rendered instance of Konva, that represents a node.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="optional-hooks"><a class="anchor" href="#optional-hooks"></a>Optional Hooks</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="initialize"><a class="anchor" href="#initialize"></a>initialize</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">initialize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method resets the internal state of the node. It&#8217;s called each time the Weave instance
+is reset, for example when switching rooms. Built-in nodes also call it from their constructor.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overridable-methods"><a class="anchor" href="#overridable-methods"></a>Overridable Methods</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="create"><a class="anchor" href="#create"></a>create</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">create</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">key</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">props</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementAttributes</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveStateElement</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method creates a JSON model of the node, based on the previous explained model.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="onregister"><a class="anchor" href="#onregister"></a>onRegister</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">onRegister</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">></span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method is called when the node is registered on the Weave instance. It returns a promise,
+by default already resolved.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="onadd"><a class="anchor" href="#onadd"></a>onAdd</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">onAdd</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">nodeInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method is called when a node instance is added to the stage via the internal reconciler.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1457,6 +1491,34 @@ stage.</p>
 listeners registered for the node and its descendants with <code>setNodeInstanceListener</code>.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="ondestroyinstance"><a class="anchor" href="#ondestroyinstance"></a>onDestroyInstance</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">onDestroyInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method is called when the Weave.js instance is destroyed, is useful for cleanup purposes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="serialize"><a class="anchor" href="#serialize"></a>serialize</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">serialize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveStateElement</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method returns the JSON model representation of the provided Konva instance
+that is handled by this Node definition. It&#8217;s a serialization from Konva instance to JSON model.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="protected-methods"><a class="anchor" href="#protected-methods"></a>Protected Methods</h2>
+<div class="sectionbody">
 <div class="sect2">
 <h3 id="setnodeinstancelistener"><a class="anchor" href="#setnodeinstancelistener"></a>setNodeInstanceListener</h3>
 <div class="listingblock">
@@ -1489,29 +1551,6 @@ avoid replacing the <code>onNodesChange</code> and <code>onSelectionState</code>
 Locking a node removes only the default <code>onNodesChange</code> and <code>onSelectionState</code> listeners.</p>
 </li>
 </ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="ondestroyinstance"><a class="anchor" href="#ondestroyinstance"></a>onDestroyInstance</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">onDestroyInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This method is called when the Weave.js instance is destroyed, is useful for cleanup purposes.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="tonode"><a class="anchor" href="#tonode"></a>toNode</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">serialize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveStateElement</span></span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This method returns the JSON model representation of the provided Konva instance
-that is handled by this Node definition. It&#8217;s a serialization from Konva instance to JSON model.</p>
 </div>
 </div>
 </div>
