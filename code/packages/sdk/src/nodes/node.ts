@@ -1248,7 +1248,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return Promise.resolve();
   }
 
-  abstract initialize?(): void;
+  initialize?(): void;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAdd(nodeInstance: WeaveElementInstance): void {}
