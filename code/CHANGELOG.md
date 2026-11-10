@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- [#1264](https://github.com/InditexTech/weavejs/issues/1264) Dependabot alert #574: follow-redirects cross-realm sensitiveHeaders bypass (bump override to 1.16.3)
+
 ## [5.7.1] - 2026-10-27
 
 ### Fixed
