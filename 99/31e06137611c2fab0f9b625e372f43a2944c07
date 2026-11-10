@@ -1,0 +1,25 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/list-continuation.test.ts
+  s_61afdb0b89842f::t_03904f2e1719c5 12,124-129
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_61afdb0b89842f::t_481d571f4e05d7 286,370,389,394,421,485,490,499,520,525,642,653,719,733,765
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_61afdb0b89842f::t_4092227afbfa2e 234,854-890,902-904
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_61afdb0b89842f::t_549c32c1b98599 1240-1259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "9931e06137611c2fab0f9b625e372f43a2944c07",
+  "prompts": {},
+  "sessions": {
+    "s_61afdb0b89842f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e39f6fa4cffedIs6UJQe30Twhe",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
