@@ -1,0 +1,14 @@
+.github/copilot-instructions.md
+  h_c93d154c7c7074 89,114,132,138-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "a2af10064f2c5c4be93a9e1678dfdc7d7d066bd6",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
