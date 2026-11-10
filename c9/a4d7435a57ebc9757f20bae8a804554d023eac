@@ -1,0 +1,57 @@
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.test.ts
+  s_f35f7e56a17fea::t_bf077c780f4f3c 699,713,737,817,1338,1346,1425-1430,1687,1711
+code/packages/sdk/src/actions/brush-tool/__tests__/shared/brush-golden.helpers.ts
+  s_f35f7e56a17fea::t_510923e46e1eef 171,190,408-410,419
+code/packages/sdk/src/actions/brush-tool/brush-tool.ts
+  s_f35f7e56a17fea::t_57478dfe558b16 16-22,27,34,335,379,382,385,388,391,394,397,400,403,406,409,635,852-881,887,940,943,946,1040-1041,1043-1044,1073-1150,1173
+code/packages/sdk/src/actions/brush-tool/profiles.ts
+  s_f35f7e56a17fea::t_bc37e76b9f8e70 24-27
+code/packages/sdk/src/actions/brush-tool/stages/bezier-fit.ts
+  s_f35f7e56a17fea::t_0d8f402e72253d 97,99,171-172,179,182,226-227,248
+code/packages/sdk/src/actions/brush-tool/stages/capture.ts
+  s_f35f7e56a17fea::t_07af0d6db36d4f 79,144
+code/packages/sdk/src/actions/brush-tool/stages/finalize.ts
+  s_f35f7e56a17fea::t_4e4c9a98183b97 124-126,155
+code/packages/sdk/src/actions/brush-tool/tunables/config-io.ts
+  s_f35f7e56a17fea::t_4a16d533723c1f 33-90,97-99,115-116
+code/packages/sdk/src/actions/brush-tool/tunables/validate.ts
+  s_f35f7e56a17fea::t_a2efffee210168 8-27,49-50
+code/packages/sdk/src/actions/brush-tool/types.ts
+  s_f35f7e56a17fea::t_e2eb0e3c810825 123-124
+code/packages/sdk/src/nodes/stroke/__tests__/shared/stroke-render.helpers.ts
+  s_f35f7e56a17fea::t_bbdd581d547b03 165
+code/packages/sdk/src/nodes/stroke/__tests__/stroke.test.ts
+  s_f35f7e56a17fea::t_8a5728a16cbedb 798
+code/packages/sdk/src/nodes/stroke/render/curve.ts
+  s_f35f7e56a17fea::t_20783d6f309f49 128
+code/packages/sdk/src/nodes/stroke/render/round-outline.ts
+  s_f35f7e56a17fea::t_26e41f3eae32dd 76,191-194,243-246,252,258,282
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_f35f7e56a17fea::t_fb35baa437ee36 19,228-229,408,519
+code/packages/sdk/src/plugins/brush-lab/brush-lab.ts
+  s_f35f7e56a17fea::t_b63a6d54980c50 64,70-71,76,403-404,406-426,428-439,441-443,445-451,456-470,472
+code/packages/sdk/src/plugins/brush-lab/constants.ts
+  s_f35f7e56a17fea::t_7ba007ea2e77fd 5
+code/packages/sdk/src/plugins/brush-lab/device-report.ts
+  s_f35f7e56a17fea::t_b87c78730c9430 26,84
+code/packages/sdk/src/plugins/brush-lab/ghosts.ts
+  s_f35f7e56a17fea::t_22b185c9ed8681 56-57,95
+code/packages/sdk/src/plugins/brush-lab/metrics.ts
+  s_f35f7e56a17fea::t_efa08c4f67b5eb 35-63,70,73,85-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "c9a4d7435a57ebc9757f20bae8a804554d023eac",
+  "prompts": {},
+  "sessions": {
+    "s_f35f7e56a17fea": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3ae9e262ffeywyPObkac0XMc3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
