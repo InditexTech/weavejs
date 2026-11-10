@@ -72,7 +72,7 @@ List blocks SHALL be laid out with an indent of `depth * indentStep` (`indentSte
 - **THEN** only that paragraph is relaid out
 
 ### Requirement: Paragraph alignment layout
-Each line SHALL be aligned by its paragraph `align`, falling back to the node `align`; the indent of list items SHALL stay on the left. Changing `align` SHALL NOT relay out wrapping.
+Each line SHALL be aligned by its paragraph `align`, falling back to the node `align`; list markers SHALL stay attached to the first line of their item when aligned. Changing `align` SHALL NOT relay out wrapping.
 
 #### Scenario: Mixed alignment
 - **WHEN** two paragraphs have different `align`

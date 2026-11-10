@@ -25,6 +25,11 @@ import type {
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { mergeExceptArrays } from '@/utils/utils';
 import { GroupFrame } from './group-frame';
+import {
+  buildFrameHitFunc,
+  getFrameEdgeBand,
+  getFrameTitleHeight,
+} from './hit-region';
 
 export class WeaveFrameNode extends WeaveNode {
   private readonly config: WeaveFrameProperties;
@@ -76,10 +81,12 @@ export class WeaveFrameNode extends WeaveNode {
       titleMargin,
       borderColor,
       borderWidth,
+      edgeHitWidth,
       onTargetEnter: {
         borderColor: onTargetEnterBorderColor,
         fill: onTargetEnterFill,
       },
+      transform: { borderStrokeWidth: targetBorderWidth = 2 },
     } = this.config;
 
     const frameParams = {
@@ -107,6 +114,8 @@ export class WeaveFrameNode extends WeaveNode {
     });
 
     this.setupDefaultNodeAugmentation(frame);
+
+    let isDragging = false;
 
     const frameInternalGroup = new Konva.Group({
       id: `${id}-selector`,
@@ -177,7 +186,11 @@ export class WeaveFrameNode extends WeaveNode {
     });
 
     const textMeasures = text.measureSize(text.getAttrs().text ?? '');
-    const textHeight = textMeasures.height + (2 * titleMargin) / stage.scaleX();
+    const textHeight = getFrameTitleHeight(
+      textMeasures.height,
+      titleMargin,
+      stage.scaleX()
+    );
     text.y(-textHeight);
     text.height(textHeight);
 
@@ -224,16 +237,14 @@ export class WeaveFrameNode extends WeaveNode {
       y: -borderWidth / 2,
       width: props.frameWidth + borderWidth,
       height: props.frameHeight + borderWidth,
-      hitFunc: function (ctx, shape) {
-        ctx.beginPath();
-        ctx.rect(
-          -borderWidth / 2,
-          -textHeight,
-          props.frameWidth + borderWidth,
-          textHeight
-        );
-        ctx.fillStrokeShape(shape);
-      },
+      hitFunc: buildFrameHitFunc({
+        frameWidth: props.frameWidth,
+        frameHeight: props.frameHeight,
+        borderWidth,
+        edgeHitWidth,
+        zoom: stage.scaleX(),
+        titleHeight: textHeight,
+      }),
       strokeWidth: 0,
       fill: 'transparent',
       nodeId: id,
@@ -305,17 +316,54 @@ export class WeaveFrameNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(frame);
 
-    this.setNodeInstanceListener(frame, 'onZoomChange', () => {
-      selectionArea.hitFunc(function (ctx, shape) {
-        ctx.beginPath();
-        ctx.rect(
-          -borderWidth / 2,
-          -textHeight,
-          props.frameWidth + borderWidth,
-          textHeight
-        );
-        ctx.fillStrokeShape(shape);
+    const applyClip = () => {
+      const { outer } = getFrameEdgeBand(
+        borderWidth,
+        edgeHitWidth,
+        stage.scaleX()
+      );
+      const pad = Math.max(borderWidth, outer);
+      const top = Math.min(text.y(), -pad);
+      frame.clip({
+        x: -pad,
+        y: top,
+        width: frame.width() + 2 * pad,
+        height: frame.height() + 2 * pad - top,
       });
+    };
+
+    this.setNodeInstanceListener(frame, 'onZoomChange', () => {
+      selectionArea.hitFunc(
+        buildFrameHitFunc({
+          frameWidth: frame.getAttrs().frameWidth,
+          frameHeight: frame.getAttrs().frameHeight,
+          borderWidth,
+          edgeHitWidth,
+          zoom: stage.scaleX(),
+          titleHeight: text.height(),
+        })
+      );
+      if (frame.getAttr('clip')) {
+        applyClip();
+      }
+    });
+
+    const container = () => this.instance.getStage().container();
+
+    frame.on('dragstart', () => {
+      isDragging = true;
+      container().style.cursor = 'move';
+    });
+
+    frame.on('dragmove', () => {
+      if (isDragging) {
+        container().style.cursor = 'move';
+      }
+    });
+
+    frame.on('dragend', () => {
+      isDragging = false;
+      container().style.cursor = frame.defineMousePointer();
     });
 
     frame.off('pointerover');
@@ -331,6 +379,8 @@ export class WeaveFrameNode extends WeaveNode {
       backgroundBorder.setAttrs({
         onTargetEnter: false,
         stroke: borderColor,
+        strokeWidth: borderWidth,
+        strokeScaleEnabled: true,
       });
     });
 
@@ -344,6 +394,8 @@ export class WeaveFrameNode extends WeaveNode {
       backgroundBorder.setAttrs({
         onTargetEnter: true,
         stroke: onTargetEnterBorderColor,
+        strokeWidth: targetBorderWidth,
+        strokeScaleEnabled: false,
       });
     });
 
@@ -355,12 +407,7 @@ export class WeaveFrameNode extends WeaveNode {
       return [];
     };
 
-    frame.clip({
-      x: -borderWidth,
-      y: text.y(),
-      width: frame.width() + 2 * borderWidth,
-      height: frame.height() + 2 * borderWidth + text.height(),
-    });
+    applyClip();
 
     return frame;
   }
@@ -373,7 +420,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     const newProps = { ...nextProps };
 
-    const { titleMargin, borderWidth } = this.config;
+    const { titleMargin, borderWidth, edgeHitWidth } = this.config;
 
     nodeInstance.setAttrs({
       ...newProps,
@@ -409,16 +456,16 @@ export class WeaveFrameNode extends WeaveNode {
       title.y(-textHeight);
       title.height(textHeight);
 
-      selectionArea.hitFunc(function (ctx, shape) {
-        ctx.beginPath();
-        ctx.rect(
-          -borderWidth / 2,
-          -textHeight,
-          nextProps.frameWidth + borderWidth,
-          textHeight
-        );
-        ctx.fillStrokeShape(shape);
-      });
+      selectionArea.hitFunc(
+        buildFrameHitFunc({
+          frameWidth: nextProps.frameWidth,
+          frameHeight: nextProps.frameHeight,
+          borderWidth,
+          edgeHitWidth,
+          zoom: stage.scaleX(),
+          titleHeight: textHeight,
+        })
+      );
     }
 
     const nodesSelectionPlugin =

@@ -136,3 +136,6 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/nodes/text-v2.adoc (paragraph indent) | `code/packages/sdk/src/nodes/text-v2/{model.ts,layout/engine.ts,edit/model.ts}` | unreleased |
 | sdk:api-reference/nodes/text-v2.adoc (paragraph indent, `getSelectionFormat().indent`) | `code/packages/sdk/src/nodes/text-v2/{model.ts,layout/engine.ts,edit/model.ts}` | unreleased |
 | sdk:api-reference/weave/index.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| main:build/nodes/frame.adoc (edge selection) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | unreleased |
+| sdk:api-reference/nodes/frame.adoc (`edgeHitWidth`) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | unreleased |
+| sdk:api-reference/nodes/text-v2.adoc (list marker alignment) | `code/packages/sdk/src/nodes/text-v2/layout/engine.ts` | unreleased |

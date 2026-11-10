@@ -169,7 +169,12 @@ or run values. Vertical alignment (`verticalAlign`) stays a setting of the whole
 
 Lists show markers in a gutter (`disc`, `circle`, `square`; `1.`, `a.`, `i.` by depth). Numbering is
 continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
-item; `start` sets the first number. Markers are not part of `text`.
+item; `start` sets the first number. Markers are not part of `text`. With centre or right alignment the
+marker stays attached to the first line of its item.
+
+Press kbd:[Shift]+kbd:[Enter] inside a list item to add another paragraph to it: a continuation block
+(`cont: true`) with the item indent and no marker. It does not break the numbering. kbd:[Enter] in a
+continuation starts a new item, and kbd:[Backspace] at its start merges it into the previous paragraph.
 
 Plain paragraphs can be indented too: each level moves every line of the paragraph (wrapped lines included) one `indentStep` to the right, with no marker. The indent is kept when you edit, press kbd:[Enter], copy and paste, and renders for everyone even when rich text is off. Clients on an older version show these paragraphs without indent.
 

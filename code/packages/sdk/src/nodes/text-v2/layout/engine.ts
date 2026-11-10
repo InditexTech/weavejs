@@ -285,6 +285,9 @@ function applyAlign(lines: LayoutLine[], width: number, padding: number) {
     }
     const free = width - line.indent - line.width - padding * 2;
     line.offsetX = line.indent + (align === 'center' ? free / 2 : free);
+    if (line.marker) {
+      line.marker.x = Math.max(0, line.marker.x + line.offsetX - line.indent);
+    }
   }
 }
 
