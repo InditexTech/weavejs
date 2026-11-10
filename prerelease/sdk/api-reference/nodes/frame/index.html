@@ -1267,6 +1267,7 @@ visual organization.</p>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  titleMargin</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  borderWidth</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  borderColor</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  edgeHitWidth</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  onTargetLeave</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    borderColor</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    fill</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
@@ -1392,6 +1393,13 @@ visual organization.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The border color (HEX with alpha) of the frame.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edgeHitWidth</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">6</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum width (screen px) of the clickable band along each frame edge. The effective band, in canvas units, is the greater of <code class="dt-mono">borderWidth</code> and <code class="dt-mono">edgeHitWidth</code> divided by the current zoom, so edges stay selectable when zoomed out.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTargetLeave.borderColor</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">string</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -1410,7 +1418,7 @@ visual organization.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">string</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">check default values</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The border color (HEX with alpha) of the frame when a target is going to be added.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The border color (HEX with alpha) of the frame when a target is going to be added. Drawn with the width of <code class="dt-mono">transform.borderStrokeWidth</code>, constant on screen at any zoom.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTargetEnter.fill</code></p></td>
@@ -1443,6 +1451,7 @@ visual organization.</p>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  titleMargin:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 20</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  borderColor:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#000000ff"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  borderWidth:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  edgeHitWidth:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 6</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  onTargetLeave:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    borderColor:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#000000ff"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    fill:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#ffffffff"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
