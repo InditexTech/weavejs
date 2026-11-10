@@ -22,6 +22,11 @@
       "import": "./dist/sdk.js",
       "default": "./dist/sdk.js"
     },
+    "./lab": {
+      "types": "./dist/lab.d.ts",
+      "import": "./dist/lab.js",
+      "default": "./dist/lab.js"
+    },
     "./server": {
       "types": "./dist/types.d.ts",
       "import": "./dist/sdk.node.js",
