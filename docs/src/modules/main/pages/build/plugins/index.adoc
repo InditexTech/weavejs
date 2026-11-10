@@ -161,6 +161,17 @@ getName(): string
 The `getName` method returns the name of the plugin, used as an identifier
 on the Weave instance. The name of the plugin must be unique among other plugins.
 
+==== initialize
+
+[source,ts]
+----
+initialize?(): void
+----
+
+The `initialize` method is optional, and is called each time the Weave instance is reset, for example
+when switching rooms. It's a good place to reset the plugin internal state. Use `onInit` to create
+elements and register events instead.
+
 ==== onInit
 
 [source,ts]

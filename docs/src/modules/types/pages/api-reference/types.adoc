@@ -168,18 +168,43 @@ export type WeaveCallbacks = {
 [source,ts]
 ----
 export interface WeaveNodeBase {
-  createNode(id: string, props: WeaveElementAttributes): WeaveStateElement;
+  getNodeType(): string;
 
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance;
+  create(id: string, props: WeaveElementAttributes): WeaveStateElement;
 
-  updateInstance(
+  onAdd?(nodeInstance: WeaveElementInstance): void;
+
+  onRender(props: WeaveElementAttributes): WeaveElementInstance;
+
+  onUpdate(
     instance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void;
 
-  removeInstance(instance: WeaveElementInstance): void;
+  onDestroy(instance: WeaveElementInstance): void;
 
-  toNode(instance: WeaveElementInstance): WeaveStateElement;
+  serialize(instance: WeaveElementInstance): WeaveStateElement;
+
+  setupDefaultNodeAugmentation(node: Konva.Node): void;
+
+  setupDefaultNodeEvents(
+    node: Konva.Node,
+    { performScaleReset }: { performScaleReset: boolean }
+  ): void;
+
+  isNodeSelected(ele: Konva.Node): boolean;
+
+  lock(instance: Konva.Node): void;
+
+  unlock(instance: Konva.Node): void;
+
+  isLocked(instance: Konva.Node): boolean;
+
+  isSelecting(): boolean;
+
+  isPasting(): boolean;
+
+  getIsAsync(): boolean;
 }
 ----
 
@@ -188,9 +213,9 @@ export interface WeaveNodeBase {
 [source,ts]
 ----
 export interface WeavePluginBase {
-  init?(): void;
+  onInit?(): void;
 
-  render?(): void;
+  onRender?(): void;
 
   enable(): void;
 
@@ -205,11 +230,17 @@ export interface WeavePluginBase {
 [source,ts]
 ----
 export interface WeaveActionBase {
-  init?(): void;
+  onInit?(): void;
+
+  getName(): string;
+
+  hasAliases(): boolean;
+
+  getAliases(): string[];
 
   trigger(cancelAction: () => void, params?: unknown): unknown;
 
-  internalUpdate?(): void;
+  onPropsChange?(): void;
 
   cleanup?(): void;
 }
