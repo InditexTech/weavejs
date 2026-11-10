@@ -1,0 +1,63 @@
+AGENTS.md
+  s_61afdb0b89842f::t_f1021fc50edc61 139-141
+code/CHANGELOG.md
+  s_61afdb0b89842f::t_0fc138c6e5a8d4 19,23
+code/packages/sdk/src/nodes/frame/__tests__/frame-edge-selection.test.ts
+  s_61afdb0b89842f::t_e4b665adf5e1d3 1-356
+code/packages/sdk/src/nodes/frame/constants.ts
+  s_61afdb0b89842f::t_b6fdf5e7257f54 15
+code/packages/sdk/src/nodes/frame/frame.ts
+  s_61afdb0b89842f::t_923fdc743b5255 28-32,84,89,118-119,189-193,240-247,319-331,333-366,382-383,397-398,410,423,459-468
+code/packages/sdk/src/nodes/frame/hit-region.ts
+  s_61afdb0b89842f::t_1364b9001a09d8 1-65
+code/packages/sdk/src/nodes/frame/types.ts
+  s_61afdb0b89842f::t_d6878707b31c95 18
+code/packages/sdk/src/nodes/text-v2/__tests__/list-continuation.test.ts
+  s_61afdb0b89842f::t_82dc7925aaa17e 1-130
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-layout.test.ts
+  s_61afdb0b89842f::t_32165236b76a08 183-200,202,204-215,217
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_61afdb0b89842f::t_f4c83c54ebba2a 317-319,321,327-341,356-357,377
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_61afdb0b89842f::t_ed74faa7f9d16e 286,340,370,389,394,421,485,490,499,520,525,642,653,719,733,765
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_61afdb0b89842f::t_950f832cd12864 288-290
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_61afdb0b89842f::t_12a8b0cf88e507 58-62,95,234,596,600-612,620,650,663,727,874-910,922-924
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_61afdb0b89842f::t_99f099f640e78f 1240-1259,1265
+docs/src/modules/main/pages/build/nodes/frame.adoc
+  s_61afdb0b89842f::t_389f6e1bf8e2a6 14-27
+docs/src/modules/sdk/pages/api-reference/nodes/frame.adoc
+  s_61afdb0b89842f::t_71c841006857e4 57,104,107,124
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_61afdb0b89842f::t_f566f1af9f509a 172-177
+openspec/changes/frame-edge-selection/.openspec.yaml
+  s_61afdb0b89842f::t_d8662df771ea4b 1-2
+openspec/changes/frame-edge-selection/design.md
+  s_61afdb0b89842f::t_a9f77336bb9706 1-41
+openspec/changes/frame-edge-selection/proposal.md
+  s_61afdb0b89842f::t_7acd3e4284af1c 1-30
+openspec/changes/frame-edge-selection/specs/frame-node/edge-selection/spec.md
+  s_61afdb0b89842f::t_65a1c6a54febcd 1-89
+openspec/changes/frame-edge-selection/tasks.md
+  s_61afdb0b89842f::t_1dfbd70ebc63dd 1-25
+openspec/specs/text-v2/layout/spec.md
+  s_61afdb0b89842f::t_a1f032343021b1 75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "a4d0f648efeaf86cb64360d8a0db48e60ddf799d",
+  "prompts": {},
+  "sessions": {
+    "s_61afdb0b89842f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e39f6fa4cffedIs6UJQe30Twhe",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
