@@ -337,7 +337,7 @@ export class TextEditSession {
       return true;
     }
     if (e.key === 'Enter') {
-      if (this.model.enter()) this.afterFormat('command', true);
+      if (this.model.enter(e.shiftKey)) this.afterFormat('command', true);
       return true;
     }
     if (e.key === 'Backspace' && this.model.backspaceInList()) {

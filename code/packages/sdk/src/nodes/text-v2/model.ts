@@ -55,6 +55,11 @@ export type WeaveTextBlock = {
   kind?: WeaveTextListKind;
   depth?: number;
   start?: number;
+  /**
+   * Continuation of the previous list item: same indent, no marker, and it
+   * does not break the numbering. Only meaningful together with `kind`.
+   */
+  cont?: boolean;
   align?: WeaveTextBlockAlign;
   /** Marks of an empty block (no runs); ignored and dropped once it has text. */
   m?: WeaveTextMarks;
@@ -87,6 +92,7 @@ function blockFields(block: WeaveTextBlock | undefined, withStart: boolean) {
   if (block.depth) out.depth = block.depth;
   if (block.align) out.align = block.align;
   if (withStart && block.start !== undefined) out.start = block.start;
+  if (withStart && block.cont) out.cont = true;
   return out;
 }
 
@@ -587,8 +593,21 @@ function mapBlocks(
 }
 
 function stripList(b: WeaveTextBlock): WeaveTextBlock {
-  const { kind: _k, depth: _d, start: _s, ...rest } = b;
+  const { kind: _k, depth: _d, start: _s, cont: _c, ...rest } = b;
   return rest;
+}
+
+/** Range indices widened to whole list items (a bullet and its continuations). */
+function itemIndices(blocks: WeaveTextBlock[], idx: number[]): number[] {
+  const out = new Set<number>();
+  for (const i of idx) {
+    let from = i;
+    while (from > 0 && blocks[from].cont) from--;
+    let to = i;
+    while (to + 1 < blocks.length && blocks[to + 1].cont) to++;
+    for (let k = from; k <= to; k++) out.add(k);
+  }
+  return [...out].sort((a, b) => a - b);
 }
 
 /** Toggle list `kind` on the blocks of a range (all already that kind -> off). */
@@ -598,7 +617,7 @@ export function toggleList(
   end: number,
   kind: WeaveTextListKind
 ): WeaveTextBlock[] {
-  const idx = blockIndicesInRange(blocks, start, end);
+  const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   const allSame = idx.every((i) => blocks[i].kind === kind);
   return mapBlocks(blocks, idx, (b) =>
     allSame ? stripList(b) : { ...b, kind }
@@ -628,7 +647,7 @@ export function indentBlocks(
   start: number,
   end: number
 ): WeaveTextBlock[] {
-  const idx = blockIndicesInRange(blocks, start, end);
+  const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   return mapBlocks(blocks, idx, (b) =>
     b.kind ? { ...b, depth: (b.depth ?? 0) + 1 } : b
   );
@@ -640,7 +659,7 @@ export function outdentBlocks(
   start: number,
   end: number
 ): WeaveTextBlock[] {
-  const idx = blockIndicesInRange(blocks, start, end);
+  const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   return mapBlocks(blocks, idx, (b) => {
     if (!b.kind) return b;
     const d = b.depth ?? 0;
@@ -704,6 +723,7 @@ export function listMarkers(blocks: WeaveTextBlock[]): (string | null)[] {
       stack.length = 0;
       return null;
     }
+    if (b.cont) return null;
     const d = Math.max(0, Math.floor(b.depth ?? 0));
     stack.length = Math.min(stack.length, d + 1);
     while (stack.length < d) stack.push({ kind: b.kind, n: 0 });

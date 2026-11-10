@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1270](https://github.com/InditexTech/weavejs/issues/1270) Text V2: list markers do not follow the text when a list is centered or right-aligned
 - [#1256](https://github.com/InditexTech/weavejs/issues/1256) Optional lifecycle hooks declared abstract force every custom node, action and plugin to implement them
 - [#1254](https://github.com/InditexTech/weavejs/issues/1254) Wacom handwriting produces uneven, angular strokes
 

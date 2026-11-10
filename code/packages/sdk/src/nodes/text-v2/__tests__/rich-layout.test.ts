@@ -159,14 +159,41 @@ describe('paragraph align and per-run line height', () => {
     expect(e.getLastRelaidCount()).toBe(0);
   });
 
-  it('keeps the list indent on the left when aligned', () => {
+  it('moves the list marker with the first line when aligned', () => {
+    const run = (align: 'left' | 'center' | 'right') =>
+      engine().layout([{ kind: 'ul', align, runs: [{ t: 'ab' }] }], style, {
+        ...bounds,
+        width: 100,
+      }).lines[0];
+    // indent 15, text width 10, free 75, marker gap 15
+    expect(run('left').marker?.x).toBe(0);
+    const c = run('center');
+    expect(c.offsetX).toBe(15 + 37.5);
+    expect(c.marker?.x).toBe(37.5);
+    const r = run('right');
+    expect(r.offsetX).toBe(90);
+    expect(r.marker?.x).toBe(75);
+    expect(r.offsetX - (r.marker?.x ?? 0)).toBe(15);
+  });
+
+  it('keeps the marker on the first line of a wrapped aligned item', () => {
     const l = engine().layout(
-      [{ kind: 'ul', align: 'right', runs: [{ t: 'ab' }] }],
+      [{ kind: 'ul', align: 'right', runs: [{ t: 'aaaa bbbbb' }] }],
       style,
-      { ...bounds, width: 100 }
+      { ...bounds, width: 60 }
     );
-    expect(l.lines[0].offsetX).toBe(100 - 10);
-    expect(l.lines[0].marker?.x).toBe(0);
+    expect(l.lines.length).toBeGreaterThan(1);
+    expect(l.lines[0].marker?.x).toBe(l.lines[0].offsetX - 15);
+    expect(l.lines[1].marker).toBeUndefined();
+  });
+
+  it('keeps the marker inside the box when the text overflows', () => {
+    const l = engine().layout(
+      [{ kind: 'ul', align: 'center', runs: [{ t: 'aaaaaaaaaaaa' }] }],
+      { ...style, wrap: 'none' },
+      { ...bounds, width: 40 }
+    );
+    expect(l.lines[0].marker?.x).toBeGreaterThanOrEqual(0);
   });
 
   it('uses the tallest run line height on a line', () => {

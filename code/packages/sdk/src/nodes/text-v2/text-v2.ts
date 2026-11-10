@@ -1265,6 +1265,7 @@ export class WeaveTextV2Node extends WeaveNode {
       kind: z.enum(['ul', 'ol']).optional(),
       depth: z.number().int().min(0).optional(),
       start: z.number().int().min(1).optional(),
+      cont: z.boolean().optional(),
       align: z.enum(['left', 'center', 'right']).optional(),
     });
     return base.extend({
