@@ -1,0 +1,14 @@
+CONTRIBUTING.md
+  h_c93d154c7c7074 135,138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "154cda4d6779488c52ab6271cc9eddc93ede184f",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
