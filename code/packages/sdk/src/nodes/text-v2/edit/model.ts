@@ -321,7 +321,7 @@ export class TextEditModel {
   enter(soft = false): boolean {
     const { start, end } = this.getSelection();
     const b = start === end ? this.blockAt(start) : undefined;
-    if (b && this.blocks[b.index].kind && b.length === 0) {
+    if (!soft && b && this.blocks[b.index].kind && b.length === 0) {
       return this.commitFormat(outdentToPlain(this.blocks, b.index));
     }
     const at = this.blockAt(start);

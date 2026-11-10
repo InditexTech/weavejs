@@ -295,6 +295,8 @@ export function replaceRange(
   const suffixBlocks: WeaveTextBlock[] = [];
   let inheritedMarks: WeaveTextMarks | undefined;
   let startBlock: WeaveTextBlock | undefined;
+  let endBlock: WeaveTextBlock | undefined;
+  let startAtBlockStart = false;
   let pos = 0;
 
   blocks.forEach((block) => {
@@ -312,10 +314,12 @@ export function replaceRange(
         const local = start - bStart;
         before = sliceRuns(block.runs, 0, local);
         startBlock = block;
+        startAtBlockStart = local === 0;
         inheritedMarks = len === 0 ? block.m : marksAt(block.runs, local);
       }
       if (end >= bStart && end <= bEnd) {
         after = sliceRuns(block.runs, end - bStart, len);
+        endBlock = block;
       }
     }
   });
@@ -327,6 +331,12 @@ export function replaceRange(
       ? []
       : [{ t, ...(isEmptyMarks(inheritedMarks) ? {} : { m: inheritedMarks }) }];
 
+  // Deleting from the start of a block to a later one removes that whole
+  // block: the block that follows keeps its own structure (list item, depth).
+  const structure =
+    insert === '' && startAtBlockStart && endBlock && endBlock !== startBlock
+      ? endBlock
+      : startBlock;
   const middle: WeaveTextBlock[] = [];
   lines.forEach((line, idx) => {
     let runs = mk(line);
@@ -335,7 +345,7 @@ export function replaceRange(
     const normalized = normalizeRuns(runs);
     const carried = emptyBlockMarks(inheritedMarks);
     middle.push({
-      ...blockFields(startBlock, idx === 0),
+      ...blockFields(structure, idx === 0),
       runs: normalized,
       ...(normalized.length === 0 && carried ? { m: carried } : {}),
     });
