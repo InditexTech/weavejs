@@ -10,6 +10,7 @@ Selecting an artboard (`frame` node) is only possible by clicking its title bar.
 - Edge band width is `max(borderWidth, edgeHitWidth / zoom)`; `edgeHitWidth` is a new frame config value in screen pixels (default 6), so the band stays clickable at low zoom. The band is biased outward (about 2/3 outside, 1/3 inside the border).
 - The frame interior stays non-selecting (unchanged), so marquee selection, drawing and children interactions keep working.
 - The `move` (four-arrow) cursor is shown while a frame is being dragged.
+- The drop-target outline (shown when a node is dragged over a frame) uses the selection outline width and keeps it on screen at any zoom.
 - Hover and selection feedback keeps coming from the nodes-selection plugin (no new frame colors).
 - The three duplicated hit functions (`onRender`, `onZoomChange`, `onUpdate`) are consolidated into one helper. Title geometry is unchanged.
 - Out of scope: title bar appearance or naming.

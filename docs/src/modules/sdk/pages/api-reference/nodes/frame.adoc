@@ -104,7 +104,7 @@ For `WeaveFrameProperties`:
 | mono:[edgeHitWidth] | mono:[number] |  | mono:[6] | Minimum width (screen px) of the clickable band along each frame edge. The effective band, in canvas units, is the greater of mono:[borderWidth] and mono:[edgeHitWidth] divided by the current zoom, so edges stay selectable when zoomed out.
 | mono:[onTargetLeave.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when no target is added.
 | mono:[onTargetLeave.fill] | mono:[string] |  | mono:[check default values] | The frame background color (HEX with alpha) of the frame when no target is added.
-| mono:[onTargetEnter.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when a target is going to be added.
+| mono:[onTargetEnter.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when a target is going to be added. Drawn with the width of mono:[transform.borderStrokeWidth], constant on screen at any zoom.
 | mono:[onTargetEnter.fill] | mono:[string] |  | mono:[check default values] | The frame background color (HEX with alpha) of the frame when a target going to be added.
 | mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the frame (if can be resized, rotated, anchors, etc.).
 |===

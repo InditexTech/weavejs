@@ -19,6 +19,9 @@ xref:sdk:api-reference/nodes/frame.adoc[Frame API reference]), so edges remain e
 the canvas is zoomed out. Clicking the empty inside of a frame does not select it. Once selected,
 the frame can be dragged from its title or edges, and the pointer shows the `move` cursor while dragging.
 
+While a node is dragged over a frame, its border is highlighted with the `onTargetEnter` color. The highlight
+uses the same width as the selection outline (`transform.borderStrokeWidth`) at any zoom level.
+
 Hover and selection feedback uses the colors of the xref:main:build/plugins/nodes-selection.adoc[Nodes Selection]
 plugin, as for any other node.
 

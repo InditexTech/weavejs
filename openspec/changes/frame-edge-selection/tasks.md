@@ -12,6 +12,8 @@
 - [x] 2.2 Keep hover/selected feedback on the nodes-selection plugin and the drop-target border unchanged; verify existing frame tests still pass
 - [x] 2.3 Verify adjacent-frame band overlap at very low zoom resolves by z-order (test)
 
+- [x] 2.4 Draw the drop-target outline with `transform.borderStrokeWidth` and `strokeScaleEnabled: false`, restoring `borderWidth` and scaling on leave; verify tests for enter, leave and a custom `borderStrokeWidth`
+
 ## 3. Docs, changelog, release notes
 
 - [x] 3.1 Add the `[Unreleased]` → Added entry to `code/CHANGELOG.md`: `- [#1263](https://github.com/InditexTech/weavejs/issues/1263) Artboard selection: allow selecting an artboard by clicking any of its edges, not only the top bar`; verify format against neighboring entries

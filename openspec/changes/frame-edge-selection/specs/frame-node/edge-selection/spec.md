@@ -76,3 +76,14 @@ The system SHALL NOT introduce frame-specific hover or selected colors; hover an
 #### Scenario: Selected frame
 - **WHEN** a frame is selected
 - **THEN** it is outlined by the nodes-selection plugin like any other node
+
+### Requirement: Drop-target outline has a constant on-screen width
+While a node is dragged over a frame, the frame's drop-target outline SHALL be drawn with the same width as the selection outline (`transform.borderStrokeWidth`) and SHALL keep that width on screen at any zoom. When the drag leaves, the regular border width and zoom scaling SHALL be restored.
+
+#### Scenario: Drop target at low zoom
+- **WHEN** a node is dragged over a frame while the stage is zoomed out
+- **THEN** the drop-target outline is as thick on screen as the selection outline
+
+#### Scenario: Drag leaves
+- **WHEN** the dragged node leaves the frame
+- **THEN** the border returns to `borderWidth` and scales with zoom again

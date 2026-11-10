@@ -314,4 +314,43 @@ describe('WeaveFrameNode edge selection', () => {
       expect(container.style.cursor).toBe('default');
     });
   });
+
+  describe('drop target outline', () => {
+    function border(frame: GroupFrame) {
+      return frame.findOne('#frame-id-bg-border') as Konva.Rect;
+    }
+
+    function fireOnFrame(frame: GroupFrame, eventName: string) {
+      frame.fire(eventName, {}, true);
+    }
+
+    it('F.9 target enter uses the selection border width, constant on screen', () => {
+      const frame = render();
+      fireOnFrame(frame, 'onTargetEnter');
+      expect(border(frame).strokeWidth()).toBe(
+        WEAVE_FRAME_NODE_DEFAULT_CONFIG.transform.borderStrokeWidth
+      );
+      expect(border(frame).strokeScaleEnabled()).toBe(false);
+    });
+
+    it('F.10 target leave restores the regular border', () => {
+      const frame = render();
+      fireOnFrame(frame, 'onTargetEnter');
+      fireOnFrame(frame, 'onTargetLeave');
+      expect(border(frame).strokeWidth()).toBe(1);
+      expect(border(frame).strokeScaleEnabled()).toBe(true);
+    });
+
+    it('F.11 target outline width follows transform.borderStrokeWidth config', () => {
+      make({
+        transform: {
+          ...WEAVE_FRAME_NODE_DEFAULT_CONFIG.transform,
+          borderStrokeWidth: 5,
+        },
+      });
+      const frame = render();
+      fireOnFrame(frame, 'onTargetEnter');
+      expect(border(frame).strokeWidth()).toBe(5);
+    });
+  });
 });

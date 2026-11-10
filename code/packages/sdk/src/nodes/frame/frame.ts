@@ -86,6 +86,7 @@ export class WeaveFrameNode extends WeaveNode {
         borderColor: onTargetEnterBorderColor,
         fill: onTargetEnterFill,
       },
+      transform: { borderStrokeWidth: targetBorderWidth = 2 },
     } = this.config;
 
     const frameParams = {
@@ -378,6 +379,8 @@ export class WeaveFrameNode extends WeaveNode {
       backgroundBorder.setAttrs({
         onTargetEnter: false,
         stroke: borderColor,
+        strokeWidth: borderWidth,
+        strokeScaleEnabled: true,
       });
     });
 
@@ -391,6 +394,8 @@ export class WeaveFrameNode extends WeaveNode {
       backgroundBorder.setAttrs({
         onTargetEnter: true,
         stroke: onTargetEnterBorderColor,
+        strokeWidth: targetBorderWidth,
+        strokeScaleEnabled: false,
       });
     });
 

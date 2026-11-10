@@ -25,7 +25,7 @@ A frame (`code/packages/sdk/src/nodes/frame/frame.ts`) is a Konva group. Its onl
 
 4. **Cursor.** Frame sets the `move` cursor on `dragstart`/`dragmove` and restores `defineMousePointer()` on `dragend`. Hover and click keep the default pointer/grab behavior.
 
-5. **Drop target border** (`onTargetEnter`) is unchanged.
+5. **Drop target outline.** On `onTargetEnter` the outline uses `transform.borderStrokeWidth` (the selection outline width, default 2) with `strokeScaleEnabled: false`, so it keeps its on-screen width at any zoom; on leave, `borderWidth` and scaling are restored. Colors (`onTargetEnter`) are unchanged.
 
 6. **Docs and changelog** are part of the tasks, per AGENTS.md.
 
