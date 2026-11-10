@@ -1,0 +1,55 @@
+AGENTS.md
+  s_1776a4ecc8d6ec::t_09da9328564c40 136-137
+code/CHANGELOG.md
+  s_1776a4ecc8d6ec::t_3aafc0c5a7956e 16-19
+code/packages/sdk/src/nodes/text-v2/__tests__/clipboard-blocks.test.ts
+  s_1776a4ecc8d6ec::t_d5a2035fa5d186 65-79
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-api.test.ts
+  s_1776a4ecc8d6ec::t_d65c4dc3fd0fd5 216-231
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-layout.test.ts
+  s_1776a4ecc8d6ec::t_c1374947fac7ad 92-112
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-model.test.ts
+  s_1776a4ecc8d6ec::t_866b3eb9e4561a 117-160
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-session.test.ts
+  s_1776a4ecc8d6ec::t_52097685398e7c 132-153
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_1776a4ecc8d6ec::t_98b00ab882cc63 330-331,337-339
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_1776a4ecc8d6ec::t_4d59a5c85b54e8 320,327-328,336
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_1776a4ecc8d6ec::t_0df96d0044a686 625,632,635-638,647,746-747,817,821-836
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_1776a4ecc8d6ec::t_5824740badec66 86,97,148
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_1776a4ecc8d6ec::t_54494748c9d1f5 139,149,154,174-175,230
+openspec/changes/text-v2-paragraph-indent/.openspec.yaml
+  s_1776a4ecc8d6ec::t_6ddd93a0b9b9da 1-2
+openspec/changes/text-v2-paragraph-indent/design.md
+  s_1776a4ecc8d6ec::t_ecbd98e8d54785 1-46
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/editing/spec.md
+  s_1776a4ecc8d6ec::t_9994c0dddf9e25 1-43
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/layout/spec.md
+  s_1776a4ecc8d6ec::t_a8ffcea5f700be 1-27
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/model/spec.md
+  s_1776a4ecc8d6ec::t_6e5a24845823e9 1-27
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/rich-text-api/spec.md
+  s_1776a4ecc8d6ec::t_6a068c9dc3954b 1-37
+openspec/changes/text-v2-paragraph-indent/tasks.md
+  s_1776a4ecc8d6ec::t_dd4804176be346 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "859ea8b4568cbea4b8b7775ea810d5b47f536729",
+  "prompts": {},
+  "sessions": {
+    "s_1776a4ecc8d6ec": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3ac4d2f4ffewFZQdXdzhBWg6v",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
