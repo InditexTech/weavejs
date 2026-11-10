@@ -1,0 +1,53 @@
+AGENTS.md
+  s_f35f7e56a17fea::t_62924e320bdc77 132-136
+code/CHANGELOG.md
+  s_f35f7e56a17fea::t_b7fb3f0c8f853f 18
+code/package-lock.json
+  s_f35f7e56a17fea::t_791f7681d53559 9486-9488
+code/package.json
+  s_f35f7e56a17fea::t_542a6e0a30407f 100
+code/packages/sdk/src/__tests__/types/optional-hooks.test-d.ts
+  s_f35f7e56a17fea::t_06ff0ecf9baf89 1-65
+code/packages/sdk/src/__tests__/types/tsconfig.json
+  s_f35f7e56a17fea::t_23f4fd7f096741 1-11
+code/packages/sdk/src/actions/action.ts
+  s_f35f7e56a17fea::t_03172ab25d3ad5 116,118,122,124
+code/packages/sdk/src/nodes/node.ts
+  s_f35f7e56a17fea::t_0e3706c25129ff 1251
+code/packages/sdk/src/plugins/plugin.ts
+  s_f35f7e56a17fea::t_9c58565267d44d 37,39,41
+code/packages/sdk/vitest.config.ts
+  s_f35f7e56a17fea::t_f38a66192fb974 29-33
+docs/src/modules/main/pages/build/actions/index.adoc
+  s_f35f7e56a17fea::t_bab92065761d5e 49,213-223,249,253,260
+docs/src/modules/main/pages/build/nodes/index.adoc
+  s_f35f7e56a17fea::t_06ec144fad10ec 207-216
+docs/src/modules/main/pages/build/plugins/index.adoc
+  s_f35f7e56a17fea::t_0fcff8caac5759 164-174
+docs/src/modules/sdk/pages/api-reference/actions/action.adoc
+  s_f35f7e56a17fea::t_1ea3148249550d 43,160,162,166,169,171-176,180,183-184,186-201
+docs/src/modules/sdk/pages/api-reference/nodes/node.adoc
+  s_f35f7e56a17fea::t_b56d1677f59ba7 166,168,172,175-176,178-181,185-188,191,193-195,199,202-203,205,207,211,214-233,245-265
+docs/src/modules/sdk/pages/api-reference/plugins/plugin.adoc
+  s_f35f7e56a17fea::t_273f9fac75ee16 41,43,109,111,115,118,120,124,127,129-131,135,138-139,141,145,148-166
+docs/src/modules/sdk/pages/api-reference/weave/index.adoc
+  s_f35f7e56a17fea::t_79a969ce0490e9 997-1001,1003,1005-1018,1022-1025,1027,1032-1033
+docs/src/modules/types/pages/api-reference/types.adoc
+  s_f35f7e56a17fea::t_60cccca023ce4b 171,173,175-179,184-197,199-207,216,218,233-239,243
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "d3fc6e2e10b66cc6ef3de1468261c37d71ff680a",
+  "prompts": {},
+  "sessions": {
+    "s_f35f7e56a17fea": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3ae9e262ffeywyPObkac0XMc3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
