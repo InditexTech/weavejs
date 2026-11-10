@@ -1,0 +1,43 @@
+AGENTS.md
+  s_7378802f9fa88b::t_3f7641b09f0b6d 137-138
+code/CHANGELOG.md
+  s_7378802f9fa88b::t_bdb9b5651b2fe9 16-19
+code/packages/sdk/src/nodes/frame/__tests__/frame-edge-selection.test.ts
+  s_7378802f9fa88b::t_243e3490214f68 1-317
+code/packages/sdk/src/nodes/frame/constants.ts
+  s_7378802f9fa88b::t_2b64774952b8f4 15
+code/packages/sdk/src/nodes/frame/frame.ts
+  s_7378802f9fa88b::t_bed22e6bd7a367 28-32,84,117-118,188-192,239-246,318-330,332-365,405,418,454-463
+code/packages/sdk/src/nodes/frame/types.ts
+  s_7378802f9fa88b::t_fd9b7a81cfa782 18
+docs/src/modules/main/pages/build/nodes/frame.adoc
+  s_7378802f9fa88b::t_6bd6fc0d132566 14-24
+docs/src/modules/sdk/pages/api-reference/nodes/frame.adoc
+  s_7378802f9fa88b::t_3fa1ca5b42b8f1 57,104,124
+openspec/changes/frame-edge-selection/.openspec.yaml
+  s_7378802f9fa88b::t_a3436bfbcc69b4 1-2
+openspec/changes/frame-edge-selection/design.md
+  s_7378802f9fa88b::t_8e53f15db1505f 1-41
+openspec/changes/frame-edge-selection/proposal.md
+  s_7378802f9fa88b::t_3d76b26fcf008d 1-29
+openspec/changes/frame-edge-selection/specs/frame-node/edge-selection/spec.md
+  s_7378802f9fa88b::t_333615f93277c7 1-78
+openspec/changes/frame-edge-selection/tasks.md
+  s_7378802f9fa88b::t_50a7430eda681e 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "cbc33d4a36de79bb14191edf40f992f59722a384",
+  "prompts": {},
+  "sessions": {
+    "s_7378802f9fa88b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3a507c35ffeV10kQdeWiB7FwZ",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
