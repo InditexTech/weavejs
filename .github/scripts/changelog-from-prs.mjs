@@ -97,6 +97,27 @@ export function formatEntry(issue, repo) {
   return `- [${issueRef(issue, repo)}](${issue.url}) ${normalizeTitle(issue.title)}`;
 }
 
+const ENTRY_LINE = /^(- \[[^\]\n]+\]\([^)\n]+\) )(\S.*)$/;
+
+// Preview only: a code span keeps `@user` and `@org/team` in an issue title
+// from notifying anyone when the text is posted as a PR comment. Only the
+// title after the leading issue link is wrapped; other lines pass through.
+export function wrapTitle(line) {
+  const match = ENTRY_LINE.exec(line);
+  if (!match) {
+    return line;
+  }
+  const [, prefix, title] = match;
+  const longestRun = Math.max(0, ...(title.match(/`+/g) ?? []).map((run) => run.length));
+  const fence = '`'.repeat(longestRun + 1);
+  const pad = title.startsWith('`') || title.endsWith('`') ? ' ' : '';
+  return `${prefix}${fence}${pad}${title}${pad}${fence}`;
+}
+
+export function wrapTitles(text) {
+  return text.split('\n').map(wrapTitle).join('\n');
+}
+
 export function bypassReason(pr) {
   if (pr.labels.includes(BYPASS_LABEL)) {
     return `has the \`${BYPASS_LABEL}\` label`;
@@ -566,12 +587,12 @@ function defaultRepo() {
 // ---------------------------------------------------------------------------
 // Report
 
-function renderEntries(entries) {
+function renderEntries(entries, render = (line) => line) {
   const out = [];
   for (const section of [...SECTION_ORDER, ...new Set(entries.map((entry) => entry.section))]) {
     const lines = entries.filter((entry) => entry.section === section);
     if (lines.length > 0 && !out.includes(`**${section}**`)) {
-      out.push(`**${section}**`, '', ...lines.map((entry) => entry.line), '');
+      out.push(`**${section}**`, '', ...lines.map((entry) => render(entry.line)), '');
     }
   }
   return out;
@@ -619,7 +640,7 @@ export function renderPullRequestReport({ pr, result, enforce }) {
         ? `This PR has the \`${BYPASS_LABEL}\` label: merging it publishes no release. These entries go into the next release:`
         : 'When this PR is released, `code/CHANGELOG.md` gets:',
       '',
-      ...renderEntries(result.entries)
+      ...renderEntries(result.entries, wrapTitle)
     );
     out.push('The text is the issue title, read at release time: edit the issue title or labels to change it.');
   }
@@ -723,6 +744,7 @@ function applyToChangelog(path, entries, dryRun) {
 
 const USAGE = `usage:
   changelog-from-prs.mjs --pr <number> [--enforce] [--changelog <file>] [--report <file>]
+  changelog-from-prs.mjs --wrap-titles < changelog-section.md
   changelog-from-prs.mjs [--from <ref>] [--to <ref>] [--branch <name>] [--changelog <file>] [--dry-run] [--report <file>]
 
 options:
@@ -733,7 +755,9 @@ options:
   --changelog <file>   write the entries into its [Unreleased] section
   --dry-run            never write; in range mode, compare with the [--to] section of --changelog
   --enforce            PR mode: fail when the PR has no linked issue and no bypass
-  --report <file>      also append the Markdown report to this file (e.g. $GITHUB_STEP_SUMMARY)`;
+  --report <file>      also append the Markdown report to this file (e.g. $GITHUB_STEP_SUMMARY)
+  --wrap-titles        filter stdin to stdout, putting each entry title in a code span so @mentions
+                       do not notify when posted as a PR comment`;
 
 export async function main(argv = process.argv.slice(2)) {
   const { values } = parseArgs({
@@ -748,11 +772,16 @@ export async function main(argv = process.argv.slice(2)) {
       'dry-run': { type: 'boolean', default: false },
       enforce: { type: 'boolean', default: false },
       report: { type: 'string' },
+      'wrap-titles': { type: 'boolean', default: false },
       help: { type: 'boolean', default: false },
     },
   });
   if (values.help) {
     console.log(USAGE);
+    return 0;
+  }
+  if (values['wrap-titles']) {
+    process.stdout.write(wrapTitles(readFileSync(0, 'utf8')));
     return 0;
   }
 
