@@ -100,6 +100,8 @@
     "follow-redirects": "1.16.3",
     "konva": "10.0.2",
     "lodash": "4.18.1",
+    "minimatch@^9": "11.0.8",
+    "minimatch@^10": "11.0.8",
     "rimraf": "6.0.1",
     "smol-toml": "1.9.0",
     "vite": "6.4.5",
