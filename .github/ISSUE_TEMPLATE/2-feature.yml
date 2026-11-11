@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+# SPDX-License-Identifier: Apache-2.0
+name: Feature Request
+description: Suggest a feature or improvement
+title: '[Feature] '
+labels: ['enhancement']
+assignees: []
+
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Feature description
+      description: What would you like to see added or changed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Use case or motivation
+      description: Why is this feature useful?
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to work on this?
+      options:
+        - Yes, I'd like to open a PR
+        - Maybe, I'd need help
+        - No, I'm just proposing it
+    validations:
+      required: true

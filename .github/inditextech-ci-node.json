@@ -1,0 +1,32 @@
+{
+  "project_type": "workspaces",
+  "release": {
+    "package_paths": {
+      "@inditextech/weave-react": "react",
+      "@inditextech/weave-renderer-konva-base": "renderer-konva-base",
+      "@inditextech/weave-renderer-konva-react-reconciler": "renderer-konva-react-reconciler",
+      "@inditextech/weave-sdk": "sdk",
+      "@inditextech/weave-store-azure-web-pubsub": "store-azure-web-pubsub",
+      "@inditextech/weave-store-standalone": "store-standalone",
+      "@inditextech/weave-store-websockets": "store-websockets",
+      "@inditextech/weave-types": "types",
+      "create-weave-backend-app": "create-backend-app",
+      "create-weave-frontend-app": "create-frontend-app"
+    },
+    "packages": [
+      "@inditextech/weave-sdk",
+      "@inditextech/weave-react",
+      "@inditextech/weave-types",
+      "@inditextech/weave-renderer-konva-base",
+      "@inditextech/weave-renderer-konva-react-reconciler",
+      "@inditextech/weave-store-standalone",
+      "@inditextech/weave-store-websockets",
+      "@inditextech/weave-store-azure-web-pubsub",
+      "create-weave-backend-app",
+      "create-weave-frontend-app"
+    ],
+    "strategy": "independent"
+  },
+  "schema_version": 1,
+  "working_directory": "code"
+}

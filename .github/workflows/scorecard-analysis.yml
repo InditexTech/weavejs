@@ -1,42 +1,104 @@
+# SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+# SPDX-License-Identifier: Apache-2.0
+
 name: Scorecard analysis
-permissions: read-all
+
+permissions:
+  contents: read
+
 on:
   push:
-    # Only the default branch is supported.
-    branches: [ 'main' ]
 
+concurrency:
+  group: scorecard-analysis-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  analysis:
-    name: Scorecard analysis
-    runs-on: ubuntu-latest
+  resolve-code-scanning:
+    name: Resolve Code Scanning availability
+    if: >-
+      github.ref_type == 'branch' &&
+      github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
-      # Needed for GitHub OIDC token if publish_results is true
-      id-token: write
+      contents: read
+    outputs:
+      enabled: ${{ steps.scanning-availability.outputs.enabled }}
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Resolve code scanning availability
+        id: scanning-availability
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE_ENABLED: ${{ vars.CODE_SCANNING_ENABLED }}
+          REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+        run: |
+          set -euo pipefail
+          visibility="${REPOSITORY_VISIBILITY}"
+          seat="unknown"
+          if ! seat="$(gh api "/repos/${GITHUB_REPOSITORY}" --jq '.security_and_analysis.advanced_security.status // "unknown"')"; then
+            echo "::notice title=Code Scanning availability unavailable::Unable to query the Advanced Security seat; retaining the SARIF artifact only."
+            seat="unknown"
+          fi
+          enabled=false
+          if [ "${visibility}" = "public" ] || [ "${seat}" = "enabled" ] || [ "${FORCE_ENABLED:-}" = "true" ]; then
+            enabled=true
+          fi
+          echo "Code scanning availability: visibility=${visibility} seat=${seat} enabled=${enabled}"
+          echo "enabled=${enabled}" >> "${GITHUB_OUTPUT}"
+
+  scorecard-analysis:
+    needs: resolve-code-scanning
+    if: needs.resolve-code-scanning.result == 'success'
+    name: Scorecard analysis
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: read # Lets Scorecard read issue metadata.
+      pull-requests: read # Lets Scorecard read pull request metadata.
+      id-token: write # Lets Scorecard attest result provenance.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: "Run analysis"
+      - name: Run analysis
         uses: ossf/scorecard-action@f49aabe0b5af0936a0987cfb85d86b75731b0186 # v2.4.1
         with:
           results_file: results.sarif
           results_format: sarif
-          # Scorecard team runs a weekly scan of public GitHub repos,
-          # see https://github.com/ossf/scorecard#public-data.
-          # Setting `publish_results: true` helps us scale by leveraging your workflow to
-          # extract the results instead of relying on our own infrastructure to run scans.
-          # And it's free for you!
-          publish_results: true
+          publish_results: ${{ github.event.repository.visibility == 'public' }}
 
-      # Upload the results as artifacts (optional). Commenting out will disable
-      # uploads of run results in SARIF format to the repository Actions tab.
-      # https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
-      - name: "Upload artifact"
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: SARIF file
           path: results.sarif
           retention-days: 5
+
+  upload-scorecard-sarif:
+    name: Upload Scorecard SARIF
+    needs: [resolve-code-scanning, scorecard-analysis]
+    if: >-
+      always() &&
+      needs.resolve-code-scanning.outputs.enabled == 'true' &&
+      needs.scorecard-analysis.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read # Lets SARIF upload read run metadata.
+      security-events: write # Lets CodeQL upload Scorecard SARIF.
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: SARIF file
+
+      - name: Upload SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+        with:
+          sarif_file: results.sarif
+          category: scorecard
