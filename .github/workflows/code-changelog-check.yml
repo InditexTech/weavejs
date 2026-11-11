@@ -19,9 +19,9 @@ on:
 permissions: {}
 
 env:
-  # Warn-only until the first release with generated entries has gone
-  # through. A follow-up PR sets this to 'true' to fail unlinked PRs.
-  CHANGELOG_LINK_ENFORCE: 'false'
+  # 'true' fails a PR that has no linked issue and no bypass. Set it to
+  # 'false' to go back to warn-only.
+  CHANGELOG_LINK_ENFORCE: 'true'
 
 jobs:
   linked-issue:
