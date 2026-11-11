@@ -55,6 +55,11 @@ export type WeaveTextBlock = {
   kind?: WeaveTextListKind;
   depth?: number;
   start?: number;
+  /**
+   * Continuation of the previous list item: same indent, no marker, and it
+   * does not break the numbering. Only meaningful together with `kind`.
+   */
+  cont?: boolean;
   align?: WeaveTextBlockAlign;
   /** Marks of an empty block (no runs); ignored and dropped once it has text. */
   m?: WeaveTextMarks;
@@ -87,6 +92,7 @@ function blockFields(block: WeaveTextBlock | undefined, withStart: boolean) {
   if (block.depth) out.depth = block.depth;
   if (block.align) out.align = block.align;
   if (withStart && block.start !== undefined) out.start = block.start;
+  if (withStart && block.cont) out.cont = true;
   return out;
 }
 
@@ -225,7 +231,7 @@ export function insertBlocks(
   const before = head.pop() ?? { runs: [] };
   const after = tail.shift() ?? { runs: [] };
   const first = fragment[0];
-  const last = fragment[fragment.length - 1];
+  const last = fragment.at(-1) as WeaveTextBlock;
   const finish = (b: WeaveTextBlock): WeaveTextBlock => {
     const runs = normalizeRuns(b.runs);
     const { m: _m, ...rest } = b;
@@ -587,8 +593,21 @@ function mapBlocks(
 }
 
 function stripList(b: WeaveTextBlock): WeaveTextBlock {
-  const { kind: _k, depth: _d, start: _s, ...rest } = b;
+  const { kind: _k, depth: _d, start: _s, cont: _c, ...rest } = b;
   return rest;
+}
+
+/** Range indices widened to whole list items (a bullet and its continuations). */
+function itemIndices(blocks: WeaveTextBlock[], idx: number[]): number[] {
+  const out = new Set<number>();
+  for (const i of idx) {
+    let from = i;
+    while (from > 0 && blocks[from].cont) from--;
+    let to = i;
+    while (to + 1 < blocks.length && blocks[to + 1].cont) to++;
+    for (let k = from; k <= to; k++) out.add(k);
+  }
+  return [...out].sort((a, b) => a - b);
 }
 
 /** Toggle list `kind` on the blocks of a range (all already that kind -> off). */
@@ -598,7 +617,7 @@ export function toggleList(
   end: number,
   kind: WeaveTextListKind
 ): WeaveTextBlock[] {
-  const idx = blockIndicesInRange(blocks, start, end);
+  const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   const allSame = idx.every((i) => blocks[i].kind === kind);
   return mapBlocks(blocks, idx, (b) =>
     allSame ? stripList(b) : { ...b, kind }
@@ -628,7 +647,7 @@ export function indentBlocks(
   start: number,
   end: number
 ): WeaveTextBlock[] {
-  const idx = blockIndicesInRange(blocks, start, end);
+  const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   return mapBlocks(blocks, idx, (b) =>
     b.kind ? { ...b, depth: (b.depth ?? 0) + 1 } : b
   );
@@ -640,7 +659,7 @@ export function outdentBlocks(
   start: number,
   end: number
 ): WeaveTextBlock[] {
-  const idx = blockIndicesInRange(blocks, start, end);
+  const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   return mapBlocks(blocks, idx, (b) => {
     if (!b.kind) return b;
     const d = b.depth ?? 0;
@@ -704,6 +723,7 @@ export function listMarkers(blocks: WeaveTextBlock[]): (string | null)[] {
       stack.length = 0;
       return null;
     }
+    if (b.cont) return null;
     const d = Math.max(0, Math.floor(b.depth ?? 0));
     stack.length = Math.min(stack.length, d + 1);
     while (stack.length < d) stack.push({ kind: b.kind, n: 0 });
@@ -831,6 +851,43 @@ function alignQuery(
 
 export const WEAVE_TEXT_MIME = 'application/x-weave-text+json';
 
+const CLIPBOARD_MAX_BLOCKS = 5000;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RawJson = any; // untrusted clipboard JSON, validated field by field
+const BLOCK_ALIGNS = ['left', 'center', 'right'];
+
+function parseClipboardRun(r: RawJson): WeaveTextRun | undefined {
+  if (typeof r?.t !== 'string') return undefined;
+  const m = cleanMarks(r.m && typeof r.m === 'object' ? { ...r.m } : undefined);
+  if (m && 'link' in m && !isSafeLink(m.link)) delete m.link;
+  return { t: r.t, ...(m && Object.keys(m).length ? { m } : {}) };
+}
+
+function parseClipboardRuns(raw: RawJson[]): WeaveTextRun[] | undefined {
+  const runs: WeaveTextRun[] = [];
+  for (const r of raw) {
+    const run = parseClipboardRun(r);
+    if (!run) return undefined;
+    runs.push(run);
+  }
+  return runs;
+}
+
+function parseClipboardBlock(b: RawJson): WeaveTextBlock | undefined {
+  if (!b || !Array.isArray(b.runs)) return undefined;
+  const runs = parseClipboardRuns(b.runs);
+  if (!runs) return undefined;
+  const block: WeaveTextBlock = { runs: normalizeRuns(runs) };
+  if (b.kind === 'ul' || b.kind === 'ol') block.kind = b.kind;
+  if (Number.isInteger(b.depth) && b.depth > 0) block.depth = b.depth;
+  if (Number.isInteger(b.start)) block.start = b.start;
+  if (b.cont === true) block.cont = true;
+  if (BLOCK_ALIGNS.includes(b.align)) block.align = b.align;
+  const em = cleanMarks(b.m && typeof b.m === 'object' ? b.m : undefined);
+  if (!block.runs.length && em) block.m = em;
+  return block;
+}
+
 /** Defensive parse of a clipboard payload; undefined when invalid. */
 export function parseWeaveClipboard(
   raw: string | undefined
@@ -842,24 +899,9 @@ export function parseWeaveClipboard(
       return undefined;
     }
     const out: WeaveTextBlock[] = [];
-    for (const b of data.blocks.slice(0, 5000)) {
-      if (!b || !Array.isArray(b.runs)) return undefined;
-      const runs: WeaveTextRun[] = [];
-      for (const r of b.runs) {
-        if (typeof r?.t !== 'string') return undefined;
-        const m = cleanMarks(
-          r.m && typeof r.m === 'object' ? { ...r.m } : undefined
-        );
-        if (m && 'link' in m && !isSafeLink(m.link)) delete m.link;
-        runs.push({ t: r.t, ...(m && Object.keys(m).length ? { m } : {}) });
-      }
-      const block: WeaveTextBlock = { runs: normalizeRuns(runs) };
-      if (b.kind === 'ul' || b.kind === 'ol') block.kind = b.kind;
-      if (Number.isInteger(b.depth) && b.depth > 0) block.depth = b.depth;
-      if (Number.isInteger(b.start)) block.start = b.start;
-      if (['left', 'center', 'right'].includes(b.align)) block.align = b.align;
-      const em = cleanMarks(b.m && typeof b.m === 'object' ? b.m : undefined);
-      if (!block.runs.length && em) block.m = em;
+    for (const b of data.blocks.slice(0, CLIPBOARD_MAX_BLOCKS)) {
+      const block = parseClipboardBlock(b);
+      if (!block) return undefined;
       out.push(block);
     }
     return out;
