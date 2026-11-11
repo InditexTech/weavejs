@@ -295,6 +295,8 @@ export function replaceRange(
   const suffixBlocks: WeaveTextBlock[] = [];
   let inheritedMarks: WeaveTextMarks | undefined;
   let startBlock: WeaveTextBlock | undefined;
+  let endBlock: WeaveTextBlock | undefined;
+  let startAtBlockStart = false;
   let pos = 0;
 
   blocks.forEach((block) => {
@@ -312,10 +314,12 @@ export function replaceRange(
         const local = start - bStart;
         before = sliceRuns(block.runs, 0, local);
         startBlock = block;
+        startAtBlockStart = local === 0;
         inheritedMarks = len === 0 ? block.m : marksAt(block.runs, local);
       }
       if (end >= bStart && end <= bEnd) {
         after = sliceRuns(block.runs, end - bStart, len);
+        endBlock = block;
       }
     }
   });
@@ -327,6 +331,12 @@ export function replaceRange(
       ? []
       : [{ t, ...(isEmptyMarks(inheritedMarks) ? {} : { m: inheritedMarks }) }];
 
+  // Deleting from the start of a block to a later one removes that whole
+  // block: the block that follows keeps its own structure (list item, depth).
+  const structure =
+    insert === '' && startAtBlockStart && endBlock && endBlock !== startBlock
+      ? endBlock
+      : startBlock;
   const middle: WeaveTextBlock[] = [];
   lines.forEach((line, idx) => {
     let runs = mk(line);
@@ -335,7 +345,7 @@ export function replaceRange(
     const normalized = normalizeRuns(runs);
     const carried = emptyBlockMarks(inheritedMarks);
     middle.push({
-      ...blockFields(startBlock, idx === 0),
+      ...blockFields(structure, idx === 0),
       runs: normalized,
       ...(normalized.length === 0 && carried ? { m: carried } : {}),
     });
@@ -641,19 +651,20 @@ export function setBlockAlign(
   });
 }
 
-/** Increase depth of list blocks in the range (non-list blocks untouched). */
+/** Increase depth of the blocks in the range (list items and plain paragraphs). */
 export function indentBlocks(
   blocks: WeaveTextBlock[],
   start: number,
   end: number
 ): WeaveTextBlock[] {
   const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
-  return mapBlocks(blocks, idx, (b) =>
-    b.kind ? { ...b, depth: (b.depth ?? 0) + 1 } : b
-  );
+  return mapBlocks(blocks, idx, (b) => ({ ...b, depth: (b.depth ?? 0) + 1 }));
 }
 
-/** Decrease depth; at depth 0 the list marker is removed. */
+/**
+ * Decrease depth; at depth 0 a list marker is removed and a plain paragraph
+ * is left untouched.
+ */
 export function outdentBlocks(
   blocks: WeaveTextBlock[],
   start: number,
@@ -661,8 +672,8 @@ export function outdentBlocks(
 ): WeaveTextBlock[] {
   const idx = itemIndices(blocks, blockIndicesInRange(blocks, start, end));
   return mapBlocks(blocks, idx, (b) => {
-    if (!b.kind) return b;
     const d = b.depth ?? 0;
+    if (!b.kind && d <= 0) return b;
     if (d <= 0) return stripList(b);
     const next: WeaveTextBlock = { ...b, depth: d - 1 };
     if (d - 1 === 0) delete next.depth;
@@ -762,6 +773,8 @@ export type WeaveTextSelectionFormat = {
   /** `value` in px (ratio * base); `none` reports the base size. */
   size: MarkQuery;
   list: { kind: WeaveTextListKind | 'none' | 'mixed'; depth?: number };
+  /** Paragraph depth of the plain (non-list) blocks in the range. */
+  indent: { state: MarkState; depth?: number };
 };
 
 /**
@@ -831,7 +844,24 @@ export function getSelectionFormat(
     align: alignQuery(blocks, start, end),
     size,
     list,
+    indent: indentQuery(blocks, start, end),
   };
+}
+
+function indentQuery(
+  blocks: WeaveTextBlock[],
+  start: number,
+  end: number
+): { state: MarkState; depth?: number } {
+  const depths = blockIndicesInRange(blocks, start, end)
+    .filter((i) => !blocks[i].kind)
+    .map((i) => blocks[i].depth ?? 0);
+  if (!depths.length || depths.every((d) => d === 0)) return { state: 'none' };
+  const uniform = depths.every((d) => d === depths[0]);
+  if (depths.every((d) => d > 0)) {
+    return uniform ? { state: 'all', depth: depths[0] } : { state: 'all' };
+  }
+  return { state: 'some' };
 }
 
 function alignQuery(

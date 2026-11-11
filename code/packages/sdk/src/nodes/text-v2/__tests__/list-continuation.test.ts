@@ -48,6 +48,18 @@ describe('list continuation blocks', () => {
     expect(m.blocks.map((b) => !!b.cont)).toEqual([false, true, true]);
   });
 
+  it('Shift+Enter twice keeps the list and stacks empty continuations', () => {
+    const m = new TextEditModel([item('ab')]);
+    m.moveTo(2);
+    m.enter(true);
+    m.enter(true);
+    expect(m.blocks.map((b) => [b.kind, !!b.cont])).toEqual([
+      ['ol', false],
+      ['ol', true],
+      ['ol', true],
+    ]);
+  });
+
   it('Enter inside a continuation starts a new bullet', () => {
     const m = new TextEditModel([item('ab'), item('cdef', { cont: true })]);
     m.moveTo(5);
@@ -126,5 +138,31 @@ describe('list continuation blocks', () => {
     const blocks = [item('a'), item('b', { cont: true })];
     const parsed = parseWeaveClipboard(JSON.stringify({ v: 1, blocks }));
     expect(parsed?.map((b) => !!b.cont)).toEqual([false, true]);
+  });
+
+  it('deleting a whole paragraph keeps the next item as a bullet', () => {
+    const blocks = [item('ab'), item('cd', { cont: true }), item('ef')];
+    const m = new TextEditModel(blocks);
+    m.setSelection(3, 6);
+    m.backspace();
+    expect(m.blocks.map((b) => [blocksToText([b]), !!b.cont])).toEqual([
+      ['ab', false],
+      ['ef', false],
+    ]);
+    expect(listMarkers(m.blocks)).toEqual(['1.', '2.']);
+  });
+
+  it('forward-deleting an empty continuation keeps the next item', () => {
+    const m = new TextEditModel([
+      item('ab'),
+      { kind: 'ol', cont: true, runs: [] },
+      item('ef'),
+    ]);
+    m.moveTo(3);
+    m.del();
+    expect(m.blocks.map((b) => [blocksToText([b]), !!b.cont])).toEqual([
+      ['ab', false],
+      ['ef', false],
+    ]);
   });
 });
