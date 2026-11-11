@@ -633,6 +633,15 @@
   <li class="side-menu__item">
     <div class="side-menu__row">
       <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/brush-lab/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushLabPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
         href="../../plugins/comments-renderer/">
         <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentsRendererPlugin</span></span>
       </a>
@@ -838,6 +847,15 @@
       <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
         href="../../actions/brush-tool/">
         <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/brush-tuning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush tuning</span></span>
       </a>
     </div>
 
@@ -1360,6 +1378,83 @@ than it did before.</p>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  resamplingSpacing:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 2</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  isEraser:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> false</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="stroke-look"><a class="anchor" href="#stroke-look"></a>Stroke look</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A stroke can carry a <code class="dt-mono">look</code> attribute that says how it is drawn. The look is saved with the stroke, so every viewer and every export draws it the same way. A stroke without a look, or with a look whose <code class="dt-mono">version</code> is not <code class="dt-mono">1</code>, is drawn exactly as in earlier releases.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStrokeLook</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  version</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  outline</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'legacy'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'round'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'freehand'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  curve</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'uniform'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'centripetal'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'none'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  pressureInterp</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'catmullRom'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'linear'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  zoomAware</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">boolean</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  spacingPx</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  edgePx</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  caps</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'separate'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'merged'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  width</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">min</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">gamma</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">taperStart</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">taperEnd</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> };</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Missing or invalid fields fall back to the legacy values, and numbers are clamped to a safe range.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">outline</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">legacy</code> is the offset ribbon of earlier releases. <code class="dt-mono">round</code> draws the union of the tangent quads between neighbours, merged into one polygon where the path bends only slightly, with a disc at every real bend and at the ends, in one fill. Turns, reversals and ends are round and a translucent colour stays uniform. <code class="dt-mono">freehand</code> currently draws like <code class="dt-mono">round</code>; it has no outline of its own yet.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">curve</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">uniform</code> is the earlier Catmull-Rom curve. <code class="dt-mono">centripetal</code> does not overshoot or form cusps when points are unevenly spaced. <code class="dt-mono">none</code> joins the points with straight edges.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pressureInterp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">linear</code> never leaves the range of the two neighbouring pressures. <code class="dt-mono">catmullRom</code> is smooth and clamped to that range.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">zoomAware</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spacing and subdivision are in screen pixels, so no facet shows at high zoom. Tapers are measured in screen pixels too.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">caps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">With the <code class="dt-mono">legacy</code> outline, <code class="dt-mono">separate</code> draws the round ends over the fill, as before. <code class="dt-mono">merged</code> puts them in the same fill, so a translucent colour is not darker at the ends.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">width</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Half-width is the stroke width times a fraction between <code class="dt-mono">min</code> and <code class="dt-mono">max</code>, following pressure raised to <code class="dt-mono">gamma</code>, narrowing over <code class="dt-mono">taperStart</code> and <code class="dt-mono">taperEnd</code>. The defaults reproduce the earlier width.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="sect2">
+<h3 id="viewer-side-preview"><a class="anchor" href="#viewer-side-preview"></a>Viewer-side preview</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> stroke</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">weave</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getNodeHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStrokeNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'stroke'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">stroke</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setLookPreview</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">version:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">outline:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'round'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> });  </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// draw every stroke with this look</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">stroke</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setLookPreview</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">null</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                              </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// back to the saved looks</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The preview only changes how this screen draws. It does not change any saved stroke and other users do not see it.</p>
 </div>
 </div>
 </div>

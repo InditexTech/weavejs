@@ -633,6 +633,15 @@
   <li class="side-menu__item">
     <div class="side-menu__row">
       <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/brush-lab/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushLabPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
         href="../../plugins/comments-renderer/">
         <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentsRendererPlugin</span></span>
       </a>
@@ -838,6 +847,15 @@
       <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
         href="../../actions/brush-tool/">
         <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../actions/brush-tuning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush tuning</span></span>
       </a>
     </div>
 
@@ -1385,7 +1403,7 @@ paragraph, never per line.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">indent(node</code> / <code class="dt-mono">outdent(node</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Change list depth. Outdent at depth 0 removes the list marker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Change the depth of every block in the range, list items and plain paragraphs. A plain paragraph is indented by <code>depth</code> steps (see <code class="dt-mono">richText.indentStep</code>); outdent at depth 0 does nothing on a paragraph and removes the marker on a list item.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setRunLink(node</code> / <code class="dt-mono">removeRunLink(node</code></p></td>
@@ -1402,14 +1420,18 @@ paragraph, never per line.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">'none'</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">'some', value? }`, <code>size</code> in px, and <code>list: { kind, depth? }</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'some', value? }`, <code>size</code> in px, <code>list: { kind, depth? }</code> for list items and `indent: { state: 'all'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'none'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'some', depth? }` for the paragraph depth of plain (non-list) blocks. The two never include each other&#8217;s blocks.</p></td>
 </tr>
 </tbody>
 </table></div></div>
 <div class="paragraph">
 <p>When editing with rich text enabled: <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>B</kbd>, <kbd>I</kbd>, <kbd>U</kbd> toggle marks;
 <kbd>Enter</kbd> continues a list item (and the formatting of the text before it) and exits on an empty one; <kbd>Backspace</kbd> at the start of an item
-outdents it or removes the marker; <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change the depth. Pasting a
+outdents it or removes the marker, and at the start of an indented paragraph outdents it by one level; <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change the depth of list items and paragraphs (a collapsed caret indents the whole paragraph). Pasting a
 <code>WEAVE_TEXT_MIME</code> payload restores its marks and lists; other text is inserted as plain text with the marks at the caret. With it disabled, <kbd>Enter</kbd> in a list item still creates
 an item with the same <code>kind</code> and <code>depth</code>.</p>
 </div>
@@ -1430,7 +1452,16 @@ or run values. Vertical alignment (<code>verticalAlign</code>) stays a setting o
 <div class="paragraph">
 <p>Lists show markers in a gutter (<code>disc</code>, <code>circle</code>, <code>square</code>; <code>1.</code>, <code>a.</code>, <code>i.</code> by depth). Numbering is
 continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
-item; <code>start</code> sets the first number. Markers are not part of <code>text</code>.</p>
+item; <code>start</code> sets the first number. Markers are not part of <code>text</code>. With centre or right alignment the
+marker stays attached to the first line of its item.</p>
+</div>
+<div class="paragraph">
+<p>Press <kbd>Shift</kbd>+<kbd>Enter</kbd> inside a list item to add another paragraph to it: a continuation block
+(<code>cont: true</code>) with the item indent and no marker. It does not break the numbering. <kbd>Enter</kbd> in a
+continuation starts a new item, and <kbd>Backspace</kbd> at its start merges it into the previous paragraph.</p>
+</div>
+<div class="paragraph">
+<p>Plain paragraphs can be indented too: each level moves every line of the paragraph (wrapped lines included) one <code>indentStep</code> to the right, with no marker. The indent is kept when you edit, press <kbd>Enter</kbd>, copy and paste, and renders for everyone even when rich text is off. Clients on an older version show these paragraphs without indent.</p>
 </div>
 <div class="paragraph">
 <p>Images export with the formatting. Exporting to PDF rasterizes each frame, so it follows the image.
@@ -1540,7 +1571,7 @@ covers that edge.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">richText.indentStep</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.5</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List indent per depth, as a multiple of <code>fontSize</code>. The total indent is limited so at least 4 times
+<td class="tableblock halign-left valign-top"><p class="tableblock">List and paragraph indent per depth, as a multiple of <code>fontSize</code>. The total indent is limited so at least 4 times
 <code>fontSize</code> stays for text in fixed-width nodes. Must be the same on every client.</p></td>
 </tr>
 <tr>

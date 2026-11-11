@@ -1465,7 +1465,7 @@ family and links), per-paragraph alignment and bulleted or numbered lists with n
 </div>
 <div class="paragraph">
 <p>While editing, <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>B</kbd>, <kbd>I</kbd> and <kbd>U</kbd> work, <kbd>Enter</kbd> continues a list
-and <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change its depth. The toolbar is yours: call the node
+and <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change its depth. The same keys indent and outdent plain paragraph lines (the whole paragraph, or every paragraph in the selection), and <kbd>Backspace</kbd> at the start of an indented paragraph outdents it. The toolbar is yours: call the node
 commands (for example from a modal; <code>setRunLink</code> adds a URL to a range) and listen to <code>onTextSelectionChange</code> and <code>onTextFormatChange</code>.
 Formatting survives move, resize, copy, duplicate, undo and image export.</p>
 </div>
@@ -1479,7 +1479,7 @@ also commands. On a server render (skia-canvas or node-canvas) italic text in fo
 file is slanted like in the browser; see the reference.</p>
 </div>
 <div class="paragraph">
-<p>Lists and marks already in a document render for everyone, even when rich text is off.</p>
+<p>Lists, paragraph indentation and marks already in a document render for everyone, even when rich text is off.</p>
 </div>
 <div class="paragraph">
 <p>See <a href="../../../../sdk/api-reference/nodes/text-v2/#_rich_text" class="xref page">the reference</a> for the commands.</p>
@@ -1582,7 +1582,7 @@ still render, only the commands go away. Switching it to <code>true</code> makes
 editable with the formatting commands.</p>
 </li>
 <li>
-<p><code>richText.indentStep</code> is read by the handler, not the node, so use the same value on every client.</p>
+<p><code>richText.indentStep</code> (used for lists and paragraph indent) is read by the handler, not the node, so use the same value on every client.</p>
 </li>
 </ul>
 </div>

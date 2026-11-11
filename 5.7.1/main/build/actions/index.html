@@ -1359,7 +1359,7 @@ functionality to your specific application needs.</p>
 <div class="sect2">
 <h3 id="rendering-cycle"><a class="anchor" href="#rendering-cycle"></a>Rendering cycle</h3>
 <div class="paragraph">
-<p>After the first render, the <code>init</code> method of every action is called.</p>
+<p>After the first render, the <code>onInit</code> method of every action is called.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1449,6 +1449,19 @@ on the Weave instance. The name of the action must be unique among other actions
 </div>
 </div>
 <div class="sect3">
+<h4 id="initialize"><a class="anchor" href="#initialize"></a>initialize</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">initialize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>initialize</code> method is optional, and is called each time the Weave instance is reset, for example
+when switching rooms. It&#8217;s a good place to reset the action internal state. Use <code>onInit</code> to create
+elements and register events instead.</p>
+</div>
+</div>
+<div class="sect3">
 <h4 id="oninit"><a class="anchor" href="#oninit"></a>onInit</h4>
 <div class="listingblock">
 <div class="content">
@@ -1485,10 +1498,10 @@ on the action implementation.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="internalupdate"><a class="anchor" href="#internalupdate"></a>internalUpdate</h4>
+<h4 id="onpropschange"><a class="anchor" href="#onpropschange"></a>onPropsChange</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">internalUpdate</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">onPropsChange</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1497,7 +1510,7 @@ on the action implementation.</p>
 object, which enables us to intercept the <code>get</code> and <code>set</code> operations on the action instance.</p>
 </div>
 <div class="paragraph">
-<p>The <code>internalUpdate</code> method is called when the for example the <code>props</code> property of the instance
+<p>The <code>onPropsChange</code> method is called when the for example the <code>props</code> property of the instance
 is updated (via get/set), allowing us to dynamically pass parameters to an action after this is
 triggered.</p>
 </div>
