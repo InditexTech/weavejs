@@ -1,0 +1,37 @@
+openspec/specs/brush-lab/plugin/spec.md
+  s_21878a01060aa8::t_7acf9e77100c2e 1-75
+openspec/specs/brush-tool/input-profiles/spec.md
+  s_21878a01060aa8::t_16824f78c91885 1-136
+openspec/specs/brush-tool/pressure-sampling/spec.md
+  s_21878a01060aa8::t_e5f45941357d3a 30,33,43-76
+openspec/specs/brush-tool/tunables/spec.md
+  s_21878a01060aa8::t_cb0ae92d3e3d7c 1-53
+openspec/specs/frame-node/edge-selection/spec.md
+  s_21878a01060aa8::t_957feeee906511 1-87
+openspec/specs/stroke-node/rendering/spec.md
+  s_21878a01060aa8::t_2fc2596bb19071 1-89
+openspec/specs/text-v2/editing/spec.md
+  s_21878a01060aa8::t_f2b91b71e08e7f 141-182
+openspec/specs/text-v2/layout/spec.md
+  s_21878a01060aa8::t_4607e39936001f 131-156
+openspec/specs/text-v2/model/spec.md
+  s_21878a01060aa8::t_a02b0ac9501902 110-135
+openspec/specs/text-v2/rich-text-api/spec.md
+  s_21878a01060aa8::t_e12511a8dc18a2 55,61-72,79-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "df5e7744c9dba9804627f4783a4773366f001832",
+  "prompts": {},
+  "sessions": {
+    "s_21878a01060aa8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e357851cbffeJfsWV3fS25iNku",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
