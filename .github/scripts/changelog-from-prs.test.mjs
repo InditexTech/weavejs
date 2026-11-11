@@ -19,6 +19,8 @@ import {
   releasedUrls,
   renderPullRequestReport,
   sectionFor,
+  wrapTitle,
+  wrapTitles,
 } from './changelog-from-prs.mjs';
 
 const REPO = 'InditexTech/weavejs';
@@ -312,6 +314,38 @@ describe('renderPullRequestReport', () => {
     assert.match(report, /get no changelog entry \(see below\)/);
     assert.match(report, /\*\*Out of scope\*\*.*\n\n- #40 \(`internal`, PR #3\)/);
     assert.doesNotMatch(report, /:x:/);
+  });
+});
+
+describe('wrapTitle / preview', () => {
+  const link = '[#9](https://github.com/InditexTech/weavejs/issues/9)';
+
+  it('puts the title in a code span so mentions do not notify', () => {
+    assert.equal(
+      wrapTitle(`- ${link} Fix @InditexTech/weavejs-admins crash`),
+      `- ${link} \`Fix @InditexTech/weavejs-admins crash\``
+    );
+  });
+
+  it('uses a longer fence when the title has backticks', () => {
+    assert.equal(wrapTitle(`- ${link} Fix \`a\` bug`), `- ${link} \`\`Fix \`a\` bug\`\``);
+    assert.equal(wrapTitle(`- ${link} \`a\``), `- ${link} \`\` \`a\` \`\``);
+  });
+
+  it('leaves headings, references and manual bullets alone', () => {
+    const text = '## [5.8.0] - 2026-11-11\n### Added\n- Manual @someone line\n[Unreleased]: https://x/compare/a...b';
+    assert.equal(wrapTitles(text), text);
+  });
+
+  it('wraps only in the PR report; the changelog line stays verbatim', () => {
+    const linked = pr(5, [issue(9, 'Fix @InditexTech/weavejs-admins crash', ['bug'])]);
+    const result = buildEntries([linked], { repo: REPO });
+    assert.match(
+      renderPullRequestReport({ pr: linked, result, enforce: false }),
+      /- \[#9\]\(.*\) `Fix @InditexTech\/weavejs-admins crash`/
+    );
+    assert.equal(result.entries[0].line, `- ${link} Fix @InditexTech/weavejs-admins crash`);
+    assert.ok(applyEntries(CHANGELOG, result.entries).text.includes(`${link} Fix @InditexTech/weavejs-admins crash\n`));
   });
 });
 
