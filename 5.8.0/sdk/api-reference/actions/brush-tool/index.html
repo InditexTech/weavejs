@@ -1,0 +1,1968 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>WeaveBrushToolAction | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.8.0/sdk/api-reference/actions/brush-tool/">
+    <link rel="prev" href="../align-nodes-tool/">
+    <link rel="next" href="../brush-tuning/">
+    <meta name="description" content="Paint freeform strokes on the canvas">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../../../../_/favicon.ico">
+  </head>
+  <body class="article">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../../../../">
+        <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">5.8.0</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <a class="version" href="../../../../../prerelease/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </a>
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">5.8.0</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </span>
+    <a class="version" href="../../../../../5.7.1/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.7.1</span>
+    </a>
+    <a class="version" href="../../../../../5.7.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.7.0</span>
+    </a>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.6.0</span>
+    </a>
+    <a class="version" href="../../../../../5.4.2/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.4.2</span>
+    </a>
+    <a class="version" href="../../../../../5.4.1/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.4.1</span>
+    </a>
+    <a class="version" href="../../../../../5.4.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.4.0</span>
+    </a>
+    <a class="version" href="../../../../../5.3.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.3.0</span>
+    </a>
+    <a class="version" href="../../../../../5.2.2/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.2.2</span>
+    </a>
+    <a class="version" href="../../../../../5.2.1/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.2.1</span>
+    </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.8.0.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="body">
+
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.8.0" data-module="sdk">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../../../../">
+    <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently SDK">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-code"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../main/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-azure-web-pubsub/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Introduction</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../setup/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Setup</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">API Reference</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../weave/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Weave</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Weave">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../weave/events/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Events</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Nodes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/comment/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/connector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveConnectorNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/ellipse/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveEllipseNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/frame/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFrameNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/group/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveGroupNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/image/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveImageNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/node/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/layer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveLayerNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/measure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveMeasureNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePolygonNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/rectangle/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRectangleNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/stage/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/star/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStarNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/stroke/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStrokeNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/stroke-single/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStrokeSingleNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/text/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/text-v2/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextV2Node</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/video/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveVideoNode</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/arrow/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveArrowNode (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/line/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveLineNode (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../nodes/regular-polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRegularPolygonNode (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../plugins/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Plugins</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Plugins">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/plugin/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/brush-lab/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushLabPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/comments-renderer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentsRendererPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/connected-users/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveConnectedUsersPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/context-menu/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveContextMenuPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/copy-paste-nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCopyPasteNodesPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-selection/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesSelectionPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-multi-selection-feedback/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesMultiSelectionFeedbackPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesSnappingPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-edge-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesEdgeSnappingPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/nodes-distance-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveNodesDistanceSnappingPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-drop-area/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageDropAreaPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-grid/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageGridPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-keyboard-move/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageKeyboardMovePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-minimap/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageMinimapPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-panning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStagePanningPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-resize/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageResizePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/stage-zoom/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStageZoomPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/users-pointers/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveUsersPointersPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/users-presence/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveUsersPresencePlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../plugins/users-selector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveUsersSelectionPlugin</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Actions</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Actions">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../action/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../align-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveAlignNodesToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="./" aria-current="page">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveBrushToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../brush-tuning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush tuning</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../comment-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveCommentToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../connector-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveConnectorToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../eraser-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveEraserToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../ellipse-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveEllipseToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../export-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveExportNodesToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../export-stage-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveExportStageToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../fit-to-screen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFitToScreenToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../fit-to-selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFitToSelectionToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../frame-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveFrameToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../image-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveImageToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../images-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveImagesToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../measure-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveMeasureToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../move-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveMoveToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePolygonToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../rectangle-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRectangleToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveSelectionToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../star-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStarToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stroke-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStrokeToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../text-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveTextToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../video-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveVideoToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../zoom-in-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveZoomInToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../zoom-out-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveZoomOutToolAction</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../arrow-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveArrowToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../line-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveLineToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../pen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeavePenToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../regular-polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveRegularPolygonToolAction (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../state-api/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">State Api</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">5.8.0</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <a class="version" href="../../../../../prerelease/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </a>
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">5.8.0</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </span>
+    <a class="version" href="../../../../../5.7.1/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.7.1</span>
+    </a>
+    <a class="version" href="../../../../../5.7.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.7.0</span>
+    </a>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.6.0</span>
+    </a>
+    <a class="version" href="../../../../../5.4.2/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.4.2</span>
+    </a>
+    <a class="version" href="../../../../../5.4.1/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.4.1</span>
+    </a>
+    <a class="version" href="../../../../../5.4.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.4.0</span>
+    </a>
+    <a class="version" href="../../../../../5.3.0/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.3.0</span>
+    </a>
+    <a class="version" href="../../../../../5.2.2/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.2.2</span>
+    </a>
+    <a class="version" href="../../../../../5.2.1/sdk/api-reference/actions/brush-tool/">
+      <span class="version__label">5.2.1</span>
+    </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+
+<main class="article">
+
+<div class="hero">
+  <div class="dt-grid-layout dt-grid-layout--with-margin hero__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full hero__row">
+      <div class="hero__main">
+
+<nav class="dt-breadcrumbs" aria-label="Breadcrumb">
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../../../"><span class="dt-breadcrumb-item__content">Weave.js</span></a>
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../"><span class="dt-breadcrumb-item__content">Actions</span></a>
+  <div class="dt-breadcrumb-item dt-breadcrumb-item--active" aria-current="page"><span class="dt-breadcrumb-item__content">WeaveBrushToolAction</span></div>
+</nav>
+        <h1 class="hero__title dt-text dt-text--title-xl">WeaveBrushToolAction</h1>
+        <p class="hero__excerpt dt-text dt-text--body-l">Paint freeform strokes on the canvas</p>
+      </div>
+      <div class="hero__aside">
+        <button class="dt-button dt-button--ghost dt-button--icon-only toc-toggle" type="button" aria-controls="on-this-page" aria-expanded="true" hidden>
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-panel-left"></use></svg></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="content dt-grid-layout dt-grid-layout--with-margin">
+
+<aside id="on-this-page" class="toc" data-title="On this page" data-levels="4">
+  <div class="toc-menu"></div>
+</aside>
+
+<article class="doc">
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/brush-tool/brush-tool.ts">WeaveBrushToolAction</a>
+class that enables users to draw freeform strokes on the canvas using a brush tool. It lets users click and drag across the canvas
+to create a smooth, continuous path—perfect for sketching, annotating, or freehand drawing within a collaborative environment.</p>
+</div>
+<div class="paragraph">
+<p>Each stroke is recorded as a <a href="../../nodes/line/" class="xref page">WeaveLineNode</a>, synchronized across all connected users in real time.</p>
+</div>
+<div class="paragraph">
+<p>The class extends the <a href="../action/" class="xref page">WeaveAction</a> class.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="name"><a class="anchor" href="#name"></a>Name</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This action <code>name</code> property value is <code>brushTool</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="type"><a class="anchor" href="#type"></a>Type</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This node <code>nodeType</code> property value is <code>stroke</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import"><a class="anchor" href="#import"></a>Import</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="shell"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">import</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> {</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> WeaveBrushToolAction</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> }</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "@inditextech/weave-sdk"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="instantiation"><a class="anchor" href="#instantiation"></a>Instantiation</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveBrushToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">params</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveBrushToolActionParams</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="typescript-types"><a class="anchor" href="#typescript-types"></a>TypeScript types</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveBrushToolActionProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  interpolationSteps</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Number of steps for interpolation</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  simplifyTolerance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Douglas-Peucker tolerance applied on stroke finalize</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  input</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushInputConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Input profiles, see "Input profiles"</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveBrushToolActionParams</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  config</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushToolActionConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// every field is optional, profiles accept partial objects</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveBrushInputProfileKey</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> =</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"mouse"</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"touch"</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen.applePencil"</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen.desktop"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveBrushInputConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  resolveProfile</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">info</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushPointerInfo</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveBrushInputProfileKey</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  forceProfile</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushInputProfileKey</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">null</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  profiles</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Record</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushInputProfileKey</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushInputProfile</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveBrushPointerInfo</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  pointerType</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// "mouse" | "touch" | "pen" | ""</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  platform</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// "ipad" | "ios" | "mac" | "windows" | "android" | "linux" | "unknown"</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  persistentDeviceId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// only where the browser reports it</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="parameters"><a class="anchor" href="#parameters"></a>Parameters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For <code>WeaveBrushToolActionParams</code>:</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WeaveBrushToolActionConfig</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="dt-label dt-label--green"><span class="dt-label__content">Required</span></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config parameters for the tool. Every field is optional; a partial profile is merged over the legacy profile.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>For <code>WeaveBrushToolActionProperties</code>:</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">interpolationSteps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">10</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of interpolation steps for smooth curve on touch devices.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">input</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WeaveBrushInputConfig</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">legacy profiles</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Per-device input profiles, see <a href="#input-profiles">Input profiles</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">simplifyTolerance</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">0.5</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tolerance, in canvas units, of the Douglas-Peucker simplification applied once when a stroke is finalized. While a stroke is being drawn every recorded sample is rendered; on release the point list is simplified before being persisted, so this value governs how much fidelity a finished stroke gives up. Lower values keep a finished stroke closer to the path drawn, at the cost of more points stored per stroke.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="input-profiles"><a class="anchor" href="#input-profiles"></a>Input profiles</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The tool resolves one input profile for each stroke, from the first event of the stroke, and uses it until the stroke ends.
+A profile groups the settings for capturing samples, pressure, position stabilizing, finishing the stroke and (for fingers)
+a gesture guard.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Profile</th>
+<th class="tableblock halign-left valign-top">Chosen when</th>
+<th class="tableblock halign-left valign-top">Typical device</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">mouse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pointer type <code>mouse</code>, or any unknown or empty pointer type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mouse, trackpad</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">touch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pointer type <code>touch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Finger</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pen.applePencil</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pointer type <code>pen</code> on an iPad</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Apple Pencil</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pen.desktop</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pointer type <code>pen</code> on any other platform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wacom, Surface Pen, other desktop pens</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+A tablet whose driver does not expose pen input to the browser (for example Wacom with <em>Use Windows Ink</em> turned off on
+Windows) reports itself as a <code>mouse</code>, with a constant pressure. The tool cannot tell, and uses the <code>mouse</code> profile.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Every profile starts as the <strong>legacy</strong> profile, which reproduces the behaviour the tool had before profiles existed, point for
+point. Without any <code>input</code> configuration, strokes are recorded exactly as in earlier releases.</p>
+</div>
+<div class="sect2">
+<h3 id="choosing-the-profile"><a class="anchor" href="#choosing-the-profile"></a>Choosing the profile</h3>
+<div class="paragraph">
+<p>The profile is chosen in this order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>forceProfile</code>, when set.</p>
+</li>
+<li>
+<p><code>resolveProfile</code>, when the application provides it. A resolver that throws or returns an unknown key is ignored.</p>
+</li>
+<li>
+<p>The automatic choice from the table above.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveBrushToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  config:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    input:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">      // Treat every pen as a desktop pen.</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">      resolveProfile</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">info</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">info</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">pointerType</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> === </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> ? </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen.desktop"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> : </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"mouse"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">),</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">});</span></span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="profile-settings"><a class="anchor" href="#profile-settings"></a>Profile settings</h3>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Group</th>
+<th class="tableblock halign-left valign-top">Setting</th>
+<th class="tableblock halign-left valign-top">Legacy value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">capture</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">source</code> <code>legacy</code> | <code>coalesced</code>; <code class="dt-mono">clock</code> <code>now</code> | <code>event</code>; <code class="dt-mono">minMovePx</code>; <code class="dt-mono">predicted</code> <code>off</code> | <code>tail</code>; <code class="dt-mono">event</code> <code>pointermove</code> | <code>pointerrawupdate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code>, <code>now</code>, <code>0</code>, <code>tail</code>, <code>pointermove</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">zero</code> <code>legacy</code> | <code>keep</code> | <code>holdLast</code>; <code class="dt-mono">filter</code> <code>legacy</code> | <code>timeEma</code> | <code>oneEuro</code> | <code>none</code>; <code class="dt-mono">timeConstantMs</code>; <code class="dt-mono">oneEuro</code>; <code class="dt-mono">floor</code>; <code class="dt-mono">start</code> <code>backfill</code> | <code>average</code> | <code>none</code>; <code class="dt-mono">startSamples</code>; <code class="dt-mono">end</code> <code>backfill</code> | <code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code>, <code>legacy</code>, <code>40</code>, <code>{ minCutoff: 1, beta: 0.01 }</code>, <code>0.15</code>, <code>backfill</code>, <code>3</code>, <code>backfill</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">stabilizer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">type</code> <code>none</code> | <code>oneEuro</code> | <code>pulledString</code> | <code>streamline</code>; <code class="dt-mono">minCutoff</code>; <code class="dt-mono">beta</code>; <code class="dt-mono">radiusPx</code>; <code class="dt-mono">amount</code>; <code class="dt-mono">zoomAware</code>; <code class="dt-mono">catchUpOnEnd</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">finalize</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">mode</code> <code>dp</code> | <code>dpPressure</code> | <code>bezierFit</code> | <code>none</code>; <code class="dt-mono">tolerance</code>; <code class="dt-mono">toleranceUnit</code> <code>canvas</code> | <code>screen</code>; <code class="dt-mono">pressureWeight</code>; <code class="dt-mono">resampleSpacingPx</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dp</code>, the tool-level <code class="dt-mono">simplifyTolerance</code>, <code>canvas</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">touchGuard</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">waitMs</code>; <code class="dt-mono">movePx</code>; <code class="dt-mono">cancelOnSecondTouch</code>; <code class="dt-mono">ignoreAfterPen</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no wait, no guard</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The modes other than the legacy ones are introduced progressively. A setting whose mode is not implemented yet behaves
+as the legacy mode. Everything below is implemented except <code>capture.event</code>, which still reads pointer moves.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="capture-and-pressure-modes"><a class="anchor" href="#capture-and-pressure-modes"></a>Capture and pressure modes</h3>
+<div class="sect3">
+<h4 id="capturing-every-pen-sample"><a class="anchor" href="#capturing-every-pen-sample"></a>Capturing every pen sample</h4>
+<div class="paragraph">
+<p>With <code>capture.source: "legacy"</code> the tool records one position per pointer event. A pen reports many samples between two
+animation frames and browsers deliver them batched ("coalesced") in a single event, so the legacy mode discards most of the
+path: only the event&#8217;s final position is kept, and every other sample in the batch lands on it.</p>
+</div>
+<div class="paragraph">
+<p>With <code>capture.source: "coalesced"</code> every batched sample becomes a stroke point at its <strong>own</strong> position, pressure and time,
+in the order reported. An event without a batch is one sample. Positions are computed from each sample&#8217;s client coordinates
+and the container&#8217;s transform, so zoomed, panned and nested containers are handled and no shared stage state is changed.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>capture.minMovePx</code> skips samples closer than this many screen pixels to the last recorded one.</p>
+</li>
+<li>
+<p><code>capture.predicted: "tail"</code> draws the browser&#8217;s predicted position ahead of the pen as a provisional point. It is replaced
+by the next real samples and removed when the stroke ends. <code>"off"</code> never draws it.</p>
+</li>
+<li>
+<p><code>capture.clock: "event"</code> measures the time between samples with the time each sample&#8217;s own event reports, instead of the
+time the tool happens to process it. Processing a batch in one step then does not change the smoothing; with <code>"now"</code> all
+samples of a batch look simultaneous. Where an event reports no usable time, the processing time is used.</p>
+<div class="paragraph">
+<p>When the profile has a stabilizer (<code>stabilizer.type</code> is not <code>none</code>) predicted samples are skipped: the stabilizer keeps a state that follows the pen, and a guess that is dropped on the next real sample would still bend it, and with it the real line.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="zero-pressure"><a class="anchor" href="#zero-pressure"></a>Zero pressure</h4>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>pressure.zero</code></th>
+<th class="tableblock halign-left valign-top">A pen reporting a pressure of 0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Replaced by 0.5. This makes the width jump up as the pen lifts.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>keep</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Recorded as 0, then limited by <code>pressure.floor</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>holdLast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Replaced by the last non-zero reading, or 0.5 when there is none.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>Mouse, trackpad and finger input never report pressure and always record 0.5, whatever this setting says.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="pressure-filters"><a class="anchor" href="#pressure-filters"></a>Pressure filters</h4>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>pressure.filter</code></th>
+<th class="tableblock halign-left valign-top">Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Velocity-adaptive smoothing. Its factor depends on how fast the pen moves and on how often events arrive, so the same stroke is smoothed differently at 133 Hz and at 240 Hz.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timeEma</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Exponential smoothing with the time constant <code>pressure.timeConstantMs</code>. The result does not depend on the report rate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>oneEuro</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One Euro filter: smooths slow changes and follows fast ones. Tune <code>pressure.oneEuro.minCutoff</code> first (lower removes jitter, adds lag), then <code>pressure.oneEuro.beta</code> (higher removes lag at speed).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Readings are recorded as reported, limited by <code>pressure.floor</code>.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>The first movement reading of a stroke seeds every filter; the pointer-down reading never does, because it is frequently an
+unreliable contact spike. Filter state is never carried over from the previous stroke, and a non-finite reading is recorded
+as 0.5 and cannot corrupt the filter.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="first-and-last-point"><a class="anchor" href="#first-and-last-point"></a>First and last point</h4>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>pressure.start</code></th>
+<th class="tableblock halign-left valign-top">First point&#8217;s pressure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>backfill</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Replaced by the first real movement reading.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>average</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Replaced by the mean of the first <code>pressure.startSamples</code> movement readings, refined as each arrives.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Left as the contact reading.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>Predicted samples never change the first point. <code>pressure.end: "backfill"</code> gives the last point the pressure of the one
+before it, because a lift-off reading is as unreliable as the contact reading; <code>"none"</code> keeps it.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="stabilizing-the-pen-position"><a class="anchor" href="#stabilizing-the-pen-position"></a>Stabilizing the pen position</h3>
+<div class="paragraph">
+<p><code>stabilizer.type</code> smooths the pen position while drawing. It never changes the pointer-down position, and every type starts
+from it.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>stabilizer.type</code></th>
+<th class="tableblock halign-left valign-top">Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Positions are recorded as reported.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>oneEuro</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One Euro filter on the position: slow movement is smoothed, fast movement is followed closely. See <a href="#tuning-the-one-euro-filter">Tuning the One Euro filter</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pulledString</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The recorded point is held back on a leash of <code>stabilizer.radiusPx</code>. It only moves when the pen pulls the string taut, so tiny movements leave no mark and tight curves are rounded.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>streamline</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The recorded point eases towards the pen with a time constant proportional to <code>stabilizer.amount</code> (0 follows the pen exactly, 1 is about 80 ms). The result does not depend on how often samples arrive.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>Distances are <strong>screen pixels</strong> when <code>stabilizer.zoomAware</code> is on, so the effect on screen is the same at every zoom level. With
+it off they are canvas units, and a stroke drawn zoomed out is smoothed more strongly on screen than one drawn zoomed in.</p>
+</div>
+<div class="paragraph">
+<p>A stabilized stroke lags behind the pen. With <code>stabilizer.catchUpOnEnd</code> on, the stroke is completed at the position where the
+pen was lifted. With it off the stroke ends where the stabilizer had reached.</p>
+</div>
+<div class="sect3">
+<h4 id="tuning-the-one-euro-filter"><a class="anchor" href="#tuning-the-one-euro-filter"></a>Tuning the One Euro filter</h4>
+<div class="paragraph">
+<p>The filter has two settings, <code>stabilizer.minCutoff</code> and <code>stabilizer.beta</code>. Tune them in this order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Set <code>beta</code> to <code>0</code> and <code>minCutoff</code> to about <code>1</code>.</p>
+</li>
+<li>
+<p>Hold the pen almost still, or move it slowly, and lower <code>minCutoff</code> until the jitter is gone. Lower values remove more jitter
+and add more lag.</p>
+</li>
+<li>
+<p>Move the pen quickly in different directions and raise <code>beta</code> until the line keeps up. Start with a very small value
+(<code>0.001</code>) and change it by factors of 10. Higher values remove more lag at speed.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>A slow-speed jitter problem means <code>minCutoff</code> is too high; a high-speed lag problem means <code>beta</code> is too low. With <code>beta: 0</code> the
+filter is a plain low-pass filter and lags by about <code>speed / (2 * pi * minCutoff)</code>: at 400 px/s and 1 Hz that is 64 px.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="finishing-a-stroke"><a class="anchor" href="#finishing-a-stroke"></a>Finishing a stroke</h3>
+<div class="paragraph">
+<p>When a stroke ends its points are reduced before they are saved. <code>finalize.mode</code> selects how:</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>finalize.mode</code></th>
+<th class="tableblock halign-left valign-top">Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Every recorded point is kept.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Douglas-Peucker simplification of the positions (the legacy mode). Pressure is ignored, so a change of pressure along a straight path is lost.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dpPressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The same, but a point is also kept when its pressure differs from the pressure interpolated along the reduced path by more than <code>finalize.tolerance / finalize.pressureWeight</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bezierFit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fits smooth cubic Bézier curves through the stroke, within the tolerance, and samples them back to points every <code>finalize.resampleSpacingPx</code>. The first and last points are kept exactly. Hand shake smaller than the tolerance disappears and the line is smooth, like the Fidelity setting of vector drawing tools.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p><code>finalize.tolerance</code> is in canvas units with <code>finalize.toleranceUnit: "canvas"</code> (the legacy behaviour; empty uses
+<code>simplifyTolerance</code>). With <code>"screen"</code> it is in pixels, converted with the zoom in force when the stroke ends, so the same
+setting gives the same on-screen fidelity at every zoom level. <code>finalize.pressureWeight</code> is then in pixels per unit of pressure.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>bezierFit</code> changes the stroke a little when the pen lifts, because the live stroke shows the recorded points and the
+saved stroke is the fitted curve. Keep the tolerance small, or use a stabilizer while drawing, to keep that change small.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fingers-the-touch-guard"><a class="anchor" href="#fingers-the-touch-guard"></a>Fingers: the touch guard</h3>
+<div class="paragraph">
+<p>A finger that touches down may be the start of a pinch or a pan rather than a stroke. The <code>touch</code> profile can hold a finger
+stroke back until it is clear:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>touchGuard.waitMs</code> is how long to wait, and <code>touchGuard.movePx</code> how far (screen pixels) the finger may move, before the
+stroke is committed. Whichever comes first commits it. With both at <code>0</code>, the default, strokes start immediately.</p>
+</li>
+<li>
+<p>While waiting, a second finger landing cancels the stroke without leaving any mark (<code>touchGuard.cancelOnSecondTouch</code>).</p>
+</li>
+<li>
+<p>Once committed, the stroke starts at the point where the finger first touched down and the path held back during the wait is
+kept, so nothing is lost.</p>
+</li>
+<li>
+<p>A finger that lifts before the wait ends draws a dot.</p>
+</li>
+<li>
+<p><code>touchGuard.ignoreAfterPen</code> stops finger input from drawing once a pen has been used, until the tool is activated again.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The guard needs <code>capture.source: "coalesced"</code> to keep the held-back path; otherwise the stroke starts at the touch-down point
+and continues from the current position.</p>
+</div>
+<div class="paragraph">
+<p>A stroke that is in progress when a pinch begins ends when the finger that drew it lifts. Another finger lifting, for example
+the second finger of the pinch, does not end it.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="recording-how-a-stroke-was-drawn"><a class="anchor" href="#recording-how-a-stroke-was-drawn"></a>Recording how a stroke was drawn</h3>
+<div class="paragraph">
+<p>While the lab plugin is active, each new stroke carries an <code>inputMeta</code> property with the <code>profile</code> that drew it, the <code>preset</code>
+that profile held (<code>legacy</code>, a preset id, <code>custom</code> when it was changed on its own, or <code>imported</code>) and the <code>scenario</code> in force.
+Without the plugin no such property is saved. <code>getPresetId(key)</code> and <code>getScenarioId()</code> expose the same values.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="changing-a-profile-at-runtime"><a class="anchor" href="#changing-a-profile-at-runtime"></a>Changing a profile at runtime</h3>
+<div class="paragraph">
+<p>The action exposes methods to read and change profiles while the application is running, without recreating the tool.
+A change applies from the <strong>next</strong> stroke; a stroke in progress keeps the configuration it started with.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">getInputProfile(key)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns a copy of a profile&#8217;s current configuration.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setInputProfile(key</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Merges a partial configuration into a profile. Returns <code>{ applied, errors }</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setForcedProfile(key | null)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Forces a profile for every stroke, or restores automatic resolution with <code>null</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setProfileResolver(resolver | undefined)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Replaces the automatic resolution, or restores it with <code>undefined</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">getActiveProfileKey()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key of the profile of the stroke in progress, or of the last stroke.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">weave</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getActionHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"brushTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setInputProfile</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen.desktop"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">pressure:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">floor:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0.05</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } });</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setForcedProfile</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen.desktop"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="default-values"><a class="anchor" href="#default-values"></a>Default values</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> BRUSH_TOOL_DEFAULT_CONFIG</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  interpolationSteps:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 10</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  simplifyTolerance:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0.5</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  input:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    forceProfile:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> null</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    profiles:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      mouse:</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> BRUSH_LEGACY_INPUT_PROFILE</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      touch:</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> BRUSH_LEGACY_INPUT_PROFILE</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">      "pen.applePencil"</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">:</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> BRUSH_LEGACY_INPUT_PROFILE</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">      "pen.desktop"</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">:</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> BRUSH_LEGACY_INPUT_PROFILE</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+
+
+<footer class="page-footer">
+  <div class="page-footer__nav">
+
+<div class="dt-grid-layout dt-grid-layout--with-margin pagination">
+  <div class="dt-grid-layout__item dt-grid-layout__item--span-full pagination__row">
+    <div class="pagination__buttons">
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-icon pagination__prev" href="../align-nodes-tool/">
+      <span class="dt-button__content">
+        <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-left"></use></svg></span>
+        <span class="pagination__label-full">WeaveAlignNodesToolAction</span>
+        <span class="pagination__label-short">Prev</span>
+      </span>
+    </a>
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action pagination__next" href="../brush-tuning/">
+      <span class="dt-button__content">
+        <span class="pagination__label-full">Brush tuning</span>
+        <span class="pagination__label-short">Next</span>
+        <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-right"></use></svg></span>
+      </span>
+    </a>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="dt-grid-layout dt-grid-layout--with-margin page-footer__feedback">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full page-footer__contribute">
+      <div class="page-footer__contribute-copy">
+        <p class="dt-text dt-text--title-s">Help us make these docs great!</p>
+        <p class="dt-text dt-text--body-m">See something that is wrong or unclear? Collaborate with us! Submit a pull request</p>
+      </div>
+      <div class="page-footer__contribute-buttons">
+
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.8.0/docs/src/modules/sdk/pages/api-reference/actions/brush-tool.adoc">
+  <span class="dt-button__content">
+    Propose a change
+    <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
+  </span>
+</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../../../../">
+        <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/build/stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-azure-web-pubsub/">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>
