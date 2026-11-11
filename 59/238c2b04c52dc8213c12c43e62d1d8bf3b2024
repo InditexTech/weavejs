@@ -1,0 +1,657 @@
+.github/copilot-instructions.md
+  s_f2a23b1484e3a7::t_c5b5b9fe4b0af3 89,114,132,138-140
+.github/pull_request_template.md
+  s_f2a23b1484e3a7::t_c1d26a507918af 1-11
+.github/scripts/changelog-from-prs.mjs
+  s_f2a23b1484e3a7::t_c9c3176c8e6ea9 1-827
+.github/scripts/changelog-from-prs.test.mjs
+  s_f2a23b1484e3a7::t_f9b6fba8bc4068 1-414
+.github/scripts/sanitize-changelog.mjs
+  s_f2a23b1484e3a7::t_4887cc8b683264 62
+.github/workflows/code-changelog-check.yml
+  s_f2a23b1484e3a7::t_d1e32e1f9adc1a 1-61
+.github/workflows/code-npm_node-PR_verify.yml
+  s_f2a23b1484e3a7::t_05058f28b95d01 84-98,101-102,107-113
+.github/workflows/code-npm_node-publish-release-and-snapshot.yml
+  s_f2a23b1484e3a7::t_afb1657a7af052 1-3,6-9,12-13,15,18-34,37-39,41,43-45,47-48,50-52,54-59,61-68,70-71,73-74,76-99,102-103,105,107-109,111,114-128,130,132-133,135-137,139-143,145-147,149-151,153-155,157-159,161-188,190-191,193,195-207,209-231,234-274,277-283,285-292,295-328,331-382,384,390-391,393,397-398,400-408,410-411,413,416-417,419,421-423,425,428-436,438-440,442,444,446-447,449-451,453-465,467-471,473-475,477-553,555-620,623-630,632-639,642-659,661-664,666-672,674-692,694-697,699-703,705-706,708,710-715,718-726
+.github/workflows/code-release_preview.yml
+  s_f2a23b1484e3a7::t_e852169efb97dd 1,5-7,10-14,16,19-34,39,41-43,45-46,50-97,99-100,103-106,108-119,121-122,124-151,153-160,162-164,166-215
+.github/workflows/docouture-kroki-cache-warm.yml
+  s_f2a23b1484e3a7::t_2fdc33308fb031 24-28,41,59-61,70,72-73,84-86,89,117-118,126,136-137
+.github/workflows/docouture-pr-verify.yml
+  s_f2a23b1484e3a7::t_77b9f84ac42539 36-38,47,49-50,61-63,66,107,123-124
+.github/workflows/docouture-publish-prerelease.yml
+  s_f2a23b1484e3a7::t_dd568bff57c080 20-23,41-45,50,59-62,66-70,72,75,77-80,83-97,103-107,121-124,126,140-142,144,146-147
+.github/workflows/docouture-publish.yml
+  s_f2a23b1484e3a7::t_5eb4e7091355a1 28-40,42-46,49-50,58-59,61,72,78,81,86-88,93-96,108-110,113,117-119,121-124
+.github/workflows/docouture-release-preview.yml
+  s_f2a23b1484e3a7::t_ebe222b909a8e2 5,21-24,30-31,33-34,41-42,45-50,56-66,72-73,75-76,87-89,137-141,145-146,148,151,156,164-166,173,187,204,210-211,213,216-219,221,229-230,232,235-238,240
+.github/workflows/docouture-release.yml
+  s_f2a23b1484e3a7::t_284e7d94e5bb05 58-66,77-88,106,115-126,139-140,151,165-166,168,172,189,194-197,238,242-248,284-306,485,500,503-624,642-648,650-651
+.github/workflows/docs/code-changelog-check.md
+  s_f2a23b1484e3a7::t_7b37b7ae0a3f1f 1-27
+.github/workflows/docs/code-npm_node-publish-release-and-snapshot.md
+  s_f2a23b1484e3a7::t_e48e202ac86be8 7,9,31,35-37,47-48,52,66,69
+.github/workflows/docs/code-release_preview.md
+  s_f2a23b1484e3a7::t_69fadea8d4de3e 15,30,33,35
+.github/workflows/oss-compliance.yml
+  s_f2a23b1484e3a7::t_bae6857b7a9525 17,24,44
+AGENTS.md
+  s_f2a23b1484e3a7::t_4c670e1fba55ca 1-4,62-65,109-141
+CONTRIBUTING.md
+  s_f2a23b1484e3a7::t_5356fb589f6e18 132-139,143,145,200
+REUSE.toml
+  s_f2a23b1484e3a7::t_5628b05a820126 46
+code/CHANGELOG.md
+  s_f2a23b1484e3a7::t_1e07f0866ee58d 16-72,1996-2004
+code/nx.json
+  s_f2a23b1484e3a7::t_74b7e6f59eba64 21,29,37
+code/package-lock.json
+  s_f2a23b1484e3a7::t_eb6c99b39c398b 3,9,21,28,32,234-236,239,247-249,2456-2458,2461,2463,2468-2470,2473,2479-2481,3335-3337,3352-3354,3368-3369,3419-3421,3433-3435,3447-3449,3461-3463,3475-3477,3489-3491,3503-3505,3517-3519,3531-3533,3545-3547,3559-3561,3565,3568,5636-5638,5643,5657-5658,5667-5669,5675-5676,5685-5687,5691,5712-5714,5725-5727,5731,5739-5741,5745-5746,5755-5757,5765-5767,5771,5783,5787-5789,5793,6763,6775,7066,7079-7081,7115,7674,7697,7868,9150,9282-9298,9300-9302,9316-9325,9486-9489,9610,9845,10359,12117,12175,12227,12279,12292,12415-12417,12423-12424,12472-12474,12527,12553-12562,12577-12606,13537,13792,13808,13815,14021,15392,15413,15515-15517,15626-15628,15650,15937,15950,16034-16036,16318,16901,16963-16965,17039-17041,17046-17052,17080-17085,17679-17681,17719,17754,17786,17789-17790,17799-17800,17809,17829,17832-17833,17842-17843,17851,17863-17870,17875,17878-17879,17890-17891,17899,17914-17921,17926,17929,17933,17942-17944,17956,17970-17977,17995,17999,18001-18002,18020-18021,18035,18063,18066-18067,18074-18075,18081,18108,18111-18112,18125-18126,18136,18164,18169-18170,18177
+code/package.json
+  s_f2a23b1484e3a7::t_7e36ff66c8ffc3 3,13,35,38-39,72,79,83,91-94,100-101,106
+code/packages/create-backend-app/package.json
+  s_f2a23b1484e3a7::t_d8c7a5e1d90701 3
+code/packages/create-backend-app/src/create-app.ts
+  s_f2a23b1484e3a7::t_5334b1a26ea67e 136,147,208,219
+code/packages/create-backend-app/template/package.json
+  s_f2a23b1484e3a7::t_943448f0459f62 16,27,31
+code/packages/create-frontend-app/package.json
+  s_f2a23b1484e3a7::t_8c387e9e1ac7b8 3
+code/packages/create-frontend-app/template/package.json
+  s_f2a23b1484e3a7::t_2a1074c53e1129 8,38,57,73
+code/packages/react/package.json
+  s_f2a23b1484e3a7::t_c15421eec8b208 3,17-18,20-24,54-55,64-65,74
+code/packages/renderer-konva-base/package.json
+  s_f2a23b1484e3a7::t_c5f92ef57b1d14 3,17,23,28,58-59,68-69,77,86-93
+code/packages/renderer-konva-react-reconciler/package.json
+  s_f2a23b1484e3a7::t_f0e78547e875ed 3,17,23,28,58-59,70-71,79,91-98
+code/packages/sdk/package.json
+  s_f2a23b1484e3a7::t_2fa7c5a2d83ca7 3,17,23-28,33,64,68,77-79,91,102-109
+code/packages/sdk/src/__tests__/backend.failure.test.ts
+  s_f2a23b1484e3a7::t_8af4fe1ec3db50 1-38
+code/packages/sdk/src/__tests__/backend.test.ts
+  s_f2a23b1484e3a7::t_1f467c61b87e22 9,37-88
+code/packages/sdk/src/__tests__/types/optional-hooks.test-d.ts
+  s_f2a23b1484e3a7::t_dd8a969406968b 1-65
+code/packages/sdk/src/__tests__/types/tsconfig.json
+  s_f2a23b1484e3a7::t_3d2e88948c134d 1-11
+code/packages/sdk/src/actions/action.ts
+  s_f2a23b1484e3a7::t_1774f70a78f2aa 116,118,122,124
+code/packages/sdk/src/actions/brush-tool/__tests__/__snapshots__/brush-tool.golden.test.ts.snap
+  s_f2a23b1484e3a7::t_3ddb319ca48fe2 1-1136
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.coalesced.test.ts
+  s_f2a23b1484e3a7::t_1f6bf7ee54663f 1-231
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.config-io.test.ts
+  s_f2a23b1484e3a7::t_81ee24905c107f 1-116
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.event-time.test.ts
+  s_f2a23b1484e3a7::t_4336e32dbcf28f 1-114
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.finalize.test.ts
+  s_f2a23b1484e3a7::t_1196b8ca3e5af4 1-166
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.golden.test.ts
+  s_f2a23b1484e3a7::t_a95ab4c4f611dd 1-53
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.input-meta.test.ts
+  s_f2a23b1484e3a7::t_b13584c6f1dd1b 1-136
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.predicted.test.ts
+  s_f2a23b1484e3a7::t_be49348c6efb53 1-85
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.presets.test.ts
+  s_f2a23b1484e3a7::t_4ed476023c5d28 1-227
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.pressure-modes.test.ts
+  s_f2a23b1484e3a7::t_f58a69c9cb5471 1-249
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.profiles.test.ts
+  s_f2a23b1484e3a7::t_a79ab1703d4923 1-174
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.runtime-config.test.ts
+  s_f2a23b1484e3a7::t_831ec45cda363b 1-184
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.stabilizer.test.ts
+  s_f2a23b1484e3a7::t_e658686e747bf5 1-195
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.test.ts
+  s_f2a23b1484e3a7::t_92b4f33e235e03 699,713,737,817,855,859,1338,1346,1425-1430,1687,1711
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.touch-guard.test.ts
+  s_f2a23b1484e3a7::t_157554a6fdcd89 1-242
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.trace.test.ts
+  s_f2a23b1484e3a7::t_96adfa9995b6e1 1-89
+code/packages/sdk/src/actions/brush-tool/__tests__/shared/brush-golden.helpers.ts
+  s_f2a23b1484e3a7::t_7e82207169dcf4 1,5-7,9-64,67-357,359-373,376-398,401-430,433-447,449-475,478-484
+code/packages/sdk/src/actions/brush-tool/brush-tool.ts
+  s_f2a23b1484e3a7::t_e57e2a1e37bedd 9,16-22,27,34,38-100,120-141,153-158,172-415,431,433-436,441-442,444-452,454-466,468,475-486,493-494,499-500,502-506,509-582,635,637-639,642-653,655-660,670-685,697-701,710,719-726,731-737,741-742,744,788-931,935-950,968-969,972-973,986-994,1009,1028-1030,1033-1036,1038-1044,1066-1148,1161-1180,1185,1197-1207,1210-1213,1221-1231,1233,1235,1238-1252,1392-1393,1425
+code/packages/sdk/src/actions/brush-tool/constants.ts
+  s_f2a23b1484e3a7::t_a4c0526d33e5a9 5-6,9-11,32-83,85-93
+code/packages/sdk/src/actions/brush-tool/profiles.ts
+  s_f2a23b1484e3a7::t_8e8684dbbd0412 1-86
+code/packages/sdk/src/actions/brush-tool/stages/__tests__/finalize.test.ts
+  s_f2a23b1484e3a7::t_5a6b6cd916842d 1-280
+code/packages/sdk/src/actions/brush-tool/stages/bezier-fit.ts
+  s_f2a23b1484e3a7::t_d6f23db3bc6267 1-252
+code/packages/sdk/src/actions/brush-tool/stages/capture.ts
+  s_f2a23b1484e3a7::t_a10c8daf47b0ca 1-157
+code/packages/sdk/src/actions/brush-tool/stages/finalize.ts
+  s_f2a23b1484e3a7::t_e15eebaf3f80a3 1-190
+code/packages/sdk/src/actions/brush-tool/stages/pressure.ts
+  s_f2a23b1484e3a7::t_5f7e8928dabf34 1-289
+code/packages/sdk/src/actions/brush-tool/stages/stabilizer.ts
+  s_f2a23b1484e3a7::t_22f0bae30ecd4b 1-212
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/descriptors.test.ts
+  s_f2a23b1484e3a7::t_d545aebb325b90 1-115
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/docs.test.ts
+  s_f2a23b1484e3a7::t_712bf34b0a58f1 1-47
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/validate.test.ts
+  s_f2a23b1484e3a7::t_24768b7cb99c84 1-92
+code/packages/sdk/src/actions/brush-tool/tunables/config-io.ts
+  s_f2a23b1484e3a7::t_a74890b406d4b2 1-119
+code/packages/sdk/src/actions/brush-tool/tunables/descriptors.ts
+  s_f2a23b1484e3a7::t_817f71679453a3 1-261
+code/packages/sdk/src/actions/brush-tool/tunables/merge.ts
+  s_f2a23b1484e3a7::t_4280ff6c2e76ec 1-40
+code/packages/sdk/src/actions/brush-tool/tunables/presets.ts
+  s_f2a23b1484e3a7::t_1bc05063563de2 1-514
+code/packages/sdk/src/actions/brush-tool/tunables/types.ts
+  s_f2a23b1484e3a7::t_6e97c9296038c3 1-52
+code/packages/sdk/src/actions/brush-tool/tunables/validate.ts
+  s_f2a23b1484e3a7::t_1022ca634d4356 1-89
+code/packages/sdk/src/actions/brush-tool/types.ts
+  s_f2a23b1484e3a7::t_51424adb0ae115 14-112,116-141,145-184
+code/packages/sdk/src/actions/ellipse-tool/__tests__/ellipse-tool.test.ts
+  s_f2a23b1484e3a7::t_d209c1682138a7 260-329
+code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts
+  s_f2a23b1484e3a7::t_cf80fd98e143f8 18-22,74-80,126,142,179-180,191,202,206,209-215,240,252-255,264-267
+code/packages/sdk/src/actions/polygon-tool/__tests__/polygon-tool.test.ts
+  s_f2a23b1484e3a7::t_39c9f9c63f9ef9 50-56,69-72,82-84,90,167-170,213,230,235,239-242,246-277,286-287,297,305-306,315-353,376-440
+code/packages/sdk/src/actions/polygon-tool/constants.ts
+  s_f2a23b1484e3a7::t_67130de1cc3959 10
+code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts
+  s_f2a23b1484e3a7::t_ea8e5bf2039462 6,8-11,26-32,38-43,59-64,96-102,113-116,123-160,172,180-182,184,209,213-227,229-272,290,312-319,323-325,333-338
+code/packages/sdk/src/actions/rectangle-tool/__tests__/rectangle-tool.test.ts
+  s_f2a23b1484e3a7::t_f642e557c8d474 789-794
+code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts
+  s_f2a23b1484e3a7::t_0425435b77c38e 17-21,74-80,128,142,191,204-211,260,277-280,283-286
+code/packages/sdk/src/actions/regular-polygon-tool/__tests__/regular-polygon-tool.test.ts
+  s_f2a23b1484e3a7::t_fe01285c2c777c 752-825
+code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts
+  s_f2a23b1484e3a7::t_fdaf0cdef8583d 21-25,76-84,130,146,193,213,219-224,248,267-270,281-283
+code/packages/sdk/src/actions/shared/__tests__/shape-geometry.test.ts
+  s_f2a23b1484e3a7::t_5b7833b21cd9b8 1-90
+code/packages/sdk/src/actions/shared/shape-geometry.ts
+  s_f2a23b1484e3a7::t_143b0e03da7a3a 1-71
+code/packages/sdk/src/actions/shared/shape-keyboard.ts
+  s_f2a23b1484e3a7::t_c451f7a2025dcc 1-55
+code/packages/sdk/src/actions/text-tool/__tests__/rich-params.test.ts
+  s_f2a23b1484e3a7::t_88632114bcb185 1-37
+code/packages/sdk/src/actions/text-tool/text-tool.ts
+  s_f2a23b1484e3a7::t_a84a76098504f1 10,26-33,36-38,52,66
+code/packages/sdk/src/backend.ts
+  s_f2a23b1484e3a7::t_2db1bd7996df4d 6,9-13,18-22
+code/packages/sdk/src/index.common.ts
+  s_f2a23b1484e3a7::t_2e0f5252bcfa8d 59-64,140-145
+code/packages/sdk/src/index.lab.ts
+  s_f2a23b1484e3a7::t_5e4f2c5bd11eff 1-7
+code/packages/sdk/src/nodes/__tests__/node.events.test.ts
+  s_f2a23b1484e3a7::t_88da33ea416006 17,338,340,343,345-348,351,1380-1560
+code/packages/sdk/src/nodes/__tests__/node.test.ts
+  s_f2a23b1484e3a7::t_557f33de731344 1087,1100,1103,1116
+code/packages/sdk/src/nodes/comment/comment.ts
+  s_f2a23b1484e3a7::t_62b8550f6dd432 630
+code/packages/sdk/src/nodes/connector/__tests__/connector.listeners.test.ts
+  s_f2a23b1484e3a7::t_62807fd335d655 1-151
+code/packages/sdk/src/nodes/connector/anchors.ts
+  s_f2a23b1484e3a7::t_ca72c09830934f 5,161
+code/packages/sdk/src/nodes/connector/connector.ts
+  s_f2a23b1484e3a7::t_63051052f28106 291-292,370-371,512-518,521-522,524-536,539-541,1050
+code/packages/sdk/src/nodes/connector/line-types/curved.ts
+  s_f2a23b1484e3a7::t_86c9e2e9061f8a 5,110-119
+code/packages/sdk/src/nodes/ellipse/ellipse.ts
+  s_f2a23b1484e3a7::t_ca9c560e28725c 17-19,24,30,33-34,46,194-204,458,473
+code/packages/sdk/src/nodes/ellipse/types.ts
+  s_f2a23b1484e3a7::t_60f6d2bae28cd4 9-10,17-18
+code/packages/sdk/src/nodes/extensions.d.ts
+  s_f2a23b1484e3a7::t_2077fe9ff6d3bf 46-47
+code/packages/sdk/src/nodes/frame/__tests__/frame-edge-selection.test.ts
+  s_f2a23b1484e3a7::t_7b072fb9f67e40 1-356
+code/packages/sdk/src/nodes/frame/__tests__/frame.test.ts
+  s_f2a23b1484e3a7::t_b454cf0a09764c 9,443-458,941-968
+code/packages/sdk/src/nodes/frame/constants.ts
+  s_f2a23b1484e3a7::t_76c457f9203de5 15
+code/packages/sdk/src/nodes/frame/frame.ts
+  s_f2a23b1484e3a7::t_b5c5edfca321f8 28-32,35,84,89,118-119,189-193,240-247,319-331,333-366,379-384,394-399,410,423,459-468
+code/packages/sdk/src/nodes/frame/hit-region.ts
+  s_f2a23b1484e3a7::t_fedb0539682cfb 1-65
+code/packages/sdk/src/nodes/frame/types.ts
+  s_f2a23b1484e3a7::t_5b73ab1511aba5 18
+code/packages/sdk/src/nodes/image/__tests__/crop.test.ts
+  s_f2a23b1484e3a7::t_04f2f5147cb3f6 979-1132
+code/packages/sdk/src/nodes/image/__tests__/flip.integration.test.ts
+  s_f2a23b1484e3a7::t_3845fc49b3c2b0 1-213
+code/packages/sdk/src/nodes/image/__tests__/flip.render.test.ts
+  s_f2a23b1484e3a7::t_d44bcd78cfca7b 1-86
+code/packages/sdk/src/nodes/image/__tests__/flip.test.ts
+  s_f2a23b1484e3a7::t_633402d232533d 1-182
+code/packages/sdk/src/nodes/image/__tests__/image.test.ts
+  s_f2a23b1484e3a7::t_a7afcd2a42d44f 17,2302-2329
+code/packages/sdk/src/nodes/image/crop.ts
+  s_f2a23b1484e3a7::t_adf8cb17bcd4ed 55-64,66-72,80-111,113-114,117-120,128,148-151,153-154,215-220,694-712,716-717,789-790,795-812,816-817
+code/packages/sdk/src/nodes/image/image.ts
+  s_f2a23b1484e3a7::t_3800d206545d6e 18,135,290-328,417-424,582-583,1116,1192,1281,1450-1454,1590-1592,1594,1597,1670,1795-1796,1832-1833,1896-1903
+code/packages/sdk/src/nodes/image/types.ts
+  s_f2a23b1484e3a7::t_53aa9828aac815 28-35
+code/packages/sdk/src/nodes/measure/__tests__/measure.test.ts
+  s_f2a23b1484e3a7::t_b71ceb33566e8c 374,388,681,961-997
+code/packages/sdk/src/nodes/measure/measure.ts
+  s_f2a23b1484e3a7::t_40a32a27aa12bf 259-260,277-278,300-301,305-306,319-322,374,395,451
+code/packages/sdk/src/nodes/node.ts
+  s_f2a23b1484e3a7::t_3662f4bf7d9961 20-23,43-120,141-142,245-246,494,505-506,616-621,623-628,630,1104-1105,1223,1247-1248,1251,1264,1268-1304
+code/packages/sdk/src/nodes/polygon/polygon.ts
+  s_f2a23b1484e3a7::t_159867d95b88da 17-23,132,135-136,147,258-268,617-619,657,675-677,713,787
+code/packages/sdk/src/nodes/polygon/types.ts
+  s_f2a23b1484e3a7::t_372871e9eeb08f 6,21-22
+code/packages/sdk/src/nodes/rectangle/rectangle.ts
+  s_f2a23b1484e3a7::t_f8c9aba0c56ad7 20-22,27,33,36-37,49,148-158,354,369
+code/packages/sdk/src/nodes/rectangle/types.ts
+  s_f2a23b1484e3a7::t_dd4d5473fd1f45 9-10,17-18
+code/packages/sdk/src/nodes/shared/__tests__/shape-label-engines.test.ts
+  s_f2a23b1484e3a7::t_3368404ee38e17 1-312
+code/packages/sdk/src/nodes/shared/__tests__/shape-label-server.test.ts
+  s_f2a23b1484e3a7::t_f2f1b7f0d636db 1-53
+code/packages/sdk/src/nodes/shared/shape-label-editor.ts
+  s_f2a23b1484e3a7::t_05b2e0bbc02443 11-14,20-23,25,179,205
+code/packages/sdk/src/nodes/shared/shape-label-native-editor.ts
+  s_f2a23b1484e3a7::t_cc9950a22293b0 1-345
+code/packages/sdk/src/nodes/shared/shape-label.constants.ts
+  s_f2a23b1484e3a7::t_6b76f952abcfaf 9
+code/packages/sdk/src/nodes/shared/shape-label.edit-shared.ts
+  s_f2a23b1484e3a7::t_f5d8889f7b1496 1-96
+code/packages/sdk/src/nodes/shared/shape-label.engine.ts
+  s_f2a23b1484e3a7::t_5e4b38f442c7af 1-25
+code/packages/sdk/src/nodes/shared/shape-label.types.ts
+  s_f2a23b1484e3a7::t_397022b84cc07c 5-12,27-28,37-90
+code/packages/sdk/src/nodes/shared/shape-label.utils.ts
+  s_f2a23b1484e3a7::t_ff4648930cfacc 8-13,22-55,70,118-120,129,149
+code/packages/sdk/src/nodes/stroke/__tests__/__snapshots__/stroke-legacy.golden.test.ts.snap
+  s_f2a23b1484e3a7::t_d772cbe191a61e 1-4602
+code/packages/sdk/src/nodes/stroke/__tests__/shared/stroke-render.helpers.ts
+  s_f2a23b1484e3a7::t_a3d59a9b8f9e48 1-167
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-legacy.golden.test.ts
+  s_f2a23b1484e3a7::t_d25355ca42bc0f 1-81
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look-curve.test.ts
+  s_f2a23b1484e3a7::t_1faacaf17237ae 1-112
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look-preview.test.ts
+  s_f2a23b1484e3a7::t_3664fb9a6c1f70 1-58
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look-width.test.ts
+  s_f2a23b1484e3a7::t_944574a4166f99 1-69
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-round.test.ts
+  s_f2a23b1484e3a7::t_d4205c59d0efd1 1-233
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-translucent.test.ts
+  s_f2a23b1484e3a7::t_3d27aa36aa989c 1-124
+code/packages/sdk/src/nodes/stroke/__tests__/stroke.test.ts
+  s_f2a23b1484e3a7::t_03592a9149cb40 266-268,283-285,290-295,400,417-422,431-436,445-450,459-464,574-576,588-590,605-607,622-625,628-631,643-646,657-660,677-681,684-687,696-700,703-706,719-722,738-741,775,798,849-852,912-915,928-932,935-938,947-951,954-957,972,977-980,1014-1017
+code/packages/sdk/src/nodes/stroke/constants.ts
+  s_f2a23b1484e3a7::t_a739d933c0ef40 5-6,9-24
+code/packages/sdk/src/nodes/stroke/render/__tests__/look.test.ts
+  s_f2a23b1484e3a7::t_37b10502eb7d9e 1-142
+code/packages/sdk/src/nodes/stroke/render/curve.ts
+  s_f2a23b1484e3a7::t_0119eb51f53180 1-130
+code/packages/sdk/src/nodes/stroke/render/look.ts
+  s_f2a23b1484e3a7::t_2440bb4c98cf79 1-106
+code/packages/sdk/src/nodes/stroke/render/round-outline.ts
+  s_f2a23b1484e3a7::t_2b8e9259f032f7 1-310
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_f2a23b1484e3a7::t_54dd4710b9b4e4 19,26-28,32,135-141,145-147,165,169,177-181,220-221,228-229,237-261,293-314,336,348-349,396-544,556-569
+code/packages/sdk/src/nodes/stroke/types.ts
+  s_f2a23b1484e3a7::t_4e56b4cfbe50ce 25-60
+code/packages/sdk/src/nodes/text-v2/__tests__/bench.test.ts
+  s_f2a23b1484e3a7::t_9d0d2152b84d34 1-170
+code/packages/sdk/src/nodes/text-v2/__tests__/clipboard-blocks.test.ts
+  s_f2a23b1484e3a7::t_f17c0ba13802b5 1-106
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-model.test.ts
+  s_f2a23b1484e3a7::t_6ce368735f6f6d 1-155
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-session.test.ts
+  s_f2a23b1484e3a7::t_239ebde419e0d7 1-410
+code/packages/sdk/src/nodes/text-v2/__tests__/empty-block-marks.test.ts
+  s_f2a23b1484e3a7::t_dea2a5ea7226c9 1-126
+code/packages/sdk/src/nodes/text-v2/__tests__/enter-keypress.test.ts
+  s_f2a23b1484e3a7::t_f1c9bae6032e57 1-59
+code/packages/sdk/src/nodes/text-v2/__tests__/layout.test.ts
+  s_f2a23b1484e3a7::t_07b91674c7456a 1-171
+code/packages/sdk/src/nodes/text-v2/__tests__/list-continuation.test.ts
+  s_f2a23b1484e3a7::t_c6e67253d261c5 1-168
+code/packages/sdk/src/nodes/text-v2/__tests__/model.test.ts
+  s_f2a23b1484e3a7::t_1ef1ed1f51e42f 1-60
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-api.test.ts
+  s_f2a23b1484e3a7::t_8d1b64c1a39127 1-487
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-layout.test.ts
+  s_f2a23b1484e3a7::t_860e89efd46246 1-291
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-model.test.ts
+  s_f2a23b1484e3a7::t_f252a2182e4ee7 1-234
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-paint.test.ts
+  s_f2a23b1484e3a7::t_29660ac935bdbb 1-118
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-session.test.ts
+  s_f2a23b1484e3a7::t_75434e022b0975 1-407
+code/packages/sdk/src/nodes/text-v2/__tests__/server-skia.test.ts
+  s_f2a23b1484e3a7::t_2c5595728fd9ba 1-274
+code/packages/sdk/src/nodes/text-v2/__tests__/server.test.ts
+  s_f2a23b1484e3a7::t_0a0b3282a61fc6 1-180
+code/packages/sdk/src/nodes/text-v2/__tests__/shape.test.ts
+  s_f2a23b1484e3a7::t_2bda1bbb0d722b 1-199
+code/packages/sdk/src/nodes/text-v2/__tests__/synthetic-italic.test.ts
+  s_f2a23b1484e3a7::t_65cc232fce7b82 1-26
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2-edit.test.ts
+  s_f2a23b1484e3a7::t_a149fca11a5035 1-486
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2.test.ts
+  s_f2a23b1484e3a7::t_240ceb24b22b53 1-336
+code/packages/sdk/src/nodes/text-v2/constants.ts
+  s_f2a23b1484e3a7::t_67ad7955eacbb7 1-24
+code/packages/sdk/src/nodes/text-v2/edit/geometry.ts
+  s_f2a23b1484e3a7::t_a392185d3ee87d 1-254
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_f2a23b1484e3a7::t_9903a5b57c6993 1-380
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_f2a23b1484e3a7::t_0cfe64a1343fb0 1-872
+code/packages/sdk/src/nodes/text-v2/edit/stage-coordinates.ts
+  s_f2a23b1484e3a7::t_4bf249f8b8dfc2 1-28
+code/packages/sdk/src/nodes/text-v2/index.ts
+  s_f2a23b1484e3a7::t_75636eabe5bce7 1-24
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_f2a23b1484e3a7::t_8e6843218c22b2 1-785
+code/packages/sdk/src/nodes/text-v2/layout/synthetic-italic.ts
+  s_f2a23b1484e3a7::t_b644eff5e4ebb8 1-95
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_f2a23b1484e3a7::t_60a74aedd07ae3 1-941
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_f2a23b1484e3a7::t_70188cb8c362dc 1-676
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_f2a23b1484e3a7::t_8954520030e2d0 1-1284
+code/packages/sdk/src/nodes/text-v2/types.ts
+  s_f2a23b1484e3a7::t_5b82618b85ee94 1-98
+code/packages/sdk/src/nodes/text/__tests__/text.test.ts
+  s_f2a23b1484e3a7::t_a8f7c4116653cb 1198,1209-1210
+code/packages/sdk/src/nodes/text/text.ts
+  s_f2a23b1484e3a7::t_06d500ee87a942 585-590
+code/packages/sdk/src/nodes/video/__tests__/video.test.ts
+  s_f2a23b1484e3a7::t_53363876cf1e66 9,454,1559,1645-1672
+code/packages/sdk/src/nodes/video/video.ts
+  s_f2a23b1484e3a7::t_3e3740e863c5df 27,59,341-342,642
+code/packages/sdk/src/plugins/brush-lab/__tests__/brush-lab.test.ts
+  s_f2a23b1484e3a7::t_cee060e1d5f5c3 1-318
+code/packages/sdk/src/plugins/brush-lab/__tests__/device-report.test.ts
+  s_f2a23b1484e3a7::t_fb086ecaa92b31 1-85
+code/packages/sdk/src/plugins/brush-lab/__tests__/ghosts.test.ts
+  s_f2a23b1484e3a7::t_0cb590adc852d9 1-180
+code/packages/sdk/src/plugins/brush-lab/__tests__/metrics.test.ts
+  s_f2a23b1484e3a7::t_858fb2294dd409 1-143
+code/packages/sdk/src/plugins/brush-lab/__tests__/recorder.test.ts
+  s_f2a23b1484e3a7::t_c917eb30338142 1-59
+code/packages/sdk/src/plugins/brush-lab/brush-lab.ts
+  s_f2a23b1484e3a7::t_c5abdc45bc0a6c 1-534
+code/packages/sdk/src/plugins/brush-lab/constants.ts
+  s_f2a23b1484e3a7::t_6c8ec24a205369 1-9
+code/packages/sdk/src/plugins/brush-lab/device-report.ts
+  s_f2a23b1484e3a7::t_fb0b24ab0fe403 1-107
+code/packages/sdk/src/plugins/brush-lab/ghosts.ts
+  s_f2a23b1484e3a7::t_c075f0d1e19ebb 1-109
+code/packages/sdk/src/plugins/brush-lab/metrics.ts
+  s_f2a23b1484e3a7::t_80c3e891fc4bd6 1-110
+code/packages/sdk/src/plugins/brush-lab/recorder.ts
+  s_f2a23b1484e3a7::t_252f8f960f1c0f 1-47
+code/packages/sdk/src/plugins/brush-lab/types.ts
+  s_f2a23b1484e3a7::t_83a1bf5cfdc777 1-97
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/keyboard-hover.test.ts
+  s_f2a23b1484e3a7::t_8a3d68f4415028 1-60
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/pointer-down.test.ts
+  s_f2a23b1484e3a7::t_987064af29acce 479-490
+code/packages/sdk/src/plugins/nodes-selection/events/click-tap.ts
+  s_f2a23b1484e3a7::t_05d93c6e58478f 175-177,203-212
+code/packages/sdk/src/plugins/nodes-selection/events/keyboard.ts
+  s_f2a23b1484e3a7::t_3a731e935e5466 30,39-73
+code/packages/sdk/src/plugins/nodes-selection/events/pointer-down.ts
+  s_f2a23b1484e3a7::t_f3756ae4b37800 106-114
+code/packages/sdk/src/plugins/nodes-snapping/__tests__/nodes-snapping.test.ts
+  s_f2a23b1484e3a7::t_754a0e85d9c764 395-412,414-428
+code/packages/sdk/src/plugins/nodes-snapping/nodes-snapping.custom-guides.ts
+  s_f2a23b1484e3a7::t_ec2763844a379c 89-91
+code/packages/sdk/src/plugins/nodes-snapping/nodes-snapping.ts
+  s_f2a23b1484e3a7::t_6d5ba9651dbb2f 100-115,117-123,125
+code/packages/sdk/src/plugins/plugin.ts
+  s_f2a23b1484e3a7::t_80dd5db66cb697 37,39,41
+code/packages/sdk/src/utils/native-backend.ts
+  s_f2a23b1484e3a7::t_6ae5993f340785 1-32
+code/packages/sdk/src/weave.ts
+  s_f2a23b1484e3a7::t_b6993353c53b31 420,430,631,945,1114-1126
+code/packages/sdk/tsconfig.json
+  s_f2a23b1484e3a7::t_3ccfbea022d4fd 20-21
+code/packages/sdk/tsdown.config.ts
+  s_f2a23b1484e3a7::t_f20df4ba6dfe67 88-114
+code/packages/sdk/vitest.config.ts
+  s_f2a23b1484e3a7::t_4286a91bdf7020 14-17,29-33
+code/packages/store-azure-web-pubsub/package.json
+  s_f2a23b1484e3a7::t_6597f2c14e0ab3 3,21,26,58,60-61,79-80,94
+code/packages/store-standalone/package.json
+  s_f2a23b1484e3a7::t_126ed678950547 3,21,26,55-56,63-64,70
+code/packages/store-websockets/package.json
+  s_f2a23b1484e3a7::t_1b3bd786444ea7 3,21,26,57-58,71-72,82
+code/packages/types/package.json
+  s_f2a23b1484e3a7::t_80379ee2593113 3,17-18,20-24,59-60,67
+docs/.release-version
+  s_f2a23b1484e3a7::t_5175e63f2b8c3e 1
+docs/antora-playbook.local.yml
+  s_f2a23b1484e3a7::t_6227ccc5782394 77
+docs/antora-playbook.yml
+  s_f2a23b1484e3a7::t_535bbd79273737 117
+docs/package-lock.json
+  s_f2a23b1484e3a7::t_5d42d7b6962c8e 12-17,323-325,332,335,344-346,358-360,375-377,388-390,894-896,2004-2006,2010,2573-2575,3024
+docs/package.json
+  s_f2a23b1484e3a7::t_4144d72c617947 15,18-23
+docs/src/modules/main/nav.adoc
+  s_f2a23b1484e3a7::t_b7ec3b5b58e2df 32
+docs/src/modules/main/pages/build/actions/ellipse-tool.adoc
+  s_f2a23b1484e3a7::t_6a003dde40a246 77-80
+docs/src/modules/main/pages/build/actions/index.adoc
+  s_f2a23b1484e3a7::t_a06bb6f8ef25e8 49,213-223,249,253,260
+docs/src/modules/main/pages/build/actions/polygon-tool.adoc
+  s_f2a23b1484e3a7::t_09ca7b84ebe26d 6,91-94
+docs/src/modules/main/pages/build/actions/rectangle-tool.adoc
+  s_f2a23b1484e3a7::t_61ff72289430ab 77-79
+docs/src/modules/main/pages/build/actions/regular-polygon-tool.adoc
+  s_f2a23b1484e3a7::t_ac22a7f8b41235 83
+docs/src/modules/main/pages/build/actions/text-tool.adoc
+  s_f2a23b1484e3a7::t_48978ea43f7501 20,47-57
+docs/src/modules/main/pages/build/nodes/frame.adoc
+  s_f2a23b1484e3a7::t_3688ab4616c178 14-27
+docs/src/modules/main/pages/build/nodes/image.adoc
+  s_f2a23b1484e3a7::t_46a583f7b0f024 45-68
+docs/src/modules/main/pages/build/nodes/index.adoc
+  s_f2a23b1484e3a7::t_90fbc93d1920cf 76-79,207-216
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_f2a23b1484e3a7::t_47802baeb4b69e 1-157
+docs/src/modules/main/pages/build/nodes/text.adoc
+  s_f2a23b1484e3a7::t_94187a86c32d05 2,55-59
+docs/src/modules/main/pages/build/plugins/copy-paste-nodes.adoc
+  s_f2a23b1484e3a7::t_601f64718968c4 2
+docs/src/modules/main/pages/build/plugins/index.adoc
+  s_f2a23b1484e3a7::t_16df7bafa01263 164-174
+docs/src/modules/sdk/nav.adoc
+  s_f2a23b1484e3a7::t_8f2f6d53e78428 24,31,55
+docs/src/modules/sdk/pages/api-reference/actions/action.adoc
+  s_f2a23b1484e3a7::t_ea8a13ad29b8c2 43,160,162,166,169,171-176,180,183-184,186-201
+docs/src/modules/sdk/pages/api-reference/actions/brush-tool.adoc
+  s_f2a23b1484e3a7::t_f9cf37ecc70f1c 43,47-65,77,87,91-316,324-332
+docs/src/modules/sdk/pages/api-reference/actions/brush-tuning.adoc
+  s_f2a23b1484e3a7::t_0fb74bff8ca646 1-250
+docs/src/modules/sdk/pages/api-reference/actions/ellipse-tool.adoc
+  s_f2a23b1484e3a7::t_51855f9bd63965 15-16
+docs/src/modules/sdk/pages/api-reference/actions/polygon-tool.adoc
+  s_f2a23b1484e3a7::t_9edc32852aa536 8,17-18,71
+docs/src/modules/sdk/pages/api-reference/actions/rectangle-tool.adoc
+  s_f2a23b1484e3a7::t_eec25ac1e2b127 15-16
+docs/src/modules/sdk/pages/api-reference/actions/regular-polygon-tool.adoc
+  s_f2a23b1484e3a7::t_631cc2597266a4 20-21
+docs/src/modules/sdk/pages/api-reference/actions/text-tool.adoc
+  s_f2a23b1484e3a7::t_76c7a99b23c5dd 12-14,35-54
+docs/src/modules/sdk/pages/api-reference/nodes/ellipse.adoc
+  s_f2a23b1484e3a7::t_86ca6a01fbad1f 19-40,65-68,71,92
+docs/src/modules/sdk/pages/api-reference/nodes/frame.adoc
+  s_f2a23b1484e3a7::t_cee5db59dc7fa7 57,104,107,124
+docs/src/modules/sdk/pages/api-reference/nodes/image.adoc
+  s_f2a23b1484e3a7::t_62e8d8c1e808bb 54-61,171-186,317-332,360-379
+docs/src/modules/sdk/pages/api-reference/nodes/index.adoc
+  s_f2a23b1484e3a7::t_70a96e0fbe67f8 84-87
+docs/src/modules/sdk/pages/api-reference/nodes/node.adoc
+  s_f2a23b1484e3a7::t_8dc863624c4b93 166,168,172,175-176,178-181,185-188,191,193-195,199,202-203,205,207,211,214-233,242-243,254,264-288
+docs/src/modules/sdk/pages/api-reference/nodes/polygon.adoc
+  s_f2a23b1484e3a7::t_83075ccef5b2e9 18-39,73-84,87
+docs/src/modules/sdk/pages/api-reference/nodes/rectangle.adoc
+  s_f2a23b1484e3a7::t_1db26f7569a8e3 26-47,72-75,78,99
+docs/src/modules/sdk/pages/api-reference/nodes/stroke.adoc
+  s_f2a23b1484e3a7::t_b6f942637cf440 103-146
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_f2a23b1484e3a7::t_343a55d10adf12 1-305
+docs/src/modules/sdk/pages/api-reference/nodes/text.adoc
+  s_f2a23b1484e3a7::t_5029ab4026a237 202-207
+docs/src/modules/sdk/pages/api-reference/plugins/brush-lab.adoc
+  s_f2a23b1484e3a7::t_102b5a43f25152 1-76
+docs/src/modules/sdk/pages/api-reference/plugins/copy-paste-nodes.adoc
+  s_f2a23b1484e3a7::t_35348546dd9d88 2
+docs/src/modules/sdk/pages/api-reference/plugins/plugin.adoc
+  s_f2a23b1484e3a7::t_a977aaac3b43c6 41,43,109,111,115,118,120,124,127,129-131,135,138-139,141,145,148-166
+docs/src/modules/sdk/pages/api-reference/weave/index.adoc
+  s_f2a23b1484e3a7::t_93ce3e2fd59545 449-466,997-1001,1003-1010,1012-1018,1022-1025,1027,1032-1033
+docs/src/modules/sdk/pages/index.adoc
+  s_f2a23b1484e3a7::t_7a20e1b77c12f8 105
+docs/src/modules/sdk/pages/setup.adoc
+  s_f2a23b1484e3a7::t_b8532ddbacc1b5 11-34,41-45
+docs/src/modules/types/pages/api-reference/types.adoc
+  s_f2a23b1484e3a7::t_ace18c0f0169c8 171,173,175-179,184-197,199-207,216,218,233-239,243
+openspec/changes/archive/2026-10-22-add-image-flip/.openspec.yaml
+  s_f2a23b1484e3a7::t_cb85e11d7e5a9a 1-2
+openspec/changes/archive/2026-10-22-add-image-flip/design.md
+  s_f2a23b1484e3a7::t_e33f43a5b8c497 1-32
+openspec/changes/archive/2026-10-22-add-image-flip/proposal.md
+  s_f2a23b1484e3a7::t_5e433b92616678 1-27
+openspec/changes/archive/2026-10-22-add-image-flip/specs/image-node/flip/spec.md
+  s_f2a23b1484e3a7::t_4741aebb2d83cf 1-95
+openspec/changes/archive/2026-10-22-add-image-flip/tasks.md
+  s_f2a23b1484e3a7::t_8d3e21e21ceae8 1-24
+openspec/changes/archive/2026-10-22-text-node-native-editing/.openspec.yaml
+  s_f2a23b1484e3a7::t_8415d6fc4d25a5 1-2
+openspec/changes/archive/2026-10-22-text-node-native-editing/design.md
+  s_f2a23b1484e3a7::t_47181435908a6e 1-52
+openspec/changes/archive/2026-10-22-text-node-native-editing/proposal.md
+  s_f2a23b1484e3a7::t_66d2134f6fecd0 1-34
+openspec/changes/archive/2026-10-22-text-node-native-editing/specs/text-v2/editing/spec.md
+  s_f2a23b1484e3a7::t_eb9b8d91959553 1-86
+openspec/changes/archive/2026-10-22-text-node-native-editing/specs/text-v2/layout/spec.md
+  s_f2a23b1484e3a7::t_1c67f627a4d64a 1-50
+openspec/changes/archive/2026-10-22-text-node-native-editing/specs/text-v2/model/spec.md
+  s_f2a23b1484e3a7::t_025e4828ad0702 1-36
+openspec/changes/archive/2026-10-22-text-node-native-editing/tasks.md
+  s_f2a23b1484e3a7::t_100abe2244bf72 1-57
+openspec/changes/archive/2026-10-26-shape-label-native-engine/.openspec.yaml
+  s_f2a23b1484e3a7::t_de93d33935c219 1-2
+openspec/changes/archive/2026-10-26-shape-label-native-engine/design.md
+  s_f2a23b1484e3a7::t_18a3bf2f83eb7d 1-38
+openspec/changes/archive/2026-10-26-shape-label-native-engine/proposal.md
+  s_f2a23b1484e3a7::t_ceede201affe87 1-30
+openspec/changes/archive/2026-10-26-shape-label-native-engine/specs/shape-label/engine/spec.md
+  s_f2a23b1484e3a7::t_16a07486bf4131 1-76
+openspec/changes/archive/2026-10-26-shape-label-native-engine/tasks.md
+  s_f2a23b1484e3a7::t_468b0ca2bf7fe6 1-41
+openspec/changes/archive/2026-10-26-text-v2-rich-text/.openspec.yaml
+  s_f2a23b1484e3a7::t_ae50afa677dc31 1-2
+openspec/changes/archive/2026-10-26-text-v2-rich-text/design.md
+  s_f2a23b1484e3a7::t_e13266df134c5b 1-40
+openspec/changes/archive/2026-10-26-text-v2-rich-text/proposal.md
+  s_f2a23b1484e3a7::t_eca47800851cd2 1-33
+openspec/changes/archive/2026-10-26-text-v2-rich-text/specs/text-v2/editing/spec.md
+  s_f2a23b1484e3a7::t_0025f088089ba4 1-36
+openspec/changes/archive/2026-10-26-text-v2-rich-text/specs/text-v2/layout/spec.md
+  s_f2a23b1484e3a7::t_94b6133d593e07 1-71
+openspec/changes/archive/2026-10-26-text-v2-rich-text/specs/text-v2/model/spec.md
+  s_f2a23b1484e3a7::t_6bcdb3fd474285 1-56
+openspec/changes/archive/2026-10-26-text-v2-rich-text/specs/text-v2/rich-text-api/spec.md
+  s_f2a23b1484e3a7::t_4876a89aa71e81 1-62
+openspec/changes/archive/2026-10-26-text-v2-rich-text/tasks.md
+  s_f2a23b1484e3a7::t_c7bb321df92fcb 1-57
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/.openspec.yaml
+  s_f2a23b1484e3a7::t_6f863475468233 1-2
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/design.md
+  s_f2a23b1484e3a7::t_66e2a4fb481ecb 1-23
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/proposal.md
+  s_f2a23b1484e3a7::t_9040e506fe9a48 1-28
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/specs/text-v2/editing/spec.md
+  s_f2a23b1484e3a7::t_e6e479ea97cc1d 1-16
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/specs/text-v2/layout/spec.md
+  s_f2a23b1484e3a7::t_f3feba2a8c1283 1-16
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/specs/text-v2/model/spec.md
+  s_f2a23b1484e3a7::t_b3ac6b993ecf38 1-24
+openspec/changes/archive/2026-10-27-text-v2-empty-block-marks/tasks.md
+  s_f2a23b1484e3a7::t_50b66a08668ac2 1-23
+openspec/changes/brush-input-lab/.openspec.yaml
+  s_f2a23b1484e3a7::t_0b808f629b28fd 1-2
+openspec/changes/brush-input-lab/design.md
+  s_f2a23b1484e3a7::t_3fe741236ba88a 1-95
+openspec/changes/brush-input-lab/proposal.md
+  s_f2a23b1484e3a7::t_c88c7773806c0c 1-35
+openspec/changes/brush-input-lab/specs/brush-lab/plugin/spec.md
+  s_f2a23b1484e3a7::t_c56f7db692ebe4 1-77
+openspec/changes/brush-input-lab/specs/brush-tool/input-profiles/spec.md
+  s_f2a23b1484e3a7::t_8f78c0fd59e38d 1-138
+openspec/changes/brush-input-lab/specs/brush-tool/pressure-sampling/spec.md
+  s_f2a23b1484e3a7::t_02a870608396a2 1-54
+openspec/changes/brush-input-lab/specs/brush-tool/tunables/spec.md
+  s_f2a23b1484e3a7::t_16ed075814a023 1-55
+openspec/changes/brush-input-lab/specs/stroke-node/rendering/spec.md
+  s_f2a23b1484e3a7::t_8ea51ec4084476 1-91
+openspec/changes/brush-input-lab/tasks.md
+  s_f2a23b1484e3a7::t_1c08c113dfbb22 1-83
+openspec/changes/frame-edge-selection/.openspec.yaml
+  s_f2a23b1484e3a7::t_7452c2a5410179 1-2
+openspec/changes/frame-edge-selection/design.md
+  s_f2a23b1484e3a7::t_46acd6efd82187 1-41
+openspec/changes/frame-edge-selection/proposal.md
+  s_f2a23b1484e3a7::t_ca50e1a511a180 1-30
+openspec/changes/frame-edge-selection/specs/frame-node/edge-selection/spec.md
+  s_f2a23b1484e3a7::t_2d5d9def96b718 1-89
+openspec/changes/frame-edge-selection/tasks.md
+  s_f2a23b1484e3a7::t_84785eaa64bd50 1-25
+openspec/changes/text-v2-paragraph-indent/.openspec.yaml
+  s_f2a23b1484e3a7::t_f622bd188f63ff 1-2
+openspec/changes/text-v2-paragraph-indent/design.md
+  s_f2a23b1484e3a7::t_a97083dc64b05d 1-46
+openspec/changes/text-v2-paragraph-indent/proposal.md
+  s_f2a23b1484e3a7::t_fdd7a282483f92 1-37
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/editing/spec.md
+  s_f2a23b1484e3a7::t_50292d8217a5ec 1-43
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/layout/spec.md
+  s_f2a23b1484e3a7::t_9cd6dfb7bdee42 1-27
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/model/spec.md
+  s_f2a23b1484e3a7::t_3dce599ccdbb4b 1-27
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/rich-text-api/spec.md
+  s_f2a23b1484e3a7::t_a185ae5cc90cc2 1-37
+openspec/changes/text-v2-paragraph-indent/tasks.md
+  s_f2a23b1484e3a7::t_f710bb4d06613b 1-36
+openspec/specs/image-node/flip/spec.md
+  s_f2a23b1484e3a7::t_d1d23d3605f344 1-99
+openspec/specs/shape-label/engine/spec.md
+  s_f2a23b1484e3a7::t_36ac87628bd751 1-80
+openspec/specs/text-v2/editing/spec.md
+  s_f2a23b1484e3a7::t_7aa65439464e16 1-140
+openspec/specs/text-v2/layout/spec.md
+  s_f2a23b1484e3a7::t_76d75edf3b8e1a 1-130
+openspec/specs/text-v2/model/spec.md
+  s_f2a23b1484e3a7::t_82ad231720fa9a 1-109
+openspec/specs/text-v2/rich-text-api/spec.md
+  s_f2a23b1484e3a7::t_27d6b11ecb3b75 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "59238c2b04c52dc8213c12c43e62d1d8bf3b2024",
+  "prompts": {},
+  "sessions": {
+    "s_f2a23b1484e3a7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e35decb2cffeX1n4nN4Uu9kJI6",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
