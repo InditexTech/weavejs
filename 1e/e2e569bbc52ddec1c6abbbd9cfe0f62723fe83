@@ -1,0 +1,19 @@
+.github/workflows/docouture-release.yml
+  s_524bfc6c3331c0::t_d65f4d9b30ec22 220-224,242-248,255,497-498
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "1ee2e569bbc52ddec1c6abbbd9cfe0f62723fe83",
+  "prompts": {},
+  "sessions": {
+    "s_524bfc6c3331c0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3608ee6bfferbEOWosvF8tFjm",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
