@@ -129,6 +129,28 @@ describe('rich text session', () => {
     expect(c.session.model.getBlocks()[0].kind).toBeUndefined();
   });
 
+  it('Tab / Shift+Tab / Backspace indent plain paragraphs', () => {
+    const c = make([{ runs: [{ t: 'ab' }] }, { runs: [{ t: 'cd' }] }]);
+    c.session.model.setSelection(1, 1);
+    key(c, 'Tab');
+    key(c, 'Tab');
+    let b = c.session.model.getBlocks();
+    expect(b.map((x) => x.depth)).toEqual([2, undefined]);
+    expect(c.session.model.getSelection()).toEqual({ start: 1, end: 1 });
+    c.session.model.setSelection(0, 0);
+    key(c, 'Backspace');
+    expect(c.session.model.getBlocks()[0].depth).toBe(1);
+    key(c, 'Tab', { shiftKey: true });
+    b = c.session.model.getBlocks();
+    expect(b[0]).not.toHaveProperty('depth');
+    expect(b[0].runs[0].t).toBe('ab');
+    key(c, 'Tab', { shiftKey: true });
+    expect(c.session.model.getBlocks()).toHaveLength(2);
+    c.session.model.setSelection(0, 5);
+    key(c, 'Tab');
+    expect(c.session.model.getBlocks().map((x) => x.depth)).toEqual([1, 1]);
+  });
+
   it('disabled: shortcuts and list rules are inactive, keydown stays stopped', () => {
     const c = make([{ kind: 'ul', runs: [{ t: 'a' }] }], false);
     c.session.model.setSelection(0, 1);

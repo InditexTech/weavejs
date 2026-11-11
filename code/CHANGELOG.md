@@ -13,9 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.8.0] - 2026-11-11
+
 ### Added
 
-- [#1232](https://github.com/InditexTech/weavejs/issues/1232) Add sticky note canvas primitive and interactive placement tool
+- [#1262](https://github.com/InditexTech/weavejs/issues/1262) Text indentation: apply to a single paragraph line, not only to bulleted lists
+- [#1236](https://github.com/InditexTech/weavejs/issues/1236) Proposal: generate the CHANGELOG entries in CI from the issues each PR closes
+- [#1263](https://github.com/InditexTech/weavejs/issues/1263) Artboard selection: allow selecting an artboard by clicking any of its edges, not only the top bar
+- [#1254](https://github.com/InditexTech/weavejs/issues/1254) Wacom handwriting produces uneven, angular strokes
+
+### Fixed
+
+- [#1270](https://github.com/InditexTech/weavejs/issues/1270) Text V2: list markers do not follow the text when a list is centered or right-aligned
+- [#1259](https://github.com/InditexTech/weavejs/issues/1259) API reference for WeaveNode, WeaveAction and WeavePlugin lists outdated hook names and omits initialize
+- [#1256](https://github.com/InditexTech/weavejs/issues/1256) Optional lifecycle hooks declared abstract force every custom node, action and plugin to implement them
 
 ## [5.7.1] - 2026-10-27
 
@@ -1982,7 +1993,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.7.1...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.8.0...HEAD
+
+[5.8.0]: https://github.com/InditexTech/weavejs/compare/5.7.1...5.8.0
 
 [5.7.1]: https://github.com/InditexTech/weavejs/compare/5.7.0...5.7.1
 

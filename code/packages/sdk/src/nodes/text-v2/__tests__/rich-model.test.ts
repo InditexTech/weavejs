@@ -114,6 +114,50 @@ describe('lists', () => {
     );
   });
 
+  it('indents and outdents plain paragraphs, lists untouched', () => {
+    const two: WeaveTextBlock[] = [
+      { runs: [{ t: 'a' }] },
+      { runs: [{ t: 'b' }] },
+      { kind: 'ul', runs: [{ t: 'c' }] },
+    ];
+    let b = indentBlocks(two, 0, 5);
+    expect(b.map((x) => x.depth)).toEqual([1, 1, 1]);
+    b = indentBlocks(b, 0, 3);
+    expect(b.map((x) => x.depth)).toEqual([2, 2, 1]);
+    b = outdentBlocks(outdentBlocks(b, 0, 3), 0, 3);
+    expect(b[0]).toEqual({ runs: [{ t: 'a' }] });
+    expect(b[0]).not.toHaveProperty('depth');
+    expect(outdentBlocks(plain('a'), 0, 0)).toEqual(plain('a'));
+  });
+
+  it('toggling a list off drops depth', () => {
+    const b = toggleList(
+      [{ kind: 'ul', depth: 2, runs: [{ t: 'a' }] }],
+      0,
+      0,
+      'ul'
+    );
+    expect(b).toEqual(plain('a'));
+  });
+
+  it('reports paragraph indent separately from lists', () => {
+    const blocks: WeaveTextBlock[] = [
+      { depth: 1, runs: [{ t: 'a' }] },
+      { depth: 1, runs: [{ t: 'b' }] },
+      { runs: [{ t: 'c' }] },
+      { kind: 'ul', depth: 3, runs: [{ t: 'd' }] },
+    ];
+    const f = (s: number, e: number) => getSelectionFormat(blocks, s, e).indent;
+    expect(f(0, 3)).toEqual({ state: 'all', depth: 1 });
+    expect(f(0, 5)).toEqual({ state: 'some' });
+    expect(f(4, 5)).toEqual({ state: 'none' });
+    expect(f(6, 7)).toEqual({ state: 'none' });
+    expect(getSelectionFormat(blocks, 6, 7).list).toEqual({
+      kind: 'ul',
+      depth: 3,
+    });
+  });
+
   it('numbers continuously, restarts, honours start and cycles', () => {
     const ol = (depth: number, start?: number): WeaveTextBlock => ({
       kind: 'ol',

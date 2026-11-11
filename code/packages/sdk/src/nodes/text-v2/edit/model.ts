@@ -321,7 +321,7 @@ export class TextEditModel {
   enter(soft = false): boolean {
     const { start, end } = this.getSelection();
     const b = start === end ? this.blockAt(start) : undefined;
-    if (b && this.blocks[b.index].kind && b.length === 0) {
+    if (!soft && b && this.blocks[b.index].kind && b.length === 0) {
       return this.commitFormat(outdentToPlain(this.blocks, b.index));
     }
     const at = this.blockAt(start);
@@ -343,15 +343,18 @@ export class TextEditModel {
 
   /**
    * Backspace at the start of a list item outdents it, or removes the
-   * marker at depth 0. Returns false when the key is not handled here.
+   * marker at depth 0; at the start of an indented plain paragraph it
+   * outdents it. Returns false when the key is not handled here.
    */
   backspaceInList(): boolean {
     const { start, end } = this.getSelection();
     if (start !== end) return false;
     const b = this.blockAt(start);
-    if (b?.start !== start || !this.blocks[b.index].kind) return false;
+    if (b?.start !== start) return false;
+    const block = this.blocks[b.index];
+    if (!block.kind && !block.depth) return false;
     // A continuation merges into the previous block (default Backspace).
-    if (this.blocks[b.index].cont) return false;
+    if (block.cont) return false;
     return this.commitFormat(outdentBlocks(this.blocks, start, start));
   }
 
