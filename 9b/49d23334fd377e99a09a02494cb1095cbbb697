@@ -1,0 +1,93 @@
+.github/workflows/code-changelog-check.yml
+  s_f2a23b1484e3a7::t_69303ee1e134f2 22-24
+.github/workflows/docouture-release.yml
+  s_f2a23b1484e3a7::t_a6ae96397d3edd 242-248
+.github/workflows/docs/code-changelog-check.md
+  s_f2a23b1484e3a7::t_95ff9e109a9d67 19
+AGENTS.md
+  s_f2a23b1484e3a7::t_6f30c452f7ec52 120-123,136-137,139-141
+CONTRIBUTING.md
+  s_f2a23b1484e3a7::t_e130d75c327d09 139
+code/CHANGELOG.md
+  s_f2a23b1484e3a7::t_bdbb1af4f3a865 16-17,20-29,1996-1998
+code/package-lock.json
+  s_f2a23b1484e3a7::t_46353fb903ea6a 3,9,17719,17754,17786,17789-17790,17829,17832-17833,17875,17878-17879,17926,17929,17995,18001-18002,18063,18066-18067,18108,18111-18112,18164
+code/package.json
+  s_f2a23b1484e3a7::t_73453c0a4779fd 3
+code/packages/create-backend-app/package.json
+  s_f2a23b1484e3a7::t_a2fec3d4c1a5fb 3
+code/packages/create-frontend-app/package.json
+  s_f2a23b1484e3a7::t_c6f3d1edce3b83 3
+code/packages/react/package.json
+  s_f2a23b1484e3a7::t_b46caea5bedff0 3,54-55
+code/packages/renderer-konva-base/package.json
+  s_f2a23b1484e3a7::t_fffee76368d90d 3,58-59
+code/packages/renderer-konva-react-reconciler/package.json
+  s_f2a23b1484e3a7::t_fc7024d54e0c7c 3,58-59
+code/packages/sdk/package.json
+  s_f2a23b1484e3a7::t_ba7f2f7f715794 3,64
+code/packages/sdk/src/nodes/text-v2/__tests__/clipboard-blocks.test.ts
+  s_f2a23b1484e3a7::t_97ba6eb83e19bb 65-79
+code/packages/sdk/src/nodes/text-v2/__tests__/list-continuation.test.ts
+  s_f2a23b1484e3a7::t_92a91e6492c3dc 51-62,142-167
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-api.test.ts
+  s_f2a23b1484e3a7::t_ce35c4d907c928 216-231
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-layout.test.ts
+  s_f2a23b1484e3a7::t_e73ad8a92aa555 92-112
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-model.test.ts
+  s_f2a23b1484e3a7::t_18e58a75af0ab1 117-160
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-session.test.ts
+  s_f2a23b1484e3a7::t_cb6bca7d608dd1 132-153
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_f2a23b1484e3a7::t_9b3a62435d6f58 324,346-347,353-355,357
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_f2a23b1484e3a7::t_608efcffd101eb 323,330-331,339
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_f2a23b1484e3a7::t_e526e1f2083a28 298-299,317,322,334-339,348,654,661,664-667,676,776-777,847,851-866
+code/packages/store-azure-web-pubsub/package.json
+  s_f2a23b1484e3a7::t_1fc95a6068dcd7 3,60-61
+code/packages/store-standalone/package.json
+  s_f2a23b1484e3a7::t_0a2ccf33f53b56 3,55-56
+code/packages/store-websockets/package.json
+  s_f2a23b1484e3a7::t_bb78ee13ac18c6 3,57-58
+code/packages/types/package.json
+  s_f2a23b1484e3a7::t_99bcb12de614e2 3
+docs/.release-version
+  s_f2a23b1484e3a7::t_aa2b7d4643cefc 1
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_f2a23b1484e3a7::t_3f5d2a03922e83 86,97,148
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_f2a23b1484e3a7::t_639cb4cb9deac2 139,149,154,179-180,235
+openspec/changes/text-v2-paragraph-indent/.openspec.yaml
+  s_f2a23b1484e3a7::t_36ab55841f4165 1-2
+openspec/changes/text-v2-paragraph-indent/design.md
+  s_f2a23b1484e3a7::t_8126806adc7c42 1-46
+openspec/changes/text-v2-paragraph-indent/proposal.md
+  s_f2a23b1484e3a7::t_d83fa1a8239215 1-37
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/editing/spec.md
+  s_f2a23b1484e3a7::t_4b0a231b09710e 1-43
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/layout/spec.md
+  s_f2a23b1484e3a7::t_e23a7b35a49fa9 1-27
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/model/spec.md
+  s_f2a23b1484e3a7::t_957e0cf21363c4 1-27
+openspec/changes/text-v2-paragraph-indent/specs/text-v2/rich-text-api/spec.md
+  s_f2a23b1484e3a7::t_8be39f5ca8d386 1-37
+openspec/changes/text-v2-paragraph-indent/tasks.md
+  s_f2a23b1484e3a7::t_b1d90372f763d7 1-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "9b49d23334fd377e99a09a02494cb1095cbbb697",
+  "prompts": {},
+  "sessions": {
+    "s_f2a23b1484e3a7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e35decb2cffeX1n4nN4Uu9kJI6",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
