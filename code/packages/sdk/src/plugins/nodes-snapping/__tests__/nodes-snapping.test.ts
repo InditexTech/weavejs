@@ -392,24 +392,40 @@ describe('WeaveNodesSnappingPlugin dragEndHandler', () => {
 // ─── register ─────────────────────────────────────────────────────────────────
 
 describe('WeaveNodesSnappingPlugin.register', () => {
-  it('hooks weave:onNodeDragStart', () => {
-    const { plugin, weave } = setup();
-    plugin.instance = weave as never;
-    plugin.onInit();
-    plugin.register(weave as never);
+  describe('container custom guides while dragging', () => {
+    const arm = () => {
+      const { plugin, weave } = setup();
+      plugin.instance = weave as never;
+      plugin.onInit();
+      plugin.register(weave as never);
+      const mgr = plugin.snappingManagerCustomGuides;
+      const hide = vi.spyOn(mgr, 'hideCustomGuides').mockImplementation(() => {});
+      const render = vi.spyOn(mgr, 'renderCustomGuides').mockImplementation(() => {});
+      vi.spyOn(mgr, 'isCustomGuidesVisible').mockImplementation((id: string) => id === 'frame-1');
+      const frame = { id: () => 'frame-1', getAttrs: () => ({ containerId: 'frame-1-group' }) };
+      const plain = { id: () => 'text-1', getAttrs: () => ({}) };
+      const hidden = { id: () => 'frame-2', getAttrs: () => ({ containerId: 'x' }) };
+      // `register()` adds its hook last (after the ones from `onInit()`).
+      const run = (event: string, nodes: unknown[]) =>
+        weave._hooks[event].at(-1)?.({ nodes });
+      return { weave, hide, render, frame, plain, hidden, run };
+    };
 
-    const hooks = weave._hooks;
-    expect(hooks['weave:onNodeDragStart']).toBeDefined();
-  });
+    it('hides the guides of a dragged container with visible guides', () => {
+      const t = arm();
+      expect(t.weave._hooks['weave:onTransformerDragStart']).toBeDefined();
+      t.run('weave:onTransformerDragStart', [t.frame, t.plain, t.hidden]);
+      expect(t.hide).toHaveBeenCalledTimes(1);
+      expect(t.hide).toHaveBeenCalledWith('frame-1');
+    });
 
-  it('hooks weave:onNodeDragEnd', () => {
-    const { plugin, weave } = setup();
-    plugin.instance = weave as never;
-    plugin.onInit();
-    plugin.register(weave as never);
-
-    const hooks = weave._hooks;
-    expect(hooks['weave:onNodeDragEnd']).toBeDefined();
+    it('draws them again on drop', () => {
+      const t = arm();
+      expect(t.weave._hooks['weave:onTransformerDragEnd']).toBeDefined();
+      t.run('weave:onTransformerDragEnd', [t.frame, t.plain, t.hidden]);
+      expect(t.render).toHaveBeenCalledTimes(1);
+      expect(t.render).toHaveBeenCalledWith('frame-1');
+    });
   });
 
   it('returns the plugin instance', () => {

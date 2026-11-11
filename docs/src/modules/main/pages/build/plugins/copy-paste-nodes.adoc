@@ -1,5 +1,5 @@
 = Copy & Paste Nodes
-:description: Activate support to copy & paste the nodes
+:description: Activate support to copy and paste the nodes
 
 image::plugins/copy-paste.gif[Copy & Paste plugin on use on the Weave.js showcase,role="zoom-in"]
 

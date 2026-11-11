@@ -288,7 +288,8 @@ export class WeaveConnectorNode extends WeaveNode {
 
     connector.add(connectorLine);
 
-    this.instance.addEventListener(
+    this.setNodeInstanceListener(
+      connector,
       'onNodeRenderedAdded',
       (node: Konva.Node) => {
         const connectorAttrs = connector.getAttrs();
@@ -366,7 +367,8 @@ export class WeaveConnectorNode extends WeaveNode {
       }
     );
 
-    this.instance.addEventListener(
+    this.setNodeInstanceListener(
+      connector,
       'onNodeRenderedUpdated',
       (node: Konva.Node) => {
         if (
@@ -507,31 +509,36 @@ export class WeaveConnectorNode extends WeaveNode {
       };
     })();
 
-    this.instance.addEventListener('onNodesChange', () => {
-      const nodesSelection = this.getNodesSelectionPlugin();
-      if (nodesSelection) {
-        const selectedNodes = nodesSelection.getSelectedNodes();
+    this.setNodeInstanceListener(
+      connector,
+      'onNodesChange',
+      () => {
+        const nodesSelection = this.getNodesSelectionPlugin();
+        if (nodesSelection) {
+          const selectedNodes = nodesSelection.getSelectedNodes();
 
-        if (
-          selectedNodes.length === 1 &&
-          selectedNodes[0].getAttrs().id === connector.getAttrs().id
-        ) {
-          this.teardownSelection(connector);
-          teardownCurvedLine(this.instance, connector);
-
-          this.setupSelection(connector);
           if (
-            connector.getAttrs().lineType ===
-            WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED
+            selectedNodes.length === 1 &&
+            selectedNodes[0].getAttrs().id === connector.getAttrs().id
           ) {
-            setupCurvedLine(this.instance, this.config, this, connector);
+            this.teardownSelection(connector);
+            teardownCurvedLine(this.instance, connector);
+
+            this.setupSelection(connector);
+            if (
+              connector.getAttrs().lineType ===
+              WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED
+            ) {
+              setupCurvedLine(this.instance, this.config, this, connector);
+            }
+          } else {
+            this.teardownSelection(connector);
+            teardownCurvedLine(this.instance, connector);
           }
-        } else {
-          this.teardownSelection(connector);
-          teardownCurvedLine(this.instance, connector);
         }
-      }
-    });
+      },
+      'connector:onNodesChange'
+    );
 
     connector.allowedAnchors = function () {
       return [];
@@ -1040,7 +1047,7 @@ export class WeaveConnectorNode extends WeaveNode {
       );
     });
 
-    this.instance.addEventListener('onZoomChange', () => {
+    this.setNodeInstanceListener(nodeHandler, 'onZoomChange', () => {
       nodeHandler!.setAttrs({
         radius: radius / this.instance.getStage().scaleX(),
       });

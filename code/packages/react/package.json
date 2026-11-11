@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-react",
-  "version": "5.6.0-SNAPSHOT",
+  "version": "5.9.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -14,9 +14,14 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
+  "main": "./dist/react.js",
+  "module": "./dist/react.js",
   "exports": {
-    "import": "./dist/react.js",
-    "require": "./dist/react.cjs"
+    ".": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    }
   },
   "types": "dist/react.d.ts",
   "files": [
@@ -46,8 +51,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-sdk": "5.6.0-SNAPSHOT",
-    "@inditextech/weave-types": "5.6.0-SNAPSHOT"
+    "@inditextech/weave-sdk": "5.9.0-SNAPSHOT",
+    "@inditextech/weave-types": "5.9.0-SNAPSHOT"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -56,8 +61,8 @@
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
     "@vitejs/plugin-react": "4.3.4",
-    "@vitest/coverage-v8": "^4.1.11",
-    "@vitest/ui": "^4.1.11",
+    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/ui": "^4.1.12",
     "eslint": "8.57.1",
     "eslint-plugin-react": "7.34.1",
     "eslint-plugin-react-hooks": "^4.6.2",
@@ -66,7 +71,7 @@
     "rollup-plugin-visualizer": "^7.0.1",
     "tsdown": "0.22.14",
     "typescript-eslint": "8.22.0",
-    "vitest": "^4.1.11",
+    "vitest": "^4.1.12",
     "vitest-canvas-mock": "^1.1.4",
     "vitest-sonar-reporter": "^3.0.0",
     "zustand": "5.0.3"

@@ -81,11 +81,35 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles(format('{0}/package-lock.json', env.WORKING_DIRECTORY)) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: asdf / Setup Dependencies Cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        id: asdf-cache
+        with:
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles(format('{0}/.tool-versions', env.WORKING_DIRECTORY)) }}
+
       - name: Set up asdf-managed Node
         uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        # https://github.com/asdf-vm/actions/issues/356
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
           asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      # Catches invisible Unicode whitespace (e.g. a pasted-in NBSP) before
+      # it reaches CHANGELOG.md's [Unreleased] section. See
+      # .github/scripts/sanitize-changelog.mjs.
+      - name: Verify CHANGELOG.md has no invisible whitespace
+        shell: bash
+        run: node .github/scripts/sanitize-changelog.mjs "${WORKING_DIRECTORY}/CHANGELOG.md" --check
 
       - name: Verify, test, and build
         working-directory: ${{ env.WORKING_DIRECTORY }}

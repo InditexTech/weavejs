@@ -6,7 +6,7 @@ import type { WeaveShapeLabelProps } from './shape-label.types';
 
 export const WEAVE_STAGE_SHAPE_LABEL_EDITION_MODE = 'shape-label-edition';
 
-export const WEAVE_SHAPE_LABEL_DEFAULTS: Required<WeaveShapeLabelProps> = {
+export const WEAVE_SHAPE_LABEL_DEFAULTS: Required<Omit<WeaveShapeLabelProps, 'labelBlocks'>> = {
   labelText: '',
   labelFontFamily: 'Arial, sans-serif',
   labelFontSize: 14,

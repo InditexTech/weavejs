@@ -14,6 +14,7 @@ import {
   vi,
 } from 'vitest';
 import Konva from 'konva';
+import type { WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveImageNode } from '../image';
 import {
   WEAVE_IMAGE_CROP_END_TYPE,
@@ -2296,5 +2297,33 @@ describe('WeaveImageNode', () => {
       const result = WeaveImageNode.updateNodeState(base, defaultProps());
       expect((result.props as Record<string, unknown>)['imageId']).toBeUndefined();
     });
+  });
+});
+
+describe('WeaveImageNode instance listeners lifecycle', () => {
+  it('does not leak Weave instance listeners across render and destroy cycles', async () => {
+    const { default: Emittery } = await import('emittery');
+    const { node, mock } = makeNode();
+    const emitter = new Emittery();
+    mock.addEventListener.mockImplementation(
+      (event: string, cb: (payload: unknown) => void) => emitter.on(event, cb)
+    );
+    mock.removeEventListener.mockImplementation(
+      (event: string, cb: (payload: unknown) => void) => emitter.off(event, cb)
+    );
+    const events = ['onNodeRenderedAdded'];
+    const counts = () => events.map((e) => emitter.listenerCount(e));
+    const render = (i: number) =>
+      node.onRender(defaultProps({ id: `leak-${i}` })) as unknown as WeaveElementInstance;
+
+    const first = render(0);
+    const alive = counts();
+    for (let i = 1; i < 5; i++) {
+      node.onDestroy(render(i));
+    }
+
+    expect(counts()).toEqual(alive);
+    node.onDestroy(first);
+    expect(counts()).toEqual(events.map(() => 0));
   });
 });

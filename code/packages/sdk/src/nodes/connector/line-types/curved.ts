@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { addNodeInstanceListener } from '../../node';
 import Konva from 'konva';
 import { WEAVE_CONNECTOR_NODE_LINE_TYPE } from '../constants';
 import type { Weave } from '@/weave';
@@ -106,11 +107,16 @@ export const setupCurvedLine = (
     instance.updateNodeNT(connectorHandler.serialize(connector));
   });
 
-  instance.addEventListener('onZoomChange', () => {
-    curvedControlNodeHandler!.setAttrs({
-      radius: radius / instance.getStage().scaleX(),
-    });
-  });
+  addNodeInstanceListener(
+    instance,
+    curvedControlNodeHandler!,
+    'onZoomChange',
+    () => {
+      curvedControlNodeHandler!.setAttrs({
+        radius: radius / instance.getStage().scaleX(),
+      });
+    }
+  );
 
   instance.getSelectionLayer()?.add(curvedControlNodeHandler);
 };

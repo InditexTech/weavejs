@@ -257,6 +257,76 @@ describe('WeaveEllipseToolAction', () => {
       windowHandlers['keydown']?.({ code: 'KeyA' });
       expect(cancelAction).not.toHaveBeenCalled();
     });
+
+    it('4.6 Shift and Alt keydown/keyup update the active drag geometry', () => {
+      const ellipse = makeMockEllipse();
+      const nodeHandler = makeMockNodeHandler();
+      mockWeave._stage.findOne.mockReturnValue(ellipse);
+      mockWeave.getNodeHandler.mockReturnValue(nodeHandler);
+      mockWeave.getMousePointerRelativeToContainer.mockReturnValue({
+        mousePoint: { x: 50, y: 40 },
+      });
+
+      const { handlers } = triggerAndCapture();
+      handlers['pointerdown']?.(makePointerEvent({ clientX: 10, clientY: 20 }));
+      const altBeforeMovePreventDefault = vi.fn();
+      windowHandlers['keydown']?.({
+        type: 'keydown',
+        key: 'Alt',
+        shiftKey: false,
+        altKey: true,
+        preventDefault: altBeforeMovePreventDefault,
+      });
+      expect(altBeforeMovePreventDefault).toHaveBeenCalled();
+      expect(nodeHandler.onUpdate).not.toHaveBeenCalled();
+      windowHandlers['keyup']?.({
+        key: 'Alt',
+        shiftKey: false,
+        altKey: false,
+      });
+
+      handlers['pointermove']?.(makePointerEvent({ clientX: 50, clientY: 40 }));
+
+      windowHandlers['keydown']?.({
+        key: 'Shift',
+        shiftKey: true,
+        altKey: false,
+      });
+      const constrained = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as R;
+      expect(constrained.radiusX).toBe(20);
+      expect(constrained.radiusY).toBe(20);
+
+      windowHandlers['keyup']?.({
+        key: 'Shift',
+        shiftKey: false,
+        altKey: false,
+      });
+      const unconstrained = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as R;
+      expect(unconstrained.radiusX).toBe(20);
+      expect(unconstrained.radiusY).toBe(10);
+
+      const preventAltDefault = vi.fn();
+      windowHandlers['keydown']?.({
+        type: 'keydown',
+        key: 'Alt',
+        shiftKey: false,
+        altKey: true,
+        preventDefault: preventAltDefault,
+      });
+      expect(preventAltDefault).toHaveBeenCalled();
+      const centered = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as R;
+      expect(centered.x + centered.radiusX).toBe(10);
+      expect(centered.y + centered.radiusY).toBe(20);
+
+      windowHandlers['keyup']?.({
+        key: 'Alt',
+        shiftKey: false,
+        altKey: false,
+      });
+      const cornerBased = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as R;
+      expect(cornerBased.x).toBe(10);
+      expect(cornerBased.y).toBe(20);
+    });
   });
 
   // ── Suite 5: setupEvents – pointerdown ────────────────────────────────────

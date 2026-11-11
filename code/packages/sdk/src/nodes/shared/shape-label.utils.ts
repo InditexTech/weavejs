@@ -5,7 +5,12 @@
 import { z } from 'zod';
 import Konva from 'konva';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
-import type { WeaveShapeLabelTextBounds } from './shape-label.types';
+import type {
+  WeaveShapeLabelNode,
+  WeaveShapeLabelTextBounds,
+} from './shape-label.types';
+import { blocksToText } from '@/nodes/text-v2/model';
+import type { WeaveTextBlock } from '@/nodes/text-v2/model';
 import { labelId, WEAVE_SHAPE_LABEL_DEFAULTS } from './shape-label.constants';
 
 /**
@@ -14,6 +19,40 @@ import { labelId, WEAVE_SHAPE_LABEL_DEFAULTS } from './shape-label.constants';
  * `addNodeState` / `updateNodeState` to avoid duplicating the 12-field pattern
  * across every shape node that supports inline text labels.
  */
+const labelBlocksSchema = z.array(
+  z.object({
+    runs: z.array(
+      z.object({ t: z.string(), m: z.object({}).passthrough().optional() })
+    ),
+    kind: z.enum(['ul', 'ol']).optional(),
+    depth: z.number().int().min(0).optional(),
+    start: z.number().int().min(1).optional(),
+    align: z.enum(['left', 'center', 'right']).optional(),
+  })
+);
+
+/**
+ * `labelBlocks` are replaced wholesale and cleared when the next props carry
+ * none (the state merge alone would keep a stale value).
+ */
+export function applyLabelBlocksState<T extends { props: Record<string, unknown> }>(
+  state: T,
+  nextProps: WeaveElementAttributes
+): T {
+  if (nextProps.labelBlocks) state.props.labelBlocks = nextProps.labelBlocks;
+  else delete state.props.labelBlocks;
+  return state;
+}
+
+/** Stored rich blocks, only when they still match the plain `labelText`. */
+export function resolveLabelBlocks(
+  props: WeaveElementAttributes
+): WeaveTextBlock[] | undefined {
+  const blocks = props.labelBlocks as WeaveTextBlock[] | undefined;
+  if (!Array.isArray(blocks) || blocks.length === 0) return undefined;
+  return blocksToText(blocks) === (props.labelText ?? '') ? blocks : undefined;
+}
+
 export function spreadLabelProps(props: WeaveElementAttributes): Partial<WeaveElementAttributes> {
   return {
     ...(props.labelText !== undefined && { labelText: props.labelText }),
@@ -28,6 +67,7 @@ export function spreadLabelProps(props: WeaveElementAttributes): Partial<WeaveEl
     ...(props.labelLineHeight !== undefined && { labelLineHeight: props.labelLineHeight }),
     ...(props.labelPaddingX !== undefined && { labelPaddingX: props.labelPaddingX }),
     ...(props.labelPaddingY !== undefined && { labelPaddingY: props.labelPaddingY }),
+    ...(props.labelBlocks !== undefined && { labelBlocks: props.labelBlocks }),
   };
 }
 
@@ -75,6 +115,9 @@ export function getShapeLabelSchemaFields() {
       .number()
       .optional()
       .describe('Vertical inset (padding) in pixels applied on top and bottom of the label'),
+    labelBlocks: labelBlocksSchema
+      .optional()
+      .describe('Rich label content (paragraphs of runs with marks); labelText is the plain mirror'),
   };
 }
 
@@ -83,7 +126,7 @@ interface LabelNodeContext {
   paddingX: number;
   paddingY: number;
   fontSize: number;
-  labelNode: Konva.Text;
+  labelNode: WeaveShapeLabelNode;
   /** Natural (unconstrained) client rect of the label text. */
   naturalSize: { width: number; height: number };
 }
@@ -103,7 +146,7 @@ function extractLabelNodeContext(
 
   if (!labelText) return null;
 
-  const labelNode = group.findOne<Konva.Text>(`#${labelId(group.id())}`);
+  const labelNode = group.findOne<WeaveShapeLabelNode>(`#${labelId(group.id())}`);
   if (!labelNode) return null;
 
   const paddingX =

@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-store-azure-web-pubsub",
-  "version": "5.6.0-SNAPSHOT",
+  "version": "5.9.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -18,12 +18,12 @@
     "./client": {
       "types": "./dist/client.d.ts",
       "import": "./dist/client.js",
-      "require": "./dist/client.cjs"
+      "default": "./dist/client.js"
     },
     "./server": {
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+      "default": "./dist/server.js"
     }
   },
   "files": [
@@ -55,9 +55,10 @@
   },
   "dependencies": {
     "@azure/identity": "4.13.2",
+    "@azure/msal-node": "^7.1.0",
     "@azure/web-pubsub": "1.2.0",
-    "@inditextech/weave-sdk": "5.6.0-SNAPSHOT",
-    "@inditextech/weave-types": "5.6.0-SNAPSHOT",
+    "@inditextech/weave-sdk": "5.9.0-SNAPSHOT",
+    "@inditextech/weave-types": "5.9.0-SNAPSHOT",
     "buffer": "6.0.3",
     "reconnecting-websocket": "4.4.0",
     "uuid": "11.1.1",
@@ -75,8 +76,8 @@
     "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
-    "@vitest/coverage-v8": "^4.1.11",
-    "@vitest/ui": "^4.1.11",
+    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/ui": "^4.1.12",
     "cors": "^2.8.5",
     "emittery": "^1.1.0",
     "eslint": "8.57.1",
@@ -90,7 +91,7 @@
     "tsdown": "0.22.14",
     "tsx": "^4.19.3",
     "typescript-eslint": "8.22.0",
-    "vitest": "^4.1.11",
+    "vitest": "^4.1.12",
     "vitest-sonar-reporter": "^3.0.0"
   },
   "peerDependencies": {

@@ -29,6 +29,7 @@
 ** xref:main:build/nodes/stroke.adoc[Stroke]
 ** xref:main:build/nodes/stroke-single.adoc[Stroke Single]
 ** xref:main:build/nodes/text.adoc[Text]
+** xref:main:build/nodes/text-v2.adoc[Text (native editing)]
 ** xref:main:build/nodes/video.adoc[Video]
 ** xref:main:build/nodes/arrow.adoc[Arrow (deprecated)]
 ** xref:main:build/nodes/line.adoc[Line (deprecated)]

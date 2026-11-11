@@ -54,6 +54,7 @@ type WeaveFrameProperties = {
   titleMargin: number;
   borderWidth: number;
   borderColor: string;
+  edgeHitWidth: number;
   onTargetLeave: {
     borderColor: string;
     fill: string;
@@ -100,9 +101,10 @@ For `WeaveFrameProperties`:
 | mono:[titleMargin] | mono:[number] |  | mono:[check default values] | The margin of the title (px) with the frame contents.
 | mono:[borderWidth] | mono:[number] |  | mono:[check default values] | The border width (px) of the frame.
 | mono:[borderColor] | mono:[string] |  | mono:[#000check default values0ff] | The border color (HEX with alpha) of the frame.
+| mono:[edgeHitWidth] | mono:[number] |  | mono:[6] | Minimum width (screen px) of the clickable band along each frame edge. The effective band, in canvas units, is the greater of mono:[borderWidth] and mono:[edgeHitWidth] divided by the current zoom, so edges stay selectable when zoomed out.
 | mono:[onTargetLeave.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when no target is added.
 | mono:[onTargetLeave.fill] | mono:[string] |  | mono:[check default values] | The frame background color (HEX with alpha) of the frame when no target is added.
-| mono:[onTargetEnter.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when a target is going to be added.
+| mono:[onTargetEnter.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when a target is going to be added. Drawn with the width of mono:[transform.borderStrokeWidth], constant on screen at any zoom.
 | mono:[onTargetEnter.fill] | mono:[string] |  | mono:[check default values] | The frame background color (HEX with alpha) of the frame when a target going to be added.
 | mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the frame (if can be resized, rotated, anchors, etc.).
 |===
@@ -119,6 +121,7 @@ const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   titleMargin: 20,
   borderColor: "#000000ff",
   borderWidth: 1,
+  edgeHitWidth: 6,
   onTargetLeave: {
     borderColor: "#000000ff",
     fill: "#ffffffff",

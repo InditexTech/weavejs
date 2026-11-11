@@ -74,7 +74,7 @@ urls:
 
 runtime:
   log:
-    failure_level: warn
+    failure_level: error
     # See antora-playbook.yml's own comment on this key: Antora's own
     # default is 'warn', which would otherwise silently drop
     # @inditextech/docouture-antora-extensions' docouture-version-report and

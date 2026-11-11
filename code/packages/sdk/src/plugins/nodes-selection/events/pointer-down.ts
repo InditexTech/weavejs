@@ -103,6 +103,15 @@ export function handlePointerDown(
 
   if (isTransformer) return;
 
+  // Controls that handle their own drag (e.g. measure handles) must not
+  // select or arm a drag of the node that owns them.
+  if (e.target.getAttrs().ownsDrag) {
+    ctx.setAreaSelecting(false);
+    ctx.getEdgePanning().stop();
+    ctx.getAreaSelector().hide();
+    return;
+  }
+
   if (!isStage && !isContainerEmptyArea && canBeTargeted) {
     ctx.setAreaSelecting(false);
     ctx.getEdgePanning().stop();

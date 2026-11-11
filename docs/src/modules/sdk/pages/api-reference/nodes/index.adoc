@@ -81,6 +81,10 @@ The WeaveStrokeSingleNode node represents the recommended way to render single-s
 .xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode]
 The WeaveTextNode node is used to display editable or static text on the canvas. It supports rich styling options including font size, family, color, alignment, and line height.
 
+[card,subheader="Drawing",labels="new"]
+.xref:sdk:api-reference/nodes/text-v2.adoc[WeaveTextV2Node]
+The WeaveTextV2Node node is a drop-in replacement for WeaveTextNode with editing drawn natively on the canvas: caret and selection, select-all on edit, session undo and an outline of the text box.
+
 [card,subheader="Drawing"]
 .xref:sdk:api-reference/nodes/video.adoc[WeaveVideoNode]
 The WeaveVideoNode node allows you to render and play videos directly onto the canvas.

@@ -43,6 +43,7 @@ path = [
     "code/lerna.json",
     "code/nx.json",
     "code/tsconfig.base.json",
+    "code/**/__snapshots__/**",
 
     # docs/ directory licensing
     "docs/**",

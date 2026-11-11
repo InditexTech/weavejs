@@ -2,7 +2,7 @@ name: docouture-release-preview
 
 # Comments on a pull request labeled `docs/release`, previewing what
 # docouture-release.yml (this workflow's sibling) will do when the PR merges —
-# same 3-job shape as this monorepo's own .github/workflows/code-release_preview.yml
+# same 3-job shape as docouture's own code-release preview
 # (check-changes-in-paths / release-preview / release-preview-no-*-changes /
 # release-preview-no-release-label), adapted to docs-release's own signal
 # (the `docs/release` label + versioning-mode detection) instead of
@@ -18,47 +18,62 @@ name: docouture-release-preview
 # docs/.release-version's contents) logic verbatim — see that workflow's own
 # comments, and the docs-site-package skill's reference/versioning-modes.md,
 # for the full mechanism.
+#
+# Docouture hardening: pinned actions, no persisted checkout credentials,
+# no third-party path filter (the pull request's own file list comes from the
+# REST API), and every expression a shell script reads arrives through `env:`.
 on:
   pull_request:
     types: [labeled, synchronize, ready_for_review, opened]
     branches: ['main*']
 
+permissions: {}
+
 concurrency:
-  # Scoped per-PR, not just per-workflow: a bare 'release-preview' group name
-  # collides with this monorepo's own code-release_preview.yml, so a label
-  # change firing both workflows at once could have one cancel the other
-  # mid-run even though they preview unrelated releases.
+  # Scoped per-PR, not just per-workflow, so a label change on one pull
+  # request never cancels the preview of another.
   group: docouture-release-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   check-changes-in-paths:
     name: Check for changes in corresponding paths
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
       contents: read
-      pull-requests: read
-    if: ${{ github.event.pull_request.draft == false || contains(github.event.pull_request.labels.*.name, 'docs/release') }}
+      pull-requests: read # List the files this pull request changes.
+    # Same-repository pull requests only: on a fork's pull request GitHub hands
+    # the workflow a read-only GITHUB_TOKEN whatever `permissions:` asks for,
+    # so every `gh pr comment` below would fail the run. Skipping this job
+    # skips the three comment jobs that need it.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && (github.event.pull_request.draft == false || contains(github.event.pull_request.labels.*.name, 'docs/release')) }}
     outputs:
       detected: ${{ steps.changes.outputs.paths }}
     steps:
       - name: Check for changed files in specific paths
         id: changes
-        uses: dorny/paths-filter@ebc4d7e9ebcb0b1eb21480bb8f43113e996ac77a # v3
-        with:
-          filters: |
-            paths:
-              - 'docs/**'
-              - '.github/workflows/docouture-release*.yml'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          files="$(gh api --paginate "repos/${REPOSITORY}/pulls/${PR_NUMBER}/files" --jq '.[].filename')"
+          if printf '%s\n' "$files" | grep -Eq '^(docs/|\.github/workflows/docouture-release[^/]*\.yml$)'; then
+            echo "paths=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "paths=false" >> "$GITHUB_OUTPUT"
+          fi
 
   release-preview:
     name: Release Preview
     needs: check-changes-in-paths
     if: ${{ contains(github.event.pull_request.labels.*.name, 'docs/release') && needs.check-changes-in-paths.outputs.detected == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
-      contents: read
-      pull-requests: write
+      contents: read # Read the playbook and docs/.release-version, and look up tags.
+      pull-requests: write # Post the preview comment on this pull request.
     # `docouture new` scaffolds this site's antora-playbook.yml, docs/antora.yml
     # etc. under docs/ (not the repository root) — same layout
     # docouture-release.yml itself runs against. Every step below runs from
@@ -69,7 +84,9 @@ jobs:
         working-directory: docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # Same signal docouture-release.yml's own "Detect mode" step reads:
       # antora-playbook.yml's content.sources[] tags, not docs/antora.yml
@@ -117,21 +134,26 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
-      # Query the remote directly — no local tag fetch needed. A hit here
-      # means docouture-release.yml's "Push release tag" step will force-move an
-      # existing tag (a republish) rather than create a new one.
+      # Asks the REST API rather than `git ls-remote`: checkout keeps no
+      # credentials, and an unauthenticated ls-remote against a private
+      # repository fails, which would read as "no such tag". A hit here
+      # means docouture-release.yml's "Push release tag" step will force-move
+      # an existing tag (a republish) rather than create a new one.
       - name: Check for existing tag
         id: check
         env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
           MODE: ${{ steps.detect.outputs.mode }}
+          VERSION: ${{ steps.resolve.outputs.version }}
           TAG: ${{ steps.resolve.outputs.tag }}
         run: |
-          if [ "$MODE" = "versioned" ] && [ -z "${{ steps.resolve.outputs.version }}" ]; then
+          if [ "$MODE" = "versioned" ] && [ -z "$VERSION" ]; then
             echo "existed=unknown" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+          if gh api "repos/${REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
             echo "existed=true" >> "$GITHUB_OUTPUT"
           else
             echo "existed=false" >> "$GITHUB_OUTPUT"
@@ -139,14 +161,16 @@ jobs:
 
       - name: Comment on PR
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           MODE: ${{ steps.detect.outputs.mode }}
           VERSION: ${{ steps.resolve.outputs.version }}
           TAG: ${{ steps.resolve.outputs.tag }}
           EXISTED: ${{ steps.check.outputs.existed }}
         run: |
           if [ "$MODE" = "versioned" ] && [ -z "$VERSION" ]; then
-            gh pr comment ${{ github.event.number }} --body "
+            gh pr comment "$PR_NUMBER" --repo "$REPOSITORY" --body "
           ### :x: docs/release: no target version
           This site is on Versioned (Full History) mode, but no \`docs/.release-version\` file was found in this PR — add one with the target version (e.g. \`1.2.0\`) before merging with the \`docs/release\` label, or the release workflow will fail on merge."
             exit 0
@@ -160,7 +184,7 @@ jobs:
           # thing, but only finds out after the PR has already merged.
           SEMVER_RE='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
           if [ "$MODE" = "versioned" ] && ! [[ "$VERSION" =~ $SEMVER_RE ]]; then
-            gh pr comment ${{ github.event.number }} --body "
+            gh pr comment "$PR_NUMBER" --repo "$REPOSITORY" --body "
           ### :x: docs/release: invalid target version
           \`docs/.release-version\` contains \`${VERSION}\`, which is not a valid SemVer version — use something like \`1.2.0\` (see https://semver.org). A leading \`v\` or a two-part \`1.2\` are not valid; the release workflow will fail on merge otherwise."
             exit 0
@@ -177,25 +201,24 @@ jobs:
           \`${TAG}\` already exists and will be **force-overwritten** on merge."
           fi
 
-          gh pr comment ${{ github.event.number }} --body "$(echo -e "$MESSAGE")"
+          gh pr comment "$PR_NUMBER" --repo "$REPOSITORY" --body "$(echo -e "$MESSAGE")"
 
   release-preview-no-docs-changes:
     name: Add PR comment with configuration management information
     needs: check-changes-in-paths
     if: ${{ contains(github.event.pull_request.labels.*.name, 'docs/release') && needs.check-changes-in-paths.outputs.detected == 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
-      contents: read
-      pull-requests: write
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      pull-requests: write # Post the preview comment on this pull request.
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Add PR comment with release preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh pr comment ${{ github.event.number }} --body "
+          gh pr comment "$PR_NUMBER" --repo "$REPOSITORY" --body "
           ### :exclamation: This Pull Request will not trigger a meaningful release
           The \`docs/release\` label is set, but this Pull Request has no changes under \`docs/**\` — merging it will still cut a release, just with nothing new in it."
 
@@ -203,18 +226,17 @@ jobs:
     name: Add PR comment with release information
     needs: check-changes-in-paths
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'docs/release') && needs.check-changes-in-paths.outputs.detected == 'true' && github.event.pull_request.draft == false }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
-      contents: read
-      pull-requests: write
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      pull-requests: write # Post the preview comment on this pull request.
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Add PR comment with release preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh pr comment ${{ github.event.number }} --body "
+          gh pr comment "$PR_NUMBER" --repo "$REPOSITORY" --body "
           ### :exclamation: This Pull Request will not trigger a docs release
           A Pull Request with no \`docs/release\` label will not trigger a docs site release — label it \`docs/release\` if you want this merge to release the docs site."

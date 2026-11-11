@@ -17,7 +17,7 @@ across all connected users in real time.
 
 This action needs registered on the Weave instance the following element:
 
-* xref:main:build/nodes/text.adoc[Text] node
+* xref:main:build/nodes/text.adoc[Text] node, or xref:main:build/nodes/text-v2.adoc[Text (native editing)] if you registered `WeaveTextV2Node` instead (both use the `text` type, so register only one)
 
 == Usage
 
@@ -43,6 +43,17 @@ const instance = new Weave({
 })
 ----
 <.> Added in this step.
+
+=== Plain and rich text tools
+With xref:main:build/nodes/text-v2.adoc[Text (native editing)] you can register a second tool whose
+nodes have rich text enabled. Give it another name and the `richText` prop:
+
+[source,ts]
+----
+new WeaveTextToolAction({ name: "richTextTool", props: { richText: true } })
+----
+
+Trigger it with `instance.triggerAction("richTextTool")`.
 
 === Setup the action trigger
 Setup on a button or any element on the UI the user can interact with on the action event:

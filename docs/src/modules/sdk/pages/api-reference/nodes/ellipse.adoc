@@ -16,6 +16,28 @@ All label appearance properties (font, colour, alignment, padding, …) are conf
 
 The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
 
+== Label engine
+
+By default the label is rendered with Konva's text and edited through a DOM textarea overlay (`legacy`).
+Set `config.label.engine` to `native` to render the label with the on-canvas text engine and edit it
+with the native editing session instead: no DOM overlay, and caret and selection are drawn on the canvas.
+
+[source,ts]
+----
+new WeaveEllipseNode({ config: { label: { engine: "native" } } });
+----
+
+Both engines read and write the same `labelText` and `label*` props, so clients using different engines
+can edit the same document. The `native` engine enables rich text in labels (bold, italic, underline, lists, alignment). Formatted content is stored in the optional `labelBlocks` prop, and `labelText` always holds the plain text, so the `legacy` engine shows the plain text.
+
+== Label edit events
+
+With the `native` label engine the node emits `onEnterShapeLabelEditMode` when a label edit session starts and
+`onExitShapeLabelEditMode` when it ends. Exit receives `{ node: Konva.Group }`; enter also receives the live
+`session`, so an app can build a formatting toolbar by running format commands on it. While editing,
+`onShapeLabelFormatChange` receives `{ node, format }` whenever the selection format changes.
+The `legacy` engine does not emit them.
+
 == Type
 
 This node `nodeType` property value is `ellipse`.
@@ -40,8 +62,13 @@ new WeaveEllipseNode(params?: WeaveEllipseNodeParams);
 ----
 type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
+type WeaveShapeLabelConfig = {
+  engine: "legacy" | "native"; // default "legacy"
+};
+
 type WeaveEllipseProperties = {
   transform: WeaveNodeTransformerProperties;
+  label?: Partial<WeaveShapeLabelConfig>;
 };
 
 type WeaveEllipseNodeParams = {
@@ -62,6 +89,7 @@ type WeaveShapeLabelProps = {
   labelLineHeight?: number;
   labelPaddingX?: number;
   labelPaddingY?: number;
+  labelBlocks?: WeaveTextBlock[]; // rich content written by the native engine
 };
 ----
 

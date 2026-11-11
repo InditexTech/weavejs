@@ -7,5 +7,6 @@ export const POLYGON_TOOL_ACTION_NAME = 'polygonTool';
 export const POLYGON_TOOL_STATE = {
   ['IDLE']: 'idle',
   ['ADDING']: 'adding',
+  ['DEFINING_SIZE']: 'defining-size',
   ['ADDED']: 'added',
 } as const;

@@ -25,6 +25,14 @@ export type ImageProps = WeaveElementAttributes & {
     width: number;
     height: number;
   };
+  flipX?: boolean;
+  flipY?: boolean;
+};
+
+export type WeaveImageFlipAxis = 'horizontal' | 'vertical';
+
+export type WeaveImageFlipOptions = {
+  axis: WeaveImageFlipAxis;
 };
 
 export type WeaveImageState = {

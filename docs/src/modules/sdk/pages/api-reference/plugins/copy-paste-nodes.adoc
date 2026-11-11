@@ -1,5 +1,5 @@
 = WeaveCopyPasteNodesPlugin
-:description: Activate support to copy & paste the nodes
+:description: Activate support to copy and paste the nodes
 
 == Overview
 

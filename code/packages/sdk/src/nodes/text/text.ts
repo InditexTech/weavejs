@@ -582,9 +582,12 @@ export class WeaveTextNode extends WeaveNode {
       if (typeof cleanedAttrs.linkPreviousFill === 'string') {
         cleanedAttrs.fill = cleanedAttrs.linkPreviousFill;
       }
-      if (typeof cleanedAttrs.linkPreviousTextDecoration === 'string') {
-        cleanedAttrs.textDecoration = cleanedAttrs.linkPreviousTextDecoration;
-      }
+      // A node created without `textDecoration` has no captured value: the
+      // link underline must still never be persisted (it leaked on removal).
+      cleanedAttrs.textDecoration =
+        typeof cleanedAttrs.linkPreviousTextDecoration === 'string'
+          ? cleanedAttrs.linkPreviousTextDecoration
+          : '';
     }
 
     return {

@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "5.6.0-SNAPSHOT",
+  "version": "5.9.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
     "build": "nx run-many -t build --no-tui",
-    "bump:snapshot": "npm ci && nx release version $npm_package_version.$(date \"+%s\")",
+    "bump:snapshot": "npm ci && nx release version --stage-changes=false $npm_package_version.$(date \"+%s\")",
     "check": "nx run-many -t check --no-tui",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dev": "nx run-many -t dev --no-tui",
@@ -32,11 +32,11 @@
     "reset": "nx reset",
     "test": "nx run-many -t test --no-tui && npm run test:merge-coverage",
     "test:merge-coverage": "shx mkdir -p coverage && npx lcov-result-merger 'packages/**/reports/vite-coverage/**/lcov.info' coverage/lcov.info --prepend-source-files --prepend-path-fix '../..'",
-    "unpublish": "nx run-many --skip-nx-cache -t unpublish --no-tui",
+    "unpublish": "nx run-many -t unpublish --no-tui",
     "verdaccio:setup": "node ./verdaccio.setup.js",
     "verify": "npm ci && nx run-many -t verify --no-tui",
-    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
-    "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION",
+    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false --stage-changes=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
+    "version:release": "npm ci && nx release version --git-tag=false --git-commit=false --stage-changes=false $RELEASE_VERSION && npm version $RELEASE_VERSION",
     "pretest": "npm rebuild canvas"
   },
   "keywords": [
@@ -69,18 +69,18 @@
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
-    "@nx/js": "23.1.2",
+    "@nx/js": "23.2.1",
     "@swc-node/register": "1.11.1",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.17",
     "husky": "9.1.4",
     "lcov-result-merger": "^6.0.0",
     "npkill": "0.12.2",
-    "nx": "23.1.2",
+    "nx": "23.2.1",
     "prettier": "2.8.8",
     "shx": "^0.4.0",
     "typescript": "5.7.3",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   },
   "engines": {
     "node": ">= 22.17.1",
@@ -88,17 +88,22 @@
   },
   "overrides": {
     "@babel/preset-env": "7.29.5",
+    "@emnapi/core": "1.11.2",
+    "@emnapi/runtime": "1.11.2",
+    "@emnapi/wasi-threads": "1.2.2",
+    "@azure/msal-node@^5.1.5": "^7.1.0",
     "axios": "1.20.0",
     "nx": {
       "brace-expansion": "5.0.12"
     },
     "esbuild": "0.25.0",
-    "fast-uri": "3.1.7",
-    "follow-redirects": "1.16.0",
+    "fast-uri": "3.1.9",
+    "follow-redirects": "1.16.3",
     "konva": "10.0.2",
     "lodash": "4.18.1",
     "rimraf": "6.0.1",
     "smol-toml": "1.9.0",
+    "vite": "6.4.5",
     "yjs": "13.6.27"
   },
   "repository": "github:InditexTech/weavejs"

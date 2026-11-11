@@ -3,7 +3,7 @@
 
 == Introduction
 
-This action enables users to create new polygon nodes on the canvas by clicking or touching it.
+This action enables users to create new polygon nodes on the canvas by clicking, touching, or dragging.
 The shape drawn is determined by a *preset* — one of the six built-in polygon shapes.
 
 == Dependencies
@@ -88,6 +88,10 @@ When active the user can:
 
 * *Click* on the canvas, it will place the selected preset polygon at the cursor position with its default size.
 * *Touch* on the canvas, it will place the selected preset polygon at the touch position with its default size.
+* *Click & drag* to set the polygon's size.
+* Hold *Shift* while dragging to preserve the preset's default proportions.
+* Hold *Alt/Option* while dragging to draw outward from the initial click, which stays at the polygon's center.
+* Hold *Shift + Alt/Option* to combine centered drawing with the preset's proportions.
 
 Once placed, the polygon is added to the canvas as a fully functional node. This action integrates
 seamlessly with Weave.js's real-time state system, ensuring the new element appears instantly for

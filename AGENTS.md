@@ -1,3 +1,7 @@
+## Changelog
+
+Do not edit `code/CHANGELOG.md`. The release job generates its entries from the issues that merged PRs close (`.github/scripts/changelog-from-prs.mjs`). Every PR must be linked to its issue with `Closes #<n>` in the description or from the Development sidebar; a plain `#<n>` mention does not count. The entry is the issue title, verbatim, and its section comes from the issue labels (`security` → Security, `bug` → Fixed, `enhancement` or `kind/feature` → Added, otherwise Changed); issues labelled `internal` or `kind/internal` get no entry. Fix an entry by editing the issue title or labels.
+
 ## Agent skills
 
 ### Issue tracker
@@ -55,9 +59,10 @@ go through the `docouture` CLI.
 
 - Every page lives at `docs/src/modules/<module>/pages/*.adoc` and must have an `xref:`
   entry in that module's `nav.adoc`, or it builds but is unreachable from the navigation.
-- A build failure on a warning is expected behaviour here, not a bug — `antora-playbook.yml`
-  sets `runtime.log.failure_level: warn`. A broken `xref:`, a missing include target or an
-  unknown attribute reference fails the build.
+- A build failure on an error is expected behaviour here, not a bug — `antora-playbook.yml`
+  sets `runtime.log.failure_level: error`. A broken `xref:`, a missing include target or an
+  authoring mistake reported by a docouture extension fails the build. Warnings (an
+  undefined attribute reference, an out-of-sequence section level) are logged but do not.
 - Run `docouture doctor` after any structural change (renaming the component, moving
   `antora.yml`, editing `package.json`'s `name`) — it's the fast way to catch the four names
   drifting out of agreement.
@@ -101,5 +106,36 @@ npx skills@latest add InditexTech/docouture --all
 | doc page          | derived from          | status |
 | ----------------- | --------------------- | ------ |
 | index.adoc (home) | manual (hand-written) | —      |
-| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | updated for unreleased changes |
-| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | updated for unreleased changes |
+| main:build/actions/rectangle-tool.adoc | `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/rectangle-tool.adoc | `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | released in 5.7.0 |
+| main:build/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | released in 5.7.0 |
+| sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | released in 5.7.0 |
+| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants,stroke}.ts`, `render/*` (stroke look, `setLookPreview`) | released in 5.8.0 |
+| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants,profiles}.ts`, `code/packages/sdk/src/actions/brush-tool/brush-tool.ts` (input profiles, `setInputProfile`) | released in 5.8.0 |
+| sdk:api-reference/actions/brush-tuning.adoc | `code/packages/sdk/src/actions/brush-tool/tunables/*` (descriptors, presets, scenarios, config export), `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` (`WeaveStrokeLook`) | released in 5.8.0 |
+| sdk:api-reference/plugins/brush-lab.adoc | `code/packages/sdk/src/plugins/brush-lab/*`, `code/packages/sdk/src/index.lab.ts` | released in 5.8.0 |
+| main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
+| sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
+| main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
+| sdk:api-reference/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/rectangle.adoc | `code/packages/sdk/src/nodes/rectangle/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/ellipse.adoc | `code/packages/sdk/src/nodes/ellipse/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/polygon.adoc | `code/packages/sdk/src/nodes/polygon/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | released in 5.7.0 |
+| sdk:api-reference/nodes/node.adoc | `code/packages/sdk/src/nodes/node.ts` (`setNodeInstanceListener`) | released in 5.7.0 |
+| sdk:api-reference/actions/action.adoc | `code/packages/sdk/src/actions/action.ts` | released in 5.8.0 |
+| sdk:api-reference/plugins/plugin.adoc | `code/packages/sdk/src/plugins/plugin.ts` | released in 5.8.0 |
+| sdk:api-reference/nodes/node.adoc (hooks) | `code/packages/sdk/src/nodes/node.ts` | released in 5.8.0 |
+| types:api-reference/types.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| main:build/nodes/text-v2.adoc (paragraph indent) | `code/packages/sdk/src/nodes/text-v2/{model.ts,layout/engine.ts,edit/model.ts}` | released in 5.8.0 |
+| sdk:api-reference/nodes/text-v2.adoc (paragraph indent, `getSelectionFormat().indent`) | `code/packages/sdk/src/nodes/text-v2/{model.ts,layout/engine.ts,edit/model.ts}` | released in 5.8.0 |
+| sdk:api-reference/weave/index.adoc (base interfaces) | `code/packages/types/src/base/{node,action,plugin}.ts` | released in 5.8.0 |
+| main:build/nodes/frame.adoc (edge selection) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
+| sdk:api-reference/nodes/frame.adoc (`edgeHitWidth`) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
+| sdk:api-reference/nodes/text-v2.adoc (list marker alignment) | `code/packages/sdk/src/nodes/text-v2/layout/engine.ts` | released in 5.8.0 |

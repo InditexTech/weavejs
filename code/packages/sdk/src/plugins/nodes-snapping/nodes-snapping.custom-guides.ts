@@ -86,7 +86,9 @@ export class WeaveNodesSnappingCustomGuides {
     return guides;
   }
 
-  async initialize(): Promise<void> {
+  // Nothing in here is asynchronous: keep it synchronous so callers do not
+  // end up with a floating promise.
+  initialize(): void {
     if (this.config.persistence.enabled) {
       const metadata = this.instance.getMetadata();
 

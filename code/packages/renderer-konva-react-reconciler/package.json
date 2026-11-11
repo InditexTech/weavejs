@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-renderer-konva-react-reconciler",
-  "version": "5.6.0-SNAPSHOT",
+  "version": "5.9.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -14,18 +14,18 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "./dist/renderer-konva-react-reconciler.cjs",
+  "main": "./dist/renderer-konva-react-reconciler.js",
   "module": "./dist/renderer-konva-react-reconciler.js",
   "exports": {
     ".": {
       "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-react-reconciler.js",
-      "require": "./dist/renderer-konva-react-reconciler.cjs"
+      "default": "./dist/renderer-konva-react-reconciler.js"
     },
     "./server": {
       "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-react-reconciler.node.js",
-      "require": "./dist/renderer-konva-react-reconciler.node.cjs"
+      "default": "./dist/renderer-konva-react-reconciler.node.js"
     }
   },
   "files": [
@@ -55,8 +55,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-sdk": "5.6.0-SNAPSHOT",
-    "@inditextech/weave-types": "5.6.0-SNAPSHOT",
+    "@inditextech/weave-sdk": "5.9.0-SNAPSHOT",
+    "@inditextech/weave-types": "5.9.0-SNAPSHOT",
     "pino": "9.6.0",
     "pino-pretty": "13.0.0",
     "react-reconciler": "~0.28.0"
@@ -67,8 +67,8 @@
     "@types/react-reconciler": "0.28.9",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
-    "@vitest/coverage-v8": "^4.1.11",
-    "@vitest/ui": "^4.1.11",
+    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/ui": "^4.1.12",
     "eslint": "8.57.1",
     "eslint-config-eslint": "11.0.0",
     "lodash": "4.18.1",
@@ -76,7 +76,7 @@
     "tsdown": "0.22.14",
     "typescript-eslint": "8.22.0",
     "uuid": "11.1.1",
-    "vitest": "^4.1.11",
+    "vitest": "^4.1.12",
     "vitest-canvas-mock": "^1.1.4",
     "vitest-sonar-reporter": "^3.0.0"
   },
@@ -87,6 +87,14 @@
     "react": ">= 18.2.0 && < 19",
     "skia-canvas": "3.0.8",
     "yjs": "13.6.27"
+  },
+  "peerDependenciesMeta": {
+    "canvas": {
+      "optional": true
+    },
+    "skia-canvas": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=18.12",

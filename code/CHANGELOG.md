@@ -13,6 +13,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.8.0] - 2026-11-11
+
+### Added
+
+- [#1262](https://github.com/InditexTech/weavejs/issues/1262) Text indentation: apply to a single paragraph line, not only to bulleted lists
+- [#1236](https://github.com/InditexTech/weavejs/issues/1236) Proposal: generate the CHANGELOG entries in CI from the issues each PR closes
+- [#1263](https://github.com/InditexTech/weavejs/issues/1263) Artboard selection: allow selecting an artboard by clicking any of its edges, not only the top bar
+- [#1254](https://github.com/InditexTech/weavejs/issues/1254) Wacom handwriting produces uneven, angular strokes
+
+### Fixed
+
+- [#1270](https://github.com/InditexTech/weavejs/issues/1270) Text V2: list markers do not follow the text when a list is centered or right-aligned
+- [#1259](https://github.com/InditexTech/weavejs/issues/1259) API reference for WeaveNode, WeaveAction and WeavePlugin lists outdated hook names and omits initialize
+- [#1256](https://github.com/InditexTech/weavejs/issues/1256) Optional lifecycle hooks declared abstract force every custom node, action and plugin to implement them
+
+## [5.7.1] - 2026-10-27
+
+### Fixed
+
+- [#1246](https://github.com/InditexTech/weavejs/issues/1246) Text V2: newly created node blinks when leaving first edit session
+- [#1245](https://github.com/InditexTech/weavejs/issues/1245) Rich text: new list item after Enter loses marks (size); marker and empty line render at base size
+
+### Security
+
+- [#1243](https://github.com/InditexTech/weavejs/issues/1243) Open Dependabot security alerts need to be resolved (next, zod, @azure/msal-node, fast-uri)
+
+## [5.7.0] - 2026-10-26
+
+### Added
+
+- [#1226](https://github.com/InditexTech/weavejs/issues/1226) Shape label: use the native-canvas text engine and editor session
+- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text node: rich text formatting, enabled via node config
+- [#1224](https://github.com/InditexTech/weavejs/issues/1224) Text node: native on-canvas editing (replace DOM textarea overlay)
+
+### Fixed
+
+- [#1215](https://github.com/InditexTech/weavejs/issues/1215) Some node types register per-render event listeners that are never removed
+- [#1214](https://github.com/InditexTech/weavejs/issues/1214) Grouping and ungrouping leak the event listeners of the moved nodes' descendants
+- [#1229](https://github.com/InditexTech/weavejs/issues/1229) Nx caches the publish and unpublish targets, so a cache hit skips the actual publish
+- [#1227](https://github.com/InditexTech/weavejs/issues/1227) Harden the SonarCloud, release preview and OSS compliance workflows
+- [#1222](https://github.com/InditexTech/weavejs/issues/1222) Server backend setup sets the backend flag even when the native backend fails to load
+
+## [5.6.0] - 2026-10-22
+
+### Fixed
+
+- [#1200](https://github.com/InditexTech/weavejs/issues/1200) Published packages declare CommonJS entry points that do not exist. The packages are ESM only: loading them with `require()` needs Node.js 20.19+ or 22.12+
+- [#1202](https://github.com/InditexTech/weavejs/issues/1202) Native canvas and skia-canvas peers are installed in every consumer, including browser apps
+- [#1198](https://github.com/InditexTech/weavejs/issues/1198) Node event listeners leak on every render and are never removed on destroy
+- [#1208](https://github.com/InditexTech/weavejs/issues/1208) Publish snapshots via `workflow_dispatch` (`ACTION=snapshot`) instead of the `/publish-snapshot` comment, since npm trusted publishing rejects `issue_comment` tokens
+- [#1142](https://github.com/InditexTech/weavejs/issues/1142) Override `@emnapi` packages to v1.11.2 / 1.2.2 to unify monorepo dependency resolution and prevent lockfile stripping during release versioning
+
+### Added
+
+- [#1177](https://github.com/InditexTech/weavejs/issues/1177) Shift and Alt/Option modifiers when drawing shapes (proportions and center-based drawing)
+- [#1205](https://github.com/InditexTech/weavejs/issues/1205) Native horizontal and vertical image flipping (`weave.flipImage`, `flipX` / `flipY` image node properties), consistent with crop, resize, rotation and server-side rendering
+
 ## [5.5.0] - 2026-10-02
 
 ## [5.4.1] - 2026-09-16
@@ -1936,7 +1993,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.5.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.8.0...HEAD
+
+[5.8.0]: https://github.com/InditexTech/weavejs/compare/5.7.1...5.8.0
+
+[5.7.1]: https://github.com/InditexTech/weavejs/compare/5.7.0...5.7.1
+
+[5.7.0]: https://github.com/InditexTech/weavejs/compare/5.6.0...5.7.0
+
+[5.6.0]: https://github.com/InditexTech/weavejs/compare/5.5.0...5.6.0
 
 [5.5.0]: https://github.com/InditexTech/weavejs/compare/5.4.1...5.5.0
 

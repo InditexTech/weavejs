@@ -696,7 +696,7 @@ describe('WeaveBrushToolAction', () => {
       expect(mockTempStroke.setAttrs).toHaveBeenCalledTimes(1);
       const els = (mockTempStroke.setAttrs.mock.calls[0]?.[0] as R)['strokeElements'] as R[];
       // 1 pre-existing point + 2 coalesced samples
-      expect(els.length).toBe(3);
+      expect(els).toHaveLength(3);
       expect(els[1]).toMatchObject({ pressure: 0.5 });
       expect(els[2]).toMatchObject({ pressure: 0.5 });
     });
@@ -710,7 +710,7 @@ describe('WeaveBrushToolAction', () => {
       // Batched into one write; both pen samples are present.
       expect(mockTempStroke.setAttrs).toHaveBeenCalledTimes(1);
       const els = (mockTempStroke.setAttrs.mock.calls[0]?.[0] as R)['strokeElements'] as R[];
-      expect(els.length).toBe(3);
+      expect(els).toHaveLength(3);
     });
 
     it('8.7 coalesced + predicted pen events → setPointersPositions called, last predicted processed', () => {
@@ -734,7 +734,7 @@ describe('WeaveBrushToolAction', () => {
       // 2 coalesced + 1 predicted, all in a single batched write.
       expect(mockTempStroke.setAttrs).toHaveBeenCalledTimes(1);
       const els = (mockTempStroke.setAttrs.mock.calls[0]?.[0] as R)['strokeElements'] as R[];
-      expect(els.length).toBe(4);
+      expect(els).toHaveLength(4);
       expect((action as unknown as R)['predictedCount']).toBe(1);
     });
 
@@ -814,7 +814,7 @@ describe('WeaveBrushToolAction', () => {
       const els = (mockTempStroke.setAttrs.mock.calls[0]?.[0] as R)[
         'strokeElements'
       ] as R[];
-      expect(els.length).toBe(1 + burst.length);
+      expect(els).toHaveLength(1 + burst.length);
     });
 
   });
@@ -852,11 +852,11 @@ describe('WeaveBrushToolAction', () => {
       expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.IDLE);
     });
 
-    it('9.3 state DEFINE_STROKE + isPinching=true → returns', () => {
+    it('9.3 state DEFINE_STROKE + isPinching=true → the stroke still ends, so the tool is not left stuck', () => {
       (action as unknown as R)['state'] = BRUSH_TOOL_STATE.DEFINE_STROKE;
       mockWeave.getPlugin.mockReturnValue({ isPinching: vi.fn().mockReturnValue(true) });
       handlers['pointerup']?.(makePointerEvent());
-      expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.DEFINE_STROKE);
+      expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.IDLE);
     });
 
     it('9.4 state DEFINE_STROKE + zoom plugin absent → proceeds without throw', () => {
@@ -1335,7 +1335,7 @@ describe('WeaveBrushToolAction', () => {
       const call = mockTempStroke.setAttrs.mock.calls[0]?.[0] as R;
       const elements = call?.['strokeElements'] as R[];
       // After slice(-2): 2 elements remain (+ mapped)
-      expect(elements.length).toBe(2);
+      expect(elements).toHaveLength(2);
     });
 
     it('13.4 predictedCount=0 → no slice, all elements used', () => {
@@ -1343,7 +1343,7 @@ describe('WeaveBrushToolAction', () => {
       callHandleEndStroke(action);
       const call = mockTempStroke.setAttrs.mock.calls[0]?.[0] as R;
       const elements = call?.['strokeElements'] as R[];
-      expect(elements.length).toBe(3);
+      expect(elements).toHaveLength(3);
     });
 
     it('13.5 maps points to subtract box.x/box.y', () => {
@@ -1422,20 +1422,12 @@ describe('WeaveBrushToolAction', () => {
       expect(() => callHandleEndStroke(action)).not.toThrow();
     });
 
-    it('13.10 strokeElements.length >= 1 → addNode() called', () => {
-      setupEndStroke(1, 0); // 1 element → >= 1 → addNode
-      callHandleEndStroke(action);
-      expect(mockWeave.addNode).toHaveBeenCalled();
-    });
-
-    it('13.10b tap (1 element) → addNode() called', () => {
-      setupEndStroke(1, 0); // single tap → should be saved as dot
-      callHandleEndStroke(action);
-      expect(mockWeave.addNode).toHaveBeenCalled();
-    });
-
-    it('13.10c short stroke (2 elements) → addNode() called', () => {
-      setupEndStroke(2, 0); // short line → should now be saved
+    it.each([
+      ['13.10 strokeElements.length >= 1 → addNode() called', 1],
+      ['13.10b tap (1 element) → addNode() called', 1],
+      ['13.10c short stroke (2 elements) → addNode() called', 2],
+    ])('%s', (_title, elementCount) => {
+      setupEndStroke(elementCount, 0);
       callHandleEndStroke(action);
       expect(mockWeave.addNode).toHaveBeenCalled();
     });
@@ -1692,7 +1684,7 @@ describe('WeaveBrushToolAction', () => {
 
       const call = mockTempStroke.setAttrs.mock.calls[0]?.[0] as R;
       const elements = call?.['strokeElements'] as R[];
-      expect(elements.length).toBe(3);
+      expect(elements).toHaveLength(3);
       expect(elements[elements.length - 1]).toMatchObject({ pressure: 0.9 });
     });
   });
@@ -1716,7 +1708,7 @@ describe('WeaveBrushToolAction', () => {
       action.trigger(vi.fn());
       const callsAfterFirst = setupSpy.mock.calls.length;
       action.trigger(vi.fn());
-      expect(setupSpy.mock.calls.length).toBe(callsAfterFirst);
+      expect(setupSpy.mock.calls).toHaveLength(callsAfterFirst);
     });
 
     it('14.4 selectionPlugin present → tr.hide() and setSelectedNodes([])', () => {

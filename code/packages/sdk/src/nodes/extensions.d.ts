@@ -43,6 +43,8 @@ declare module 'konva/lib/Node' {
     triggerCrop(): void;
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
+    flipHorizontal(): void;
+    flipVertical(): void;
     dblClick(): void;
     click(payload: { wasSelected: boolean; ctrlOrMetaPressed: boolean }): void;
     allowedAnchors(): string[];

@@ -114,7 +114,7 @@ runtime:
   # Fail the build on broken xrefs and other content problems rather than
   # publishing a site with silent gaps.
   log:
-    failure_level: warn
+    failure_level: error
     # Antora's own default is 'warn' (@antora/playbook-builder's convict
     # schema, not @antora/logger's own 'info' default, which never actually
     # applies here) — below that, @inditextech/docouture-antora-extensions'
