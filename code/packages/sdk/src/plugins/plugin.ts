@@ -34,11 +34,11 @@ export abstract class WeavePlugin implements WeavePluginBase {
     return this.enabled;
   }
 
-  abstract initialize?(): void;
+  initialize?(): void;
 
-  abstract onInit?(): void;
+  onInit?(): void;
 
-  abstract onRender?(): void;
+  onRender?(): void;
 
   abstract enable(): void;
 

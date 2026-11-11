@@ -38,9 +38,9 @@ B: Plugins are registered
 C: getName() is called on each plugin
 D: Rendering cycle begins
 E: First render completed
-F: init() is called on each plugin
+F: onInit() is called on each plugin
 G: Subsequent renders
-H: render() is called on each plugin
+H: onRender() is called on each plugin
 [*] --> A
 A --> B
 state B {
@@ -106,27 +106,7 @@ isEnabled(): boolean
 
 This method returns `true` if the plugin is enabled, `false` otherwise.
 
-== Abstract Methods
-
-=== init
-
-[source,ts]
-----
-init?(): void
-----
-
-This method initializes the plugin, ideal to initialize all necessary Konva elements needed
-and their events.
-
-=== render
-
-[source,ts]
-----
-render?(): void
-----
-
-This method is called then the canvas re-renders, useful to update the plugin nodes updated
-according to the changes made by the user.
+== Required Methods
 
 === enable
 
@@ -145,3 +125,42 @@ disable(): void
 ----
 
 This method disables the plugin.
+
+== Optional Hooks
+
+=== initialize
+
+[source,ts]
+----
+initialize?(): void
+----
+
+This method resets the internal state of the plugin. It's called each time the Weave instance
+is reset, for example when switching rooms. Built-in plugins also call it from their constructor.
+
+=== onInit
+
+[source,ts]
+----
+onInit?(): void
+----
+
+This method is called once after the Weave instance is set up, and is the ideal place to
+initialize all necessary Konva elements needed and their events.
+
+.initialize vs onInit
+[NOTE]
+====
+Use `initialize` to (re)set state that must start clean every time the Weave instance is reset,
+and `onInit` to create elements and register events once the instance is ready.
+====
+
+=== onRender
+
+[source,ts]
+----
+onRender?(): void
+----
+
+This method is called when the canvas re-renders, useful to update the plugin nodes updated
+according to the changes made by the user.

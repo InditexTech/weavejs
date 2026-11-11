@@ -1237,34 +1237,32 @@ export class WeaveTextV2Node extends WeaveNode {
 
   static getSchema() {
     const base = WeaveTextNode.getSchema();
-    const marks = z
-      .object({
-        bold: z.boolean().optional(),
-        italic: z.boolean().optional(),
-        underline: z.boolean().optional(),
-        strike: z.boolean().optional(),
-        color: z.string().optional(),
-        size: z
-          .number()
-          .positive()
-          .optional()
-          .describe('Ratio of the node fontSize (1 is omitted).'),
-        family: z.string().optional(),
-        lineHeight: z.number().positive().optional(),
-        link: z
-          .string()
-          .url()
-          .refine((value) => isValidTextLink(value), {
-            message: 'Link must be an absolute http:// or https:// URL.',
-          })
-          .optional(),
-      })
-      .passthrough();
+    const marks = z.looseObject({
+      bold: z.boolean().optional(),
+      italic: z.boolean().optional(),
+      underline: z.boolean().optional(),
+      strike: z.boolean().optional(),
+      color: z.string().optional(),
+      size: z
+        .number()
+        .positive()
+        .optional()
+        .describe('Ratio of the node fontSize (1 is omitted).'),
+      family: z.string().optional(),
+      lineHeight: z.number().positive().optional(),
+      link: z
+        .url()
+        .refine((value) => isValidTextLink(value), {
+          message: 'Link must be an absolute http:// or https:// URL.',
+        })
+        .optional(),
+    });
     const block = z.object({
       runs: z.array(z.object({ t: z.string(), m: marks.optional() })),
       kind: z.enum(['ul', 'ol']).optional(),
       depth: z.number().int().min(0).optional(),
       start: z.number().int().min(1).optional(),
+      cont: z.boolean().optional(),
       align: z.enum(['left', 'center', 'right']).optional(),
     });
     return base.extend({

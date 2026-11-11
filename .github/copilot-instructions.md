@@ -86,12 +86,11 @@ Internally, `Weave` delegates to a set of **Manager** classes (e.g., `WeaveStage
 
 ### Custom Node Pattern
 
-Extend `WeaveNode` and implement at minimum:
+Extend `WeaveNode` and implement the required members `onRender()` and `onUpdate()`. `initialize()` is an optional hook: omit it if not needed.
 
 ```ts
 export class MyNode extends WeaveNode {
   protected nodeType = 'myNodeType';
-  initialize = undefined;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const group = new Konva.Group({ ...props, name: 'node' });
@@ -112,13 +111,11 @@ Always call `setupDefaultNodeAugmentation()` and `setupDefaultNodeEvents()` when
 
 ### Custom Action Pattern
 
-Extend `WeaveAction` and implement `trigger()`:
+Extend `WeaveAction` and implement the required member `trigger()`. The hooks `initialize()`, `onInit()`, `onPropsChange()` and `cleanup()` are optional: omit the ones you don't need.
 
 ```ts
 export class MyToolAction extends WeaveAction {
   protected name = 'myTool';
-  onPropsChange = undefined;
-  onInit = undefined;
 
   trigger(cancelAction: () => void, params?: unknown): unknown {
     // Set up Konva stage event listeners
@@ -132,15 +129,15 @@ export class MyToolAction extends WeaveAction {
 
 ### Custom Plugin Pattern
 
-Extend `WeavePlugin` and implement lifecycle hooks:
+Extend `WeavePlugin` and implement the required members `enable()` and `disable()`. The hooks `initialize()`, `onInit()` and `onRender()` are optional: omit the ones you don't need.
 
 ```ts
 export class MyPlugin extends WeavePlugin {
   protected name = 'myPlugin';
 
-  initialize(): void { /* called once at construction */ }
-  onInit(): void { /* called when Weave initializes */ }
-  onRender(): void { /* called on each render */ }
+  initialize(): void { /* optional: called once at construction */ }
+  onInit(): void { /* optional: called when Weave initializes */ }
+  onRender(): void { /* optional: called on each render */ }
   enable(): void { this.enabled = true; }
   disable(): void { this.enabled = false; }
 }

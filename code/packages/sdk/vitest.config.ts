@@ -11,6 +11,10 @@ export default defineConfig({
 
     alias: {
       ['@']: path.resolve(__dirname, './src'),
+      ['@inditextech/weave-sdk']: path.resolve(
+        __dirname,
+        './src/plugins/plugin.ts'
+      ),
     },
 
     environmentOptions: {
@@ -21,6 +25,11 @@ export default defineConfig({
 
     include: ['**/*.test.ts'],
     exclude: ['**/node_modules/**'],
+
+    typecheck: {
+      enabled: true,
+      tsconfig: './src/__tests__/types/tsconfig.json',
+    },
 
     reporters: ['default', 'json'],
     outputFile: {

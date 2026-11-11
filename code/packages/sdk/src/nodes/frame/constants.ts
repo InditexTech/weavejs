@@ -12,6 +12,7 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   titleMargin: 20,
   borderColor: '#000000',
   borderWidth: 1,
+  edgeHitWidth: 6,
   onTargetEnter: {
     borderColor: '#FF6863FF',
     fill: '#FFFFFFFF',
