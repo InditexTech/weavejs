@@ -136,7 +136,7 @@ As you can see to test you can repeat steps 1-3 as many times as you want.
   - Issues labelled `internal` or `kind/internal` (for example tracking issues like "Release docs X") get no entry, and an issue already listed in an earlier release is not listed again. Both are shown in the report.
   - To change the wording of an entry, edit the issue title; to change its section, change the issue labels.
   - Releases up to 5.7.1 keep their hand-written changelog sections as history. From the next release on, the generated output is the source of truth.
-  - The `Changelog / Linked issue` check reports the entries the PR will generate. Dependabot PRs are exempt.
+  - The `Changelog / Linked issue` check reports the entries the PR will generate, and fails if the PR has no linked issue and no `skip-release` label. Dependabot PRs are exempt.
 
 - On the PR, depending on your change add one of the following labels:
 
