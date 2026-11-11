@@ -31,7 +31,6 @@
 - [x] 5.5 `rich-api.test.ts`: node-level `indent` / `outdent` with and without range, disabled no-op
 - [x] 5.6 Run the sdk test suite and type check
 
-## 6. Docs and changelog
+## 6. Docs
 
 - [x] 6.1 Update `main:build/nodes/text-v2.adoc` and `sdk:api-reference/nodes/text-v2.adoc` (paragraph indent, `indent` in the selection format, Backspace, compatibility note) and the AGENTS.md documentation ledger
-- [x] 6.2 Add to `code/CHANGELOG.md` under `[Unreleased]` > Added: `- [#1262](https://github.com/InditexTech/weavejs/issues/1262) Text indentation: apply to a single paragraph line, not only to bulleted lists`

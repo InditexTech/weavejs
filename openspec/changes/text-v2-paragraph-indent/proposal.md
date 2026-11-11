@@ -35,4 +35,3 @@ None.
 - Compatibility: older clients ignore `depth` on plain blocks and render them flush left (graceful degradation). `indentStep` must match across clients, as for lists.
 - Tests: `rich-model`, `rich-layout`, `rich-session`, `clipboard-blocks`, `rich-api`.
 - Docs: `main:build/nodes/text-v2.adoc`, `sdk:api-reference/nodes/text-v2.adoc`, and the AGENTS.md documentation ledger.
-- `code/CHANGELOG.md`: entry under `[Unreleased]` for #1262.
