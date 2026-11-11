@@ -1,0 +1,23 @@
+.github/scripts/changelog-from-prs.mjs
+  s_55cc288db4bcde::t_be9922d8508231 100-120,590,595,643,747,758-760,775,783-786
+.github/scripts/changelog-from-prs.test.mjs
+  s_55cc288db4bcde::t_8e7ced0589c5ca 22-23,320-351
+.github/workflows/code-release_preview.yml
+  s_55cc288db4bcde::t_ff08cdc5bea016 119-120,140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "fa3910708c532e0a9779d13169c8da58bac06dc0",
+  "prompts": {},
+  "sessions": {
+    "s_55cc288db4bcde": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e35b999d9ffeNBgaQjPCrOmqJb",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
