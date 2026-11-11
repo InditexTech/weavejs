@@ -498,6 +498,17 @@ jobs:
           git config commit.gpgsign true
           git config tag.gpgsign true
 
+      # Writes the entries of the issues closed by the PRs merged since the
+      # last release tag into [Unreleased], so the bump below and the signed
+      # CHANGELOG commit include them. Any error stops the job here, before
+      # the bump, the commit and the tag.
+      - name: Generate CHANGELOG.md entries from merged pull requests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node .github/scripts/changelog-from-prs.mjs --branch "$BASELINE_BRANCH" \
+            --changelog code/CHANGELOG.md --report "$GITHUB_STEP_SUMMARY"
+
       - name: Update CHANGELOG.md
         id: update-changelog
         uses: release-flow/keep-a-changelog-action@74931dec7ecdbfc8e38ac9ae7e8dd84c08db2f32 # v3.0.0

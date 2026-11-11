@@ -36,6 +36,7 @@ jobs:
     name: Release Preview
     permissions:
       contents: read
+      issues: read
       pull-requests: write
     needs: check-changes-in-paths
     if: ${{ (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type') || contains(join(github.event.pull_request.labels.*.name, ', '), 'release-preview')) && needs.check-changes-in-paths.outputs.detected == 'true' }}
@@ -82,17 +83,27 @@ jobs:
               echo "MERGE_STRATEGY=Create a merge commit" >> "$GITHUB_ENV"
           fi
 
-      - name: Check if CHANGELOG.md has changes
+      - name: Setup Node
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version-file: code/.tool-versions
+
+      # Same script as the release job. Into the local [Unreleased] it writes
+      # the entries already pending on the base branch (PRs merged since the
+      # last release tag, usually with skip-release) and then this PR's, so
+      # the bump below previews the whole release. HEAD is the merge commit,
+      # so HEAD^1 is the base branch. Whether the PR is linked at all is
+      # checked by code-changelog-check.yml.
+      - name: Generate CHANGELOG.md entries for the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          if git diff --quiet HEAD^ HEAD -- code/CHANGELOG.md; then
-            echo "::error title={No CHANGELOG.md changes}::{No CHANGELOG.md changes were found. Update the UNRELEASED section with the new changes.}"
-            gh pr comment ${{ github.event.number }} --body "
-          ### :x: No changes in the \`CHANGELOG.md\` file
-          No changes were found in the \`CHANGELOG.md\` file. Please, update the UNRELEASED section, listing the new changes that applies to this release."
-            exit 1
-          fi
+          node .github/scripts/changelog-from-prs.mjs --to HEAD^1 --branch "$BASE_REF" \
+            --changelog code/CHANGELOG.md --report "$GITHUB_STEP_SUMMARY"
+          node .github/scripts/changelog-from-prs.mjs --pr "$PR_NUMBER" \
+            --changelog code/CHANGELOG.md --report "$RUNNER_TEMP/changelog-report.md"
 
       - name: Update CHANGELOG.md
         id: update-changelog
@@ -105,13 +116,12 @@ jobs:
           keep-unreleased-section: true
           tag-prefix: ""
 
-      # Fork PRs get a read-only GITHUB_TOKEN, so `gh pr comment` cannot post.
-      - name: Add PR comment with release preview
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+      - name: Build release preview
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEXT_VERSION: ${{ steps.update-changelog.outputs.version }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          TASKS=$(awk -v version="${{ steps.update-changelog.outputs.version }}" '
+          TASKS=$(awk -v version="$NEXT_VERSION" '
             BEGIN { capture=0; found_version=0 }
             $0 ~ "## \\[" version "\\] -" { capture=1; found_version=1; print; next }
             capture && $0 ~ /^## \[.*\] -/ { capture=0 }
@@ -126,18 +136,32 @@ jobs:
               }
             }
           ' code/CHANGELOG.md)
-          MESSAGE="
+          {
+            echo "### :rocket: Release Preview Success"
+            echo "You are going to release the version **${NEXT_VERSION}** (${RELEASE_VERSION}) with the following changes:"
+            echo "$TASKS"
+            echo ""
+            cat "$RUNNER_TEMP/changelog-report.md"
+            echo ""
+            echo "### 💡 Merge Strategy: $MERGE_STRATEGY"
+            echo ""
+            echo "Remember to use the **'$MERGE_STRATEGY'** strategy to merge this _Pull Request (\`$PR_HEAD_REF\` → \`$BASE_REF\`)_."
+            echo ""
+            echo "_With the \`skip-release\` label, merging publishes no release: the entries of the issues this PR closes go into the next release. Without a linked issue, the PR gets no entry._"
+          } > "$RUNNER_TEMP/release-preview.md"
 
-          ### :rocket: Release Preview Success
-          You are going to release the version **${RELEASE_VERSION}** with the following changes:
-          $TASKS
+      # Fork PRs get a read-only GITHUB_TOKEN, so `gh pr comment` cannot post:
+      # the preview goes to the job summary instead.
+      - name: Add PR comment with release preview
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr comment "$PR_NUMBER" --body-file "$RUNNER_TEMP/release-preview.md"
 
-          ### 💡 Merge Strategy: $MERGE_STRATEGY
-
-          Remember to use the **'$MERGE_STRATEGY'** strategy to merge this _Pull Request (\`$PR_HEAD_REF\` → \`${{ github.event.pull_request.base.ref }}\`)_.
-          "
-
-          gh pr comment ${{ github.event.number }} --body "$(echo -e "$MESSAGE")"
+      - name: Add release preview to the job summary
+        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        run: cat "$RUNNER_TEMP/release-preview.md" >> "$GITHUB_STEP_SUMMARY"
 
   release-preview-no-code-changes:
     name: Add PR comment with configuration management information
