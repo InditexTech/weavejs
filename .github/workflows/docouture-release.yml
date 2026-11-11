@@ -239,9 +239,13 @@ jobs:
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
-          permission-contents: write
+          # Local divergence from the docouture template
+          # (InditexTech/weavejs#1284): no `owner`/`repositories`/
+          # `permission-contents` narrowing. With them, pushes to main are
+          # rejected (GH013) even though the App is on the ruleset's bypass
+          # list; the un-narrowed token is bypassed, as in
+          # code-npm_node-publish-release-and-snapshot.yml. `docouture
+          # upgrade` overwrites this file; re-apply until fixed upstream.
 
       - name: Git app credentials
         env:

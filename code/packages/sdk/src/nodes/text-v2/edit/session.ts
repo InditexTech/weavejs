@@ -283,7 +283,7 @@ export class TextEditSession {
       .point({ x: r.x + o.x, y: r.y + o.y });
   }
 
-  private syncFromTextarea = () => {
+  private readonly syncFromTextarea = () => {
     const ta = this.textarea;
     if (!ta || this.composing || this.destroyed) return;
     const root = ta.getRootNode() as Document | ShadowRoot;
@@ -337,7 +337,7 @@ export class TextEditSession {
       return true;
     }
     if (e.key === 'Enter') {
-      if (this.model.enter()) this.afterFormat('command', true);
+      if (this.model.enter(e.shiftKey)) this.afterFormat('command', true);
       return true;
     }
     if (e.key === 'Backspace' && this.model.backspaceInList()) {
@@ -367,7 +367,7 @@ export class TextEditSession {
     return false;
   }
 
-  private onKeyDown = (e: KeyboardEvent) => {
+  private readonly onKeyDown = (e: KeyboardEvent) => {
     // The app listens for keys on `document` (e.g. undo): the editor must be
     // the only consumer while it has focus.
     e.stopPropagation();
@@ -386,12 +386,12 @@ export class TextEditSession {
     setTimeout(this.syncFromTextarea, 0);
   };
 
-  private onKeyUp = (e: KeyboardEvent) => {
+  private readonly onKeyUp = (e: KeyboardEvent) => {
     e.stopPropagation();
     this.syncFromTextarea();
   };
 
-  private onBeforeInput = (e: InputEvent) => {
+  private readonly onBeforeInput = (e: InputEvent) => {
     // Native undo/redo would diverge from the session history.
     if (e.inputType === 'historyUndo' || e.inputType === 'historyRedo') {
       e.preventDefault();
@@ -418,7 +418,7 @@ export class TextEditSession {
 
   // ---- input / IME / clipboard --------------------------------------------
 
-  private onInput = (e: Event) => {
+  private readonly onInput = (e: Event) => {
     const ta = this.textarea;
     if (!ta) return;
     const oldText = this.model.getText();
@@ -482,12 +482,12 @@ export class TextEditSession {
     return true;
   }
 
-  private onCopy = (e: ClipboardEvent) => {
+  private readonly onCopy = (e: ClipboardEvent) => {
     e.stopPropagation();
     this.writeRich(e);
   };
 
-  private onCut = (e: ClipboardEvent) => {
+  private readonly onCut = (e: ClipboardEvent) => {
     e.stopPropagation();
     if (!this.writeRich(e)) return;
     if (this.model.replaceSelection('', 'delete')) {
@@ -496,7 +496,7 @@ export class TextEditSession {
     }
   };
 
-  private onPaste = (e: ClipboardEvent) => {
+  private readonly onPaste = (e: ClipboardEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (this.host.richText) {
@@ -517,12 +517,12 @@ export class TextEditSession {
     this.insertText(raw.replace(/\r\n?/g, '\n'), 'paste');
   };
 
-  private onCompositionStart = () => {
+  private readonly onCompositionStart = () => {
     this.composing = true;
     this.model.beginComposition();
   };
 
-  private onCompositionEnd = () => {
+  private readonly onCompositionEnd = () => {
     this.composing = false;
     this.model.endComposition();
     this.syncFromTextarea();
@@ -639,7 +639,7 @@ export class TextEditSession {
     );
   }
 
-  private onMouseDown = (e: MouseEvent) => {
+  private readonly onMouseDown = (e: MouseEvent) => {
     if (this.isKeepTarget(e)) {
       const t = e.target as Element;
       if (!t.closest('input, textarea, select, [contenteditable="true"]')) {
@@ -650,7 +650,7 @@ export class TextEditSession {
     if (this.isInside(this.toLocal(e))) e.preventDefault(); // keep focus
   };
 
-  private onPointerDown = (e: PointerEvent) => {
+  private readonly onPointerDown = (e: PointerEvent) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     if (this.textarea && e.target === this.textarea) return;
     if (this.isKeepTarget(e)) return;
@@ -716,7 +716,7 @@ export class TextEditSession {
     }
   }
 
-  private onPointerMove = (e: PointerEvent) => {
+  private readonly onPointerMove = (e: PointerEvent) => {
     this.updateCursor(e);
     if (!this.dragging) return;
     const local = this.toLocal(e);
@@ -730,7 +730,7 @@ export class TextEditSession {
     this.afterSelectionChange();
   };
 
-  private onPointerUp = () => {
+  private readonly onPointerUp = () => {
     if (!this.dragging) return;
     this.dragging = false;
     this.textarea?.focus({ preventScroll: true });
@@ -762,7 +762,7 @@ export class TextEditSession {
     this.resetBlink();
   }
 
-  private sliceLayout = () => {
+  private readonly sliceLayout = () => {
     if (!this.pendingFlush || this.destroyed) return;
     const done = this.target.warmLayout!(
       this.model.getBlocks(),

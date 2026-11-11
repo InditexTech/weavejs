@@ -285,6 +285,9 @@ function applyAlign(lines: LayoutLine[], width: number, padding: number) {
     }
     const free = width - line.indent - line.width - padding * 2;
     line.offsetX = line.indent + (align === 'center' ? free / 2 : free);
+    if (line.marker) {
+      line.marker.x = Math.max(0, line.marker.x + line.offsetX - line.indent);
+    }
   }
 }
 
@@ -317,14 +320,15 @@ export class TextLayoutEngine {
     this.pool.clear();
   }
 
-  /** Text indent of a block in px (0 for plain paragraphs). */
+  /** Text indent of a block in px (0 for plain paragraphs without depth). */
   private indentFor(
     block: WeaveTextBlock,
     style: TextLayoutStyle,
     fixedWidth: boolean,
     maxWidth: number
   ): number {
-    if (!block.kind) return 0;
+    const depth = Math.max(0, Math.floor(block.depth ?? 0));
+    if (!block.kind && depth === 0) return 0;
     const step =
       typeof style.indentStep === 'number' &&
       Number.isFinite(style.indentStep) &&
@@ -332,8 +336,7 @@ export class TextLayoutEngine {
         ? style.indentStep
         : DEFAULT_INDENT_STEP;
     const stepPx = step * style.fontSize;
-    const depth = Math.max(0, Math.floor(block.depth ?? 0));
-    const wanted = (depth + 1) * stepPx;
+    const wanted = (block.kind ? depth + 1 : depth) * stepPx;
     if (!fixedWidth) return wanted;
     const limit = Math.max(0, maxWidth - MIN_TEXT_WIDTH_RATIO * style.fontSize);
     return Math.min(wanted, limit);

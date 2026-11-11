@@ -62,6 +62,21 @@ describe('clipboard blocks', () => {
     });
     expect(r?.[1]).toEqual({ runs: [], m: { bold: true } });
   });
+  it('keeps paragraph depth and ignores invalid depth', () => {
+    const r = parseWeaveClipboard(
+      JSON.stringify({
+        v: 1,
+        blocks: [
+          { depth: 2, runs: [{ t: 'a' }] },
+          { depth: -1, runs: [{ t: 'b' }] },
+          { depth: 1.5, runs: [{ t: 'c' }] },
+        ],
+      })
+    );
+    expect(r?.[0]).toEqual({ depth: 2, runs: [{ t: 'a' }] });
+    expect(r?.[1]).toEqual({ runs: [{ t: 'b' }] });
+    expect(r?.[2]).toEqual({ runs: [{ t: 'c' }] });
+  });
   it('rejects malformed shapes', () => {
     for (const v of [
       { v: 2, blocks: [{ runs: [] }] },

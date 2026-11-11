@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "5.8.0-SNAPSHOT",
+  "version": "5.9.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -97,7 +97,7 @@
     },
     "esbuild": "0.25.0",
     "fast-uri": "3.1.9",
-    "follow-redirects": "1.16.1",
+    "follow-redirects": "1.16.3",
     "konva": "10.0.2",
     "lodash": "4.18.1",
     "rimraf": "6.0.1",

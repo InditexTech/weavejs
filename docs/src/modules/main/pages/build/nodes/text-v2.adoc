@@ -83,7 +83,7 @@ new WeaveTextV2Node({
 ----
 
 While editing, kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I] and kbd:[U] work, kbd:[Enter] continues a list
-and kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change its depth. The toolbar is yours: call the node
+and kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change its depth. The same keys indent and outdent plain paragraph lines (the whole paragraph, or every paragraph in the selection), and kbd:[Backspace] at the start of an indented paragraph outdents it. The toolbar is yours: call the node
 commands (for example from a modal; `setRunLink` adds a URL to a range) and listen to `onTextSelectionChange` and `onTextFormatChange`.
 Formatting survives move, resize, copy, duplicate, undo and image export.
 
@@ -94,7 +94,7 @@ Per-paragraph alignment (`setAlign`), per-selection line height and links per ra
 also commands. On a server render (skia-canvas or node-canvas) italic text in fonts without an italic
 file is slanted like in the browser; see the reference.
 
-Lists and marks already in a document render for everyone, even when rich text is off.
+Lists, paragraph indentation and marks already in a document render for everyone, even when rich text is off.
 
 See xref:sdk:api-reference/nodes/text-v2.adoc#_rich_text[the reference] for the commands.
 
@@ -145,7 +145,7 @@ plain node every formatting command returns `false` and does nothing.
 * Switching a node's `richText` to `false` does not remove its formatting: marks and lists stay and
 still render, only the commands go away. Switching it to `true` makes an existing plain node
 editable with the formatting commands.
-* `richText.indentStep` is read by the handler, not the node, so use the same value on every client.
+* `richText.indentStep` (used for lists and paragraph indent) is read by the handler, not the node, so use the same value on every client.
 
 == Large texts
 

@@ -314,26 +314,47 @@ export class TextEditModel {
 
   /**
    * Enter in a list: an empty item exits the list; otherwise the item
-   * continues (the block split carries `kind` and `depth`).
+   * continues (the block split carries `kind` and `depth`). With `soft`
+   * (Shift+Enter) the new block is a continuation of the item instead: same
+   * indent, no marker.
    */
-  enter(): boolean {
+  enter(soft = false): boolean {
     const { start, end } = this.getSelection();
     const b = start === end ? this.blockAt(start) : undefined;
-    if (b && this.blocks[b.index].kind && b.length === 0) {
+    if (!soft && b && this.blocks[b.index].kind && b.length === 0) {
       return this.commitFormat(outdentToPlain(this.blocks, b.index));
     }
-    return this.replaceRange(start, end, '\n', 'other');
+    const at = this.blockAt(start);
+    const current = at ? this.blocks[at.index] : undefined;
+    if (!soft || !at || !current?.kind) {
+      return this.replaceRange(start, end, '\n', 'other');
+    }
+    // Before the text of an item the continuation would precede its marker.
+    if (start === at.start && !current.cont) return false;
+    if (!this.replaceRange(start, end, '\n', 'other')) return false;
+    const next = this.blocks[at.index + 1];
+    if (next?.kind) {
+      this.blocks = this.blocks.map((blk, i) =>
+        i === at.index + 1 ? { ...blk, cont: true } : blk
+      );
+    }
+    return true;
   }
 
   /**
    * Backspace at the start of a list item outdents it, or removes the
-   * marker at depth 0. Returns false when the key is not handled here.
+   * marker at depth 0; at the start of an indented plain paragraph it
+   * outdents it. Returns false when the key is not handled here.
    */
   backspaceInList(): boolean {
     const { start, end } = this.getSelection();
     if (start !== end) return false;
     const b = this.blockAt(start);
-    if (b?.start !== start || !this.blocks[b.index].kind) return false;
+    if (b?.start !== start) return false;
+    const block = this.blocks[b.index];
+    if (!block.kind && !block.depth) return false;
+    // A continuation merges into the previous block (default Backspace).
+    if (block.cont) return false;
     return this.commitFormat(outdentBlocks(this.blocks, start, start));
   }
 
@@ -353,7 +374,7 @@ function outdentToPlain(
 ): WeaveTextBlock[] {
   return blocks.map((b, i) => {
     if (i !== index) return b;
-    const { kind: _k, depth: _d, start: _s, m: _m, ...rest } = b;
+    const { kind: _k, depth: _d, start: _s, cont: _c, m: _m, ...rest } = b;
     return rest;
   });
 }

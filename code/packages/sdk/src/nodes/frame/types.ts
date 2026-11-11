@@ -15,6 +15,7 @@ export type WeaveFrameProperties = {
   titleMargin: number;
   borderWidth: number;
   borderColor: string;
+  edgeHitWidth: number;
   onTargetEnter: {
     borderColor: string;
     fill: string;
