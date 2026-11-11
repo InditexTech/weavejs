@@ -217,6 +217,11 @@ jobs:
       - name: Build docs
         run: npx antora --fetch antora-playbook.local.yml
 
+      - name: git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       # Mints an installation token for a GitHub App that's on this repo's
       # branch-ruleset bypass list, if the release branch/`gh-pages` are
       # protected by one (branch rulesets requiring PRs / status checks) —
@@ -234,42 +239,20 @@ jobs:
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
-          permission-contents: write
+          # Local divergence from the docouture template
+          # (InditexTech/weavejs#1284): no `owner`/`repositories`/
+          # `permission-contents` narrowing. With them, pushes to main are
+          # rejected (GH013) even though the App is on the ruleset's bypass
+          # list; the un-narrowed token is bypassed, as in
+          # code-npm_node-publish-release-and-snapshot.yml. `docouture
+          # upgrade` overwrites this file; re-apply until fixed upstream.
 
       - name: Git app credentials
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git config --global credential.helper store
-          echo "https://ci-user:${APP_TOKEN}@github.com" >> ~/.git-credentials
-
-      # Local divergence from the docouture template (InditexTech/weavejs#1282):
-      # main is covered by a ruleset that requires signed commits, so the
-      # "Bump release descriptor" commit must be GPG-signed. Same setup as
-      # code-npm_node-publish-release-and-snapshot.yml. `docouture upgrade`
-      # overwrites this file; re-apply until it is fixed upstream.
-      - name: Prepare committer information
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.CI_GPG_SECRET_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.CI_GPG_SECRET_KEY_PASSWORD }}
-        run: |
-          mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          printf 'allow-loopback-pinentry\nallow-preset-passphrase\n' > ~/.gnupg/gpg-agent.conf
-          printf 'use-agent\npinentry-mode loopback\n' > ~/.gnupg/gpg.conf
-          gpgconf --kill gpg-agent || true
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          KEY_DATA=$(gpg --list-secret-keys --with-colons)
-          echo "$KEY_DATA" | awk -F: '/^grp:/ {print $10}' | while read -r GRIP; do
-            /usr/lib/gnupg/gpg-preset-passphrase --preset "$GRIP" <<< "$GPG_PASSPHRASE"
-          done
-
-          FPR=$(echo "$KEY_DATA" | awk -F: '/^fpr:/ {print $10; exit}')
-          git config user.name "srvcosoitxtech"
-          git config user.email "oso@inditex.com"
-          git config user.signingkey "$FPR"
-          git config commit.gpgsign true
+          echo "https://x-access-token:${APP_TOKEN}@github.com" >> ~/.git-credentials
 
       # The one signal this workflow trusts: docs/antora-playbook.yml's own
       # content.sources[] tags permanently say `tags: ['docs/v*']` (versioned) or
@@ -511,8 +494,8 @@ jobs:
 
           echo "${next}" > .release-version
           git add .release-version
-          git commit -S --no-verify -m "chore: bump docs/.release-version to ${next}"
-          git push --no-verify origin main
+          git commit -m "chore: bump docs/.release-version to ${next}"
+          git push origin main
 
           echo "bumped=true" >> "$GITHUB_OUTPUT"
           echo "docs/.release-version: ${VERSION} → ${next}"
