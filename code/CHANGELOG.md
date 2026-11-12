@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.9.0] - 2026-11-12
+
+### Added
+
+- [#1232](https://github.com/InditexTech/weavejs/issues/1232) Add sticky note canvas primitive and interactive placement tool
+
+### Fixed
+
+- [#1294](https://github.com/InditexTech/weavejs/issues/1294) Server-side render fails with "requestAnimationFrame is not defined" when the room has a video node
+
 ## [5.8.0] - 2026-11-11
 
 ### Added
@@ -1993,7 +2003,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.8.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.9.0...HEAD
+
+[5.9.0]: https://github.com/InditexTech/weavejs/compare/5.8.0...5.9.0
 
 [5.8.0]: https://github.com/InditexTech/weavejs/compare/5.7.1...5.8.0
 
