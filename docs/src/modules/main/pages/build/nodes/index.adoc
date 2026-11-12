@@ -61,6 +61,10 @@ The Rectangle node is a simple, versatile primitive shape used to render rectang
 .xref:main:build/nodes/polygon.adoc[Polygon]
 The Polygon node is a versatile primitive shape used to render polygon elements on the canvas using a preset shape. It supports customizable properties such as position, fill color, stroke, and an optional inline text label.
 
+[card,subheader="Drawing",labels="new"]
+.xref:main:build/nodes/sticky-note.adoc[Sticky Note]
+The Sticky Note node renders a paper-like note with a dog-ear folded corner, curated pastel colors, optional author attribution, and an inline editable label.
+
 [card,subheader="Drawing"]
 .xref:main:build/nodes/stroke.adoc[Stroke]
 The Stroke node represents a customizable free line on the canvas. It supports features like stroke color, width and dash patterns.

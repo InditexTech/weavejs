@@ -1,0 +1,41 @@
+= WeaveStickyNoteToolAction
+:description: Add a sticky note to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/sticky-note-tool/sticky-note-tool.ts[WeaveStickyNoteToolAction]
+class allows users to place sticky note nodes on the canvas by clicking/touching or by dragging to size.
+
+A click or micro-drag below `20px` places a default `200x200` sticky note; larger drags display a live preview clamped to at least `120x120` px (`MIN_STICKY_NOTE_SIZE`). Each interaction creates a xref:sdk:api-reference/nodes/sticky-note.adoc[WeaveStickyNoteNode], synchronizes it to shared state, and transitions back to the selection tool with the new note selected.
+
+While dragging, hold `Shift` to constrain proportions to `1:1`, `Alt`/`Option` to draw from the initial point as the center, or both to combine the behaviors. Press `Escape` to cancel before pointer release.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `stickyNoteTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStickyNoteToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStickyNoteToolAction();
+----
+
+== Events
+
+[cols="3*"]
+|===
+| Event | Payload | Description
+
+| `onAddingStickyNote` | `undefined` | Fired when the action enters the adding state (user is about to place a sticky note).
+| `onAddedStickyNote` | `undefined` | Fired once after pointer release when the sticky note has been added to state. Not fired if cancelled with `Escape` before release.
+|===

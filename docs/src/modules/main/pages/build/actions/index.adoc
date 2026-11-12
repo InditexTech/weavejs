@@ -116,6 +116,10 @@ Enables users to place a polygon node on the canvas using a preset shape (triang
 .xref:main:build/actions/star-tool.adoc[Star Tool]
 Enables users to add new star nodes to the canvas by clicking or touching on it.
 
+[card,subheader="Nodes",labels="new"]
+.xref:main:build/actions/sticky-note-tool.adoc[Sticky Note Tool]
+Enables users to create new sticky note nodes on the canvas by clicking or dragging.
+
 [card,subheader="Nodes"]
 .xref:main:build/actions/stroke-tool.adoc[Stroke Tool]
 Enables users to create a single-stroke line on the canvas. With the possibility to define the stoke tips format.

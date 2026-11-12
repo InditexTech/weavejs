@@ -1,0 +1,77 @@
+= Sticky Note Tool
+:description: Add a sticky note to the canvas
+
+== Introduction
+
+This action enables users to create new sticky note nodes on the canvas by clicking, touching, or dragging.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/nodes/sticky-note.adoc[Sticky Note] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveStickyNoteToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveStickyNoteToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("stickyNoteTool");
+----
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyStickyNoteToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("stickyNoteTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Sticky Note Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a user triggers the UI element that launches the action.
+
+When active the user can:
+
+* *Click* or *Touch* on the canvas (or drag less than 20 px) to place a sticky note at its default size (`200x200` px).
+* *Click & drag* to define a custom sticky note size, clamped to a minimum of `120x120` px (`MIN_STICKY_NOTE_SIZE`).
+* Hold *Shift* while dragging to constrain the note to a square (`1:1`).
+* Hold *Alt/Option* while dragging to draw outward from the initial click as the center.
+* Hold *Shift + Alt/Option* to draw a centered square sticky note.
+* Press *Escape* while dragging to cancel placement before releasing the pointer.
+
+Once placed, the sticky note is added to the canvas and automatically selected so users can move, resize, or double-click to edit its text right away.
