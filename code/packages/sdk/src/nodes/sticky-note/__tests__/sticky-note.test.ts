@@ -301,7 +301,7 @@ describe('WeaveStickyNoteNode', () => {
     });
   });
 
-  describe('Vertical text reserve (symmetric for middle alignment)', () => {
+  describe('Vertical text reserve (middle alignment ignores fold and author)', () => {
     it('reserves fold and author space only at the bottom for top alignment', () => {
       expect(getStickyNoteVerticalReserve(28, true, 'top')).toEqual({
         top: 0,
@@ -311,10 +311,12 @@ describe('WeaveStickyNoteNode', () => {
       expect(getStickyNoteVerticalReserve(28, false, 'bottom').top).toBe(0);
     });
 
-    it('reserves the same space on top and bottom for middle alignment', () => {
-      const r = getStickyNoteVerticalReserve(28, true, 'middle');
-      expect(r.top).toBe(r.bottom);
-      expect(r.total).toBe(r.top * 2);
+    it('reserves nothing for middle alignment', () => {
+      expect(getStickyNoteVerticalReserve(28, true, 'middle')).toEqual({
+        top: 0,
+        bottom: 0,
+        total: 0,
+      });
     });
 
     function editBounds(overrides: Partial<WeaveElementAttributes>) {
@@ -338,15 +340,15 @@ describe('WeaveStickyNoteNode', () => {
       return bounds as unknown as { y: number; height: number };
     }
 
-    it('centers the text box on the sheet when vertical align is middle', () => {
+    it('centers the text box on the sheet (padding only) when vertical align is middle', () => {
       const padY = 16;
       const b = editBounds({
         labelVerticalAlign: 'middle',
         labelPaddingY: padY,
         author: 'jmcaamanog',
       });
-      const reserve = 28 + STICKY_NOTE_AUTHOR_MARGIN;
-      expect(b.y).toBe(padY + reserve);
+      expect(b.y).toBe(padY);
+      expect(b.height).toBe(300 - padY * 2);
       expect(b.y + b.height / 2).toBe(300 / 2);
     });
 

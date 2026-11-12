@@ -49,16 +49,19 @@ export const STICKY_NOTE_LABEL_DEFAULTS = {
 
 /**
  * Vertical space reserved inside a sticky note for the dog-ear fold and the
- * author row. With `middle` vertical alignment the same amount is reserved on
- * top so the text is visually centered on the sheet; otherwise it is only
- * reserved at the bottom.
+ * author row. It is only reserved at the bottom for `top` and `bottom`
+ * alignment. With `middle` alignment nothing is reserved so the text is
+ * centered on the sheet (padding only); a long text may then run over the
+ * fold or the author row.
  */
 export function getStickyNoteVerticalReserve(
   dogEarSize: number,
   hasAuthor: boolean,
   verticalAlign: string
 ): { top: number; bottom: number; total: number } {
+  if (verticalAlign === 'middle') {
+    return { top: 0, bottom: 0, total: 0 };
+  }
   const bottom = dogEarSize + (hasAuthor ? STICKY_NOTE_AUTHOR_MARGIN : 0);
-  const top = verticalAlign === 'middle' ? bottom : 0;
-  return { top, bottom, total: top + bottom };
+  return { top: 0, bottom, total: bottom };
 }
