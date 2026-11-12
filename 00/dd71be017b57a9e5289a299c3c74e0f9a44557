@@ -1,0 +1,27 @@
+.github/workflows/docouture-release-preview.yml
+  s_8337868a728fb7::t_f53edcaa572da2 11-16,23-33,63,84-87,128-166,170-171,173-175,177-196,205-209,242,245,247-250,252-290,292-297,308,310-315,319-332,337-341,344-356,361,374-375,380-403,416-423
+.github/workflows/docouture-release.yml
+  s_8337868a728fb7::t_12c1bbd5a01261 58-68,92-96,141,168-170,253-255,297-305,307-308,310-313,316-332,336,339-341,343,345-351,354-356,358-365,368,370-371,373-374,378-380,480,493,523
+AGENTS.md
+  s_8337868a728fb7::t_c7876c6cf2f7d0 98-99,143-148
+docs/package-lock.json
+  s_8337868a728fb7::t_3647ea6bc69ab9 12-16,323-325,332,344-346,358-360,375-377,388-390,2081-2083,3677-3679,3685,3693-3695,3743-3745
+docs/package.json
+  s_8337868a728fb7::t_d9af1a4ad0b7d2 18-22,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "00dd71be017b57a9e5289a299c3c74e0f9a44557",
+  "prompts": {},
+  "sessions": {
+    "s_8337868a728fb7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e303eb2f9ffehj5sfkmqP5WH5L",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
