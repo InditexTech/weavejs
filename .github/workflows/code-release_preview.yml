@@ -116,6 +116,8 @@ jobs:
           keep-unreleased-section: true
           tag-prefix: ""
 
+      # Titles go into code spans here so an @user or @org/team in an issue
+      # title cannot notify anyone from the comment. CHANGELOG.md is untouched.
       - name: Build release preview
         env:
           NEXT_VERSION: ${{ steps.update-changelog.outputs.version }}
@@ -135,7 +137,7 @@ jobs:
                 }
               }
             }
-          ' code/CHANGELOG.md)
+          ' code/CHANGELOG.md | node .github/scripts/changelog-from-prs.mjs --wrap-titles)
           {
             echo "### :rocket: Release Preview Success"
             echo "You are going to release the version **${NEXT_VERSION}** (${RELEASE_VERSION}) with the following changes:"
