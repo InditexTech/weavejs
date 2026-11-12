@@ -427,3 +427,75 @@ describe('10b — setup() without requestAnimationFrame', () => {
     expect(mock.render).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('10c — cancelPendingRender() with requestAnimationFrame', () => {
+  let rafCallbacks: Array<() => void>;
+
+  beforeEach(() => {
+    rafCallbacks = [];
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn().mockImplementation((cb: () => void) => {
+        rafCallbacks.push(cb);
+        return rafCallbacks.length;
+      })
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  function setupStore() {
+    const store = new TestStore(makeConfig(), false);
+    const mock = makeMockInstance();
+    store.register(mock as never);
+    store.setup();
+    populateDocument(store);
+    rafCallbacks.length = 0;
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key2', 'val2');
+    });
+    return { store, mock };
+  }
+
+  it('10c.1 cancels the pending frame with cancelAnimationFrame', () => {
+    const cancel = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', cancel);
+    const { store } = setupStore();
+
+    store.cancelPendingRender();
+
+    expect(cancel).toHaveBeenCalledWith(1);
+  });
+
+  it('10c.2 does not throw when cancelAnimationFrame is unavailable', () => {
+    vi.stubGlobal('cancelAnimationFrame', undefined);
+    const { store } = setupStore();
+
+    expect(() => store.cancelPendingRender()).not.toThrow();
+  });
+
+  it('10c.3 allows scheduling a new frame after cancelling', () => {
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+    const { store } = setupStore();
+
+    store.cancelPendingRender();
+    rafCallbacks.length = 0;
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key3', 'val3');
+    });
+
+    expect(rafCallbacks).toHaveLength(1);
+  });
+
+  it('10c.4 is a no-op when nothing is pending', () => {
+    const cancel = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', cancel);
+    const store = new TestStore(makeConfig(), false);
+
+    expect(() => store.cancelPendingRender()).not.toThrow();
+    expect(cancel).not.toHaveBeenCalled();
+  });
+});
