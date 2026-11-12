@@ -2,12 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { WEAVE_SHAPE_LABEL_DEFAULTS } from '../shared/shape-label.constants';
+
 export const WEAVE_STICKY_NOTE_NODE_TYPE = 'sticky-note';
 
 export const DEFAULT_STICKY_NOTE_WIDTH = 200;
 export const DEFAULT_STICKY_NOTE_HEIGHT = 200;
 export const MIN_STICKY_NOTE_SIZE = 120;
 export const DEFAULT_DOG_EAR_SIZE = 28;
+export const STICKY_NOTE_AUTHOR_MARGIN = 22;
+export const DEFAULT_STICKY_NOTE_PADDING = 16;
 
 export const DEFAULT_STICKY_NOTE_COLOR = '#FEF08A'; // Pastel Yellow
 export const DEFAULT_STICKY_NOTE_TEXT = '';
@@ -26,3 +30,20 @@ export const STICKY_NOTE_PASTEL_COLORS = [
   '#FFEDD5', // Coral
   '#F9FAFB', // White
 ] as const;
+
+/**
+ * Label defaults for sticky notes: top-left aligned text, Inter 16px with
+ * comfortable padding. Overrides the generic shape-label defaults
+ * (centered Arial 14px, 8px padding).
+ */
+export const STICKY_NOTE_LABEL_DEFAULTS = {
+  ...WEAVE_SHAPE_LABEL_DEFAULTS,
+  labelFontFamily: DEFAULT_STICKY_NOTE_FONT_FAMILY,
+  labelFontSize: DEFAULT_STICKY_NOTE_FONT_SIZE,
+  labelFill: DEFAULT_STICKY_NOTE_TEXT_COLOR,
+  labelLineHeight: DEFAULT_STICKY_NOTE_LINE_HEIGHT,
+  labelAlign: 'left',
+  labelVerticalAlign: 'top',
+  labelPaddingX: DEFAULT_STICKY_NOTE_PADDING,
+  labelPaddingY: DEFAULT_STICKY_NOTE_PADDING,
+} as const;

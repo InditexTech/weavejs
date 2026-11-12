@@ -16,6 +16,8 @@ import {
   DEFAULT_STICKY_NOTE_HEIGHT,
   DEFAULT_STICKY_NOTE_COLOR,
   DEFAULT_DOG_EAR_SIZE,
+  STICKY_NOTE_AUTHOR_MARGIN,
+  STICKY_NOTE_LABEL_DEFAULTS,
 } from './constants';
 import type {
   WeaveStickyNoteNodeParams,
@@ -28,10 +30,7 @@ import type {
   WeaveShapeLabelEngine,
   WeaveShapeLabelTextBounds,
 } from '@/nodes/shared/shape-label.types';
-import {
-  labelId,
-  WEAVE_SHAPE_LABEL_DEFAULTS,
-} from '@/nodes/shared/shape-label.constants';
+import { labelId } from '@/nodes/shared/shape-label.constants';
 import {
   computeStickyNoteLabelMinSize,
   spreadLabelProps,
@@ -108,11 +107,11 @@ export class WeaveStickyNoteNode extends WeaveNode {
     const height = Math.max(props.height ?? DEFAULT_STICKY_NOTE_HEIGHT, 1);
     const dogEarSize = props.dogEarSize ?? DEFAULT_DOG_EAR_SIZE;
     const author = props.author;
-    const authorMargin = author ? 22 : 0;
+    const authorMargin = author ? STICKY_NOTE_AUTHOR_MARGIN : 0;
     const padX =
-      props.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      props.labelPaddingX ?? STICKY_NOTE_LABEL_DEFAULTS.labelPaddingX;
     const padY =
-      props.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      props.labelPaddingY ?? STICKY_NOTE_LABEL_DEFAULTS.labelPaddingY;
 
     const textBounds: WeaveShapeLabelTextBounds = {
       x: padX,
@@ -476,7 +475,7 @@ export class WeaveStickyNoteNode extends WeaveNode {
         rotation: 0,
         zIndex: 1,
         children: [],
-        ...WEAVE_SHAPE_LABEL_DEFAULTS,
+        ...STICKY_NOTE_LABEL_DEFAULTS,
       },
     };
   }

@@ -201,6 +201,10 @@ describe('WeaveStickyNoteToolAction', () => {
       expect(props.width).toBe(DEFAULT_STICKY_NOTE_WIDTH);
       expect(props.height).toBe(DEFAULT_STICKY_NOTE_HEIGHT);
       expect(props.color).toBe(DEFAULT_STICKY_NOTE_COLOR);
+      expect(props.labelAlign).toBe('left');
+      expect(props.labelVerticalAlign).toBe('top');
+      expect(props.labelPaddingX).toBe(16);
+      expect(props.labelPaddingY).toBe(16);
     });
   });
 

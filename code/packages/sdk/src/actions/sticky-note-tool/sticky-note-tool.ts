@@ -25,8 +25,8 @@ import {
   MIN_STICKY_NOTE_SIZE,
   DEFAULT_STICKY_NOTE_COLOR,
   DEFAULT_DOG_EAR_SIZE,
+  STICKY_NOTE_LABEL_DEFAULTS,
 } from '@/nodes/sticky-note/constants';
-import { WEAVE_SHAPE_LABEL_DEFAULTS } from '@/nodes/shared/shape-label.constants';
 import {
   getShapeDragBounds,
   type ShapeDragModifiers,
@@ -76,7 +76,7 @@ export class WeaveStickyNoteToolAction extends WeaveAction {
       height: DEFAULT_STICKY_NOTE_HEIGHT,
       color: DEFAULT_STICKY_NOTE_COLOR,
       dogEarSize: DEFAULT_DOG_EAR_SIZE,
-      ...WEAVE_SHAPE_LABEL_DEFAULTS,
+      ...STICKY_NOTE_LABEL_DEFAULTS,
     };
   }
 

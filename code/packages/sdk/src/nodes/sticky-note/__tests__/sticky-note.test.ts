@@ -13,6 +13,8 @@ import {
   DEFAULT_STICKY_NOTE_HEIGHT,
   DEFAULT_STICKY_NOTE_COLOR,
   DEFAULT_DOG_EAR_SIZE,
+  DEFAULT_STICKY_NOTE_PADDING,
+  STICKY_NOTE_LABEL_DEFAULTS,
 } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
@@ -73,8 +75,15 @@ describe('WeaveStickyNoteNode', () => {
       expect(state.props.dogEarSize).toBe(DEFAULT_DOG_EAR_SIZE);
       expect(state.props.labelText).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelText);
       expect(state.props.labelFontSize).toBe(
-        WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize
+        STICKY_NOTE_LABEL_DEFAULTS.labelFontSize
       );
+      expect(state.props.labelFontFamily).toBe(
+        STICKY_NOTE_LABEL_DEFAULTS.labelFontFamily
+      );
+      expect(state.props.labelAlign).toBe('left');
+      expect(state.props.labelVerticalAlign).toBe('top');
+      expect(state.props.labelPaddingX).toBe(DEFAULT_STICKY_NOTE_PADDING);
+      expect(state.props.labelPaddingY).toBe(DEFAULT_STICKY_NOTE_PADDING);
     });
 
     it('adds node state preserving custom attributes and spread label props', () => {
