@@ -1,0 +1,19 @@
+docs/src/modules/sdk/pages/api-reference/nodes/sticky-note.adoc
+  s_091b7691131c63::t_b81061f0aaf268 23,138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "84fef82613387a7c516902114e9120a8750cc328",
+  "prompts": {},
+  "sessions": {
+    "s_091b7691131c63": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e31209057ffeXQC55PvIlEtqNh",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
