@@ -20,7 +20,7 @@ Set `config.label.engine` to `native` to render with the on-canvas text engine a
 new WeaveStickyNoteNode({ config: { label: { engine: "native" } } });
 ----
 
-Sticky notes override the generic shape-label defaults with `STICKY_NOTE_LABEL_DEFAULTS`: top-left alignment (`labelAlign: "left"`, `labelVerticalAlign: "top"`), `Inter, system-ui, sans-serif` at `16px`, `#1F2937` fill, `1.35` line height, and `16px` padding (`labelPaddingX` / `labelPaddingY`). Text bounds automatically exclude the padding, the dog-ear fold corner, and the optional author footer margin.
+Sticky notes override the generic shape-label defaults with `STICKY_NOTE_LABEL_DEFAULTS`: top-left alignment (`labelAlign: "left"`, `labelVerticalAlign: "top"`), `Inter, system-ui, sans-serif` at `16px`, `#1F2937` fill, `1.35` line height, and `16px` padding (`labelPaddingX` / `labelPaddingY`). With `top` and `bottom` vertical alignment the text bounds exclude the padding, the dog-ear fold corner and the optional author footer margin. With `middle` only the padding is excluded, so the text is centered on the sheet and a long text may run over the fold or the author line.
 
 == Label edit events
 
@@ -135,4 +135,4 @@ The SDK exports the following constants alongside `WeaveStickyNoteNode`:
 * `DEFAULT_STICKY_NOTE_COLOR` (`"#FEF08A"`)
 * `STICKY_NOTE_PASTEL_COLORS` (8 curated pastel swatches)
 * `STICKY_NOTE_LABEL_DEFAULTS` (`WeaveShapeLabelProps` merged with sticky note typography and top-left padding)
-* `getStickyNoteVerticalReserve(dogEarSize, hasAuthor, verticalAlign?)` (computes symmetric vertical reserves when `verticalAlign === "middle"`, or bottom-only reserve otherwise)
+* `getStickyNoteVerticalReserve(dogEarSize, hasAuthor, verticalAlign?)` (returns the space reserved for the fold and the author line: nothing when `verticalAlign === "middle"`, a bottom-only reserve otherwise)
