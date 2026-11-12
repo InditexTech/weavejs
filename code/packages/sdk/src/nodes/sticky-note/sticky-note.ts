@@ -260,6 +260,12 @@ export class WeaveStickyNoteNode extends WeaveNode {
       shadowBlur: 10,
       shadowOffset: { x: 2, y: 5 },
       shadowOpacity: 0.7,
+      // A filled + stroked + shadowed shape makes Konva draw through an
+      // intermediate buffer canvas, and on the skia server backend that left
+      // the sheet blank in exports. The shadow of the 1px stroke is
+      // imperceptible, so skip the buffer.
+      perfectDrawEnabled: false,
+      shadowForStrokeEnabled: false,
       listening: true,
       draggable: false,
     });

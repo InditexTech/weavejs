@@ -170,6 +170,13 @@ describe('WeaveStickyNoteNode', () => {
       expect(author.text()).toBe('jmcaamanog');
     });
 
+    it('draws the sheet without a Konva buffer canvas so server exports are not blank', () => {
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const mainSheet = group.findOne('#sticky-1-main-sheet') as Konva.Line;
+      expect(mainSheet.perfectDrawEnabled()).toBe(false);
+      expect(mainSheet.shadowForStrokeEnabled()).toBe(false);
+    });
+
     it('updates labelText, color and author dynamically on update', () => {
       const props = defaultProps();
       const group = node.onRender(props) as Konva.Group;
