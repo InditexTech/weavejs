@@ -1,0 +1,27 @@
+code/packages/sdk/src/__tests__/weave.lifecycle.test.ts
+  s_6f95c896a0bbdc::t_9ebe6613966aa9 50,412-417
+code/packages/sdk/src/nodes/video/__tests__/video.test.ts
+  s_6f95c896a0bbdc::t_f0dfb843472493 445,452
+code/packages/sdk/src/stores/__tests__/store.setup.test.ts
+  s_6f95c896a0bbdc::t_0b944481b6770d 336-429
+code/packages/sdk/src/stores/store.ts
+  s_6f95c896a0bbdc::t_2ff6d0a6b680e1 44-47,107-139,259-261
+code/packages/sdk/src/weave.ts
+  s_6f95c896a0bbdc::t_caf1a845a9f2f1 379
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "24a2fef570006d0b798307140a7bd4934bc74ea3",
+  "prompts": {},
+  "sessions": {
+    "s_6f95c896a0bbdc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e307d4ff1ffe3FWsbzac9YKUmk",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
