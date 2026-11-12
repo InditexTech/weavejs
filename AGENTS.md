@@ -139,3 +139,7 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/nodes/frame.adoc (edge selection) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/frame.adoc (`edgeHitWidth`) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/text-v2.adoc (list marker alignment) | `code/packages/sdk/src/nodes/text-v2/layout/engine.ts` | released in 5.8.0 |
+| main:build/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*` | unreleased |
+| main:build/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | unreleased |
+| sdk:api-reference/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*`, `code/packages/sdk/src/nodes/shared/shape-label.utils.ts` | unreleased |
+| sdk:api-reference/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | unreleased |
