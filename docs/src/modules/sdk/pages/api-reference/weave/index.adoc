@@ -594,9 +594,9 @@ defined as stage coordinates. You can also define the exportation options.
 [source,ts]
 ----
 exportNodesServerSide(
-  nodes: WeaveElementInstance[],
+  nodes: string[],
   boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
-  options: WeaveExportNodeOptions
+  options: WeaveExportNodesOptions
 ): Promise<{
     composites: { input: Buffer; left: number; top: number }[];
     width: number;
@@ -604,7 +604,7 @@ exportNodesServerSide(
   }>
 ----
 
-This method exports the specified nodes on server-side. You receive the final image
+This method exports the specified nodes on server-side. `nodes` are the IDs of the nodes to export, an empty array exports all the nodes of the main layer. You receive the final image
 width and height, and also the final image segments, the function renders using N segments
 in order to avoid OOM from the canvas side. With this information you can use a tool like
 https://sharp.pixelplumbing.com/api-composite/[sharp] to composite the final image, and
@@ -618,8 +618,8 @@ probably, and probably:
 [source,ts]
 ----
 exportAreaServerSide(
-    area: { x: number; y: number; width: number; height: number },
-  options: WeaveExportNodeOptions
+  area: { x: number; y: number; width: number; height: number },
+  options: WeaveExportNodesOptions
 ): Promise<{
     composites: { input: Buffer; left: number; top: number }[];
     width: number;

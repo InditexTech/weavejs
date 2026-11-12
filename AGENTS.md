@@ -139,3 +139,5 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/nodes/frame.adoc (edge selection) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/frame.adoc (`edgeHitWidth`) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/text-v2.adoc (list marker alignment) | `code/packages/sdk/src/nodes/text-v2/layout/engine.ts` | released in 5.8.0 |
+| main:build/server-side-rendering.adoc | `code/packages/sdk/src/backend.ts`, `code/packages/sdk/src/stores/store.ts` (`cancelPendingRender`), `code/packages/sdk/src/weave.ts` (`destroy`, `exportNodesServerSide`), `code/packages/sdk/src/nodes/video/video.ts`, `code/packages/store-standalone/src/store-standalone.ts` | unreleased |
+| sdk:api-reference/weave/index.adoc (`exportNodesServerSide` / `exportAreaServerSide` signatures) | `code/packages/sdk/src/weave.ts` | unreleased |

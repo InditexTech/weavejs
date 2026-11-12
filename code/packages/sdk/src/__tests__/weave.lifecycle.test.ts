@@ -47,6 +47,7 @@ function makeWeave() {
     setup: vi.fn(),
     connect: vi.fn().mockResolvedValue(undefined),
     disconnect: vi.fn().mockResolvedValue(undefined),
+    cancelPendingRender: vi.fn(),
     getDocument: vi.fn().mockReturnValue(doc),
     getUser: vi.fn().mockReturnValue({ id: 'user-1' }),
     setState: vi.fn(),
@@ -406,6 +407,12 @@ describe('Weave — destroy()', () => {
     await weave.destroy();
     expect(store.disconnect).toHaveBeenCalled();
     expect(doc.destroy).toHaveBeenCalled();
+  });
+
+  it('cancels the store pending render before disconnecting', async () => {
+    const { weave, store } = makeWeave();
+    await weave.destroy();
+    expect(store.cancelPendingRender).toHaveBeenCalled();
   });
 
   it('calls onDestroyInstance on all node handlers', async () => {

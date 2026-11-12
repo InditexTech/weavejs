@@ -376,6 +376,7 @@ export class Weave {
 
     // disconnect from the store
     const store = this.storeManager.getStore();
+    store.cancelPendingRender();
     await store.disconnect();
     store.getDocument()?.destroy();
 

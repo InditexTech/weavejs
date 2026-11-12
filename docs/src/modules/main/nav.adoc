@@ -84,6 +84,7 @@
 ** xref:main:build/stores/websockets-store.adoc[WebSockets]
 ** xref:main:build/stores/azure-web-pubsub-store.adoc[Azure Web PubSub]
 ** xref:main:build/stores/standalone-store.adoc[Standalone]
+* xref:main:build/server-side-rendering.adoc[Server-side rendering]
 * Additional information
 * xref:main:release-notes/index.adoc[Release notes]
 ** xref:main:release-notes/5.0.0.adoc[v5.0.0]

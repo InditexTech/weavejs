@@ -442,14 +442,14 @@ describe('5 — onRender: load branches', () => {
     expect(mock.updateNode).toHaveBeenCalled();
   });
 
-  it('5.3 isServer=true → calls updateNode, does not call loadVideo', () => {
+  it('5.3 isServer=true → does not write state nor call loadVideo', () => {
     mockIsServer.mockReturnValue(true);
     const { node, mock } = makeNode();
     const createElSpy = vi.spyOn(document, 'createElement');
 
     node.onRender(defaultProps());
 
-    expect(mock.updateNode).toHaveBeenCalled();
+    expect(mock.updateNode).not.toHaveBeenCalled();
     const videoCalls = createElSpy.mock.calls.filter(([tag]) => tag === 'video');
     expect(videoCalls).toHaveLength(0);
   });

@@ -1,0 +1,324 @@
+= Server-side rendering
+:description: Render a Weave.js room headless on Node.js and export it as an image
+
+Weave.js can render a room on the server, with no browser, no UI, and no live
+connection. You pass the room data in, the room renders on a native canvas, and you export
+the result, typically as a PNG or JPEG. Use it to generate previews, thumbnails, and
+downloads of a room.
+
+A server-side instance uses the xref:main:build/stores/standalone-store.adoc[Standalone store]
+to load the room data, and the Konva base renderer to build the canvas.
+
+[source,text]
+----
+room data (base64 Yjs)
+        |
+        v
+WeaveStoreStandalone --> Weave instance --> exportNodesServerSide()
+                         (Konva on a native   |
+                          canvas backend)     v
+                                       image tiles --> sharp --> PNG / JPEG
+----
+
+== Prerequisites
+
+* Node.js 18.12 or later.
+* A room to render, as the base64-encoded Yjs state that your backend stores. See
+xref:main:build/stores/index.adoc[Stores].
+* A project that loads ES modules. All Weave.js packages are ES modules only, see
+xref:sdk:setup.adoc[SDK setup].
+
+== Steps
+
+. Install the dependencies.
++
+Pick one native canvas backend, `canvas` or `skia-canvas`. Both are optional peer
+dependencies of the SDK, so install the one you use with the version that
+`@inditextech/weave-sdk` requires. See xref:sdk:setup.adoc#_server_side_rendering_backends[SDK setup].
++
+[tabs]
+--
+[tab,label="canvas"]
+****
+[source,shell]
+----
+npm install canvas sharp yjs konva \
+  @inditextech/weave-types @inditextech/weave-sdk \
+  @inditextech/weave-renderer-konva-base @inditextech/weave-store-standalone
+----
+****
+
+[tab,label="skia-canvas"]
+****
+[source,shell]
+----
+npm install skia-canvas sharp yjs konva \
+  @inditextech/weave-types @inditextech/weave-sdk \
+  @inditextech/weave-renderer-konva-base @inditextech/weave-store-standalone
+----
+****
+--
++
+https://sharp.pixelplumbing.com[sharp] composites the image tiles in the last step.
+
+. Import from the `/server` entry points.
++
+Every package has a `/server` entry point for Node.js. Use it on the backend instead of the
+default entry point.
++
+[source,ts]
+----
+import {
+  Weave,
+  WeaveStageNode,
+  WeaveLayerNode,
+  WeaveGroupNode,
+  WeaveRectangleNode,
+  WeaveImageNode,
+  WeaveVideoNode,
+  WeaveTextNode,
+  setupCanvasBackend, // <.>
+} from '@inditextech/weave-sdk/server';
+import { WeaveKonvaBaseRenderer } from '@inditextech/weave-renderer-konva-base/server';
+import { WeaveStoreStandalone } from '@inditextech/weave-store-standalone/server';
+----
+<.> Use `setupSkiaBackend` if you installed `skia-canvas`.
+
+. Register the fonts and select the backend.
++
+Fonts are registered with the native canvas library, not with Weave.js. Register every
+font family your rooms use before you create the instance, otherwise the text renders with a
+fallback font. Then call the backend setup function once per process, or once per worker
+thread.
++
+[tabs]
+--
+[tab,label="canvas"]
+****
+[source,ts]
+----
+import path from 'node:path';
+import { registerFont } from 'canvas';
+
+registerFont(path.resolve(process.cwd(), 'fonts/inter-regular.ttf'), {
+  family: 'Inter',
+  weight: '400',
+  style: 'normal',
+});
+
+await setupCanvasBackend();
+----
+****
+
+[tab,label="skia-canvas"]
+****
+[source,ts]
+----
+import path from 'node:path';
+import { FontLibrary } from 'skia-canvas';
+
+FontLibrary.use('Inter', [
+  path.resolve(process.cwd(), 'fonts/inter-regular.ttf'),
+  path.resolve(process.cwd(), 'fonts/inter-bold.ttf'),
+]);
+
+await setupSkiaBackend();
+----
+****
+--
++
+If the native package is missing, the setup function throws an error that names the package
+to install.
+
+. Create the instance.
++
+Create a `WeaveStoreStandalone` with the room data, a `WeaveKonvaBaseRenderer`, and a
+xref:sdk:api-reference/weave/index.adoc[Weave] instance. Register every node type the room
+contains. A node type without a registered handler is skipped with a console warning. A server-side instance needs no actions
+and no plugins.
++
+[source,ts]
+----
+const store = new WeaveStoreStandalone(
+  { roomData }, // <.>
+  {
+    getUser: () => ({ id: 'server', name: 'Server', email: 'server@example.com' }),
+  }
+);
+
+const weave = new Weave(
+  {
+    store,
+    renderer: new WeaveKonvaBaseRenderer(),
+    nodes: [
+      new WeaveStageNode(),
+      new WeaveLayerNode(),
+      new WeaveGroupNode(),
+      new WeaveRectangleNode(),
+      new WeaveTextNode(),
+      new WeaveImageNode({
+        config: { urlTransformer: toInternalUrl }, // <.>
+      }),
+      new WeaveVideoNode({
+        config: { urlTransformer: toInternalUrl },
+      }),
+    ],
+    actions: [],
+    plugins: [],
+    fonts: [],
+  },
+  { container: undefined, width: 800, height: 600 } // <.>
+);
+----
+<.> The base64 string the room is stored as. If omitted, the store loads the default initial state.
+<.> The server resolves URLs on its own, so a URL that is relative to the browser origin does
+not work. Use `urlTransformer` to rewrite image and video URLs to an address the backend can
+reach.
+<.> No container on the server, so you set the stage size.
+
+. Wait until the room is ready.
++
+`start()` begins loading the room, but images and video placeholders keep loading after the
+room is in the state. Resolve when the `onRoomLoaded` event has fired and
+`asyncElementsLoaded()` returns `true`. Register the listeners before you call `start()`.
++
+[source,ts]
+----
+const ready = new Promise<void>((resolve) => {
+  let roomLoaded = false;
+
+  const check = () => {
+    if (roomLoaded && weave.asyncElementsLoaded()) {
+      resolve();
+    }
+  };
+
+  weave.addEventListener('onRoomLoaded', (status: boolean) => {
+    if (status) {
+      roomLoaded = true;
+    }
+    check();
+  });
+
+  weave.addEventListener('onAsyncElementChange', check);
+});
+
+await weave.start();
+await ready;
+----
+
+. Export the room.
++
+Call xref:sdk:api-reference/weave/index.adoc#exportnodesserverside[`exportNodesServerSide`]
+with the IDs of the nodes to export. An empty list exports everything in the main layer.
+You get back the final image size and a list of image tiles, which the SDK renders in
+segments to avoid running out of memory in the canvas library. Composite them with sharp.
++
+[source,ts]
+----
+import sharp from 'sharp';
+
+const { composites, width, height } = await weave.exportNodesServerSide(
+  [], // <.>
+  (nodes) => nodes, // <.>
+  { format: 'image/png', padding: 20, pixelRatio: 1, backgroundColor: '#FFFFFF' }
+);
+
+await weave.destroy(); // <.>
+
+const image = await sharp({
+  create: { width, height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+})
+  .composite(composites)
+  .png()
+  .toBuffer();
+----
+<.> The IDs of the nodes to export.
+<.> Select which nodes define the bounds of the image. Return the nodes unchanged to use
+the exported nodes themselves.
+<.> Always destroy the instance when you finish, see <<lifecycle,Instance lifecycle>>.
++
+To export a region of the stage instead of a list of nodes, use
+xref:sdk:api-reference/weave/index.adoc#exportareaserverside[`exportAreaServerSide`].
+
+. Run the render in a worker thread.
++
+Rendering and compositing are CPU-bound. Run them in a
+https://nodejs.org/api/worker_threads.html[worker thread] so they do not block the main
+thread, and limit the number of concurrent workers. The backend generated by
+`create-weave-backend-app` includes an example of this: a worker that renders the room and
+exports the image.
+
+== Verify
+
+Write the buffer to disk and open it.
+
+[source,ts]
+----
+import { writeFile } from 'node:fs/promises';
+
+await writeFile('room.png', image);
+----
+
+The image is `width` by `height` pixels, which is the size of the exported nodes plus the
+padding, multiplied by `pixelRatio`.
+
+[#lifecycle]
+== Instance lifecycle
+
+Call `weave.destroy()` as soon as you finish exporting. It disconnects the store, destroys the
+stage, and cancels any render that is still scheduled, so a destroyed instance never
+renders afterward.
+
+Weave.js groups store updates into a single scheduled render. In a browser the render runs on
+the next animation frame. Node.js has no `requestAnimationFrame`, so on the server the same
+render runs on a zero-delay timer. The store also handles state changes that nodes make
+while the room renders, for example a node that writes its own state.
+
+== What changes on the server
+
+An instance is on the server when `window` is not defined, and `weave.isServerSide()` returns
+`true`. Everything that exists to support a user is skipped:
+
+* Event handlers, keyboard shortcuts, cursors, and the minimap are not set up.
+* Text editing keyboard handling is not set up.
+* The stage does not resize to a container.
+* A video node renders its placeholder image only. It does not load or play the video.
+* Images load through the Konva image element and the `urlTransformer` you configure.
+
+== Troubleshooting
+
+[cols="1,2"]
+|===
+|Symptom |Cause and fix
+
+|`setupCanvasBackend() requires the "canvas" package`
+|The native package is not installed. Install it with the version that
+`@inditextech/weave-sdk` requires, see xref:sdk:setup.adoc[SDK setup].
+
+|Text uses the wrong font
+|The font is not registered with the native library, or it is registered after the
+instance is created. Register all fonts first, with the same `family`, `weight`, and
+`style` the room uses.
+
+|An image or video placeholder is missing
+|The server cannot reach the URL. Check the `urlTransformer`, and the network access from
+the backend to the asset host.
+
+|`ReferenceError: requestAnimationFrame is not defined` when the room contains a video node
+|Caused by a bug in the store, fixed with
+https://github.com/InditexTech/weavejs/issues/1294[issue 1294]. Upgrade
+`@inditextech/weave-sdk` to a version that includes the fix.
+
+|The promise from the ready step never resolves
+|The listeners were registered after `start()`, or the room is empty. Register the
+listeners before you call `start()`.
+|===
+
+== Next steps
+
+* xref:main:build/stores/standalone-store.adoc[Standalone store] — the store that loads the room.
+* xref:sdk:api-reference/weave/index.adoc#exportnodesserverside[Weave export methods] — all
+options of `exportNodesServerSide` and `exportAreaServerSide`.
+* xref:sdk:setup.adoc[SDK setup] — native backend packages.
+* xref:main:manual-installation/backend.adoc[Set up the backend] — the generated backend.
