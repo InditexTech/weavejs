@@ -14,7 +14,8 @@ import type { WeaveTextBlock } from '@/nodes/text-v2/model';
 import { labelId, WEAVE_SHAPE_LABEL_DEFAULTS } from './shape-label.constants';
 import {
   DEFAULT_DOG_EAR_SIZE,
-  STICKY_NOTE_AUTHOR_MARGIN,
+  STICKY_NOTE_LABEL_DEFAULTS,
+  getStickyNoteVerticalReserve,
 } from '@/nodes/sticky-note/constants';
 
 /**
@@ -346,12 +347,16 @@ export function computeStickyNoteLabelMinSize(
   const attrs = group.getAttrs() as WeaveElementAttributes;
   const dogEarSize =
     (attrs.dogEarSize as number | undefined) ?? DEFAULT_DOG_EAR_SIZE;
-  const authorMargin = attrs.author ? STICKY_NOTE_AUTHOR_MARGIN : 0;
+  const reserve = getStickyNoteVerticalReserve(
+    dogEarSize,
+    !!attrs.author,
+    (attrs.labelVerticalAlign as string | undefined) ??
+      STICKY_NOTE_LABEL_DEFAULTS.labelVerticalAlign
+  );
 
   return {
     width: (paddingX * 2 + fontSize) * stage.scaleX(),
     height:
-      (naturalSize.height + paddingY * 2 + dogEarSize + authorMargin) *
-      stage.scaleY(),
+      (naturalSize.height + paddingY * 2 + reserve.total) * stage.scaleY(),
   };
 }

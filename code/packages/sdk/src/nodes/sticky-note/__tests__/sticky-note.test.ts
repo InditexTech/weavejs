@@ -15,6 +15,8 @@ import {
   DEFAULT_DOG_EAR_SIZE,
   DEFAULT_STICKY_NOTE_PADDING,
   STICKY_NOTE_LABEL_DEFAULTS,
+  STICKY_NOTE_AUTHOR_MARGIN,
+  getStickyNoteVerticalReserve,
 } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
@@ -284,6 +286,66 @@ describe('WeaveStickyNoteNode', () => {
       expect(minSize).toHaveProperty('height');
       expect(minSize.width).toBeGreaterThan(0);
       expect(minSize.height).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Vertical text reserve (symmetric for middle alignment)', () => {
+    it('reserves fold and author space only at the bottom for top alignment', () => {
+      expect(getStickyNoteVerticalReserve(28, true, 'top')).toEqual({
+        top: 0,
+        bottom: 28 + STICKY_NOTE_AUTHOR_MARGIN,
+        total: 28 + STICKY_NOTE_AUTHOR_MARGIN,
+      });
+      expect(getStickyNoteVerticalReserve(28, false, 'bottom').top).toBe(0);
+    });
+
+    it('reserves the same space on top and bottom for middle alignment', () => {
+      const r = getStickyNoteVerticalReserve(28, true, 'middle');
+      expect(r.top).toBe(r.bottom);
+      expect(r.total).toBe(r.top * 2);
+    });
+
+    function editBounds(overrides: Partial<WeaveElementAttributes>) {
+      const { node } = makeNode();
+      const group = node.onRender(
+        defaultProps({ width: 300, height: 300, ...overrides })
+      ) as Konva.Group;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any).shapeLabelEditor;
+      let bounds: { y: number; height: number } | null = null;
+      vi.spyOn(editor, 'triggerEditMode').mockImplementation(
+        (_g: Konva.Group, b: { y: number; height: number }) => {
+          bounds = b;
+        }
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isSelecting').mockReturnValue(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isNodeSelected').mockReturnValue(true);
+      group.dblClick();
+      return bounds as unknown as { y: number; height: number };
+    }
+
+    it('centers the text box on the sheet when vertical align is middle', () => {
+      const padY = 16;
+      const b = editBounds({
+        labelVerticalAlign: 'middle',
+        labelPaddingY: padY,
+        author: 'jmcaamanog',
+      });
+      const reserve = 28 + STICKY_NOTE_AUTHOR_MARGIN;
+      expect(b.y).toBe(padY + reserve);
+      expect(b.y + b.height / 2).toBe(300 / 2);
+    });
+
+    it('keeps the text box at the top for top alignment', () => {
+      const padY = 16;
+      const b = editBounds({
+        labelVerticalAlign: 'top',
+        labelPaddingY: padY,
+        author: 'jmcaamanog',
+      });
+      expect(b.y).toBe(padY);
     });
   });
 

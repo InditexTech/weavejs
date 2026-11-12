@@ -18,6 +18,7 @@ import {
   DEFAULT_DOG_EAR_SIZE,
   STICKY_NOTE_AUTHOR_MARGIN,
   STICKY_NOTE_LABEL_DEFAULTS,
+  getStickyNoteVerticalReserve,
 } from './constants';
 import type {
   WeaveStickyNoteNodeParams,
@@ -113,11 +114,17 @@ export class WeaveStickyNoteNode extends WeaveNode {
     const padY =
       props.labelPaddingY ?? STICKY_NOTE_LABEL_DEFAULTS.labelPaddingY;
 
+    const reserve = getStickyNoteVerticalReserve(
+      dogEarSize,
+      !!author,
+      props.labelVerticalAlign ?? STICKY_NOTE_LABEL_DEFAULTS.labelVerticalAlign
+    );
+
     const textBounds: WeaveShapeLabelTextBounds = {
       x: padX,
-      y: padY,
+      y: padY + reserve.top,
       width: Math.max(1, width - padX * 2),
-      height: Math.max(1, height - padY * 2 - dogEarSize - authorMargin),
+      height: Math.max(1, height - padY * 2 - reserve.total),
     };
 
     const mainSheetPoints = this.getMainSheetPoints(width, height, dogEarSize);
@@ -129,6 +136,7 @@ export class WeaveStickyNoteNode extends WeaveNode {
       dogEarSize,
       author,
       authorMargin,
+      verticalReserve: reserve.total,
       padX,
       padY,
       textBounds,
@@ -373,11 +381,8 @@ export class WeaveStickyNoteNode extends WeaveNode {
         );
 
       const currentAttrs = stickyGroup.getAttrs() as WeaveElementAttributes;
-      const {
-        textBounds: curBounds,
-        dogEarSize,
-        authorMargin,
-      } = this.getLayout(currentAttrs);
+      const { textBounds: curBounds, verticalReserve } =
+        this.getLayout(currentAttrs);
       const originalHeight =
         (currentAttrs.height as number) ?? DEFAULT_STICKY_NOTE_HEIGHT;
 
@@ -388,7 +393,7 @@ export class WeaveStickyNoteNode extends WeaveNode {
         (neededShapeHeight) => {
           // Never shrink below original; include fold and author margin
           const finalHeight = Math.max(
-            neededShapeHeight + dogEarSize + authorMargin,
+            neededShapeHeight + verticalReserve,
             originalHeight
           );
           stickyGroup.setAttrs({ height: finalHeight });
@@ -422,14 +427,14 @@ export class WeaveStickyNoteNode extends WeaveNode {
     const stickyGroup = nodeInstance as Konva.Group;
     this.updateInternalShapes(stickyGroup, nextProps);
 
-    const { textBounds, dogEarSize, authorMargin } = this.getLayout(nextProps);
+    const { textBounds, verticalReserve } = this.getLayout(nextProps);
 
     this.shapeLabelEditor.updateLabel(
       stickyGroup,
       nextProps,
       textBounds,
       (neededShapeHeight) => {
-        const finalHeight = neededShapeHeight + dogEarSize + authorMargin;
+        const finalHeight = neededShapeHeight + verticalReserve;
         nodeInstance.setAttrs({ height: finalHeight });
         this.updateInternalShapes(stickyGroup, {
           ...nextProps,
