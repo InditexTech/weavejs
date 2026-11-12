@@ -19,7 +19,10 @@ import {
   getStickyNoteVerticalReserve,
 } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
-import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import type {
+  WeaveElementAttributes,
+  WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
 import { createMockInstance } from '../../__tests__/shared/node.test-helpers';
 import {
   labelId,
@@ -30,7 +33,7 @@ import { computeStickyNoteLabelMinSize } from '@/nodes/shared/shape-label.utils'
 vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 
 function makeNode(config?: {
-  transform?: object;
+  transform?: Partial<WeaveNodeTransformerProperties>;
   label?: { engine?: 'legacy' | 'native' };
 }): {
   node: WeaveStickyNoteNode;
@@ -188,11 +191,20 @@ describe('WeaveStickyNoteNode', () => {
     });
 
     it('configures transformer properties cleanly from config', () => {
+      const { node: configured } = makeNode({
+        transform: {
+          rotateEnabled: false,
+          enabledAnchors: ['top-left', 'bottom-right'],
+        },
+      });
       const props = defaultProps();
-      const group = node.onRender(props) as Konva.Group;
+      const group = configured.onRender(props) as Konva.Group;
 
       const transformerProps = group.getTransformerProperties();
-      expect(typeof transformerProps).toBe('object');
+      expect(transformerProps).toMatchObject({
+        rotateEnabled: false,
+        enabledAnchors: ['top-left', 'bottom-right'],
+      });
     });
   });
 

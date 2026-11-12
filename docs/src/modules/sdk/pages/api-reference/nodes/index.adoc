@@ -69,6 +69,10 @@ The WeavePolygonNode node renders a polygon shape on the canvas using explicit v
 .xref:sdk:api-reference/nodes/star.adoc[WeaveStarNode]
 The WeaveStarNode node is a simple, versatile primitive shape used to render star elements on the canvas. It supports customizable properties such as position, inner and outer radius, fill color, stroke and more.
 
+[card,subheader="Drawing",labels="new"]
+.xref:sdk:api-reference/nodes/sticky-note.adoc[WeaveStickyNoteNode]
+The WeaveStickyNoteNode node renders an interactive sticky note primitive with a dog-ear folded corner, pastel color palette, optional author attribution, and an inline editable label.
+
 [card,subheader="Drawing"]
 .xref:sdk:api-reference/nodes/stroke.adoc[WeaveStrokeNode]
 The WeaveStrokeNode node represents the recommended way to render free-hand lines on the canvas. It supports features like stroke color, width, dash patterns.

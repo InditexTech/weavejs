@@ -14,7 +14,6 @@ export const STICKY_NOTE_AUTHOR_MARGIN = 22;
 export const DEFAULT_STICKY_NOTE_PADDING = 16;
 
 export const DEFAULT_STICKY_NOTE_COLOR = '#FEF08A'; // Pastel Yellow
-export const DEFAULT_STICKY_NOTE_TEXT = '';
 export const DEFAULT_STICKY_NOTE_FONT_SIZE = 16;
 export const DEFAULT_STICKY_NOTE_FONT_FAMILY = 'Inter, system-ui, sans-serif';
 export const DEFAULT_STICKY_NOTE_TEXT_COLOR = '#1F2937';

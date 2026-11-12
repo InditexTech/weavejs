@@ -1,0 +1,45 @@
+= Sticky Note
+:description: Add interactive sticky notes to the canvas
+
+The Sticky Note node renders a paper-like note on the canvas with a drop shadow, top adhesive strip, bottom-right dog-ear fold flap, an optional author attribution row, and an inline editable label.
+
+Built with Konva shapes and wired into Weave.js's shared shape-label engine, sticky notes support dragging, live resizing without distorting the fold corner or tape strip, rotation, selection via both the sheet and the fold flap, and double-click text editing (using either the `legacy` DOM overlay or the `native` on-canvas rich-text editor).
+
+== Features
+
+* **Curated pastel palette**: Exports `STICKY_NOTE_PASTEL_COLORS` with 8 colors (Yellow `#FEF08A`, Mint `#A7F3D0`, Rose `#FECDD3`, Lavender `#DDD6FE`, Sky `#BAE6FD`, Amber `#FDE68A`, Coral `#FFEDD5`, White `#F9FAFB`).
+* **3D paper geometry**: Main sheet with single ambient drop shadow, top adhesive tape accent, and bottom-right dog-ear folded flap.
+* **Shape-label engine**: Supports `label*` styling props, rich-text `labelBlocks`, auto-growing height when text exceeds bounds, and minimum size enforcement via `getNodeMinSize`.
+* **Optional author attribution**: Displays an optional `author` footer preserved as provided without forced casing or prefixes.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveStickyNoteNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveStickyNoteNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/sticky-note-tool.adoc[Sticky Note Tool] that
+allows users to add Sticky Note nodes to the canvas.

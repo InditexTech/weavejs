@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import type {
+  WeaveElementAttributes,
+  WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
 import type { WeaveShapeLabelConfig } from '@/nodes/shared/shape-label.types';
 
 export interface StickyNoteAttributes extends WeaveElementAttributes {
@@ -20,12 +23,11 @@ export interface StickyNoteAttributes extends WeaveElementAttributes {
 }
 
 export type WeaveStickyNoteProperties = {
-  transform?: {
-    enabledAnchors?: string[];
-  };
+  transform: Partial<WeaveNodeTransformerProperties>;
+  /** Label engine; defaults to `legacy`. */
   label?: Partial<WeaveShapeLabelConfig>;
 };
 
 export type WeaveStickyNoteNodeParams = {
-  config?: WeaveStickyNoteProperties;
+  config?: Partial<WeaveStickyNoteProperties>;
 };

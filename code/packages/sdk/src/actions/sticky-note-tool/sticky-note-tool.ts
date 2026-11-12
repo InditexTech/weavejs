@@ -33,6 +33,8 @@ import {
 } from '../shared/shape-geometry';
 import { bindShapeDragKeyboardHandlers } from '../shared/shape-keyboard';
 
+const STICKY_NOTE_DRAG_THRESHOLD = 20;
+
 export class WeaveStickyNoteToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state!: WeaveStickyNoteToolActionState;
@@ -198,6 +200,44 @@ export class WeaveStickyNoteToolAction extends WeaveAction {
     this.setState(STICKY_NOTE_TOOL_STATE.DEFINING_SIZE);
   }
 
+  private resolveNoteBounds(
+    mousePoint: Konva.Vector2d,
+    modifiers: ShapeDragModifiers = {}
+  ): { x: number; y: number; width: number; height: number } {
+    if (!this.clickPoint) {
+      return {
+        x: 0,
+        y: 0,
+        width: this.props.width,
+        height: this.props.height,
+      };
+    }
+
+    const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+      centered: modifiers.altKey,
+      constrained: modifiers.shiftKey,
+    });
+
+    if (
+      bounds.width < STICKY_NOTE_DRAG_THRESHOLD &&
+      bounds.height < STICKY_NOTE_DRAG_THRESHOLD
+    ) {
+      return {
+        x: this.clickPoint.x,
+        y: this.clickPoint.y,
+        width: this.props.width,
+        height: this.props.height,
+      };
+    }
+
+    return {
+      x: bounds.x,
+      y: bounds.y,
+      width: Math.max(bounds.width, MIN_STICKY_NOTE_SIZE),
+      height: Math.max(bounds.height, MIN_STICKY_NOTE_SIZE),
+    };
+  }
+
   private handleSettingSize(modifiers: ShapeDragModifiers = {}) {
     if (
       this.noteId &&
@@ -209,37 +249,16 @@ export class WeaveStickyNoteToolAction extends WeaveAction {
         this.container
       );
 
-      const notePos: Konva.Vector2d = {
-        x: this.clickPoint.x,
-        y: this.clickPoint.y,
-      };
-      const DRAG_THRESHOLD = 20;
-      let noteWidth = this.props.width;
-      let noteHeight = this.props.height;
-      if (this.moved) {
-        const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
-          centered: modifiers.altKey,
-          constrained: modifiers.shiftKey,
-        });
-        if (bounds.width < DRAG_THRESHOLD && bounds.height < DRAG_THRESHOLD) {
-          notePos.x = this.clickPoint.x;
-          notePos.y = this.clickPoint.y;
-          noteWidth = this.props.width;
-          noteHeight = this.props.height;
-        } else {
-          notePos.x = bounds.x;
-          notePos.y = bounds.y;
-          noteWidth = Math.max(bounds.width, MIN_STICKY_NOTE_SIZE);
-          noteHeight = Math.max(bounds.height, MIN_STICKY_NOTE_SIZE);
-        }
-      }
+      const noteBounds = this.moved
+        ? this.resolveNoteBounds(mousePoint, modifiers)
+        : {
+            x: this.clickPoint.x,
+            y: this.clickPoint.y,
+            width: this.props.width,
+            height: this.props.height,
+          };
 
-      this.tempPreviewNode.setAttrs({
-        x: notePos.x,
-        y: notePos.y,
-        width: noteWidth,
-        height: noteHeight,
-      });
+      this.tempPreviewNode.setAttrs(noteBounds);
 
       const nodeHandler = this.instance.getNodeHandler<WeaveStickyNoteNode>(
         WEAVE_STICKY_NOTE_NODE_TYPE
@@ -252,10 +271,7 @@ export class WeaveStickyNoteToolAction extends WeaveAction {
 
         const node = nodeHandler.create(this.noteId, {
           ...this.props,
-          x: notePos.x,
-          y: notePos.y,
-          width: noteWidth,
-          height: noteHeight,
+          ...noteBounds,
         });
 
         const destroyOnRender = (addedNode: WeaveElementInstance) => {
@@ -297,27 +313,9 @@ export class WeaveStickyNoteToolAction extends WeaveAction {
         this.measureContainer
       );
 
-      const DRAG_THRESHOLD = 20;
-      const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
-        centered: modifiers.altKey,
-        constrained: modifiers.shiftKey,
-      });
-
-      if (bounds.width < DRAG_THRESHOLD && bounds.height < DRAG_THRESHOLD) {
-        this.tempPreviewNode.setAttrs({
-          x: this.clickPoint.x,
-          y: this.clickPoint.y,
-          width: this.props.width,
-          height: this.props.height,
-        });
-      } else {
-        this.tempPreviewNode.setAttrs({
-          x: bounds.x,
-          y: bounds.y,
-          width: Math.max(bounds.width, MIN_STICKY_NOTE_SIZE),
-          height: Math.max(bounds.height, MIN_STICKY_NOTE_SIZE),
-        });
-      }
+      this.tempPreviewNode.setAttrs(
+        this.resolveNoteBounds(mousePoint, modifiers)
+      );
     }
   }
 
