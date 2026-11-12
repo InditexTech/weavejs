@@ -1,0 +1,29 @@
+code/packages/sdk/src/actions/sticky-note-tool/__tests__/sticky-note-tool.test.ts
+  s_2b329dac4d6cfb::t_d5b59226c3b632 204-207
+code/packages/sdk/src/actions/sticky-note-tool/sticky-note-tool.ts
+  s_2b329dac4d6cfb::t_3ee6ce5c01c7ee 28,79
+code/packages/sdk/src/nodes/shared/shape-label.utils.ts
+  s_2b329dac4d6cfb::t_966ff4f5a14c53 15-18,347-349
+code/packages/sdk/src/nodes/sticky-note/__tests__/sticky-note.test.ts
+  s_2b329dac4d6cfb::t_d4f95afe1f5ff5 16-17,78,80-86
+code/packages/sdk/src/nodes/sticky-note/constants.ts
+  s_2b329dac4d6cfb::t_eda2301338ba3c 5-6,13-14,33-49
+code/packages/sdk/src/nodes/sticky-note/sticky-note.ts
+  s_2b329dac4d6cfb::t_45d6e92d7e262b 19-20,33,110,112,114,478
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "04daf014fc2e86de584b0f7a4b76fbcf89ea9f2e",
+  "prompts": {},
+  "sessions": {
+    "s_2b329dac4d6cfb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3123f689ffeihrPZhSrEm8Y5J",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
