@@ -1,0 +1,25 @@
+code/packages/sdk/src/nodes/shared/shape-label.utils.ts
+  s_2b329dac4d6cfb::t_c03c67b6ec910f 17-18,350-355,360
+code/packages/sdk/src/nodes/sticky-note/__tests__/sticky-note.test.ts
+  s_2b329dac4d6cfb::t_31f94b30d142c5 18-19,292-351
+code/packages/sdk/src/nodes/sticky-note/constants.ts
+  s_2b329dac4d6cfb::t_4d3418ff77f2cd 50-65
+code/packages/sdk/src/nodes/sticky-note/sticky-note.ts
+  s_2b329dac4d6cfb::t_278efa2dfc000e 21,117-122,125,127,139,384-385,396,430,437
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "01f2116b552d130d3534622832eaa2ef94a2ace6",
+  "prompts": {},
+  "sessions": {
+    "s_2b329dac4d6cfb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3123f689ffeihrPZhSrEm8Y5J",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
