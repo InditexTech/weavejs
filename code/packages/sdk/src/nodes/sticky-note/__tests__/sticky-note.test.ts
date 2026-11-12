@@ -301,7 +301,7 @@ describe('WeaveStickyNoteNode', () => {
     });
   });
 
-  describe('Vertical text reserve (middle alignment ignores fold and author)', () => {
+  describe('Vertical text reserve (middle alignment only reserves the author row)', () => {
     it('reserves fold and author space only at the bottom for top alignment', () => {
       expect(getStickyNoteVerticalReserve(28, true, 'top')).toEqual({
         top: 0,
@@ -311,12 +311,13 @@ describe('WeaveStickyNoteNode', () => {
       expect(getStickyNoteVerticalReserve(28, false, 'bottom').top).toBe(0);
     });
 
-    it('reserves nothing for middle alignment', () => {
+    it('only reserves the author row for middle alignment', () => {
       expect(getStickyNoteVerticalReserve(28, true, 'middle')).toEqual({
         top: 0,
-        bottom: 0,
-        total: 0,
+        bottom: STICKY_NOTE_AUTHOR_MARGIN,
+        total: STICKY_NOTE_AUTHOR_MARGIN,
       });
+      expect(getStickyNoteVerticalReserve(28, false, 'middle').total).toBe(0);
     });
 
     function editBounds(overrides: Partial<WeaveElementAttributes>) {
@@ -340,7 +341,7 @@ describe('WeaveStickyNoteNode', () => {
       return bounds as unknown as { y: number; height: number };
     }
 
-    it('centers the text box on the sheet (padding only) when vertical align is middle', () => {
+    it('centers the text box above the author row when vertical align is middle', () => {
       const padY = 16;
       const b = editBounds({
         labelVerticalAlign: 'middle',
@@ -348,7 +349,17 @@ describe('WeaveStickyNoteNode', () => {
         author: 'jmcaamanog',
       });
       expect(b.y).toBe(padY);
-      expect(b.height).toBe(300 - padY * 2);
+      expect(b.height).toBe(300 - padY * 2 - STICKY_NOTE_AUTHOR_MARGIN);
+    });
+
+    it('centers the text box on the sheet with middle alignment and no author', () => {
+      const padY = 16;
+      const b = editBounds({
+        labelVerticalAlign: 'middle',
+        labelPaddingY: padY,
+        author: '',
+      });
+      expect(b.y).toBe(padY);
       expect(b.y + b.height / 2).toBe(300 / 2);
     });
 
