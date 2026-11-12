@@ -1,0 +1,27 @@
+AGENTS.md
+  s_6f95c896a0bbdc::t_fe38cee1a41d3d 142-143
+docs/src/modules/main/nav.adoc
+  s_6f95c896a0bbdc::t_493e75abb62d83 87
+docs/src/modules/main/pages/build/server-side-rendering.adoc
+  s_6f95c896a0bbdc::t_24860fd49e3dce 1-324
+docs/src/modules/main/pages/build/stores/standalone-store.adoc
+  s_6f95c896a0bbdc::t_5b6cef208c4c65 19-21
+docs/src/modules/sdk/pages/api-reference/weave/index.adoc
+  s_6f95c896a0bbdc::t_6ddc83930385b6 597,599,607,621-622
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "886a057a50208607626eb6f6b4017cb57db84397",
+  "prompts": {},
+  "sessions": {
+    "s_6f95c896a0bbdc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e307d4ff1ffe3FWsbzac9YKUmk",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
