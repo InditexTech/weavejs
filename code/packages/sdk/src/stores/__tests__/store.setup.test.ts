@@ -333,3 +333,97 @@ describe('10 — setup()', () => {
     expect(nodeChangeCalls).toHaveLength(0);
   });
 });
+
+describe('10b — setup() without requestAnimationFrame', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.stubGlobal('requestAnimationFrame', undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  function setupStore() {
+    const store = new TestStore(makeConfig(), false);
+    const mock = makeMockInstance();
+    store.register(mock as never);
+    store.setup();
+    populateDocument(store);
+    return { store, mock };
+  }
+
+  it('10b.1 transaction after first load does not throw and render() runs once the timer fires', () => {
+    const { store, mock } = setupStore();
+
+    expect(() =>
+      store.getDocument().transact(() => {
+        store.getDocument().getMap('weave').set('key2', 'val2');
+      })
+    ).not.toThrow();
+
+    expect(mock.render).not.toHaveBeenCalled();
+    vi.runAllTimers();
+    expect(mock.render).toHaveBeenCalledTimes(1);
+  });
+
+  it('10b.2 multiple transactions are coalesced into a single render()', () => {
+    const { store, mock } = setupStore();
+
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key2', 'val2');
+    });
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key3', 'val3');
+    });
+
+    vi.runAllTimers();
+    expect(mock.render).toHaveBeenCalledTimes(1);
+  });
+
+  it('10b.3 state write during setupRenderer() does not throw', () => {
+    const store = new TestStore(makeConfig(), false);
+    const mock = makeMockInstance();
+    mock.setupRenderer.mockImplementation(() => {
+      store.getDocument().transact(() => {
+        store.getDocument().getMap('weave').set('video', 'node');
+      });
+    });
+    store.register(mock as never);
+    store.setup();
+
+    expect(() => populateDocument(store)).not.toThrow();
+
+    vi.runAllTimers();
+    expect(mock.render).toHaveBeenCalledTimes(1);
+  });
+
+  it('10b.4 cancelPendingRender() drops the pending render', () => {
+    const { store, mock } = setupStore();
+
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key2', 'val2');
+    });
+    store.cancelPendingRender();
+
+    vi.runAllTimers();
+    expect(mock.render).not.toHaveBeenCalled();
+  });
+
+  it('10b.5 a new render can be scheduled after cancelPendingRender()', () => {
+    const { store, mock } = setupStore();
+
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key2', 'val2');
+    });
+    store.cancelPendingRender();
+    store.getDocument().transact(() => {
+      store.getDocument().getMap('weave').set('key3', 'val3');
+    });
+
+    vi.runAllTimers();
+    expect(mock.render).toHaveBeenCalledTimes(1);
+  });
+});

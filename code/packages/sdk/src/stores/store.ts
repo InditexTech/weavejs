@@ -41,7 +41,10 @@ export abstract class WeaveStore implements WeaveStoreBase {
   private logger!: Logger;
   private undoManager!: Y.UndoManager;
   private isRoomLoaded: boolean;
-  private _pendingRaf: ReturnType<typeof requestAnimationFrame> | null = null;
+  private _pendingRender:
+    | { kind: 'raf'; id: number }
+    | { kind: 'timeout'; id: ReturnType<typeof setTimeout> }
+    | null = null;
 
   constructor(config: WeaveStoreOptions) {
     this.config = config;
@@ -99,6 +102,39 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   getDocument(): Y.Doc {
     return this.document;
+  }
+
+  // Falls back to setTimeout where requestAnimationFrame doesn't exist
+  // (e.g. server-side rendering in Node.js).
+  private scheduleRender(callback: () => void): void {
+    if (typeof requestAnimationFrame === 'function') {
+      this._pendingRender = {
+        kind: 'raf',
+        id: requestAnimationFrame(callback),
+      };
+      return;
+    }
+
+    this._pendingRender = {
+      kind: 'timeout',
+      id: setTimeout(callback, 0),
+    };
+  }
+
+  cancelPendingRender(): void {
+    const pending = this._pendingRender;
+    this._pendingRender = null;
+
+    if (pending === null) return;
+
+    if (pending.kind === 'raf') {
+      if (typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(pending.id);
+      }
+      return;
+    }
+
+    clearTimeout(pending.id);
   }
 
   restartDocument(): void {
@@ -220,9 +256,9 @@ export abstract class WeaveStore implements WeaveStoreBase {
       // into a single requestAnimationFrame so that multiple Yjs transactions
       // arriving within the same frame (e.g. stroke drawing, multi-node drag)
       // produce only one React state update and one canvas repaint.
-      if (this._pendingRaf === null) {
-        this._pendingRaf = requestAnimationFrame(() => {
-          this._pendingRaf = null;
+      if (this._pendingRender === null) {
+        this.scheduleRender(() => {
+          this._pendingRender = null;
 
           const latestState = this.state;
 
