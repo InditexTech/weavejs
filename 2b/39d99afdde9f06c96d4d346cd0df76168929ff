@@ -1,0 +1,31 @@
+code/packages/sdk/src/actions/sticky-note-tool/sticky-note-tool.ts
+  s_21dc239cab6de9::t_b9915280dcbcb8 203-204,217-221,224-225,228-240,316-318
+code/packages/sdk/src/nodes/sticky-note/__tests__/sticky-note.test.ts
+  s_2b329dac4d6cfb::t_3ee98679ee2e67 304,314-319,343,350-351
+code/packages/sdk/src/nodes/sticky-note/constants.ts
+  s_21dc239cab6de9::t_38020fcd08b371 52-55,62-64,66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "2b39d99afdde9f06c96d4d346cd0df76168929ff",
+  "prompts": {},
+  "sessions": {
+    "s_21dc239cab6de9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e30c21fe0ffeuJkz1UH5JZiQ00",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_2b329dac4d6cfb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3123f689ffeihrPZhSrEm8Y5J",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
