@@ -1,0 +1,19 @@
+AGENTS.md
+  s_21dc239cab6de9::t_04cabf389d74a3 142-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "77a237bdc94ccd93a8330bb456d10758cc21299b",
+  "prompts": {},
+  "sessions": {
+    "s_21dc239cab6de9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e30c21fe0ffeuJkz1UH5JZiQ00",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
