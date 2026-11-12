@@ -1,0 +1,37 @@
+AGENTS.md
+  s_4760acca062662::t_b2def9f12aff49 146-147
+code/packages/sdk/src/__tests__/weave.lifecycle.test.ts
+  s_4760acca062662::t_a6e674df969ca4 50,412-417
+code/packages/sdk/src/nodes/video/__tests__/video.test.ts
+  s_4760acca062662::t_2ab96b48917115 445,452
+code/packages/sdk/src/stores/__tests__/store.setup.test.ts
+  s_4760acca062662::t_57bd33b699bd9b 336-501
+code/packages/sdk/src/stores/store.ts
+  s_4760acca062662::t_d753567ff0d50a 44-47,107-139,259-261
+code/packages/sdk/src/weave.ts
+  s_4760acca062662::t_49bd194629c427 379
+docs/src/modules/main/nav.adoc
+  s_4760acca062662::t_d50ee5c579a55b 89
+docs/src/modules/main/pages/build/server-side-rendering.adoc
+  s_4760acca062662::t_4da7b7e632f721 1-324
+docs/src/modules/main/pages/build/stores/standalone-store.adoc
+  s_4760acca062662::t_7eec6eb6786273 19-21
+docs/src/modules/sdk/pages/api-reference/weave/index.adoc
+  s_4760acca062662::t_42b7091ae386e5 597,599,607,621-622
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "2d66478b648e860b75d1b3f73d9e64ecb81dfe1f",
+  "prompts": {},
+  "sessions": {
+    "s_4760acca062662": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e305e90c3ffeYXEgY65eDlO4F4",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
