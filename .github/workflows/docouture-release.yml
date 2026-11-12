@@ -55,6 +55,17 @@ name: docouture-release
 #      that other workflow actually finishes. Either way this runs exactly
 #      once per merge, just not always at the same moment.
 #
+# Version source (versioned only): where a release's version comes from is the
+# site's `docouture.versionSource` in docs/package.json, resolved by `docouture
+# release resolve` — `descriptor` (default: docs/.release-version, as described
+# above), `github-release` (the published GitHub Release's tag; a docs-only
+# `docs/release` pull request republishes the highest published stable Release)
+# or `tag-bump` (the latest docs/v* tag plus a bump: `docs/release` patch,
+# `docs/release-minor` minor, `docs/release-major` major). Only `descriptor`
+# runs the descriptor bump and the git-flow sync below. Under `tag-bump` a
+# `release: published` run has no pull request labels to read, so it bumps
+# patch; use workflow_dispatch with an explicit version for anything else.
+#
 # Git-flow (versioned only): the descriptor bump below lands on the release
 # branch, so the `sync-prerelease` job opens a pull request carrying it into
 # the prerelease branch (name read from docs/package.json's
@@ -78,8 +89,11 @@ name: docouture-release
 # Docouture hardening, on top of the docouture scaffold:
 #   - GITHUB_TOKEN is read-only. Every push (the release tag, the versioned
 #     descriptor bump) already authenticates with the App token configured in
-#     "Git app credentials", and that token is narrowed to this repository
-#     and to contents: write.
+#     "Git app credentials". That token is deliberately NOT narrowed in the
+#     release job: a narrowed installation token loses the App's ruleset
+#     bypass and the descriptor bump is rejected (GH013) on a protected
+#     release branch (InditexTech/docouture#298). The sync-prerelease job,
+#     which never pushes to the release branch, still narrows its token.
 #   - Every action is pinned to a full-length commit SHA.
 #   - No dependency or Kroki image cache is restored: this job cuts a release,
 #     and a cache another run wrote is a poisoning vector for anything that
@@ -124,6 +138,7 @@ jobs:
       prerelease_branch: ${{ steps.flow.outputs.prerelease_branch }}
       version: ${{ steps.resolve.outputs.version }}
       bumped: ${{ steps.bump.outputs.bumped }}
+      uses_descriptor: ${{ steps.resolve.outputs.uses_descriptor }}
     # `docouture new` scaffolds this site's package.json, antora-playbook.yml,
     # docs/antora.yml etc. under docs/ (not the repository root) — see the
     # docs-site-package skill's reference/versioning-modes.md. Every step
@@ -150,7 +165,9 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'release' && !github.event.release.prerelease) ||
       (github.event.pull_request.merged == true &&
-        contains(github.event.pull_request.labels.*.name, 'docs/release') &&
+        (contains(github.event.pull_request.labels.*.name, 'docs/release') ||
+          contains(github.event.pull_request.labels.*.name, 'docs/release-minor') ||
+          contains(github.event.pull_request.labels.*.name, 'docs/release-major')) &&
         (contains(github.event.pull_request.labels.*.name, 'skip-release') ||
           !contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')))
     steps:
@@ -233,19 +250,15 @@ jobs:
       # `APP_CLIENT_ID` (a variable) and `APP_PRIVATE_KEY` (a secret) are
       # organization-level in InditexTech — set both at the org or repo
       # level for whichever GitHub App is bypass-listed on this site's rules.
+      # Deliberately not narrowed with owner/repositories/permission-*: a
+      # narrowed token is rejected (GH013) on the descriptor bump even
+      # though the App is bypass-listed — see issue #298.
       - name: Git app token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          # Local divergence from the docouture template
-          # (InditexTech/weavejs#1284): no `owner`/`repositories`/
-          # `permission-contents` narrowing. With them, pushes to main are
-          # rejected (GH013) even though the App is on the ruleset's bypass
-          # list; the un-narrowed token is bypassed, as in
-          # code-npm_node-publish-release-and-snapshot.yml. `docouture
-          # upgrade` overwrites this file; re-apply until fixed upstream.
 
       - name: Git app credentials
         env:
@@ -281,6 +294,67 @@ jobs:
           echo "mode=${mode}" >> "$GITHUB_OUTPUT"
           echo "Detected ${mode} (antora-playbook.yml: ${line})"
 
+      # A pull request carries no version under `github-release`, so a docs-only
+      # `docs/release` merge republishes the highest published Release instead:
+      # list the repository's non-draft, non-prerelease Releases here and let
+      # `docouture release resolve` filter by `versionSourcePrefix` and pick the
+      # highest SemVer (the order of this list does not matter). Other events and
+      # other version sources skip the lookup.
+      - name: List published Releases
+        id: releases
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          source=$(node -p "require('./package.json').docouture?.versionSource ?? 'descriptor'")
+          if [ "$source" != "github-release" ]; then
+            echo "tags=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          tags=$(gh api --paginate "repos/${REPOSITORY}/releases" \
+            --jq '.[] | select(.draft | not) | select(.prerelease | not) | .tag_name' | paste -sd, -)
+          echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+          echo "Published Releases: ${tags:-none}"
+
+      # Where the target version comes from is decided by `docouture release
+      # resolve`, which reads the site's `docouture.versionSource` from
+      # docs/package.json: `descriptor` (default) uses the workflow_dispatch
+      # input if a person typed one, else the docs/.release-version file the
+      # merged PR committed; `github-release` uses the published Release's
+      # tag, or the highest published stable Release for a docs-only PR;
+      # `tag-bump` bumps the latest docs/v* tag by the PR's
+      # `docs/release[-minor|-major]` label. Standalone always targets
+      # `stable`. The command also validates it (present, SemVer,
+      # not 'stable') and fails here, before any tag is pushed below — a
+      # malformed value would otherwise only fail later in "Bump release
+      # descriptor", after the tag already exists.
+      - name: Resolve version
+        id: resolve
+        env:
+          MODE: ${{ steps.detect.outputs.mode }}
+          EVENT: ${{ github.event_name }}
+          DISPATCH_VERSION: ${{ inputs.version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASES: ${{ steps.releases.outputs.tags }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          args=(release resolve --mode "$MODE" --event "$EVENT" --labels "$LABELS")
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            args+=(--version "$DISPATCH_VERSION")
+          fi
+          if [ -n "$RELEASE_TAG" ]; then
+            args+=(--release-tag "$RELEASE_TAG")
+          fi
+          if [ -n "$RELEASES" ]; then
+            args+=(--releases "$RELEASES")
+          fi
+
+          resolved=$(npx docouture "${args[@]}")
+          echo "$resolved" >> "$GITHUB_OUTPUT"
+          echo "$resolved"
+
       # The flow (trunk-based or git-flow) and, under git-flow, the prerelease
       # branch name come from docs/package.json's `docouture` block — one
       # declared source, kept in sync by `docouture new`, `branch-model` and
@@ -291,11 +365,12 @@ jobs:
         id: flow
         env:
           MODE: ${{ steps.detect.outputs.mode }}
+          USES_DESCRIPTOR: ${{ steps.resolve.outputs.uses_descriptor }}
         run: |
           branching=$(node -p "require('./package.json').docouture?.branching ?? ''")
           prerelease=$(node -p "require('./package.json').docouture?.prereleaseBranch ?? ''")
 
-          if [ "$branching" = "git-flow" ] && [ -z "$prerelease" ] && [ "$MODE" = "versioned" ]; then
+          if [ "$branching" = "git-flow" ] && [ -z "$prerelease" ] && [ "$USES_DESCRIPTOR" = "true" ]; then
             echo "::error::docs/package.json declares docouture.branching 'git-flow' but no docouture.prereleaseBranch — run 'docouture upgrade' to add it (the prerelease branch needs a sync PR carrying the docs/.release-version bump)."
             exit 1
           fi
@@ -303,74 +378,6 @@ jobs:
           echo "branching=${branching:-trunk-based}" >> "$GITHUB_OUTPUT"
           echo "prerelease_branch=${prerelease}" >> "$GITHUB_OUTPUT"
           echo "Detected flow '${branching:-trunk-based}' (prerelease branch '${prerelease}')"
-
-      # Where the target version comes from depends on how this run started:
-      # a person typed it (workflow_dispatch) or the merged PR committed it
-      # (docs/.release-version). Standalone ignores whatever this resolves to
-      # either way — it always targets `stable` — but it's still resolved
-      # uniformly here so later steps don't need to know which trigger fired.
-      - name: Resolve version
-        id: resolve
-        env:
-          EVENT: ${{ github.event_name }}
-          DISPATCH_VERSION: ${{ inputs.version }}
-        run: |
-          if [ "$EVENT" = "workflow_dispatch" ]; then
-            version="$DISPATCH_VERSION"
-            source="workflow_dispatch input"
-          elif [ -f .release-version ]; then
-            version=$(tr -d '[:space:]' < .release-version)
-            source="docs/.release-version"
-          else
-            version=""
-            source="docs/.release-version (missing)"
-          fi
-
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "Resolved version '${version}' from ${source}"
-
-      - name: Validate version
-        env:
-          MODE: ${{ steps.detect.outputs.mode }}
-          EVENT: ${{ github.event_name }}
-          VERSION: ${{ steps.resolve.outputs.version }}
-        run: |
-          if [ "$MODE" = "versioned" ] && [ -z "$VERSION" ]; then
-            if [ "$EVENT" = "workflow_dispatch" ]; then
-              echo "::error::Versioned mode requires a real target version — re-run with a 'version' input other than the default 'stable', e.g. 1.2.0."
-            else
-              echo "::error::Versioned mode requires a real target version, and this PR carried no docs/.release-version — add that file with the target version (e.g. 1.2.0) before merging with the docs/release label, or run docouture-release manually via workflow_dispatch instead."
-            fi
-            exit 1
-          fi
-
-          if [ "$MODE" = "versioned" ] && [ "$VERSION" = "stable" ]; then
-            echo "::error::'stable' is standalone's target name, not a valid versioned-mode version — use a real version, e.g. 1.2.0."
-            exit 1
-          fi
-
-          # Full SemVer 2.0.0 grammar (semver.org's own regex, rewritten with
-          # plain groups instead of `(?:...)` — bash's [[ =~ ]] runs glibc
-          # POSIX ERE, not PCRE, and doesn't understand non-capturing
-          # groups). Catches a hand-edited docs/.release-version (or a typo'd
-          # workflow_dispatch input) BEFORE any tag is pushed below — without
-          # this, a malformed value sails through here, tags and pushes fine
-          # in "Cut release"/"Push release tag", and only fails later inside
-          # "Bump release descriptor" (npm's `version patch` rejects
-          # non-semver input) — by which point the tag already exists but the
-          # job as a whole reads as failed, so the `publish` job below never
-          # runs. Prerelease/build-metadata suffixes (1.2.0-beta.1,
-          # 1.2.0+build) are valid SemVer and accepted; a leading 'v' or a
-          # bare '1.2' are not.
-          SEMVER_RE='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
-          if [ "$MODE" = "versioned" ] && [ -n "$VERSION" ] && ! [[ "$VERSION" =~ $SEMVER_RE ]]; then
-            echo "::error::docs/.release-version (or the 'version' input) must be a valid SemVer version like 1.2.0 — got '${VERSION}'. See https://semver.org — prerelease/build metadata (1.2.0-beta.1, 1.2.0+build) is fine, a leading 'v' or a two-part '1.2' is not."
-            exit 1
-          fi
-
-          if [ "$MODE" = "standalone" ] && [ -n "$VERSION" ] && [ "$VERSION" != "stable" ]; then
-            echo "::warning::Standalone mode always releases to the 'stable' tag — ignoring provided version '${VERSION}'."
-          fi
 
       # The release branch's own docs/antora.yml is never touched here — it
       # permanently says version: prerelease (both modes, trunk-based only
@@ -470,7 +477,7 @@ jobs:
       # republish of an already-released version — see "Check for existing
       # release" above): docs/.release-version needs a sane value again
       # immediately or the next docs/release merge has nothing to read (see
-      # "Validate version" above). Rather than clearing it, bump it forward
+      # "Resolve version" above). Rather than clearing it, bump it forward
       # one patch version — the same idiom `just bump` uses for this
       # workspace's own npm packages: let `npm version` do the semver
       # arithmetic against a throwaway package.json instead of hand-rolling
@@ -483,7 +490,7 @@ jobs:
       # protecting it.
       - name: Bump release descriptor
         id: bump
-        if: steps.detect.outputs.mode == 'versioned' && steps.check.outputs.existed != 'true'
+        if: steps.resolve.outputs.uses_descriptor == 'true' && steps.check.outputs.existed != 'true'
         env:
           VERSION: ${{ steps.resolve.outputs.version }}
         run: |
@@ -513,6 +520,7 @@ jobs:
     if: >-
       needs.release.result == 'success' &&
       needs.release.outputs.branching == 'git-flow' &&
+      needs.release.outputs.uses_descriptor == 'true' &&
       needs.release.outputs.bumped == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10

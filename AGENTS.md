@@ -95,7 +95,8 @@ npx skills@latest add InditexTech/docouture --all
   that must agree, the home-page vs. content-page patterns, and how a site grows beyond
   its default `ROOT` + `main` modules.
 - **`docouture-docs-versioning`** — only relevant when this site was scaffolded with
-  `--mode versioned`: cutting releases, `docouture version`, and `docs/.release-version`.
+  `--mode versioned`: cutting releases, `docouture version`, `docs/.release-version` and the
+  alternative version sources (`docouture version-source`).
 
 <!-- docouture:end -->
 
@@ -139,9 +140,9 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/nodes/frame.adoc (edge selection) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/frame.adoc (`edgeHitWidth`) | `code/packages/sdk/src/nodes/frame/{frame,constants,types,hit-region}.ts` | released in 5.8.0 |
 | sdk:api-reference/nodes/text-v2.adoc (list marker alignment) | `code/packages/sdk/src/nodes/text-v2/layout/engine.ts` | released in 5.8.0 |
-| main:build/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*` | unreleased |
-| main:build/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | unreleased |
-| sdk:api-reference/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*`, `code/packages/sdk/src/nodes/shared/shape-label.utils.ts` | unreleased |
-| sdk:api-reference/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | unreleased |
-| main:build/server-side-rendering.adoc | `code/packages/sdk/src/backend.ts`, `code/packages/sdk/src/stores/store.ts` (`cancelPendingRender`), `code/packages/sdk/src/weave.ts` (`destroy`, `exportNodesServerSide`), `code/packages/sdk/src/nodes/video/video.ts`, `code/packages/store-standalone/src/store-standalone.ts` | unreleased |
-| sdk:api-reference/weave/index.adoc (`exportNodesServerSide` / `exportAreaServerSide` signatures) | `code/packages/sdk/src/weave.ts` | unreleased |
+| main:build/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*` | released in 5.9.0 |
+| main:build/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | released in 5.9.0 |
+| sdk:api-reference/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*`, `code/packages/sdk/src/nodes/shared/shape-label.utils.ts` | released in 5.9.0 |
+| sdk:api-reference/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | released in 5.9.0 |
+| main:build/server-side-rendering.adoc | `code/packages/sdk/src/backend.ts`, `code/packages/sdk/src/stores/store.ts` (`cancelPendingRender`), `code/packages/sdk/src/weave.ts` (`destroy`, `exportNodesServerSide`), `code/packages/sdk/src/nodes/video/video.ts`, `code/packages/store-standalone/src/store-standalone.ts` | released in 5.9.0 |
+| sdk:api-reference/weave/index.adoc (`exportNodesServerSide` / `exportAreaServerSide` signatures) | `code/packages/sdk/src/weave.ts` | released in 5.9.0 |
