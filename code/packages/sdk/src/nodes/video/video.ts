@@ -539,10 +539,6 @@ export class WeaveVideoNode extends WeaveNode {
 
       this.instance.updateNode(this.serialize(videoGroup));
     }
-    if (isServer()) {
-      this.instance.updateNode(this.serialize(videoGroup));
-    }
-
     const defaultHandleMouseover = videoGroup.handleMouseover;
     videoGroup.handleMouseover = (e) => {
       defaultHandleMouseover.call(this, e);

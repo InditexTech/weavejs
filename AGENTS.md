@@ -143,3 +143,5 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | unreleased |
 | sdk:api-reference/nodes/sticky-note.adoc | `code/packages/sdk/src/nodes/sticky-note/*`, `code/packages/sdk/src/nodes/shared/shape-label.utils.ts` | unreleased |
 | sdk:api-reference/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | unreleased |
+| main:build/server-side-rendering.adoc | `code/packages/sdk/src/backend.ts`, `code/packages/sdk/src/stores/store.ts` (`cancelPendingRender`), `code/packages/sdk/src/weave.ts` (`destroy`, `exportNodesServerSide`), `code/packages/sdk/src/nodes/video/video.ts`, `code/packages/store-standalone/src/store-standalone.ts` | unreleased |
+| sdk:api-reference/weave/index.adoc (`exportNodesServerSide` / `exportAreaServerSide` signatures) | `code/packages/sdk/src/weave.ts` | unreleased |
