@@ -33,7 +33,7 @@ export const SelectionInformation = () => {
                 height: box.height * stage.scaleY(),
                 callback(img) {
                   const containerNode = document.getElementById(
-                    `selection_${node.node.key}_image_container`,
+                    `selection_${node.node?.key}_image_container`,
                   );
                   if (containerNode) {
                     containerNode.innerHTML = "";
@@ -49,19 +49,19 @@ export const SelectionInformation = () => {
             }
             return (
               <div
-                key={node.node.key}
-                id={`selection_${node.node.key}`}
+                key={node.node?.key}
+                id={`selection_${node.node?.key}`}
                 className="px-4 py-3 border-b border-light-border-3 flex flex-col"
               >
                 <div className="w-full grid grid-cols-[1fr_50px] gap-1">
                   <div className="w-full h-full flex flex-col justify-center items-start">
                     <div className="font-mono font-body-m-light w-full">
-                      {node.node.props.nodeType}
+                      {node.node?.props.nodeType}
                     </div>
                   </div>
                   <div
                     className="w-full h-[50px] border border-light-border-3 p-1"
-                    id={`selection_${node.node.key}_image_container`}
+                    id={`selection_${node.node?.key}_image_container`}
                   />
                 </div>
               </div>
