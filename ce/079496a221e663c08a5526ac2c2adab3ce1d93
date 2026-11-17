@@ -1,0 +1,19 @@
+README.md
+  s_1927b14d183016::t_84cc6fcfda6b3f 112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "ce079496a221e663c08a5526ac2c2adab3ce1d93",
+  "prompts": {},
+  "sessions": {
+    "s_1927b14d183016": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "4ba8c769-4ec6-41d7-853e-01c5a673f676",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Andrea Magán Rey <andrea.magan@outlook.com>"
+    }
+  }
+}
