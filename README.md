@@ -109,7 +109,7 @@ The following table provides a high-level overview of our approximate roadmap. F
 
 We welcome contributions from the community! Whether you're fixing a bug, adding a new feature, or improving documentation, your help is valuable.
 
-Before you start, please take a moment to read our [Contributing Guide](CONTRIBUTING.md). It provides detailed instructions on how to get your contributions accepted. Please note that you'll need to sign our [Contributor License Agreement (CLA)](https://github.com/InditexTech/foss/blob/main/documents/CLA.pdf) before we can accept your pull request.
+Before you start, please take a moment to read our [Contributing Guide](CONTRIBUTING.md). It provides detailed instructions on how to get your contributions accepted. Please note that you'll need to sign our [Contributor License Agreement (CLA)](https://github.com/InditexTech/foss/blob/main/CLA.md) before we can accept your pull request.
 
 Here's a quick overview of how you can contribute:
 
