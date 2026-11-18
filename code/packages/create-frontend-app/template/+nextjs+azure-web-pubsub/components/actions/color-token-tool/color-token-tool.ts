@@ -15,6 +15,7 @@ export class ColorTokenToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Konva.Vector2d | null;
   protected cancelAction!: () => void;
+  initialize = undefined;
   onPropsChange = undefined;
 
   constructor() {
@@ -106,20 +107,22 @@ export class ColorTokenToolAction extends WeaveAction {
     const { mousePoint, container } = this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;
-    this.container = container;
+    this.container = container as Konva.Layer | Konva.Group;
 
     this.colorTokenId = uuidv4();
 
     const nodeHandler =
       this.instance.getNodeHandler<ColorTokenNode>("color-token");
 
-    const node = nodeHandler.create(this.colorTokenId, {
-      ...this.props,
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
-    });
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.colorTokenId, {
+        ...this.props,
+        x: this.clickPoint.x,
+        y: this.clickPoint.y,
+      });
 
-    this.instance.addNode(node, this.container?.getAttrs().id);
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.cancelAction?.();
   }

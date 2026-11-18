@@ -16,6 +16,7 @@ const inter = Inter({
 
 export class ColorTokenNode extends WeaveNode {
   protected nodeType = COLOR_TOKEN_NODE_TYPE;
+  initialize = undefined;
 
   onRender(props: WeaveElementAttributes) {
     const { id } = props;

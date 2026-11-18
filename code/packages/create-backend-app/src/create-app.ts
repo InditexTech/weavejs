@@ -108,6 +108,7 @@ function createPackageJson(projectName: string, options: Options): object {
   if (options.template === '+express+azure-web-pubsub') {
     const dependencies = {
       ...pick(localVersions, [
+        '@inditextech/weave-renderer-konva-base',
         '@inditextech/weave-sdk',
         '@inditextech/weave-store-azure-web-pubsub',
         '@inditextech/weave-store-standalone',
@@ -206,6 +207,7 @@ function createPackageJson(projectName: string, options: Options): object {
       'zod',
     ]),
     ...pick(localVersions, [
+      '@inditextech/weave-renderer-konva-base',
       '@inditextech/weave-sdk',
       '@inditextech/weave-store-websockets',
       '@inditextech/weave-store-standalone',

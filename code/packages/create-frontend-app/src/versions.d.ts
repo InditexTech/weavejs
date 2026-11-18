@@ -4,4 +4,5 @@ export const versions: {
   '@inditextech/weave-store-websockets': string;
   '@inditextech/weave-store-azure-web-pubsub': string;
   '@inditextech/weave-react': string;
+  '@inditextech/weave-renderer-konva-base': string;
 };

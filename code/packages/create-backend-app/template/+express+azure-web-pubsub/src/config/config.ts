@@ -4,19 +4,9 @@ import { DEFAULT_PORT } from '../constants.js'
 
 const serviceConfigSchema = z.object({
   service: z.object({
-    hostname: z
-      .string({
-        required_error:
-          'Define the service hostname on the environment variable HOSTNAME'
-      })
-      .trim()
-      .optional()
-      .default('0.0.0.0'),
+    hostname: z.string().trim().optional().default('0.0.0.0'),
     port: z
-      .number({
-        required_error:
-          'Define the service port on the environment variable PORT'
-      })
+      .number()
       .int({ message: 'The post must be an integer' })
       .optional()
       .default(DEFAULT_PORT)

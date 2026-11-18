@@ -6,9 +6,11 @@ import storeWebsocketsPkg from '../store-websockets/package.json' with { type: '
 import storeAzureWebPubsubPkg from '../store-azure-web-pubsub/package.json' with { type: 'json' };
 import storeStandalonePkg from '../store-standalone/package.json' with { type: 'json' };
 import reactPkg from '../react/package.json' with { type: 'json' };
+import rendererKonvaBasePkg from '../renderer-konva-base/package.json' with { type: 'json' };
 
 const versions = {
   '@inditextech/weave-react': reactPkg.version,
+  '@inditextech/weave-renderer-konva-base': rendererKonvaBasePkg.version,
   '@inditextech/weave-sdk': sdkPkg.version,
   '@inditextech/weave-store-azure-web-pubsub': storeAzureWebPubsubPkg.version,
   '@inditextech/weave-store-standalone': storeStandalonePkg.version,

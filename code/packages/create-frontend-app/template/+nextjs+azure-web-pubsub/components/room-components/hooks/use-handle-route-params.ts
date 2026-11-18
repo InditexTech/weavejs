@@ -17,6 +17,7 @@ function useHandleRouteParams() {
     }
     if (userName) {
       setUser({
+        id: userName,
         name: userName,
         email: `${userName}@weave.js`,
       });

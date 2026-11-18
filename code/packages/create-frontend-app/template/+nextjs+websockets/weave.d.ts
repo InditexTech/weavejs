@@ -3,6 +3,8 @@ import 'konva/lib/Node';
 declare module 'konva/lib/Node' {
   interface Node {
     getTransformerProperties(): WeaveNodeTransformerProperties;
+    triggerCrop(): void;
+    closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
     updatePosition(position: Vector2d): void;
   }
