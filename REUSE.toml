@@ -10,6 +10,7 @@ path = [
     "images/**",
     "REUSE.toml",
     "repolinter.json",
+    "NOTICE",
 
     # Sonar Qube configuration
     "**/sonar-project.properties",

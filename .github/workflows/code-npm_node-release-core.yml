@@ -1,0 +1,1473 @@
+# SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+# SPDX-License-Identifier: Apache-2.0
+
+name: code-npm-node-release-core
+
+on:
+  workflow_call:
+    inputs:
+      release_type:
+        description: Optional release type supplied by the fixed release workflow.
+        required: false
+        type: string
+        default: ''
+    outputs:
+      release_commit:
+        description: Immutable commit represented by the release handoff.
+        value: ${{ jobs.prepare-release.outputs.release_commit }}
+      releases:
+        description: JSON array of release tags, versions, package lists, and next-dev versions.
+        value: ${{ jobs.prepare-release.outputs.releases }}
+      handoff_digest:
+        description: SHA-256 of the run-bound delegated release metadata, or empty outside delegated lifecycle.
+        value: ${{ jobs.prepare-release.outputs.handoff_digest }}
+    secrets:
+      APP_PRIVATE_KEY:
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  CI_GOVERNANCE_RELEASE_STAGING_REF: refs/ci-governance/release/${{ github.run_id }}-${{ github.run_attempt }}
+  PROJECT_TYPE: ${{ vars.PROJECT_TYPE }}
+  WORKING_DIRECTORY: ${{ vars.WORKING_DIRECTORY }}
+  PACKAGE_MANAGER: ${{ vars.PACKAGE_MANAGER }}
+  ASDF_BRANCH_VERSION: '0.18.0'
+
+jobs:
+  verify-candidate:
+    name: Verify release candidate
+    if: >-
+      (
+        github.event_name == 'workflow_dispatch' &&
+        (
+          (vars.DEVELOPMENT_FLOW == 'trunk-based-development' && (github.ref_name == 'main' || startsWith(github.ref_name, 'main-'))) ||
+          (vars.DEVELOPMENT_FLOW == 'git-flow' && (github.ref_name == 'main' || startsWith(github.ref_name, 'main-')))
+        )
+      ) ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.merged &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.head.ref != 'automated/ci-governance-sync' &&
+        !contains(join(github.event.pull_request.labels.*.name, ','), 'skip-release') &&
+        (
+          (vars.DEVELOPMENT_FLOW == 'trunk-based-development' && (github.event.pull_request.base.ref == 'main' || startsWith(github.event.pull_request.base.ref, 'main-'))) ||
+          (vars.DEVELOPMENT_FLOW == 'git-flow' && (github.event.pull_request.base.ref == 'main' || startsWith(github.event.pull_request.base.ref, 'main-')))
+        ) &&
+        (
+          contains(join(github.event.pull_request.labels.*.name, ','), 'release-type') ||
+          vars.DEVELOPMENT_FLOW == 'trunk-based-development'
+        )
+      )
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Resolve release context
+        id: release-context
+        env:
+          EVENT_SHA: ${{ github.sha }}
+          PR_MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            release_ref="$EVENT_SHA"
+          else
+            release_ref="$PR_MERGE_SHA"
+          fi
+          if [[ ! "$release_ref" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error title=Invalid release context::An immutable release commit is required."
+            exit 1
+          fi
+          echo "release_ref=$release_ref" >> "$GITHUB_OUTPUT"
+
+      - name: Check out release candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ steps.release-context.outputs.release_ref }}
+
+      - name: Read governed tool versions
+        id: tool-versions
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' .tool-versions; then
+            echo "::error title=Invalid tool-versions::${WORKING_DIRECTORY}/.tool-versions is malformed."
+            exit 1
+          fi
+          {
+            echo "tool_versions<<EOF"
+            cat .tool-versions
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up asdf-managed Node
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        with:
+          tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Verify release candidate
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$PROJECT_TYPE" in
+            single|workspaces) : ;;
+            *)
+              echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+              exit 1
+              ;;
+          esac
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)
+              npm ci --ignore-scripts
+              npm run verify
+              ;;
+            pnpm)
+              corepack enable
+              pnpm install --frozen-lockfile --ignore-scripts
+              pnpm run verify
+              ;;
+            *)
+              echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."
+              exit 1
+              ;;
+          esac
+
+  prepare-release:
+    name: Prepare Release
+    needs: verify-candidate
+    if: >-
+      needs.verify-candidate.result == 'success' &&
+      (
+        (
+          github.event_name == 'workflow_dispatch' &&
+          (
+            (vars.DEVELOPMENT_FLOW == 'trunk-based-development' && (github.ref_name == 'main' || startsWith(github.ref_name, 'main-'))) ||
+            (vars.DEVELOPMENT_FLOW == 'git-flow' && (github.ref_name == 'main' || startsWith(github.ref_name, 'main-')))
+          )
+        ) ||
+        (
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.merged &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          github.event.pull_request.head.ref != 'automated/ci-governance-sync' &&
+          !contains(join(github.event.pull_request.labels.*.name, ','), 'skip-release') &&
+          (
+            (vars.DEVELOPMENT_FLOW == 'trunk-based-development' && (github.event.pull_request.base.ref == 'main' || startsWith(github.event.pull_request.base.ref, 'main-'))) ||
+            (vars.DEVELOPMENT_FLOW == 'git-flow' && (github.event.pull_request.base.ref == 'main' || startsWith(github.event.pull_request.base.ref, 'main-')))
+          ) &&
+          (
+            contains(join(github.event.pull_request.labels.*.name, ','), 'release-type') ||
+            vars.DEVELOPMENT_FLOW == 'trunk-based-development'
+          )
+        )
+      )
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      release_commit: ${{ steps.release-metadata.outputs.release_commit }}
+      releases: ${{ steps.release-metadata.outputs.releases }}
+      expected_ref: ${{ steps.release-plan.outputs.expected_ref || steps.delegated-plan.outputs.expected_ref }}
+      staging_ref: ${{ steps.release-metadata.outputs.staging_ref }}
+      handoff_digest: ${{ steps.delegated-handoff.outputs.handoff_digest }}
+    steps:
+      - name: Resolve release context
+        id: release-context
+        env:
+          EVENT_SHA: ${{ github.sha }}
+          PR_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          PR_MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          REQUESTED_RELEASE_TYPE: ${{ inputs.release_type }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            baseline_branch="$GITHUB_REF_NAME"
+            release_labels="$REQUESTED_RELEASE_TYPE"
+            release_ref="$EVENT_SHA"
+          else
+            baseline_branch="$PR_BASE_BRANCH"
+            release_labels="$PR_LABELS"
+            release_ref="$PR_MERGE_SHA"
+          fi
+
+          if [[ -z "$baseline_branch" || ! "$release_ref" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error title=Invalid release context::A baseline branch and immutable release commit are required."
+            exit 1
+          fi
+
+          {
+            echo "baseline_branch=$baseline_branch"
+            echo "release_labels=$release_labels"
+            echo "release_ref=$release_ref"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Enforce protected release branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASELINE_BRANCH: ${{ steps.release-context.outputs.baseline_branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          protected="$(gh api "repos/${GITHUB_REPOSITORY}/branches/${BASELINE_BRANCH}" --jq '.protected')"
+          if [[ "$protected" != "true" ]]; then
+            echo "::error title=Unprotected release branch::Releases require a protected baseline branch; '${BASELINE_BRANCH}' is not protected." >&2
+            exit 1
+          fi
+
+      - name: Create GitHub App token
+        id: app-token
+        if: vars.RELEASE_LIFECYCLE != 'delegated'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Check out immutable release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ steps.release-context.outputs.release_ref }}
+
+      - name: Read governed tool versions
+        id: tool-versions
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' .tool-versions; then
+            echo "::error title=Invalid tool-versions::${WORKING_DIRECTORY}/.tool-versions is malformed."
+            exit 1
+          fi
+          {
+            echo "tool_versions<<EOF"
+            cat .tool-versions
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up asdf-managed Node
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        with:
+          tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Install dependencies for delegated release
+        if: vars.RELEASE_LIFECYCLE == 'delegated'
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)  npm ci --ignore-scripts ;;
+            pnpm) corepack enable; pnpm install --frozen-lockfile --ignore-scripts ;;
+            *)    echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."; exit 1 ;;
+          esac
+
+      - name: Plan release metadata
+        id: release-plan
+        if: vars.RELEASE_LIFECYCLE != 'delegated'
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          BASELINE_BRANCH: ${{ steps.release-context.outputs.baseline_branch }}
+          DEVELOPMENT_FLOW: ${{ vars.DEVELOPMENT_FLOW }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_LABELS: ${{ steps.release-context.outputs.release_labels }}
+          RELEASE_REF: ${{ steps.release-context.outputs.release_ref }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh auth setup-git
+
+          descriptor="$GITHUB_WORKSPACE/.github/inditextech-ci-node.json"
+          records_file="$RUNNER_TEMP/node-release-records.jsonl"
+          members_file="$RUNNER_TEMP/node-release-members.txt"
+          source_commit="$(git rev-parse "$RELEASE_REF^{commit}")"
+          expected_ref="refs/heads/$BASELINE_BRANCH"
+          remote_line="$(git ls-remote --exit-code origin "$expected_ref")"
+          read -r remote_commit remote_ref extra <<< "$remote_line"
+
+          if [[ "$remote_ref" != "$expected_ref" || -n "${extra:-}" ]]; then
+            echo "::error title=Release branch verification failed::Could not resolve exactly one destination branch."
+            exit 1
+          fi
+
+          resume="false"
+          release_commit=""
+          if [[ "$remote_commit" != "$source_commit" ]]; then
+            git fetch --no-tags origin "$remote_commit"
+            release_commit="$(git rev-list --ancestry-path --reverse "${source_commit}..${remote_commit}" | head -1)"
+            if [[ -z "$release_commit" ]] \
+              || [[ "$(git rev-parse "${release_commit}^")" != "$source_commit" ]] \
+              || [[ "$(git show -s --format=%s "$release_commit")" != "[node-release] Prepare release" ]]; then
+              echo "::error title=Release branch advanced::The destination branch moved after the release source commit."
+              exit 1
+            fi
+            git checkout --detach "$release_commit"
+            resume="true"
+          fi
+
+          case ",$RELEASE_LABELS," in
+            *",release-type/major,"*) release_bump="major" ;;
+            *",release-type/minor,"*) release_bump="minor" ;;
+            *",release-type/hotfix,"*|*",release-type/multi-hotfix,"*|*",release-type/patch,"*)
+              release_bump="patch"
+              ;;
+            *)
+              if [[ "$DEVELOPMENT_FLOW" == "trunk-based-development" ]]; then
+                release_bump="minor"
+              else
+                echo "::error title=Missing release type::git-flow releases require a release-type label."
+                exit 1
+              fi
+              ;;
+          esac
+
+          member_dir() {
+            printf '%s' "${1##*/}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
+          }
+          member_directory() {
+            local mapped
+            if mapped="$(jq -er --arg p "$1" '.[$p]' <<< "$PACKAGE_PATHS" 2>/dev/null)"; then
+              if [[ ! "$mapped" =~ ^[a-z0-9][a-z0-9._-]*$ ]]; then
+                echo "::error title=Invalid release.package_paths::directory for '$1' must be a single lowercase [a-z0-9][a-z0-9._-]* segment under packages/." >&2
+                exit 1
+              fi
+              printf '%s' "$mapped"
+              return
+            fi
+            echo "::notice title=Derived release member::directory for '$1' derived from the package name." >&2
+            member_dir "$1"
+          }
+          load_package_paths() {
+            PACKAGE_PATHS="$(jq -c '.release.package_paths // {}' "$descriptor")"
+          }
+          strip_snapshot() { printf '%s' "${1%-SNAPSHOT}"; }
+          require_member() {
+            local dir="."
+            if [[ -n "$1" ]]; then
+              dir="packages/$1"
+            fi
+            if [[ ! -f "$dir/package.json" ]]; then
+              echo "::error title=Release member missing::package.json not found at '$dir'. Check release.package_paths in $descriptor."
+              exit 1
+            fi
+          }
+          read_version() {
+            if [[ -n "$1" ]]; then
+              jq -r '.version' "packages/$1/package.json"
+            else
+              jq -r '.version' package.json
+            fi
+          }
+          bump_semver() {
+            local major minor patch
+            IFS=. read -r major minor patch <<< "$1"
+            case "$2" in
+              major) major=$((major + 1)); minor=0; patch=0 ;;
+              minor) minor=$((minor + 1)); patch=0 ;;
+              patch) patch=$((patch + 1)) ;;
+            esac
+            printf '%s.%s.%s' "$major" "$minor" "$patch"
+          }
+          set_version() {
+            if [[ -n "$2" ]]; then
+              npm pkg set "version=$1" --workspace "packages/$2"
+            else
+              npm pkg set "version=$1"
+            fi
+          }
+
+          if [[ "$PROJECT_TYPE" == "single" ]]; then
+            release_strategy=single
+            printf '%s\n' "$(jq -r '.name' package.json)" > "$members_file"
+          elif [[ "$PROJECT_TYPE" == "workspaces" ]]; then
+            release_strategy="$(jq -er '.release.strategy' "$descriptor")"
+            load_package_paths
+            : > "$members_file"
+            while IFS= read -r package; do
+              printf '%s\n' "$(member_directory "$package")" >> "$members_file"
+            done < <(jq -er '.release.packages[]' "$descriptor")
+          else
+            echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+            exit 1
+          fi
+
+          write_records() {
+            : > "$records_file"
+            if [[ "$release_strategy" == "single" ]]; then
+              package_name="$(<"$members_file")"
+              require_member ""
+              version="$(strip_snapshot "$(read_version "")")"
+              next_dev="$(bump_semver "$version" "$release_bump")-SNAPSHOT"
+              jq -cn \
+                --arg package "$package_name" \
+                --arg version "$version" \
+                --arg tag "$version" \
+                --arg next_dev "$next_dev" \
+                '{packages: [$package], version: $version, tag: $tag, next_dev: $next_dev}' >> "$records_file"
+              return
+            fi
+
+            if [[ "$release_strategy" == "locked-step" ]]; then
+              members=()
+              while IFS= read -r member; do
+                members+=("$member")
+              done < "$members_file"
+            versions=()
+            for member in "${members[@]}"; do
+              require_member "$member"
+              versions+=("$(strip_snapshot "$(read_version "$member")")")
+            done
+              if [[ "$(printf '%s\n' "${versions[@]}" | sort -u | wc -l | tr -d ' ')" -ne 1 ]]; then
+                echo "::error title=Invalid locked-step reactor::All release members must share the same version."
+                exit 1
+              fi
+              version="${versions[0]}"
+              next_dev="$(bump_semver "$version" "$release_bump")-SNAPSHOT"
+              members_json="$(printf '%s\n' "${members[@]}" | jq -R . | jq -sc .)"
+              jq -cn \
+                --argjson packages "$members_json" \
+                --arg version "$version" \
+                --arg tag "$version" \
+                --arg next_dev "$next_dev" \
+                '{packages: $packages, version: $version, tag: $tag, next_dev: $next_dev}' >> "$records_file"
+              return
+            fi
+
+          while IFS= read -r member; do
+            require_member "$member"
+            version="$(strip_snapshot "$(read_version "$member")")"
+            next_dev="$(bump_semver "$version" "$release_bump")-SNAPSHOT"
+            jq -cn \
+              --arg member "$member" \
+              --arg version "$version" \
+              --arg tag "${member}-${version}" \
+              --arg next_dev "$next_dev" \
+              '{packages: [$member], version: $version, tag: $tag, next_dev: $next_dev}' >> "$records_file"
+          done < "$members_file"
+          }
+
+          if [[ "$resume" == "false" ]]; then
+            write_records
+            releases="$(jq -cs . "$records_file")"
+
+            if [[ "$release_strategy" == "independent" ]]; then
+              while IFS= read -r record; do
+                member="$(jq -r '.packages[0]' <<< "$record")"
+                version="$(jq -r '.version' <<< "$record")"
+                set_version "$version" "$member"
+              done < <(jq -c '.[]' <<< "$releases")
+            elif [[ "$release_strategy" == "locked-step" ]]; then
+              version="$(jq -r '.[0].version' <<< "$releases")"
+              while IFS= read -r member; do
+                set_version "$version" "$member"
+              done < "$members_file"
+            else
+              set_version "$(jq -r '.[0].version' <<< "$releases")" ""
+            fi
+
+            if [[ "$PROJECT_TYPE" == "workspaces" ]]; then
+              declare -A member_version=()
+              while IFS= read -r record; do
+                rv="$(jq -r '.version' <<< "$record")"
+                while IFS= read -r mdir; do
+                  mname="$(jq -r '.name' "packages/$mdir/package.json")"
+                  member_version["$mname"]="$rv"
+                done < <(jq -r '.packages[]' <<< "$record")
+              done < <(jq -c '.[]' <<< "$releases")
+
+              while IFS= read -r member; do
+                pj="packages/$member/package.json"
+                for field in dependencies devDependencies peerDependencies optionalDependencies; do
+                  while IFS= read -r dep; do
+                    new="${member_version[$dep]:-}"
+                    [[ -n "$new" ]] || continue
+                    cur="$(jq -r --arg f "$field" --arg d "$dep" '.[$f][$d]' "$pj")"
+                    [[ "$cur" =~ [0-9] ]] || continue
+                    pre="$(printf '%s' "$cur" | sed -E 's/^([^0-9]*).*/\1/')"
+                    tmp="$(mktemp)"
+                    jq --arg f "$field" --arg d "$dep" --arg v "${pre}${new}" \
+                       '.[$f][$d] = $v' "$pj" > "$tmp" && mv "$tmp" "$pj"
+                  done < <(jq -r --arg f "$field" '(.[$f] // {}) | keys[]' "$pj")
+                done
+              done < "$members_file"
+
+              npm install --package-lock-only --ignore-scripts
+            fi
+
+            while IFS= read -r tag; do
+              if git show-ref --tags --verify --quiet "refs/tags/$tag"; then
+                echo "::error title=Tag conflict::$tag already exists."
+                exit 1
+              fi
+            done < <(jq -r '.[].tag' <<< "$releases")
+
+            git -C "$GITHUB_WORKSPACE" add --update -- "$WORKING_DIRECTORY"
+            if git diff --cached --quiet; then
+              echo "::error title=Missing release metadata::Versioning did not produce changes to commit."
+              exit 1
+            fi
+
+            primary_version="$(jq -r '.[0].version' <<< "$releases")"
+            echo "RELEASE_VERSION=$primary_version" >> "$GITHUB_ENV"
+            echo "RELEASE_BUMP=$release_bump" >> "$GITHUB_ENV"
+          else
+            write_records
+            releases="$(jq -cs . "$records_file")"
+            head_commit="$(git rev-parse HEAD)"
+            while IFS= read -r tag; do
+              if [[ "$(git rev-list -n 1 "$tag")" != "$head_commit" ]]; then
+                echo "::error title=Incomplete release resume::$tag does not point to the release commit."
+                exit 1
+              fi
+            done < <(jq -r '.[].tag' <<< "$releases")
+          fi
+
+          {
+            echo "resume=$resume"
+            echo "expected_ref=$expected_ref"
+            echo "releases_intermediate<<EOF"
+            printf '%s\n' "$releases"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Bump CHANGELOG for release
+        if: vars.RELEASE_LIFECYCLE != 'delegated' && steps.release-plan.outputs.resume != 'true'
+        uses: release-flow/keep-a-changelog-action@74931dec7ecdbfc8e38ac9ae7e8dd84c08db2f32 # v3.0.0
+        with:
+          command: bump
+          version: ${{ env.RELEASE_BUMP }}
+          changelog: ${{ env.WORKING_DIRECTORY }}/CHANGELOG.md
+          fail-on-empty-release-notes: false
+          keep-unreleased-section: true
+          tag-prefix: ""
+
+      - name: Reconcile CHANGELOG version with release
+        if: vars.RELEASE_LIFECYCLE != 'delegated' && steps.release-plan.outputs.resume != 'true'
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cl="CHANGELOG.md"
+          cl_ver="$(grep -m1 -E '^## \[[0-9]' "$cl" | sed -E 's/^## \[([^]]+)\].*/\1/')"
+          if [[ -z "$cl_ver" ]]; then
+            echo "::error title=CHANGELOG has no release entry::Expected a '## [X.Y.Z]' heading after the bump step."
+            exit 1
+          fi
+          if [[ "$cl_ver" != "$RELEASE_VERSION" ]]; then
+            echo "::notice title=CHANGELOG version reconciled::keep-a-changelog wrote ${cl_ver}; re-anchoring to release ${RELEASE_VERSION}."
+            cl_ver_re="${cl_ver//./\\.}"
+            tmp="$(mktemp)"
+            sed -E \
+              -e "s@^## \[${cl_ver_re}\]( - )@## [${RELEASE_VERSION}]\1@" \
+              -e "s@^(\[Unreleased\]: .*/compare/)${cl_ver_re}(\.\.\.HEAD)@\1${RELEASE_VERSION}\2@" \
+              -e "s@^\[${cl_ver_re}\]: (.*/)(compare/[^ ]*\.\.\.|releases/tag/)${cl_ver_re}@[${RELEASE_VERSION}]: \1\2${RELEASE_VERSION}@" \
+              "$cl" > "$tmp"
+            cat "$tmp" > "$cl"
+            rm -f "$tmp"
+          fi
+
+      - name: Commit and stage release
+        if: vars.RELEASE_LIFECYCLE != 'delegated' && steps.release-plan.outputs.resume != 'true'
+        id: release-commit
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASES: ${{ steps.release-plan.outputs.releases_intermediate }}
+          EXPECTED_REF: ${{ steps.release-plan.outputs.expected_ref }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C "$GITHUB_WORKSPACE" add -- "$WORKING_DIRECTORY/CHANGELOG.md"
+          git -C "$GITHUB_WORKSPACE" add --update -- "$WORKING_DIRECTORY"
+          if git diff --cached --quiet; then
+            echo "::error title=Missing release metadata::Versioning did not produce changes to commit."
+            exit 1
+          fi
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+          git commit -m "[node-release] Prepare release"
+
+          while IFS= read -r record; do
+            git check-ref-format --allow-onelevel "refs/tags/$(jq -r '.tag' <<< "$record")"
+          done < <(jq -c '.[]' <<< "$RELEASES")
+
+          git push --atomic --force origin "HEAD:$CI_GOVERNANCE_RELEASE_STAGING_REF"
+
+      - name: Cut delegated release
+        id: delegated-plan
+        if: vars.RELEASE_LIFECYCLE == 'delegated'
+        env:
+          BASELINE_BRANCH: ${{ steps.release-context.outputs.baseline_branch }}
+          DEVELOPMENT_FLOW: ${{ vars.DEVELOPMENT_FLOW }}
+          RELEASE_LABELS: ${{ steps.release-context.outputs.release_labels }}
+          RELEASE_SOURCE_COMMIT: ${{ steps.release-context.outputs.release_ref }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          case ",$RELEASE_LABELS," in
+            *",release-type/major,"*) release_bump="major" ;;
+            *",release-type/minor,"*) release_bump="minor" ;;
+            *",release-type/hotfix,"*|*",release-type/multi-hotfix,"*|*",release-type/patch,"*)
+              release_bump="patch"
+              ;;
+            *)
+              if [[ "$DEVELOPMENT_FLOW" == "trunk-based-development" ]]; then
+                release_bump="minor"
+              else
+                echo "::error title=Missing release type::git-flow releases require a release-type label."
+                exit 1
+              fi
+              ;;
+          esac
+          export RELEASE_BUMP="$release_bump"
+
+          git tag | sort > "$RUNNER_TEMP/tags-before.txt"
+
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)  npm run release:prepare ;;
+            pnpm) corepack enable; pnpm run release:prepare ;;
+            *)    echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."; exit 1 ;;
+          esac
+
+          git tag | sort > "$RUNNER_TEMP/tags-after.txt"
+          new_tags=()
+          while IFS= read -r tag; do
+            new_tags+=("$tag")
+          done < <(comm -13 "$RUNNER_TEMP/tags-before.txt" "$RUNNER_TEMP/tags-after.txt")
+          if [[ ${#new_tags[@]} -eq 0 ]]; then
+            echo "::error title=No release cut::release:prepare produced no new tags."
+            exit 1
+          fi
+
+          records_file="$RUNNER_TEMP/node-release-records.jsonl"
+          : > "$records_file"
+          for tag in "${new_tags[@]}"; do
+            tag_target="$(git rev-parse "${tag}^{commit}")"
+            if [[ "$tag" =~ ([0-9]+\.[0-9]+\.[0-9]+([-+.][0-9A-Za-z.-]+)?)$ ]]; then
+              version="${BASH_REMATCH[1]}"
+            else
+              version="$tag"
+            fi
+            jq -cn \
+              --arg tag "$tag" \
+              --arg tag_target "$tag_target" \
+              --arg version "$version" \
+              --arg bump "$release_bump" \
+              '{packages: [], version: $version, tag: $tag, tag_target: $tag_target, next_dev: "", release_bump: $bump}' \
+              >> "$records_file"
+          done
+          releases="$(jq -cs . "$records_file")"
+          primary_version="$(jq -r '.[0].version' <<< "$releases")"
+
+          changelog_pending="false"
+          if [[ -f CHANGELOG.md ]] \
+            && awk '/^## \[?[Uu]nreleased\]?/{f=1;next} /^## /{f=0} f && NF {print; exit}' CHANGELOG.md | grep -q .; then
+            changelog_pending="true"
+          fi
+
+          echo "RELEASE_BUMP=$release_bump" >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=$primary_version" >> "$GITHUB_ENV"
+
+          {
+            echo "expected_ref=refs/heads/$BASELINE_BRANCH"
+            echo "source_commit=$RELEASE_SOURCE_COMMIT"
+            echo "primary_version=$primary_version"
+            echo "changelog_pending=$changelog_pending"
+            echo "releases_intermediate<<EOF"
+            printf '%s\n' "$releases"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Bump CHANGELOG for delegated release
+        if: vars.RELEASE_LIFECYCLE == 'delegated' && steps.delegated-plan.outputs.changelog_pending == 'true'
+        uses: release-flow/keep-a-changelog-action@74931dec7ecdbfc8e38ac9ae7e8dd84c08db2f32 # v3.0.0
+        with:
+          command: bump
+          version: ${{ env.RELEASE_BUMP }}
+          changelog: ${{ env.WORKING_DIRECTORY }}/CHANGELOG.md
+          fail-on-empty-release-notes: false
+          keep-unreleased-section: true
+          tag-prefix: ""
+
+      - name: Reconcile CHANGELOG version with delegated release
+        if: vars.RELEASE_LIFECYCLE == 'delegated' && steps.delegated-plan.outputs.changelog_pending == 'true'
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cl="CHANGELOG.md"
+          cl_ver="$(grep -m1 -E '^## \[[0-9]' "$cl" | sed -E 's/^## \[([^]]+)\].*/\1/')"
+          if [[ -z "$cl_ver" ]]; then
+            echo "::error title=CHANGELOG has no release entry::Expected a '## [X.Y.Z]' heading after the bump step."
+            exit 1
+          fi
+          if [[ "$cl_ver" != "$RELEASE_VERSION" ]]; then
+            echo "::notice title=CHANGELOG version reconciled::keep-a-changelog wrote ${cl_ver}; re-anchoring to release ${RELEASE_VERSION}."
+            cl_ver_re="${cl_ver//./\\.}"
+            tmp="$(mktemp)"
+            sed -E \
+              -e "s@^## \[${cl_ver_re}\]( - )@## [${RELEASE_VERSION}]\1@" \
+              -e "s@^(\[Unreleased\]: .*/compare/)${cl_ver_re}(\.\.\.HEAD)@\1${RELEASE_VERSION}\2@" \
+              -e "s@^\[${cl_ver_re}\]: (.*/)(compare/[^ ]*\.\.\.|releases/tag/)${cl_ver_re}@[${RELEASE_VERSION}]: \1\2${RELEASE_VERSION}@" \
+              "$cl" > "$tmp"
+            cat "$tmp" > "$cl"
+            rm -f "$tmp"
+          fi
+
+      - name: Seal delegated release source
+        id: delegated-source
+        if: vars.RELEASE_LIFECYCLE == 'delegated'
+        env:
+          SOURCE_COMMIT: ${{ steps.delegated-plan.outputs.source_commit }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f CHANGELOG.md ]]; then
+            git -C "$GITHUB_WORKSPACE" add -- "$WORKING_DIRECTORY/CHANGELOG.md"
+          fi
+          if ! git diff --cached --quiet; then
+            git commit -m "[node-release] Update changelog"
+          fi
+
+          release_commit="$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"
+          if [[ "$release_commit" == "$SOURCE_COMMIT" ]]; then
+            echo "::error title=Missing release commit::release:prepare did not produce a release commit."
+            exit 1
+          fi
+          echo "release_commit=$release_commit" >> "$GITHUB_OUTPUT"
+
+      - name: Build and pack delegated distributions
+        id: delegated-pack
+        if: vars.RELEASE_LIFECYCLE == 'delegated'
+        env:
+          HANDOFF_DIR: ${{ runner.temp }}/node-delegated-release-handoff
+          RELEASES: ${{ steps.delegated-plan.outputs.releases_intermediate }}
+          AUTHORIZED_COMMIT: ${{ steps.delegated-source.outputs.release_commit }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          workspace_commit="$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"
+          if [[ "$workspace_commit" != "$AUTHORIZED_COMMIT" ]]; then
+            echo "::error title=Release source race::The workspace commit ($workspace_commit) is not the sealed release source ($AUTHORIZED_COMMIT). Aborting before any packaging."
+            exit 1
+          fi
+          DIST_DIR="$HANDOFF_DIR/tarballs"
+          RECORDS_FILE="$HANDOFF_DIR/tarballs.jsonl"
+          rm -rf "$HANDOFF_DIR"
+          mkdir -p "$DIST_DIR"
+          : > "$RECORDS_FILE"
+
+          inspect_declared_files() {
+            local package_dir="$1"
+            local tarball="$2"
+            local manifest="$package_dir/package.json"
+            local declared matched path relative
+            jq -e '
+              .files
+              | type == "array" and length > 0 and
+                all(.[]; type == "string" and length > 0 and test("^[^\\r\\n]+$"))
+            ' "$manifest" > /dev/null
+            while IFS= read -r declared; do
+              if [[ "$declared" == /* || "$declared" == "." || "$declared" == ".." || "$declared" == ../* || "$declared" == */../* || "$declared" == */.. || "$declared" == "!"* || "$declared" == *"{"* || "$declared" == *"}"* || "$declared" == *\\* || "$declared" == *"@("* || "$declared" == *"+("* || "$declared" == *"?("* || "$declared" == *"*("* || "$declared" == *"!("* ]]; then
+                echo "::error title=Unsupported package contents declaration::${manifest} declares an unsafe or unverifiable pattern '$declared'."
+                exit 1
+              fi
+              matched=0
+              if [[ "$declared" == *"*"* || "$declared" == *"?"* || "$declared" == *"["* || "$declared" == *"]"* ]]; then
+                while IFS= read -r -d '' path; do
+                  relative="${path#"$package_dir"/}"
+                  matched=$((matched + 1))
+                  if ! tar -tzf "$tarball" | grep -qxF "package/$relative"; then
+                    echo "::error title=Incomplete tarball::$(basename "$tarball") omits declared file '$relative'."
+                    exit 1
+                  fi
+                done < <(node - "$package_dir" "$declared" <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+          const root = process.argv[2];
+          const pattern = process.argv[3];
+          let expression = "^";
+          for (let index = 0; index < pattern.length; index += 1) {
+            const character = pattern[index];
+            if (character === "*") {
+              let stars = 1;
+              while (pattern[index + stars] === "*") stars += 1;
+              if (stars > 1 && pattern[index + stars] === "/") {
+                expression += "(?:[^/]+/)*";
+                index += stars;
+              } else {
+                expression += stars > 1 ? ".*" : "[^/]*";
+                index += stars - 1;
+              }
+            } else if (character === "?") {
+              expression += "[^/]";
+            } else if (character === "[") {
+              const closing = pattern.indexOf("]", index + 1);
+              if (closing === -1 || closing === index + 1) process.exit(2);
+              const characterClass = pattern.slice(index + 1, closing);
+              if (characterClass.includes("/") || characterClass.includes("\\")) process.exit(2);
+              expression += `[${characterClass[0] === "!" ? "^" + characterClass.slice(1) : characterClass}]`;
+              index = closing;
+            } else if (character === "]") {
+              process.exit(2);
+            } else {
+              expression += character.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
+            }
+          }
+          const matcher = new RegExp(`${expression}$`);
+          const files = [];
+          const walk = (directory) => {
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+              const candidate = path.join(directory, entry.name);
+              if (entry.isDirectory()) walk(candidate);
+              else if (entry.isFile()) files.push(path.relative(root, candidate).split(path.sep).join("/"));
+            }
+          };
+          walk(root);
+          for (const file of files.filter((file) => matcher.test(file)).sort()) process.stdout.write(`${path.join(root, file)}\0`);
+          NODE
+          )
+              elif [[ -d "$package_dir/$declared" ]]; then
+                while IFS= read -r -d '' path; do
+                  relative="${path#"$package_dir"/}"
+                  matched=$((matched + 1))
+                  if ! tar -tzf "$tarball" | grep -qxF "package/$relative"; then
+                    echo "::error title=Incomplete tarball::$(basename "$tarball") omits declared file '$relative'."
+                    exit 1
+                  fi
+                done < <(find "$package_dir/$declared" -type f -print0)
+              elif [[ -f "$package_dir/$declared" ]]; then
+                matched=1
+                if ! tar -tzf "$tarball" | grep -qxF "package/$declared"; then
+                  echo "::error title=Incomplete tarball::$(basename "$tarball") omits declared file '$declared'."
+                  exit 1
+                fi
+              fi
+              if [[ "$matched" -eq 0 ]]; then
+                echo "::error title=Missing declared package content::${manifest} declaration '$declared' matches no built files."
+                exit 1
+              fi
+            done < <(jq -r '.files[]' "$manifest")
+          }
+
+          release_tag_for() {
+            local package_name="$1"
+            local package_version="$2"
+            local member record release_tag release_version
+            local -a exact_matches=()
+            local -a version_matches=()
+            member="$(printf '%s' "${package_name##*/}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
+            while IFS= read -r record; do
+              release_tag="$(jq -r '.tag' <<< "$record")"
+              release_version="$(jq -r '.version' <<< "$record")"
+              [[ "$release_version" == "$package_version" ]] || continue
+              version_matches+=("$release_tag")
+              if [[ "$release_tag" == "$package_version" || "$release_tag" == "${member}-${package_version}" || "$release_tag" == "${package_name}-${package_version}" ]]; then
+                exact_matches+=("$release_tag")
+              fi
+            done < <(jq -c '.[]' <<< "$RELEASES")
+            if [[ ${#exact_matches[@]} -eq 1 ]]; then
+              printf '%s' "${exact_matches[0]}"
+            elif [[ ${#exact_matches[@]} -eq 0 && ${#version_matches[@]} -eq 1 ]]; then
+              printf '%s' "${version_matches[0]}"
+            else
+              echo "::error title=Ambiguous package release::Package '$package_name@$package_version' does not resolve to exactly one prepared release tag." >&2
+              exit 1
+            fi
+          }
+
+          pack_package() {
+            local package_dir="$1"
+            local package_name="$2"
+            local before="$HANDOFF_DIR/tarballs-before.txt"
+            local after="$HANDOFF_DIR/tarballs-after.txt"
+            local added="$HANDOFF_DIR/tarballs-added.txt"
+            local tarball
+            find "$DIST_DIR" -maxdepth 1 -name '*.tgz' -print | LC_ALL=C sort > "$before"
+            case "${PACKAGE_MANAGER:-npm}" in
+              npm)
+                npm pack "./$package_dir" --pack-destination "$DIST_DIR"
+                ;;
+              pnpm)
+                corepack enable
+                ( cd "$package_dir" && pnpm pack --pack-destination "$DIST_DIR" )
+                ;;
+              *)
+                echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."
+                exit 1
+                ;;
+            esac
+            find "$DIST_DIR" -maxdepth 1 -name '*.tgz' -print | LC_ALL=C sort > "$after"
+            comm -13 "$before" "$after" > "$added"
+            if [[ "$(wc -l < "$added" | tr -d ' ')" -ne 1 ]]; then
+              echo "::error title=Invalid package artifact::Packing '$package_name' must produce exactly one new tarball."
+              exit 1
+            fi
+            tarball="$(<"$added")"
+            inspect_declared_files "$package_dir" "$tarball"
+            tarball_package="$(tar -xzOf "$tarball" package/package.json | jq -er '.name | select(type == "string" and length > 0)')"
+            tarball_version="$(tar -xzOf "$tarball" package/package.json | jq -er '.version | select(type == "string" and length > 0)')"
+            if [[ "$tarball_package" != "$package_name" ]]; then
+              echo "::error title=Invalid package artifact::$(basename "$tarball") identifies '$tarball_package', not declared package '$package_name'."
+              exit 1
+            fi
+            tarball_release_tag="$(release_tag_for "$tarball_package" "$tarball_version")"
+            jq -cn \
+              --arg file "$(basename "$tarball")" \
+              --arg package "$package_name" \
+              --arg release_tag "$tarball_release_tag" \
+              --arg sha256 "$(sha256sum "$tarball" | awk '{print $1}')" \
+              --arg version "$tarball_version" \
+              '{file: $file, package: $package, release_tag: $release_tag, sha256: $sha256, version: $version}' >> "$RECORDS_FILE"
+          }
+
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)
+              npm run build
+              ;;
+            pnpm)
+              corepack enable
+              pnpm run build
+              ;;
+            *)
+              echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."
+              exit 1
+              ;;
+          esac
+
+          case "$PROJECT_TYPE" in
+            single)
+              package_name="$(jq -er '.name | select(type == "string" and length > 0)' package.json)"
+              pack_package "." "$package_name"
+              ;;
+            workspaces)
+              jq -e '
+                .release.packages
+                | type == "array" and length > 0 and
+                  all(.[]; type == "string" and length > 0)
+              ' "$GITHUB_WORKSPACE/.github/inditextech-ci-node.json" > /dev/null
+              while IFS= read -r package_name; do
+                member="$(printf '%s' "${package_name##*/}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
+                package_dir="packages/$member"
+                if [[ ! -f "$package_dir/package.json" ]] || [[ "$(jq -r '.name' "$package_dir/package.json")" != "$package_name" ]]; then
+                  echo "::error title=Unknown workspace package::release.packages entry '$package_name' does not resolve to its declared workspace manifest."
+                  exit 1
+                fi
+                pack_package "$package_dir" "$package_name"
+              done < <(jq -r '.release.packages[]' "$GITHUB_WORKSPACE/.github/inditextech-ci-node.json")
+              ;;
+            *)
+              echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+              exit 1
+              ;;
+          esac
+
+          jq -cs . "$RECORDS_FILE" > "$HANDOFF_DIR/tarballs.json"
+          echo "handoff_dir=$HANDOFF_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Create delegated release handoff
+        id: delegated-handoff
+        if: vars.RELEASE_LIFECYCLE == 'delegated'
+        env:
+          EXPECTED_REF: ${{ steps.delegated-plan.outputs.expected_ref }}
+          HANDOFF_DIR: ${{ steps.delegated-pack.outputs.handoff_dir }}
+          RELEASES: ${{ steps.delegated-plan.outputs.releases_intermediate }}
+          RELEASE_COMMIT: ${{ steps.delegated-source.outputs.release_commit }}
+          SOURCE_COMMIT: ${{ steps.delegated-plan.outputs.source_commit }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git merge-base --is-ancestor "$SOURCE_COMMIT" "$RELEASE_COMMIT"; then
+            echo "::error title=Invalid release provenance::The prepared release is not descended from the verified source commit."
+            exit 1
+          fi
+
+          tag_refs=()
+          while IFS= read -r record; do
+            tag="$(jq -r '.tag' <<< "$record")"
+            tag_target="$(jq -r '.tag_target' <<< "$record")"
+            git check-ref-format --allow-onelevel "refs/tags/$tag"
+            if [[ "$(git rev-parse "${tag}^{commit}")" != "$tag_target" ]]; then
+              echo "::error title=Invalid release tag::Prepared tag '$tag' no longer points at its recorded commit."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$SOURCE_COMMIT" "$tag_target" \
+              || ! git merge-base --is-ancestor "$tag_target" "$RELEASE_COMMIT"; then
+              echo "::error title=Invalid release tag provenance::Prepared tag '$tag' must satisfy source <= tag <= release."
+              exit 1
+            fi
+            tag_refs+=("refs/tags/$tag")
+          done < <(jq -c '.[]' <<< "$RELEASES")
+
+          while IFS= read -r tarball; do
+            release_tag="$(jq -r '.release_tag' <<< "$tarball")"
+            package_name="$(jq -r '.package' <<< "$tarball")"
+            package_version="$(jq -r '.version' <<< "$tarball")"
+            if [[ "$(jq -r --arg tag "$release_tag" --arg version "$package_version" '[.[] | select(.tag == $tag and .version == $version)] | length' <<< "$RELEASES")" -ne 1 ]]; then
+              echo "::error title=Invalid package release::Tarball '$package_name@$package_version' is not bound to exactly one prepared release tag."
+              exit 1
+            fi
+          done < <(jq -c '.[]' "$HANDOFF_DIR/tarballs.json")
+
+          git bundle create "$HANDOFF_DIR/release-source.bundle" "$RELEASE_COMMIT" "${tag_refs[@]}"
+          source_bundle_sha256="$(sha256sum "$HANDOFF_DIR/release-source.bundle" | awk '{print $1}')"
+          jq -n \
+            --arg expected_ref "$EXPECTED_REF" \
+            --arg release_commit "$RELEASE_COMMIT" \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg source_bundle_sha256 "$source_bundle_sha256" \
+            --arg source_commit "$SOURCE_COMMIT" \
+            --argjson releases "$RELEASES" \
+            --slurpfile tarballs "$HANDOFF_DIR/tarballs.json" \
+            '{
+              schema_version: 1,
+              repository: $repository,
+              run_id: $run_id,
+              run_attempt: $run_attempt,
+              expected_ref: $expected_ref,
+              source_commit: $source_commit,
+              release_commit: $release_commit,
+              releases: $releases,
+              tags: [$releases[] | {name: .tag, target: .tag_target}],
+              source_bundle: {file: "release-source.bundle", sha256: $source_bundle_sha256},
+              tarballs: $tarballs[0]
+            }' > "$HANDOFF_DIR/release-handoff.json"
+          handoff_digest="$(sha256sum "$HANDOFF_DIR/release-handoff.json" | awk '{print $1}')"
+          rm -f \
+            "$HANDOFF_DIR/tarballs.json" \
+            "$HANDOFF_DIR/tarballs.jsonl" \
+            "$HANDOFF_DIR/tarballs-added.txt" \
+            "$HANDOFF_DIR/tarballs-after.txt" \
+            "$HANDOFF_DIR/tarballs-before.txt"
+          echo "handoff_digest=$handoff_digest" >> "$GITHUB_OUTPUT"
+
+      - name: Upload delegated release handoff
+        if: vars.RELEASE_LIFECYCLE == 'delegated'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: node-delegated-release-handoff
+          path: ${{ steps.delegated-pack.outputs.handoff_dir }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish release metadata
+        id: release-metadata
+        env:
+          RELEASES: ${{ steps.release-plan.outputs.releases_intermediate || steps.delegated-plan.outputs.releases_intermediate }}
+          RELEASE_LIFECYCLE: ${{ vars.RELEASE_LIFECYCLE }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          staging_ref="$CI_GOVERNANCE_RELEASE_STAGING_REF"
+          if [[ "$RELEASE_LIFECYCLE" == "delegated" ]]; then
+            staging_ref=""
+          fi
+          {
+            if [[ "$RELEASE_LIFECYCLE" == "delegated" ]]; then
+              echo "release_commit=${{ steps.delegated-source.outputs.release_commit }}"
+            else
+              echo "release_commit=$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"
+            fi
+            echo "staging_ref=$staging_ref"
+            echo "releases<<EOF"
+            printf '%s\n' "$RELEASES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  build-distributions:
+    name: Build ${{ matrix.release.tag }}
+    needs: prepare-release
+    if: vars.RELEASE_LIFECYCLE != 'delegated'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        release: ${{ fromJSON(needs.prepare-release.outputs.releases) }}
+    steps:
+      - name: Check out release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ needs.prepare-release.outputs.release_commit }}
+
+      - name: Verify sealed release commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${{ needs.prepare-release.outputs.release_commit }}"
+          workspace="$(git rev-parse HEAD)"
+          if [[ "$workspace" != "$expected" ]]; then
+            echo "::error title=Sealed commit mismatch::The publish job checked out $workspace but the sealed release commit is $expected. Aborting."
+            exit 1
+          fi
+          digest="${{ needs.prepare-release.outputs.handoff_digest }}"
+          if [[ -n "$digest" && ! -f .ci-governance-handoff-digest ]]; then
+            echo "::error title=Missing handoff digest::The delegated release handoff artifact is absent for digest $digest."
+            exit 1
+          fi
+
+      - name: Read governed tool versions
+        id: tool-versions
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' .tool-versions; then
+            echo "::error title=Invalid tool-versions::${WORKING_DIRECTORY}/.tool-versions is malformed."
+            exit 1
+          fi
+          {
+            echo "tool_versions<<EOF"
+            cat .tool-versions
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up asdf-managed Node
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        with:
+          tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Build and pack declared distributions
+        env:
+          RELEASE: ${{ toJSON(matrix.release) }}
+          DIST_DIR: ${{ runner.temp }}/dist
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$DIST_DIR"
+          mkdir -p "$DIST_DIR"
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)
+              npm ci --ignore-scripts
+              npm run build
+              case "$PROJECT_TYPE" in
+                single)
+                  npm pack --pack-destination "$DIST_DIR"
+                  ;;
+                workspaces)
+                  while IFS= read -r member; do
+                    npm pack --workspace "packages/$member" --pack-destination "$DIST_DIR"
+                  done < <(jq -r '.packages[]' <<< "$RELEASE")
+                  ;;
+                *)
+                  echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+                  exit 1
+                  ;;
+              esac
+              ;;
+            pnpm)
+              corepack enable
+              pnpm install --frozen-lockfile --ignore-scripts
+              pnpm run build
+              case "$PROJECT_TYPE" in
+                single)
+                  pnpm pack --pack-destination "$DIST_DIR"
+                  ;;
+                workspaces)
+                  while IFS= read -r member; do
+                    ( cd "packages/$member" && pnpm pack --pack-destination "$DIST_DIR" )
+                  done < <(jq -r '.packages[]' <<< "$RELEASE")
+                  ;;
+                *)
+                  echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+                  exit 1
+                  ;;
+              esac
+              ;;
+            *)
+              echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."
+              exit 1
+              ;;
+          esac
+
+          if ! ls "$DIST_DIR"/*.tgz > /dev/null 2>&1; then
+            echo "::error title=Missing artifacts::No tarballs were produced for ${RELEASE}."
+            exit 1
+          fi
+
+      - name: Upload release distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-distributions-${{ matrix.release.tag }}
+          path: ${{ runner.temp }}/dist/*.tgz
+          if-no-files-found: error
+          retention-days: 14
+
+  finalize-release:
+    name: Finalize release (next dev + sync PR)
+    needs: [prepare-release, build-distributions]
+    if: >-
+      !cancelled() &&
+      vars.RELEASE_LIFECYCLE != 'delegated' &&
+      needs.prepare-release.result == 'success' &&
+      (needs.build-distributions.result == 'success' || needs.build-distributions.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Check out release branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Read governed tool versions
+        id: tool-versions
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' .tool-versions; then
+            echo "::error title=Invalid tool-versions::${WORKING_DIRECTORY}/.tool-versions is malformed."
+            exit 1
+          fi
+          {
+            echo "tool_versions<<EOF"
+            cat .tool-versions
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up asdf-managed Node
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        with:
+          tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Promote the release to the default branch
+        id: promote
+        if: vars.RELEASE_LIFECYCLE != 'delegated' && (needs.build-distributions.result == 'success' || needs.build-distributions.result == 'skipped')
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          EXPECTED_REF: ${{ needs.prepare-release.outputs.expected_ref }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASES: ${{ needs.prepare-release.outputs.releases }}
+          RELEASE_COMMIT: ${{ needs.prepare-release.outputs.release_commit }}
+          STAGING_REF: ${{ needs.prepare-release.outputs.staging_ref }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+
+          git fetch --no-tags origin "+${STAGING_REF}:refs/ci-governance/staged" 2>/dev/null || true
+          if [[ "$(git ls-remote origin "$EXPECTED_REF" | cut -f1)" == "$RELEASE_COMMIT" ]]; then
+            echo "::notice title=Promotion skipped::$EXPECTED_REF already points at the release commit."
+            git checkout --force --detach "$RELEASE_COMMIT"
+            exit 0
+          fi
+
+          if [[ "$(git rev-parse --verify --quiet refs/ci-governance/staged || true)" != "$RELEASE_COMMIT" ]]; then
+            echo "::error title=Release staging mismatch::$STAGING_REF does not point at the release commit."
+            exit 1
+          fi
+          git checkout --force --detach "$RELEASE_COMMIT"
+
+          tag_refs=()
+          while IFS= read -r record; do
+            tag="$(jq -r '.tag' <<< "$record")"
+            version="$(jq -r '.version' <<< "$record")"
+            git check-ref-format --allow-onelevel "refs/tags/$tag"
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+              echo "::error title=Tag conflict::$tag already exists."
+              exit 1
+            fi
+            git tag -a "$tag" -m "Release $version"
+            tag_refs+=("refs/tags/$tag")
+          done < <(jq -c '.[]' <<< "$RELEASES")
+
+          git push --atomic origin "${RELEASE_COMMIT}:${EXPECTED_REF}" "${tag_refs[@]}"
+
+      - name: Next development iteration and sync PR
+        if: steps.promote.outcome == 'success'
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          BASELINE_BRANCH: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          DEVELOPMENT_FLOW: ${{ vars.DEVELOPMENT_FLOW }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASES: ${{ needs.prepare-release.outputs.releases }}
+          RELEASE_COMMIT: ${{ needs.prepare-release.outputs.release_commit }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+
+          descriptor="$GITHUB_WORKSPACE/.github/inditextech-ci-node.json"
+
+          member_dir() {
+            printf '%s' "${1##*/}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
+          }
+          member_directory() {
+            local mapped
+            if mapped="$(jq -er --arg p "$1" '.[$p]' <<< "$PACKAGE_PATHS" 2>/dev/null)"; then
+              if [[ ! "$mapped" =~ ^[a-z0-9][a-z0-9._-]*$ ]]; then
+                echo "::error title=Invalid release.package_paths::directory for '$1' must be a single lowercase [a-z0-9][a-z0-9._-]* segment under packages/." >&2
+                exit 1
+              fi
+              printf '%s' "$mapped"
+              return
+            fi
+            echo "::notice title=Derived release member::directory for '$1' derived from the package name." >&2
+            member_dir "$1"
+          }
+          require_member() {
+            local dir="."
+            if [[ -n "$1" ]]; then
+              dir="packages/$1"
+            fi
+            if [[ ! -f "$dir/package.json" ]]; then
+              echo "::error title=Release member missing::package.json not found at '$dir'. Check release.package_paths in $descriptor."
+              exit 1
+            fi
+          }
+
+          if [[ "$(git rev-parse HEAD)" != "$RELEASE_COMMIT" ]]; then
+            echo "::notice title=Next-dev skipped::Branch already advanced past the release commit."
+          else
+            PACKAGE_PATHS="$(jq -c '.release.package_paths // {}' "$descriptor")"
+            {
+              if [[ "$PROJECT_TYPE" == "single" ]]; then
+                next_dev="$(jq -r '.[0].next_dev' <<< "$RELEASES")"
+                npm pkg set "version=$next_dev"
+              elif [[ "$(jq -er '.release.strategy' "$descriptor")" == "locked-step" ]]; then
+                next_dev="$(jq -r '.[0].next_dev' <<< "$RELEASES")"
+                while IFS= read -r package; do
+                  member="$(member_directory "$package")"
+                  require_member "$member"
+                  npm pkg set "version=$next_dev" --workspace "packages/$member"
+                done < <(jq -er '.release.packages[]' "$descriptor")
+              else
+                while IFS= read -r record; do
+                  member="$(jq -r '.packages[0]' <<< "$record")"
+                  next_dev="$(jq -r '.next_dev' <<< "$record")"
+                  npm pkg set "version=$next_dev" --workspace "packages/$member"
+                done < <(jq -c '.[]' <<< "$RELEASES")
+              fi
+
+              if [[ "$PROJECT_TYPE" == "workspaces" ]]; then
+                declare -A member_version=()
+                while IFS= read -r record; do
+                  rv="$(jq -r '.next_dev' <<< "$record")"
+                  while IFS= read -r mdir; do
+                    mname="$(jq -r '.name' "packages/$mdir/package.json")"
+                    member_version["$mname"]="$rv"
+                  done < <(jq -r '.packages[]' <<< "$record")
+                done < <(jq -c '.[]' <<< "$RELEASES")
+
+                while IFS= read -r mdir; do
+                  pj="packages/$mdir/package.json"
+                  for field in dependencies devDependencies peerDependencies optionalDependencies; do
+                    while IFS= read -r dep; do
+                      new="${member_version[$dep]:-}"
+                      [[ -n "$new" ]] || continue
+                      cur="$(jq -r --arg f "$field" --arg d "$dep" '.[$f][$d]' "$pj")"
+                      [[ "$cur" =~ [0-9] ]] || continue
+                      pre="$(printf '%s' "$cur" | sed -E 's/^([^0-9]*).*/\1/')"
+                      tmp="$(mktemp)"
+                      jq --arg f "$field" --arg d "$dep" --arg v "${pre}${new}" \
+                         '.[$f][$d] = $v' "$pj" > "$tmp" && mv "$tmp" "$pj"
+                    done < <(jq -r --arg f "$field" '(.[$f] // {}) | keys[]' "$pj")
+                  done
+                done < <(jq -r '.[].packages[]' <<< "$RELEASES")
+
+                npm install --package-lock-only --ignore-scripts
+              fi
+
+              git -C "$GITHUB_WORKSPACE" add --update -- "$WORKING_DIRECTORY"
+              git commit -m "[node-release] prepare for next development iteration"
+            }
+            git push origin "HEAD:refs/heads/$BASELINE_BRANCH"
+          fi
+
+          if [[ "$DEVELOPMENT_FLOW" != "git-flow" ]]; then
+            echo "::notice title=Sync skipped::Sync-to-develop applies only to git-flow."
+            exit 0
+          fi
+
+          version="$(jq -r '.[0].version' <<< "$RELEASES")"
+          develop_branch="${BASELINE_BRANCH/main/develop}"
+          if [[ -z "$(git ls-remote --heads origin "$develop_branch")" ]]; then
+            echo "::notice title=Sync skipped::$develop_branch does not exist."
+            exit 0
+          fi
+          sync_branch="automated/sync-release-${version}-to-${develop_branch}"
+          git switch --force-create "$sync_branch" "origin/$BASELINE_BRANCH"
+          git push --force-with-lease --set-upstream origin "$sync_branch"
+
+          if [[ -z "$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$sync_branch" --base "$develop_branch" --state open --json number --jq '.[0].number // empty')" ]]; then
+            gh pr create --repo "$GITHUB_REPOSITORY" \
+              --base "$develop_branch" --head "$sync_branch" \
+              --title "Sync release $version to $develop_branch" \
+              --body "**Automated pull request** syncing the release cut on \`$BASELINE_BRANCH\` back into \`$develop_branch\`."
+          fi
+
+      - name: Discard the release staging ref
+        if: always()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          STAGING_REF: ${{ needs.prepare-release.outputs.staging_ref }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${STAGING_REF:-}" ]]; then
+            echo "::notice title=Nothing staged::No staging ref was written, so there is nothing to discard."
+            exit 0
+          fi
+          gh auth setup-git
+          git push origin ":${STAGING_REF}"
