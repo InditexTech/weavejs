@@ -1,0 +1,1421 @@
+.agents/skills/stageshow/LICENSE
+  s_222f345225f7a0::t_6355c19efa9944 1-21
+.agents/skills/stageshow/NOTICE.md
+  s_222f345225f7a0::t_fe841fc230e59d 1-26
+.agents/skills/stageshow/README.md
+  s_222f345225f7a0::t_01b1d81eb11f0f 1-75
+.agents/skills/stageshow/SKILL.md
+  s_222f345225f7a0::t_995e25b3e7026e 1-152
+.agents/skills/stageshow/examples/ai-cards/cards.css
+  s_222f345225f7a0::t_5cf2f99bc57ebb 1-273
+.agents/skills/stageshow/examples/ai-cards/index.tsx
+  s_222f345225f7a0::t_0394cd7a1aee47 1-133
+.agents/skills/stageshow/examples/ai-chat/chat.css
+  s_222f345225f7a0::t_dc7959de2ade18 1-111
+.agents/skills/stageshow/examples/ai-chat/index.tsx
+  s_222f345225f7a0::t_1a315661a57c9b 1-134
+.agents/skills/stageshow/examples/annotations/annotations.css
+  s_222f345225f7a0::t_ae9874e371efda 1-190
+.agents/skills/stageshow/examples/annotations/composed.css
+  s_222f345225f7a0::t_f8d8d5a4451280 1-81
+.agents/skills/stageshow/examples/annotations/composed.tsx
+  s_222f345225f7a0::t_2c5af57e0a1a11 1-123
+.agents/skills/stageshow/examples/annotations/index.tsx
+  s_222f345225f7a0::t_9a0b4dcd532243 1-281
+.agents/skills/stageshow/examples/backgrounds/backgrounds.css
+  s_222f345225f7a0::t_9cf5d27d5ed517 1-81
+.agents/skills/stageshow/examples/backgrounds/index.tsx
+  s_222f345225f7a0::t_4df457f4ddbb0e 1-85
+.agents/skills/stageshow/examples/bento/bento.css
+  s_222f345225f7a0::t_bd2bbd4c10d9cd 1-618
+.agents/skills/stageshow/examples/bento/index.tsx
+  s_222f345225f7a0::t_c5e5432244d90f 1-399
+.agents/skills/stageshow/examples/brand-marks/brands.css
+  s_222f345225f7a0::t_84ce3c72399daa 1-10
+.agents/skills/stageshow/examples/brand-marks/index.tsx
+  s_222f345225f7a0::t_55e308a2edeac0 1-49
+.agents/skills/stageshow/examples/buttons/buttons.css
+  s_222f345225f7a0::t_c246c3c7f2753a 1-7
+.agents/skills/stageshow/examples/buttons/index.tsx
+  s_222f345225f7a0::t_3ea09cb6efb0c7 1-70
+.agents/skills/stageshow/examples/calendar/calendar.css
+  s_222f345225f7a0::t_df64b38010b618 1-320
+.agents/skills/stageshow/examples/calendar/index.tsx
+  s_222f345225f7a0::t_103d41f6fb3393 1-215
+.agents/skills/stageshow/examples/cards/cards.css
+  s_222f345225f7a0::t_21f0cf7ab6eef5 1-12
+.agents/skills/stageshow/examples/cards/index.tsx
+  s_222f345225f7a0::t_1045252475a045 1-71
+.agents/skills/stageshow/examples/chart-scrub/index.tsx
+  s_222f345225f7a0::t_f4f5dcf381bc30 1-133
+.agents/skills/stageshow/examples/chart-scrub/scrub.css
+  s_222f345225f7a0::t_f6a6959c8d7e09 1-92
+.agents/skills/stageshow/examples/choreography/choreography.css
+  s_222f345225f7a0::t_7e227bde6e841a 1-81
+.agents/skills/stageshow/examples/choreography/index.tsx
+  s_222f345225f7a0::t_5ec9c4e05a00bb 1-115
+.agents/skills/stageshow/examples/chrome/chrome.css
+  s_222f345225f7a0::t_4128abb08746b7 1-39
+.agents/skills/stageshow/examples/chrome/index.tsx
+  s_222f345225f7a0::t_9fa5b83f2b96cf 1-68
+.agents/skills/stageshow/examples/close-up/close.css
+  s_222f345225f7a0::t_aab484db005dbe 1-51
+.agents/skills/stageshow/examples/close-up/index.tsx
+  s_222f345225f7a0::t_57119f234da47b 1-76
+.agents/skills/stageshow/examples/controls/controls.css
+  s_222f345225f7a0::t_f128397a0af7ea 1-155
+.agents/skills/stageshow/examples/controls/index.tsx
+  s_222f345225f7a0::t_4793909efaa945 1-201
+.agents/skills/stageshow/examples/corner-chip/chip.css
+  s_222f345225f7a0::t_1ce30b09fef974 1-60
+.agents/skills/stageshow/examples/corner-chip/index.tsx
+  s_222f345225f7a0::t_70a4df75876263 1-55
+.agents/skills/stageshow/examples/cursor-morph/README.md
+  s_222f345225f7a0::t_725d69029790e9 1-15
+.agents/skills/stageshow/examples/cursor-morph/cursor-morph.css
+  s_222f345225f7a0::t_b398a6b5bf2c32 1-52
+.agents/skills/stageshow/examples/cursor-morph/cursor-morph.tsx
+  s_222f345225f7a0::t_ccb256e8868298 1-127
+.agents/skills/stageshow/examples/cursor-morph/index.tsx
+  s_222f345225f7a0::t_f3120a198fe69a 1-53
+.agents/skills/stageshow/examples/cursor-resize/cursor-resize.css
+  s_222f345225f7a0::t_bcf539d5b4e4db 1-80
+.agents/skills/stageshow/examples/cursor-resize/index.tsx
+  s_222f345225f7a0::t_0da1a9ac412d08 1-57
+.agents/skills/stageshow/examples/cursors/cursors.css
+  s_222f345225f7a0::t_bf7e416f78d13f 1-150
+.agents/skills/stageshow/examples/cursors/index.tsx
+  s_222f345225f7a0::t_1b7d153c62e2e9 1-146
+.agents/skills/stageshow/examples/dark-bento/bento.css
+  s_222f345225f7a0::t_e0d8eb218c919e 1-218
+.agents/skills/stageshow/examples/dark-bento/index.tsx
+  s_222f345225f7a0::t_d42ece4d915568 1-100
+.agents/skills/stageshow/examples/dark-hero/hero.css
+  s_222f345225f7a0::t_34e26ad0eb3497 1-238
+.agents/skills/stageshow/examples/dark-hero/index.tsx
+  s_222f345225f7a0::t_ac66e2accc74b2 1-174
+.agents/skills/stageshow/examples/device-pair/index.tsx
+  s_222f345225f7a0::t_5f5adf9eac7f12 1-83
+.agents/skills/stageshow/examples/device-pair/payments.css
+  s_222f345225f7a0::t_d6b3418e8972c5 1-150
+.agents/skills/stageshow/examples/dynamic-island/index.tsx
+  s_222f345225f7a0::t_8231c25a41a7b3 1-260
+.agents/skills/stageshow/examples/dynamic-island/island.css
+  s_222f345225f7a0::t_04c4f4cf84c44a 1-289
+.agents/skills/stageshow/examples/excel/excel.css
+  s_222f345225f7a0::t_539188e63c17e6 1-596
+.agents/skills/stageshow/examples/excel/index.tsx
+  s_222f345225f7a0::t_37aec95d7a20f3 1-376
+.agents/skills/stageshow/examples/fade-crop/fade.css
+  s_222f345225f7a0::t_86067743a9fb40 1-80
+.agents/skills/stageshow/examples/fade-crop/index.tsx
+  s_222f345225f7a0::t_6f00491bbb5e14 1-58
+.agents/skills/stageshow/examples/figma/figma.css
+  s_222f345225f7a0::t_e749d7ea23b3fd 1-668
+.agents/skills/stageshow/examples/figma/index.tsx
+  s_222f345225f7a0::t_f61e1530f6737b 1-446
+.agents/skills/stageshow/examples/finder-glass/finder-glass.css
+  s_222f345225f7a0::t_1482f5d12d8b74 1-430
+.agents/skills/stageshow/examples/finder-glass/index.tsx
+  s_222f345225f7a0::t_8a76396be27eb7 1-349
+.agents/skills/stageshow/examples/finder/finder.css
+  s_222f345225f7a0::t_f2e081f33e1edd 1-376
+.agents/skills/stageshow/examples/finder/index.tsx
+  s_222f345225f7a0::t_fe70aeab0810a3 1-329
+.agents/skills/stageshow/examples/form-error/form.css
+  s_222f345225f7a0::t_b388246ab684cd 1-127
+.agents/skills/stageshow/examples/form-error/index.tsx
+  s_222f345225f7a0::t_df61688dc1d233 1-97
+.agents/skills/stageshow/examples/freeform-drag/drag.css
+  s_222f345225f7a0::t_8c8df7d6aea852 1-131
+.agents/skills/stageshow/examples/freeform-drag/index.tsx
+  s_222f345225f7a0::t_288c67e7034b3c 1-135
+.agents/skills/stageshow/examples/glass/glass.css
+  s_222f345225f7a0::t_56740624e039f3 1-93
+.agents/skills/stageshow/examples/glass/index.tsx
+  s_222f345225f7a0::t_82fe612b6cb6a2 1-43
+.agents/skills/stageshow/examples/gmail/gmail.css
+  s_222f345225f7a0::t_4275131b8d180f 1-491
+.agents/skills/stageshow/examples/gmail/index.tsx
+  s_222f345225f7a0::t_a9b1b96cd0c37e 1-285
+.agents/skills/stageshow/examples/google-calendar/gcal.css
+  s_222f345225f7a0::t_e29a74fba34530 1-753
+.agents/skills/stageshow/examples/google-calendar/index.tsx
+  s_222f345225f7a0::t_eb2504b8d6fb39 1-443
+.agents/skills/stageshow/examples/google-docs/docs.css
+  s_222f345225f7a0::t_0f73d2a3978335 1-517
+.agents/skills/stageshow/examples/google-docs/index.tsx
+  s_222f345225f7a0::t_6aa4fca4426393 1-351
+.agents/skills/stageshow/examples/hero-demo/HeroDemo.tsx
+  s_222f345225f7a0::t_3fdcaf2b04c9d8 1-338
+.agents/skills/stageshow/examples/hero-demo/hero.css
+  s_222f345225f7a0::t_14d4788a66a358 1-451
+.agents/skills/stageshow/examples/hero-demo/icons.tsx
+  s_222f345225f7a0::t_1487aa985457b5 1-62
+.agents/skills/stageshow/examples/hero-demo/index.tsx
+  s_222f345225f7a0::t_fb28e839621f78 1
+.agents/skills/stageshow/examples/hero-grid/grid.css
+  s_222f345225f7a0::t_fd5a9a472cdaa4 1-112
+.agents/skills/stageshow/examples/hero-grid/index.tsx
+  s_222f345225f7a0::t_e9697331bcaf35 1-211
+.agents/skills/stageshow/examples/imessage/imessage.css
+  s_222f345225f7a0::t_348ee8d1c54054 1-253
+.agents/skills/stageshow/examples/imessage/index.tsx
+  s_222f345225f7a0::t_54d744d8673170 1-180
+.agents/skills/stageshow/examples/kit-extras/extras.css
+  s_222f345225f7a0::t_da481563fab85a 1-103
+.agents/skills/stageshow/examples/kit-extras/index.tsx
+  s_222f345225f7a0::t_06ff4e54243e6b 1-136
+.agents/skills/stageshow/examples/linear/index.tsx
+  s_222f345225f7a0::t_fed110767be749 1-366
+.agents/skills/stageshow/examples/linear/linear.css
+  s_222f345225f7a0::t_071db47298dfb4 1-676
+.agents/skills/stageshow/examples/loading/index.tsx
+  s_222f345225f7a0::t_0b69b0ff1761c5 1-107
+.agents/skills/stageshow/examples/loading/loading.css
+  s_222f345225f7a0::t_eba532c7f7bc53 1-164
+.agents/skills/stageshow/examples/looks/index.tsx
+  s_222f345225f7a0::t_40099075c51acc 1-54
+.agents/skills/stageshow/examples/looks/looks.css
+  s_222f345225f7a0::t_b16dfb00b3177e 1-44
+.agents/skills/stageshow/examples/looks/radix.css
+  s_222f345225f7a0::t_9d9e6f1bdf27f7 1-39
+.agents/skills/stageshow/examples/looks/skeuomorphic.css
+  s_222f345225f7a0::t_50326aee4b853a 1-36
+.agents/skills/stageshow/examples/looks/skeuomorphic.tsx
+  s_222f345225f7a0::t_98339030298c78 1-21
+.agents/skills/stageshow/examples/looks/studies.css
+  s_222f345225f7a0::t_2cd4a56ee808a0 1-107
+.agents/skills/stageshow/examples/looks/studies.tsx
+  s_222f345225f7a0::t_3afd265dbc495b 1-82
+.agents/skills/stageshow/examples/many-of-one/index.tsx
+  s_222f345225f7a0::t_7359ce8767486f 1-64
+.agents/skills/stageshow/examples/many-of-one/many.css
+  s_222f345225f7a0::t_808f0c98d4ae7c 1-88
+.agents/skills/stageshow/examples/messages/index.tsx
+  s_222f345225f7a0::t_9be5c950476aa0 1-90
+.agents/skills/stageshow/examples/messages/messages.css
+  s_222f345225f7a0::t_c1471ab75d5e2f 1-128
+.agents/skills/stageshow/examples/monochrome/index.tsx
+  s_222f345225f7a0::t_2f77ddd66cd072 1-52
+.agents/skills/stageshow/examples/monochrome/mono.css
+  s_222f345225f7a0::t_26168ba55ffe8a 1-98
+.agents/skills/stageshow/examples/notion/index.tsx
+  s_222f345225f7a0::t_10282dcf92a449 1-321
+.agents/skills/stageshow/examples/notion/notion.css
+  s_222f345225f7a0::t_9510d333662c1b 1-417
+.agents/skills/stageshow/examples/opposite-corners/corners.css
+  s_222f345225f7a0::t_49b15e5b629e95 1-47
+.agents/skills/stageshow/examples/opposite-corners/index.tsx
+  s_222f345225f7a0::t_fef7672aaf1b07 1-61
+.agents/skills/stageshow/examples/overlap/index.tsx
+  s_222f345225f7a0::t_625a01d192344a 1-78
+.agents/skills/stageshow/examples/overlap/overlap.css
+  s_222f345225f7a0::t_ccbfe76f3a12e4 1-134
+.agents/skills/stageshow/examples/panel-annotation/index.tsx
+  s_222f345225f7a0::t_dcdb34b0891ec3 1-110
+.agents/skills/stageshow/examples/panel-annotation/panel.css
+  s_222f345225f7a0::t_21775aad39cb2a 1-152
+.agents/skills/stageshow/examples/parts/index.tsx
+  s_222f345225f7a0::t_8c93c79c72cb11 1-177
+.agents/skills/stageshow/examples/parts/parts.css
+  s_222f345225f7a0::t_786afc2673854a 1-163
+.agents/skills/stageshow/examples/payout-flow/index.tsx
+  s_222f345225f7a0::t_813fe5cf5f8a31 1-136
+.agents/skills/stageshow/examples/payout-flow/pace.css
+  s_222f345225f7a0::t_c71c54105c8d76 1-249
+.agents/skills/stageshow/examples/phone-touch/fitness.css
+  s_222f345225f7a0::t_17e878a8338e31 1-434
+.agents/skills/stageshow/examples/phone-touch/index.tsx
+  s_222f345225f7a0::t_9d6d81d35d5fca 1-229
+.agents/skills/stageshow/examples/phones/index.tsx
+  s_222f345225f7a0::t_fd776c907dafbb 1-61
+.agents/skills/stageshow/examples/powerpoint/index.tsx
+  s_222f345225f7a0::t_61882283cace27 1-381
+.agents/skills/stageshow/examples/powerpoint/pp.css
+  s_222f345225f7a0::t_43a3bbc11a0040 1-514
+.agents/skills/stageshow/examples/presence/index.tsx
+  s_222f345225f7a0::t_7f61e2b9d7f9d8 1-130
+.agents/skills/stageshow/examples/presence/presence.css
+  s_222f345225f7a0::t_9655425ff662a0 1-135
+.agents/skills/stageshow/examples/raycast/index.tsx
+  s_222f345225f7a0::t_751f601eee2b7d 1-249
+.agents/skills/stageshow/examples/raycast/raycast.css
+  s_222f345225f7a0::t_a256230e56ea22 1-430
+.agents/skills/stageshow/examples/reorder/index.tsx
+  s_222f345225f7a0::t_9e75a647250691 1-94
+.agents/skills/stageshow/examples/reorder/reorder.css
+  s_222f345225f7a0::t_95951d8a6f1508 1-76
+.agents/skills/stageshow/examples/ruled-bento/grid.css
+  s_222f345225f7a0::t_b9c9f516f80479 1-541
+.agents/skills/stageshow/examples/ruled-bento/index.tsx
+  s_222f345225f7a0::t_9f5038826fa48f 1-347
+.agents/skills/stageshow/examples/share/index.tsx
+  s_222f345225f7a0::t_4c9e2c144e1301 1-221
+.agents/skills/stageshow/examples/share/share.css
+  s_222f345225f7a0::t_277e8139e2ce90 1-209
+.agents/skills/stageshow/examples/slack/index.tsx
+  s_222f345225f7a0::t_0211f675ff7525 1-462
+.agents/skills/stageshow/examples/slack/slack.css
+  s_222f345225f7a0::t_c9c6fad12a4b70 1-847
+.agents/skills/stageshow/examples/spotify/index.tsx
+  s_222f345225f7a0::t_174a67c28ea364 1-320
+.agents/skills/stageshow/examples/spotify/spotify.css
+  s_222f345225f7a0::t_f93a274e72c279 1-709
+.agents/skills/stageshow/examples/stacked-cards/index.tsx
+  s_222f345225f7a0::t_4bf91f220180a8 1-56
+.agents/skills/stageshow/examples/stacked-cards/stacked.css
+  s_222f345225f7a0::t_acd8ebea78a088 1-89
+.agents/skills/stageshow/examples/staggered-bento/grid.css
+  s_222f345225f7a0::t_5bbd2648353f11 1-534
+.agents/skills/stageshow/examples/staggered-bento/index.tsx
+  s_222f345225f7a0::t_8ce22c7a77d9c6 1-370
+.agents/skills/stageshow/examples/static-card/card.css
+  s_222f345225f7a0::t_95e04f62a5b7f8 1-192
+.agents/skills/stageshow/examples/static-card/index.tsx
+  s_222f345225f7a0::t_c40fd473e8984c 1-82
+.agents/skills/stageshow/examples/story/index.tsx
+  s_222f345225f7a0::t_3ee824464b03fb 1-150
+.agents/skills/stageshow/examples/story/story.css
+  s_222f345225f7a0::t_4d42b74619bc80 1-168
+.agents/skills/stageshow/examples/subscriptions/index.tsx
+  s_222f345225f7a0::t_e2cb54ff76ead3 1-252
+.agents/skills/stageshow/examples/subscriptions/subs.css
+  s_222f345225f7a0::t_92994db32caf5f 1-352
+.agents/skills/stageshow/examples/swipe/index.tsx
+  s_222f345225f7a0::t_886e681aa34270 1-195
+.agents/skills/stageshow/examples/swipe/swipe.css
+  s_222f345225f7a0::t_26a3a51df06858 1-169
+.agents/skills/stageshow/examples/table-edit/index.tsx
+  s_222f345225f7a0::t_84b4fd48b889bb 1-114
+.agents/skills/stageshow/examples/table-edit/table.css
+  s_222f345225f7a0::t_8db35acfb8b2dd 1-138
+.agents/skills/stageshow/examples/telegram/index.tsx
+  s_222f345225f7a0::t_0d106b35ed732e 1-227
+.agents/skills/stageshow/examples/telegram/telegram.css
+  s_222f345225f7a0::t_4133b8c1103705 1-422
+.agents/skills/stageshow/examples/tilted-stack/index.tsx
+  s_222f345225f7a0::t_26305e8746f7e4 1-49
+.agents/skills/stageshow/examples/tilted-stack/tilted.css
+  s_222f345225f7a0::t_3f825cbf1190ac 1-63
+.agents/skills/stageshow/examples/upload/index.tsx
+  s_222f345225f7a0::t_c2b3dc9d1cb809 1-257
+.agents/skills/stageshow/examples/upload/upload.css
+  s_222f345225f7a0::t_d6f2271bedb1b1 1-310
+.agents/skills/stageshow/examples/wikipedia/PHOTOS.md
+  s_222f345225f7a0::t_6afdd8e78b7453 1-17
+.agents/skills/stageshow/examples/wikipedia/index.tsx
+  s_222f345225f7a0::t_24fe8ae4009c32 1-428
+.agents/skills/stageshow/examples/wikipedia/wiki.css
+  s_222f345225f7a0::t_17dcf9bf19fc66 1-577
+.agents/skills/stageshow/examples/window-row/index.tsx
+  s_222f345225f7a0::t_6fd9d081ef5bd7 1-87
+.agents/skills/stageshow/examples/window-row/row.css
+  s_222f345225f7a0::t_e97fc5ccf4bc7b 1-63
+.agents/skills/stageshow/kit/act.ts
+  s_222f345225f7a0::t_56e45068ab0d87 1-669
+.agents/skills/stageshow/kit/brands/1password-dark.svg
+  s_222f345225f7a0::t_68d704f846cd98 1
+.agents/skills/stageshow/kit/brands/1password.svg
+  s_222f345225f7a0::t_9beeccac2a5858 1
+.agents/skills/stageshow/kit/brands/LICENSE-CRYPTO-FLAT.txt
+  s_222f345225f7a0::t_a859edc93143c7 1-121
+.agents/skills/stageshow/kit/brands/LICENSE-PAYMENT-ICONS.txt
+  s_222f345225f7a0::t_0c61f382013fe0 1-201
+.agents/skills/stageshow/kit/brands/LICENSE-SIMPLE-ICONS.txt
+  s_222f345225f7a0::t_d91f2c4723bf8c 1-30
+.agents/skills/stageshow/kit/brands/LICENSE-SVGL.txt
+  s_222f345225f7a0::t_f422ba878f801a 1-21
+.agents/skills/stageshow/kit/brands/SOURCES.md
+  s_222f345225f7a0::t_1b69e954ff56eb 1-57
+.agents/skills/stageshow/kit/brands/amex-tile.svg
+  s_222f345225f7a0::t_a7de83b6c43233 1
+.agents/skills/stageshow/kit/brands/amex.svg
+  s_222f345225f7a0::t_4dfb13cea543a2 1
+.agents/skills/stageshow/kit/brands/bankofamerica-dark.svg
+  s_222f345225f7a0::t_9901a89f6b3d88 1
+.agents/skills/stageshow/kit/brands/bankofamerica.svg
+  s_222f345225f7a0::t_78fd26f6fe3639 1
+.agents/skills/stageshow/kit/brands/barclays.svg
+  s_222f345225f7a0::t_f1a546f69f7967 1
+.agents/skills/stageshow/kit/brands/bitcoin.svg
+  s_222f345225f7a0::t_9230f57b263377 1
+.agents/skills/stageshow/kit/brands/chase.svg
+  s_222f345225f7a0::t_1069d42b14e5ef 1
+.agents/skills/stageshow/kit/brands/discover.svg
+  s_222f345225f7a0::t_18d3c728d675c7 1
+.agents/skills/stageshow/kit/brands/dropbox-glyph.svg
+  s_222f345225f7a0::t_7daa6acad8d17c 1
+.agents/skills/stageshow/kit/brands/dropbox.svg
+  s_222f345225f7a0::t_cdd7ac3c7a8d53 1
+.agents/skills/stageshow/kit/brands/ethereum.svg
+  s_222f345225f7a0::t_433cb7ea8054a1 1
+.agents/skills/stageshow/kit/brands/figma.svg
+  s_222f345225f7a0::t_50171224df2853 1-14
+.agents/skills/stageshow/kit/brands/github-dark.svg
+  s_222f345225f7a0::t_a551cb60cf615b 1-3
+.agents/skills/stageshow/kit/brands/github.svg
+  s_222f345225f7a0::t_2f5a6a56cbd259 1
+.agents/skills/stageshow/kit/brands/gmail.svg
+  s_222f345225f7a0::t_a6243cc97c85af 1-11
+.agents/skills/stageshow/kit/brands/google-calendar.svg
+  s_222f345225f7a0::t_75dc49639b7362 1-17
+.agents/skills/stageshow/kit/brands/google-docs.svg
+  s_222f345225f7a0::t_91c53b13c0c92e 1
+.agents/skills/stageshow/kit/brands/google-drive.svg
+  s_222f345225f7a0::t_c775257c72211c 1-8
+.agents/skills/stageshow/kit/brands/google-meet.svg
+  s_222f345225f7a0::t_774df274a850ff 1-16
+.agents/skills/stageshow/kit/brands/google-sheets.svg
+  s_222f345225f7a0::t_c82842f182c002 1-55
+.agents/skills/stageshow/kit/brands/google-slides.svg
+  s_222f345225f7a0::t_ac159953d97529 1-61
+.agents/skills/stageshow/kit/brands/hsbc.svg
+  s_222f345225f7a0::t_caa15046c0be7f 1
+.agents/skills/stageshow/kit/brands/index.ts
+  s_222f345225f7a0::t_504719b0feb027 1-229
+.agents/skills/stageshow/kit/brands/linear-dark.svg
+  s_222f345225f7a0::t_843ed7076b6194 1-5
+.agents/skills/stageshow/kit/brands/linear.svg
+  s_222f345225f7a0::t_fcbb962b42aa8b 1-5
+.agents/skills/stageshow/kit/brands/mastercard.svg
+  s_222f345225f7a0::t_2ed7c4473b66b0 1-5
+.agents/skills/stageshow/kit/brands/monzo-dark.svg
+  s_222f345225f7a0::t_116d4a4c3658fb 1
+.agents/skills/stageshow/kit/brands/monzo.svg
+  s_222f345225f7a0::t_5512018833db18 1
+.agents/skills/stageshow/kit/brands/notion.svg
+  s_222f345225f7a0::t_2608d18b256976 1
+.agents/skills/stageshow/kit/brands/paypal.svg
+  s_222f345225f7a0::t_afa067cb5e2373 1
+.agents/skills/stageshow/kit/brands/revolut-dark.svg
+  s_222f345225f7a0::t_bf43e1b7d1bd2b 1
+.agents/skills/stageshow/kit/brands/revolut.svg
+  s_222f345225f7a0::t_170118b7561a66 1
+.agents/skills/stageshow/kit/brands/shopify.svg
+  s_222f345225f7a0::t_e9bd9975a825d1 1-5
+.agents/skills/stageshow/kit/brands/slack.svg
+  s_222f345225f7a0::t_5c5301854ea151 1-24
+.agents/skills/stageshow/kit/brands/solana.svg
+  s_222f345225f7a0::t_6259383a173487 1
+.agents/skills/stageshow/kit/brands/stripe.svg
+  s_222f345225f7a0::t_0fc7574a98f7a8 1
+.agents/skills/stageshow/kit/brands/tether.svg
+  s_222f345225f7a0::t_011558d6cdd674 1
+.agents/skills/stageshow/kit/brands/usdc.svg
+  s_222f345225f7a0::t_64c083135c2fa2 1-6
+.agents/skills/stageshow/kit/brands/vercel-dark.svg
+  s_222f345225f7a0::t_adf0862a0048a2 1
+.agents/skills/stageshow/kit/brands/vercel.svg
+  s_222f345225f7a0::t_ba11b492fda341 1
+.agents/skills/stageshow/kit/brands/visa.svg
+  s_222f345225f7a0::t_868af1ff684287 1-3
+.agents/skills/stageshow/kit/brands/wellsfargo.svg
+  s_222f345225f7a0::t_b7a9745787cce6 1
+.agents/skills/stageshow/kit/brands/zoom.svg
+  s_222f345225f7a0::t_58b85ac192f508 1
+.agents/skills/stageshow/kit/chart.css
+  s_222f345225f7a0::t_c84b5cc92b87fa 1-59
+.agents/skills/stageshow/kit/chart.tsx
+  s_222f345225f7a0::t_2cbac201bf4c2f 1-221
+.agents/skills/stageshow/kit/clock.ts
+  s_222f345225f7a0::t_e592a4a4e13c08 1-265
+.agents/skills/stageshow/kit/code.css
+  s_222f345225f7a0::t_113adc12f38809 1-87
+.agents/skills/stageshow/kit/code.tsx
+  s_222f345225f7a0::t_a7cace27f00bf2 1-70
+.agents/skills/stageshow/kit/controls/Badge.css
+  s_222f345225f7a0::t_b67e4d21579970 1-56
+.agents/skills/stageshow/kit/controls/Badge.tsx
+  s_222f345225f7a0::t_2d12fdc42fe22e 1-17
+.agents/skills/stageshow/kit/controls/Button.css
+  s_222f345225f7a0::t_b76e37bc8f6d02 1-122
+.agents/skills/stageshow/kit/controls/Button.tsx
+  s_222f345225f7a0::t_44987fc11847bc 1-68
+.agents/skills/stageshow/kit/controls/Draft.css
+  s_222f345225f7a0::t_79c9a36baf2abf 1-90
+.agents/skills/stageshow/kit/controls/Draft.tsx
+  s_222f345225f7a0::t_29dac3d0ddbcf2 1-45
+.agents/skills/stageshow/kit/controls/Field.css
+  s_222f345225f7a0::t_53930c9fd61484 1-201
+.agents/skills/stageshow/kit/controls/Field.tsx
+  s_222f345225f7a0::t_79d0c4130bc753 1-94
+.agents/skills/stageshow/kit/controls/Segmented.css
+  s_222f345225f7a0::t_1d6c0bdba6a717 1-40
+.agents/skills/stageshow/kit/controls/Segmented.tsx
+  s_222f345225f7a0::t_27f8a0c697c77d 1-21
+.agents/skills/stageshow/kit/controls/Slot.css
+  s_222f345225f7a0::t_b1ad434bfeefda 1-39
+.agents/skills/stageshow/kit/controls/Slot.tsx
+  s_222f345225f7a0::t_6a358fa5e68be6 1-25
+.agents/skills/stageshow/kit/controls/Tabs.css
+  s_222f345225f7a0::t_19e5126cfa1b0e 1-33
+.agents/skills/stageshow/kit/controls/Tabs.tsx
+  s_222f345225f7a0::t_d689022f6b9280 1-26
+.agents/skills/stageshow/kit/controls/Toggle.css
+  s_222f345225f7a0::t_962071f1325c8c 1-46
+.agents/skills/stageshow/kit/controls/Toggle.tsx
+  s_222f345225f7a0::t_c3a080b44f8b25 1-11
+.agents/skills/stageshow/kit/controls/index.ts
+  s_222f345225f7a0::t_cb2d650ffdf13f 1-15
+.agents/skills/stageshow/kit/cursor.css
+  s_222f345225f7a0::t_2e464353aed58e 1-256
+.agents/skills/stageshow/kit/cursor.tsx
+  s_222f345225f7a0::t_ee284591ac1c8d 1-103
+.agents/skills/stageshow/kit/cursors.tsx
+  s_222f345225f7a0::t_2ee843127731b8 1-106
+.agents/skills/stageshow/kit/ease.ts
+  s_222f345225f7a0::t_700ae39e92b1f2 1-65
+.agents/skills/stageshow/kit/index.ts
+  s_222f345225f7a0::t_b9e6dc13c682c0 1-45
+.agents/skills/stageshow/kit/ios.css
+  s_222f345225f7a0::t_89b566812a05c4 1-177
+.agents/skills/stageshow/kit/ios.tsx
+  s_222f345225f7a0::t_c63a59259b9da9 1-137
+.agents/skills/stageshow/kit/keys.css
+  s_222f345225f7a0::t_313206929c6d8c 1-60
+.agents/skills/stageshow/kit/keys.tsx
+  s_222f345225f7a0::t_450fc643874c74 1-36
+.agents/skills/stageshow/kit/looks.ts
+  s_222f345225f7a0::t_b6580dd35a56fe 1-23
+.agents/skills/stageshow/kit/measure.ts
+  s_222f345225f7a0::t_6d1ce3b466eb61 1-122
+.agents/skills/stageshow/kit/messages.css
+  s_222f345225f7a0::t_456f273349c952 1-462
+.agents/skills/stageshow/kit/messages.tsx
+  s_222f345225f7a0::t_bdcd5533212c5d 1-259
+.agents/skills/stageshow/kit/motion/Camera.css
+  s_222f345225f7a0::t_221183fa032853 1-27
+.agents/skills/stageshow/kit/motion/Camera.tsx
+  s_222f345225f7a0::t_7df8ca67c3cc50 1-51
+.agents/skills/stageshow/kit/motion/Collapse.css
+  s_222f345225f7a0::t_708ebc1ad4f8d3 1-104
+.agents/skills/stageshow/kit/motion/Collapse.tsx
+  s_222f345225f7a0::t_c75d9cbdd01c42 1-83
+.agents/skills/stageshow/kit/motion/Connector.css
+  s_222f345225f7a0::t_3d957bed6938fb 1-128
+.agents/skills/stageshow/kit/motion/Connector.tsx
+  s_222f345225f7a0::t_f997c56f237ed8 1-182
+.agents/skills/stageshow/kit/motion/Count.css
+  s_222f345225f7a0::t_eaf3f513bd99c6 1-68
+.agents/skills/stageshow/kit/motion/Count.tsx
+  s_222f345225f7a0::t_4c2d251bdcbb27 1-141
+.agents/skills/stageshow/kit/motion/Expand.css
+  s_222f345225f7a0::t_d6a47a671080a8 1-80
+.agents/skills/stageshow/kit/motion/Expand.tsx
+  s_222f345225f7a0::t_d7b9f35da9102a 1-109
+.agents/skills/stageshow/kit/motion/Fly.css
+  s_222f345225f7a0::t_50324ca7e12c43 1-51
+.agents/skills/stageshow/kit/motion/Fly.tsx
+  s_222f345225f7a0::t_810e048f63d90f 1-91
+.agents/skills/stageshow/kit/motion/Follow.css
+  s_222f345225f7a0::t_2cead236eb7302 1-17
+.agents/skills/stageshow/kit/motion/Follow.tsx
+  s_222f345225f7a0::t_d9b090ff86d5cb 1-139
+.agents/skills/stageshow/kit/motion/Popover.css
+  s_222f345225f7a0::t_e74c048d034b79 1-65
+.agents/skills/stageshow/kit/motion/Popover.tsx
+  s_222f345225f7a0::t_cc58c51f2bf113 1-38
+.agents/skills/stageshow/kit/motion/Roll.css
+  s_222f345225f7a0::t_16386aa698b396 1-87
+.agents/skills/stageshow/kit/motion/Roll.tsx
+  s_222f345225f7a0::t_b12518a152a1bf 1-191
+.agents/skills/stageshow/kit/motion/Scroll.css
+  s_222f345225f7a0::t_51e6ba9967025e 1-49
+.agents/skills/stageshow/kit/motion/Scroll.tsx
+  s_222f345225f7a0::t_cd1042db1ca043 1-24
+.agents/skills/stageshow/kit/motion/States.css
+  s_222f345225f7a0::t_589c57c2b88300 1-49
+.agents/skills/stageshow/kit/motion/States.tsx
+  s_222f345225f7a0::t_09aa956593aeb6 1-29
+.agents/skills/stageshow/kit/motion/Stream.css
+  s_222f345225f7a0::t_00dcdfa1ff22c9 1-32
+.agents/skills/stageshow/kit/motion/Stream.tsx
+  s_222f345225f7a0::t_e4aaab2536ac1e 1-30
+.agents/skills/stageshow/kit/motion/Swap.css
+  s_222f345225f7a0::t_25c0e143c27db8 1-48
+.agents/skills/stageshow/kit/motion/Swap.tsx
+  s_222f345225f7a0::t_743c1e297af298 1-103
+.agents/skills/stageshow/kit/motion/index.ts
+  s_222f345225f7a0::t_f865409bc1b72a 1-22
+.agents/skills/stageshow/kit/parts/Avatar.css
+  s_222f345225f7a0::t_0260a5e7395c54 1-102
+.agents/skills/stageshow/kit/parts/Avatar.tsx
+  s_222f345225f7a0::t_16092efde3abe3 1-46
+.agents/skills/stageshow/kit/parts/BrandMark.css
+  s_222f345225f7a0::t_8293bdfab19154 1-45
+.agents/skills/stageshow/kit/parts/BrandMark.tsx
+  s_222f345225f7a0::t_b2d0bbb37ebeb1 1-43
+.agents/skills/stageshow/kit/parts/Card.css
+  s_222f345225f7a0::t_0ceb246277aafc 1-35
+.agents/skills/stageshow/kit/parts/Card.tsx
+  s_222f345225f7a0::t_7a43e7f6059eb4 1-40
+.agents/skills/stageshow/kit/parts/Check.css
+  s_222f345225f7a0::t_3e3f9f3b7714ed 1-94
+.agents/skills/stageshow/kit/parts/Check.tsx
+  s_222f345225f7a0::t_1aaf6b09f414fc 1-21
+.agents/skills/stageshow/kit/parts/Chip.css
+  s_222f345225f7a0::t_51535862b76dba 1-66
+.agents/skills/stageshow/kit/parts/Chip.tsx
+  s_222f345225f7a0::t_0bd1abe12c0a93 1-29
+.agents/skills/stageshow/kit/parts/Divider.css
+  s_222f345225f7a0::t_737de2e2b98db9 1-17
+.agents/skills/stageshow/kit/parts/Divider.tsx
+  s_222f345225f7a0::t_5c3f99b2f0aea3 1-20
+.agents/skills/stageshow/kit/parts/Facepile.css
+  s_222f345225f7a0::t_9d7d21f4713df2 1-17
+.agents/skills/stageshow/kit/parts/Facepile.tsx
+  s_222f345225f7a0::t_1679e689374234 1-26
+.agents/skills/stageshow/kit/parts/Icon.css
+  s_222f345225f7a0::t_8d189304acd07b 1-8
+.agents/skills/stageshow/kit/parts/Icon.tsx
+  s_222f345225f7a0::t_1cb6959a47568e 1-65
+.agents/skills/stageshow/kit/parts/Kbd.css
+  s_222f345225f7a0::t_bd466149fa7df5 1-32
+.agents/skills/stageshow/kit/parts/Kbd.tsx
+  s_222f345225f7a0::t_e3557bfbf414d5 1-15
+.agents/skills/stageshow/kit/parts/Menu.css
+  s_222f345225f7a0::t_2daf00358e245f 1-34
+.agents/skills/stageshow/kit/parts/Menu.tsx
+  s_222f345225f7a0::t_124cc58093b88e 1-15
+.agents/skills/stageshow/kit/parts/Meter.css
+  s_222f345225f7a0::t_285bbb28c6de09 1-46
+.agents/skills/stageshow/kit/parts/Meter.tsx
+  s_222f345225f7a0::t_0d4b69293d1c3c 1-16
+.agents/skills/stageshow/kit/parts/Pin.css
+  s_222f345225f7a0::t_9376d0e4620db7 1-58
+.agents/skills/stageshow/kit/parts/Pin.tsx
+  s_222f345225f7a0::t_23ef951d8d2e8e 1-39
+.agents/skills/stageshow/kit/parts/Row.css
+  s_222f345225f7a0::t_04c75fa288bff3 1-211
+.agents/skills/stageshow/kit/parts/Row.tsx
+  s_222f345225f7a0::t_08f4f4433e2ef3 1-67
+.agents/skills/stageshow/kit/parts/Spinner.css
+  s_222f345225f7a0::t_8153682b1e652f 1-12
+.agents/skills/stageshow/kit/parts/Spinner.tsx
+  s_222f345225f7a0::t_e59b9533dba51d 1-12
+.agents/skills/stageshow/kit/parts/Toast.css
+  s_222f345225f7a0::t_f7a6bb4394bb40 1-35
+.agents/skills/stageshow/kit/parts/Toast.tsx
+  s_222f345225f7a0::t_4b054296aa5aac 1-22
+.agents/skills/stageshow/kit/parts/Tooltip.css
+  s_222f345225f7a0::t_3d64d0ca649d1d 1-42
+.agents/skills/stageshow/kit/parts/Tooltip.tsx
+  s_222f345225f7a0::t_5932eaaee44d78 1-20
+.agents/skills/stageshow/kit/parts/index.ts
+  s_222f345225f7a0::t_76920c82e9eea7 1-25
+.agents/skills/stageshow/kit/phone.css
+  s_222f345225f7a0::t_0633912853a171 1-539
+.agents/skills/stageshow/kit/phone.tsx
+  s_222f345225f7a0::t_ac097265637b60 1-362
+.agents/skills/stageshow/kit/reduced-motion.ts
+  s_222f345225f7a0::t_8a5923a0d47ac6 1-18
+.agents/skills/stageshow/kit/stage.css
+  s_222f345225f7a0::t_6fb3f80368a4c1 1-448
+.agents/skills/stageshow/kit/stage.tsx
+  s_222f345225f7a0::t_1b9335e4f7eefb 1-612
+.agents/skills/stageshow/kit/stageshow.css
+  s_222f345225f7a0::t_fefcc0ada8ab40 1-43
+.agents/skills/stageshow/kit/util.ts
+  s_222f345225f7a0::t_473b229f31cb6b 1-25
+.agents/skills/stageshow/kit/window.css
+  s_222f345225f7a0::t_0fb65a864a2c40 1-612
+.agents/skills/stageshow/kit/window.tsx
+  s_222f345225f7a0::t_f3427121613a6a 1-276
+.agents/skills/stageshow/package-lock.json
+  s_222f345225f7a0::t_0b1709778b2c13 1-1932
+.agents/skills/stageshow/package.json
+  s_222f345225f7a0::t_2b2ebec703de8d 1-34
+.agents/skills/stageshow/playground/catalog.ts
+  s_222f345225f7a0::t_fa7bc8863f805e 1-94
+.agents/skills/stageshow/playground/index.html
+  s_222f345225f7a0::t_864558760bc476 1-5
+.agents/skills/stageshow/playground/main.tsx
+  s_222f345225f7a0::t_6505b121472607 1-117
+.agents/skills/stageshow/playground/playback.ts
+  s_222f345225f7a0::t_9655969b25e5e7 1-110
+.agents/skills/stageshow/playground/preview.css
+  s_222f345225f7a0::t_a80183fb3d03bc 1-6
+.agents/skills/stageshow/playground/preview.tsx
+  s_222f345225f7a0::t_55254a03b941fe 1-18
+.agents/skills/stageshow/playground/tsconfig.json
+  s_222f345225f7a0::t_4a8934e85edc02 1-4
+.agents/skills/stageshow/playground/viewer.css
+  s_222f345225f7a0::t_60e43b03d34088 1-63
+.agents/skills/stageshow/playground/viewer.tsx
+  s_222f345225f7a0::t_3856e1e8e09ef6 1-89
+.agents/skills/stageshow/playground/vite.config.ts
+  s_222f345225f7a0::t_6c7bf0bbf53429 1-3
+.agents/skills/stageshow/references/annotations.md
+  s_222f345225f7a0::t_50a9086995a457 1-76
+.agents/skills/stageshow/references/backgrounds.md
+  s_222f345225f7a0::t_6648acb5cd69ad 1-30
+.agents/skills/stageshow/references/bento.md
+  s_222f345225f7a0::t_e3954519c2de34 1-63
+.agents/skills/stageshow/references/brands.md
+  s_222f345225f7a0::t_1a6632ba947f9b 1-32
+.agents/skills/stageshow/references/choreography.md
+  s_222f345225f7a0::t_ceedb8b4cf6047 1-32
+.agents/skills/stageshow/references/craft.md
+  s_222f345225f7a0::t_5da1696ad82653 1-160
+.agents/skills/stageshow/references/framing.md
+  s_222f345225f7a0::t_c7e3f677c7693d 1-106
+.agents/skills/stageshow/references/kit.md
+  s_222f345225f7a0::t_207ae0a0d2a5ca 1-185
+.agents/skills/stageshow/references/looks.md
+  s_222f345225f7a0::t_6f1ed9e69859a3 1-66
+.agents/skills/stageshow/references/motion.md
+  s_222f345225f7a0::t_01dfa4443fe99a 1-174
+.agents/skills/stageshow/references/products.md
+  s_222f345225f7a0::t_1ab4a69c994682 1-26
+.agents/skills/stageshow/references/rehearse.md
+  s_222f345225f7a0::t_7abb8b12e7b5ea 1-117
+.agents/skills/stageshow/references/review.md
+  s_222f345225f7a0::t_57e454800b8a97 1-26
+.agents/skills/stageshow/references/teaching.md
+  s_222f345225f7a0::t_61140dc6870d00 1-111
+.agents/skills/stageshow/references/verify.md
+  s_222f345225f7a0::t_65df889ce5ae54 1-84
+.agents/skills/stageshow/scripts/browser.mjs
+  s_222f345225f7a0::t_05513eca5648b1 1-20
+.agents/skills/stageshow/scripts/class-clash-core.mjs
+  s_222f345225f7a0::t_f447bfb9d50e01 1-130
+.agents/skills/stageshow/scripts/class-clash.mjs
+  s_222f345225f7a0::t_284c9d652d1321 1-52
+.agents/skills/stageshow/scripts/dev.mjs
+  s_222f345225f7a0::t_76cc80167687e8 1-63
+.agents/skills/stageshow/scripts/film.mjs
+  s_222f345225f7a0::t_c04ce11db3f6c3 1-664
+.agents/skills/stageshow/scripts/jumps-core.mjs
+  s_222f345225f7a0::t_76ae4e80a62629 1-191
+.agents/skills/stageshow/scripts/jumps.mjs
+  s_222f345225f7a0::t_332c4e0277cebf 1-68
+.agents/skills/stageshow/scripts/layout-core.mjs
+  s_222f345225f7a0::t_d43dcad8107f53 1-164
+.agents/skills/stageshow/scripts/layout.mjs
+  s_222f345225f7a0::t_ff9d2517814703 1-65
+.agents/skills/stageshow/scripts/motion-watch.mjs
+  s_222f345225f7a0::t_a3a9a20d60b689 1-557
+.agents/skills/stageshow/scripts/verification.mjs
+  s_222f345225f7a0::t_8133fbdd19ebe1 1-97
+.agents/skills/stageshow/teaching/composition.css
+  s_222f345225f7a0::t_776dd802155a4d 1-195
+.agents/skills/stageshow/teaching/composition.tsx
+  s_222f345225f7a0::t_a556c55bee8a31 1-183
+.agents/skills/stageshow/teaching/continuity.css
+  s_222f345225f7a0::t_bed46ea3344aa9 1-29
+.agents/skills/stageshow/teaching/continuity.tsx
+  s_222f345225f7a0::t_f2db7d5c96c21e 1-68
+.agents/skills/stageshow/teaching/contrasts.css
+  s_222f345225f7a0::t_49420dff5cec2d 1-103
+.agents/skills/stageshow/teaching/contrasts.tsx
+  s_222f345225f7a0::t_054ecc38529816 1-201
+.agents/skills/stageshow/teaching/details.css
+  s_222f345225f7a0::t_38b59a1b204cf9 1-90
+.agents/skills/stageshow/teaching/details.tsx
+  s_222f345225f7a0::t_583c4d50cf546a 1-225
+.agents/skills/stageshow/teaching/edges.css
+  s_222f345225f7a0::t_d273bcf80b2066 1-26
+.agents/skills/stageshow/teaching/edges.tsx
+  s_222f345225f7a0::t_b7884f36d746c3 1-60
+.agents/skills/stageshow/teaching/relationships.css
+  s_222f345225f7a0::t_7d8695a1696552 1-54
+.agents/skills/stageshow/teaching/relationships.tsx
+  s_222f345225f7a0::t_076780da48e074 1-122
+.agents/skills/stageshow/teaching/scenes.css
+  s_222f345225f7a0::t_a49b3a35cf5714 1-220
+.agents/skills/stageshow/teaching/scenes.tsx
+  s_222f345225f7a0::t_d037ad3121af28 1-149
+.agents/skills/stageshow/teaching/style.css
+  s_222f345225f7a0::t_1bf7bde0169cd2 1-84
+.agents/skills/stageshow/teaching/style.tsx
+  s_222f345225f7a0::t_409d841366db68 1-130
+.agents/skills/stageshow/teaching/text-settle.css
+  s_222f345225f7a0::t_0cd8e9505913b1 1-10
+.agents/skills/stageshow/teaching/text-settle.tsx
+  s_222f345225f7a0::t_945eac73ddf7c5 1-44
+.agents/skills/weave-demos/SKILL.md
+  s_222f345225f7a0::t_f5b24733163b17 1-98
+.agents/skills/weave-demos/templates/BRIEF.md
+  s_222f345225f7a0::t_b6fd360c5ad0d9 1-40
+.agents/skills/weave-demos/templates/REHEARSAL.md
+  s_222f345225f7a0::t_3208d49e816b82 1-12
+.claude/skills/stageshow
+  s_222f345225f7a0::t_f45c65187c6ff8 1
+.claude/skills/weave-demos
+  s_222f345225f7a0::t_2253df6fd93ebc 1
+.gitignore
+  s_222f345225f7a0::t_39a858518ae515 8-10
+AGENTS.md
+  s_222f345225f7a0::t_ca3cb89b085f49 149-182
+LICENSES/MIT.txt
+  s_222f345225f7a0::t_8612d79d393f31 1-18
+LICENSES/OFL-1.1.txt
+  s_222f345225f7a0::t_78bb353b651196 1-43
+REUSE.toml
+  s_222f345225f7a0::t_b3cdfd6e34582b 66-85
+docs/.gitignore
+  s_222f345225f7a0::t_8e5496d0dad36d 4-5
+docs/demos/.gitignore
+  s_222f345225f7a0::t_899da475d9c177 1-2
+docs/demos/README.md
+  s_222f345225f7a0::t_35b7fbbb7af409 1-95
+docs/demos/index.html
+  s_222f345225f7a0::t_4a87d983159f9c 1-16
+docs/demos/kit/LICENSE
+  s_222f345225f7a0::t_4af7d5cb81d7cb 1-21
+docs/demos/kit/NOTICE.md
+  s_222f345225f7a0::t_ee6e6e024ac1cb 1-25
+docs/demos/kit/VENDORED.md
+  s_222f345225f7a0::t_50e7f137c03b4f 1-9
+docs/demos/kit/act.ts
+  s_222f345225f7a0::t_19c250cdfe3c3f 1-669
+docs/demos/kit/chart.css
+  s_222f345225f7a0::t_1b7ff6fdc0682f 1-59
+docs/demos/kit/chart.tsx
+  s_222f345225f7a0::t_e1bfc876cd61eb 1-221
+docs/demos/kit/clock.ts
+  s_222f345225f7a0::t_bf853d807ae999 1-265
+docs/demos/kit/code.css
+  s_222f345225f7a0::t_12649aa3a77f3b 1-87
+docs/demos/kit/code.tsx
+  s_222f345225f7a0::t_3f74faf9b42787 1-70
+docs/demos/kit/controls/Badge.css
+  s_222f345225f7a0::t_8c04fa3c58bc63 1-56
+docs/demos/kit/controls/Badge.tsx
+  s_222f345225f7a0::t_015f0029d5fe1b 1-17
+docs/demos/kit/controls/Button.css
+  s_222f345225f7a0::t_27c57d67874a71 1-122
+docs/demos/kit/controls/Button.tsx
+  s_222f345225f7a0::t_eb5610c4b41573 1-68
+docs/demos/kit/controls/Draft.css
+  s_222f345225f7a0::t_6592d2e77435ff 1-90
+docs/demos/kit/controls/Draft.tsx
+  s_222f345225f7a0::t_e8eb90e4e7d5b2 1-45
+docs/demos/kit/controls/Field.css
+  s_222f345225f7a0::t_c304bbea5efe87 1-201
+docs/demos/kit/controls/Field.tsx
+  s_222f345225f7a0::t_fd6c6d5f21cf33 1-94
+docs/demos/kit/controls/Segmented.css
+  s_222f345225f7a0::t_5af962de59acf1 1-40
+docs/demos/kit/controls/Segmented.tsx
+  s_222f345225f7a0::t_c232453ba532ae 1-21
+docs/demos/kit/controls/Slot.css
+  s_222f345225f7a0::t_f772f81d8ba41e 1-39
+docs/demos/kit/controls/Slot.tsx
+  s_222f345225f7a0::t_8aa4673a1cf5e8 1-25
+docs/demos/kit/controls/Tabs.css
+  s_222f345225f7a0::t_d03f861db952b5 1-33
+docs/demos/kit/controls/Tabs.tsx
+  s_222f345225f7a0::t_13b9bb63f6b583 1-26
+docs/demos/kit/controls/Toggle.css
+  s_222f345225f7a0::t_b858fba5e02e8e 1-46
+docs/demos/kit/controls/Toggle.tsx
+  s_222f345225f7a0::t_699c17d84f42e6 1-11
+docs/demos/kit/controls/index.ts
+  s_222f345225f7a0::t_3756c73417865f 1-15
+docs/demos/kit/cursor.css
+  s_222f345225f7a0::t_a1669534a945f7 1-256
+docs/demos/kit/cursor.tsx
+  s_222f345225f7a0::t_572dec89bb32b1 1-103
+docs/demos/kit/cursors.tsx
+  s_222f345225f7a0::t_0ae83b59405454 1-106
+docs/demos/kit/ease.ts
+  s_222f345225f7a0::t_59258ebdd9489b 1-65
+docs/demos/kit/index.ts
+  s_222f345225f7a0::t_c246f075319d92 1-43
+docs/demos/kit/ios.css
+  s_222f345225f7a0::t_decdc8e9a07636 1-177
+docs/demos/kit/ios.tsx
+  s_222f345225f7a0::t_9b25eacc39b6c9 1-137
+docs/demos/kit/keys.css
+  s_222f345225f7a0::t_6a362ad16531f6 1-60
+docs/demos/kit/keys.tsx
+  s_222f345225f7a0::t_1ea6a019b73745 1-36
+docs/demos/kit/looks.ts
+  s_222f345225f7a0::t_9e50bff0557783 1-23
+docs/demos/kit/measure.ts
+  s_222f345225f7a0::t_7f0a0dbe2d9f6c 1-122
+docs/demos/kit/messages.css
+  s_222f345225f7a0::t_e7d4b7b3a9aa90 1-462
+docs/demos/kit/messages.tsx
+  s_222f345225f7a0::t_fa6dcdcb8b0ecd 1-259
+docs/demos/kit/motion/Camera.css
+  s_222f345225f7a0::t_9faa18bd3cc31c 1-27
+docs/demos/kit/motion/Camera.tsx
+  s_222f345225f7a0::t_97c7355b61cbb7 1-51
+docs/demos/kit/motion/Collapse.css
+  s_222f345225f7a0::t_0fb787c9aab9dd 1-104
+docs/demos/kit/motion/Collapse.tsx
+  s_222f345225f7a0::t_beab4fea0f4a9c 1-83
+docs/demos/kit/motion/Connector.css
+  s_222f345225f7a0::t_91897b63800aac 1-128
+docs/demos/kit/motion/Connector.tsx
+  s_222f345225f7a0::t_dbdbe1bbbd1f25 1-182
+docs/demos/kit/motion/Count.css
+  s_222f345225f7a0::t_7f94d395e8c9e6 1-68
+docs/demos/kit/motion/Count.tsx
+  s_222f345225f7a0::t_c8e491a76a5edf 1-141
+docs/demos/kit/motion/Expand.css
+  s_222f345225f7a0::t_1b47c6b82c4f3a 1-80
+docs/demos/kit/motion/Expand.tsx
+  s_222f345225f7a0::t_ae3ea8187efe50 1-109
+docs/demos/kit/motion/Fly.css
+  s_222f345225f7a0::t_2fde416b7d148e 1-51
+docs/demos/kit/motion/Fly.tsx
+  s_222f345225f7a0::t_4b7bc6917add68 1-91
+docs/demos/kit/motion/Follow.css
+  s_222f345225f7a0::t_b7c617b0975080 1-17
+docs/demos/kit/motion/Follow.tsx
+  s_222f345225f7a0::t_eac62fc9a6a61d 1-139
+docs/demos/kit/motion/Popover.css
+  s_222f345225f7a0::t_d54cbf84dcc45c 1-65
+docs/demos/kit/motion/Popover.tsx
+  s_222f345225f7a0::t_2ce73f4082c092 1-38
+docs/demos/kit/motion/Roll.css
+  s_222f345225f7a0::t_3f8cb191476c5c 1-87
+docs/demos/kit/motion/Roll.tsx
+  s_222f345225f7a0::t_a0d024181c8e88 1-191
+docs/demos/kit/motion/Scroll.css
+  s_222f345225f7a0::t_1550a446fee097 1-49
+docs/demos/kit/motion/Scroll.tsx
+  s_222f345225f7a0::t_a1ded3912f1769 1-24
+docs/demos/kit/motion/States.css
+  s_222f345225f7a0::t_5114b21985f8de 1-49
+docs/demos/kit/motion/States.tsx
+  s_222f345225f7a0::t_e3dac28f08ede7 1-29
+docs/demos/kit/motion/Stream.css
+  s_222f345225f7a0::t_0b95ec5ab433d3 1-32
+docs/demos/kit/motion/Stream.tsx
+  s_222f345225f7a0::t_fdc7772e8e71b8 1-30
+docs/demos/kit/motion/Swap.css
+  s_222f345225f7a0::t_af359b254243fc 1-48
+docs/demos/kit/motion/Swap.tsx
+  s_222f345225f7a0::t_80bcc6081dbcca 1-103
+docs/demos/kit/motion/index.ts
+  s_222f345225f7a0::t_15ad70f14d4fc8 1-22
+docs/demos/kit/parts/Avatar.css
+  s_222f345225f7a0::t_3443b851ed5381 1-102
+docs/demos/kit/parts/Avatar.tsx
+  s_222f345225f7a0::t_7c4cf864efb1c9 1-46
+docs/demos/kit/parts/Card.css
+  s_222f345225f7a0::t_a8b539825a3cf2 1-35
+docs/demos/kit/parts/Card.tsx
+  s_222f345225f7a0::t_603727df7a9b8f 1-40
+docs/demos/kit/parts/Check.css
+  s_222f345225f7a0::t_95b8817a009230 1-94
+docs/demos/kit/parts/Check.tsx
+  s_222f345225f7a0::t_fbfefbd5056727 1-21
+docs/demos/kit/parts/Chip.css
+  s_222f345225f7a0::t_e02a483aa4c986 1-66
+docs/demos/kit/parts/Chip.tsx
+  s_222f345225f7a0::t_b0bfa5abc2eb67 1-29
+docs/demos/kit/parts/Divider.css
+  s_222f345225f7a0::t_334528b03f0d07 1-17
+docs/demos/kit/parts/Divider.tsx
+  s_222f345225f7a0::t_24e4051556e265 1-20
+docs/demos/kit/parts/Facepile.css
+  s_222f345225f7a0::t_75abad2510c6d8 1-17
+docs/demos/kit/parts/Facepile.tsx
+  s_222f345225f7a0::t_a8456d7c2de41b 1-26
+docs/demos/kit/parts/Icon.css
+  s_222f345225f7a0::t_7493f081e204a2 1-8
+docs/demos/kit/parts/Icon.tsx
+  s_222f345225f7a0::t_708badd3a7408a 1-65
+docs/demos/kit/parts/Kbd.css
+  s_222f345225f7a0::t_4dca45781d7cac 1-32
+docs/demos/kit/parts/Kbd.tsx
+  s_222f345225f7a0::t_68ae96f390afa9 1-15
+docs/demos/kit/parts/Menu.css
+  s_222f345225f7a0::t_bee93c9265f339 1-34
+docs/demos/kit/parts/Menu.tsx
+  s_222f345225f7a0::t_e95027da60b7e0 1-15
+docs/demos/kit/parts/Meter.css
+  s_222f345225f7a0::t_d07c5bd7e1a3b2 1-46
+docs/demos/kit/parts/Meter.tsx
+  s_222f345225f7a0::t_0135a1b1950597 1-16
+docs/demos/kit/parts/Pin.css
+  s_222f345225f7a0::t_334aafec79de7b 1-58
+docs/demos/kit/parts/Pin.tsx
+  s_222f345225f7a0::t_071b01546f91ef 1-39
+docs/demos/kit/parts/Row.css
+  s_222f345225f7a0::t_99db632d66b3bf 1-211
+docs/demos/kit/parts/Row.tsx
+  s_222f345225f7a0::t_1043b9d08b5a5b 1-67
+docs/demos/kit/parts/Spinner.css
+  s_222f345225f7a0::t_7985cacda3853e 1-12
+docs/demos/kit/parts/Spinner.tsx
+  s_222f345225f7a0::t_e005d85df2117f 1-12
+docs/demos/kit/parts/Toast.css
+  s_222f345225f7a0::t_17f40a44859c7c 1-35
+docs/demos/kit/parts/Toast.tsx
+  s_222f345225f7a0::t_183e4b50562369 1-22
+docs/demos/kit/parts/Tooltip.css
+  s_222f345225f7a0::t_40c063d2dc54a1 1-42
+docs/demos/kit/parts/Tooltip.tsx
+  s_222f345225f7a0::t_9e9f1e98414c7f 1-20
+docs/demos/kit/parts/index.ts
+  s_222f345225f7a0::t_8231875a927e75 1-23
+docs/demos/kit/phone.css
+  s_222f345225f7a0::t_d3b162210c5c99 1-539
+docs/demos/kit/phone.tsx
+  s_222f345225f7a0::t_1e455df6dda020 1-362
+docs/demos/kit/reduced-motion.ts
+  s_222f345225f7a0::t_e9c23c7495c675 1-18
+docs/demos/kit/stage.css
+  s_222f345225f7a0::t_e905e409493702 1-448
+docs/demos/kit/stage.tsx
+  s_222f345225f7a0::t_2cd7ff7955f9c5 1-612
+docs/demos/kit/util.ts
+  s_222f345225f7a0::t_134e2f0db6cd0c 1-25
+docs/demos/kit/window.css
+  s_222f345225f7a0::t_a067bc948b4294 1-612
+docs/demos/kit/window.tsx
+  s_222f345225f7a0::t_f81de4688006fe 1-276
+docs/demos/package.json
+  s_222f345225f7a0::t_9e63b7df2dcf54 1-34
+docs/demos/pages.json
+  s_222f345225f7a0::t_b98332bee3ea81 1-36
+docs/demos/scripts/lib/capture.mjs
+  s_222f345225f7a0::t_1123aaa18a5f73 1-56
+docs/demos/scripts/new-demo.mjs
+  s_222f345225f7a0::t_a790414f8f175b 1-70
+docs/demos/scripts/poster.mjs
+  s_222f345225f7a0::t_35df6bf6eda3b7 1-51
+docs/demos/scripts/posters.mjs
+  s_222f345225f7a0::t_0d2252a638b574 1-96
+docs/demos/scripts/templates/blank/demo.css
+  s_222f345225f7a0::t_d67f48b0355b2e 1-13
+docs/demos/scripts/templates/blank/demo.tsx
+  s_222f345225f7a0::t_9b9ba844f6081c 1-34
+docs/demos/scripts/templates/node/demo.css
+  s_222f345225f7a0::t_485ebebb46deb0 1-50
+docs/demos/scripts/templates/node/demo.tsx
+  s_222f345225f7a0::t_dcb26a7a53a301 1-104
+docs/demos/scripts/templates/tool/demo.css
+  s_222f345225f7a0::t_0e95eaf7d9cc15 1-50
+docs/demos/scripts/templates/tool/demo.tsx
+  s_222f345225f7a0::t_e05e29aa1b7fcb 1-102
+docs/demos/src/boot.ts
+  s_222f345225f7a0::t_29c28d57c0bfd9 1-13
+docs/demos/src/demos/arrow-tool/BRIEF.md
+  s_222f345225f7a0::t_4108c41f7c3bd5 1-42
+docs/demos/src/demos/arrow-tool/REHEARSAL.md
+  s_222f345225f7a0::t_99e9585dba0200 1-13
+docs/demos/src/demos/arrow-tool/arrow-tool.tsx
+  s_222f345225f7a0::t_67af5a9ff4bb3e 1-13
+docs/demos/src/demos/arrow/BRIEF.md
+  s_222f345225f7a0::t_51175e2c069934 1-41
+docs/demos/src/demos/arrow/REHEARSAL.md
+  s_222f345225f7a0::t_6b2ff6238ae437 1-13
+docs/demos/src/demos/arrow/arrow.tsx
+  s_222f345225f7a0::t_1b239ee10a06f0 1-11
+docs/demos/src/demos/comment-tool/BRIEF.md
+  s_222f345225f7a0::t_b9761feda24560 1-42
+docs/demos/src/demos/comment-tool/REHEARSAL.md
+  s_222f345225f7a0::t_9978b8233e4e45 1-14
+docs/demos/src/demos/comment-tool/comment-tool.tsx
+  s_222f345225f7a0::t_cda23d88f6e4e3 1-10
+docs/demos/src/demos/comment/BRIEF.md
+  s_222f345225f7a0::t_01ed0157075943 1-41
+docs/demos/src/demos/comment/REHEARSAL.md
+  s_222f345225f7a0::t_f80128b663bdf1 1-15
+docs/demos/src/demos/comment/comment.tsx
+  s_222f345225f7a0::t_4cbfc0dc396e44 1-10
+docs/demos/src/demos/connector-tool/BRIEF.md
+  s_222f345225f7a0::t_1fa9999447bae1 1-43
+docs/demos/src/demos/connector-tool/REHEARSAL.md
+  s_222f345225f7a0::t_a1eb1b3ad3d044 1-13
+docs/demos/src/demos/connector-tool/connector-tool.tsx
+  s_222f345225f7a0::t_11695297c291a8 1-12
+docs/demos/src/demos/connector/BRIEF.md
+  s_222f345225f7a0::t_4fcf194b1dde69 1-40
+docs/demos/src/demos/connector/REHEARSAL.md
+  s_222f345225f7a0::t_13cf2f89acc283 1-13
+docs/demos/src/demos/connector/connector.tsx
+  s_222f345225f7a0::t_8350e41f645bd2 1-10
+docs/demos/src/demos/ellipse-tool/BRIEF.md
+  s_222f345225f7a0::t_c87db49ddb9ae6 1-42
+docs/demos/src/demos/ellipse-tool/REHEARSAL.md
+  s_222f345225f7a0::t_09d9a114100231 1-13
+docs/demos/src/demos/ellipse-tool/ellipse-tool.tsx
+  s_222f345225f7a0::t_9748a1bf08f3f6 1-13
+docs/demos/src/demos/ellipse/BRIEF.md
+  s_222f345225f7a0::t_781f8b53430124 1-41
+docs/demos/src/demos/ellipse/REHEARSAL.md
+  s_222f345225f7a0::t_4bf191e9633e53 1-14
+docs/demos/src/demos/ellipse/ellipse.tsx
+  s_222f345225f7a0::t_6e2488d97a253e 1-11
+docs/demos/src/demos/frame-tool/BRIEF.md
+  s_222f345225f7a0::t_6c6af399241666 1-42
+docs/demos/src/demos/frame-tool/REHEARSAL.md
+  s_222f345225f7a0::t_5687656f7d5aca 1-13
+docs/demos/src/demos/frame-tool/frame-tool.tsx
+  s_222f345225f7a0::t_1b59764a66bc14 1-13
+docs/demos/src/demos/frame/BRIEF.md
+  s_222f345225f7a0::t_fd0c3bcce8d2f0 1-41
+docs/demos/src/demos/frame/REHEARSAL.md
+  s_222f345225f7a0::t_41bef7d5f8889c 1-13
+docs/demos/src/demos/frame/frame.tsx
+  s_222f345225f7a0::t_5a229031492b1b 1-10
+docs/demos/src/demos/group/BRIEF.md
+  s_222f345225f7a0::t_db02c2d9baf29d 1-41
+docs/demos/src/demos/group/REHEARSAL.md
+  s_222f345225f7a0::t_2ff291c9f823d2 1-13
+docs/demos/src/demos/group/group.tsx
+  s_222f345225f7a0::t_805ecd4eb936c6 1-10
+docs/demos/src/demos/home-hero/BRIEF.md
+  s_222f345225f7a0::t_3076890d5269bc 1-41
+docs/demos/src/demos/home-hero/REHEARSAL.md
+  s_222f345225f7a0::t_e6c4d1b32e4999 1-19
+docs/demos/src/demos/home-hero/home-hero.css
+  s_222f345225f7a0::t_81785dc2676c01 1-96
+docs/demos/src/demos/home-hero/home-hero.tsx
+  s_222f345225f7a0::t_6a0aeef71682fb 1-146
+docs/demos/src/demos/image-tool/BRIEF.md
+  s_222f345225f7a0::t_72b1c0f0b6daf3 1-42
+docs/demos/src/demos/image-tool/REHEARSAL.md
+  s_222f345225f7a0::t_2b8997b9579260 1-13
+docs/demos/src/demos/image-tool/image-tool.tsx
+  s_222f345225f7a0::t_25cfc5e094b3e7 1-22
+docs/demos/src/demos/image/BRIEF.md
+  s_222f345225f7a0::t_b436c7feff3dd8 1-42
+docs/demos/src/demos/image/REHEARSAL.md
+  s_222f345225f7a0::t_426381a7c86659 1-13
+docs/demos/src/demos/image/image.tsx
+  s_222f345225f7a0::t_bb54d44e8852aa 1-10
+docs/demos/src/demos/images-tool/BRIEF.md
+  s_222f345225f7a0::t_a9eedbc5205fa7 1-42
+docs/demos/src/demos/images-tool/REHEARSAL.md
+  s_222f345225f7a0::t_1915215b783f01 1-14
+docs/demos/src/demos/images-tool/images-tool.tsx
+  s_222f345225f7a0::t_8fd98ba594b5cc 1-22
+docs/demos/src/demos/line-tool/BRIEF.md
+  s_222f345225f7a0::t_112c8a0ad24950 1-42
+docs/demos/src/demos/line-tool/REHEARSAL.md
+  s_222f345225f7a0::t_758d4269965872 1-13
+docs/demos/src/demos/line-tool/line-tool.tsx
+  s_222f345225f7a0::t_45fe1bd458ddc9 1-13
+docs/demos/src/demos/line/BRIEF.md
+  s_222f345225f7a0::t_2a2cff95378601 1-41
+docs/demos/src/demos/line/REHEARSAL.md
+  s_222f345225f7a0::t_60d1d5139d19be 1-13
+docs/demos/src/demos/line/line.tsx
+  s_222f345225f7a0::t_5fff0cf54d2cc8 1-11
+docs/demos/src/demos/measure-tool/BRIEF.md
+  s_222f345225f7a0::t_82106719e275df 1-42
+docs/demos/src/demos/measure-tool/REHEARSAL.md
+  s_222f345225f7a0::t_b783c0a374d812 1-14
+docs/demos/src/demos/measure-tool/measure-tool.tsx
+  s_222f345225f7a0::t_0e768e98d5f1f6 1-13
+docs/demos/src/demos/measure/BRIEF.md
+  s_222f345225f7a0::t_7c47e00520cf08 1-41
+docs/demos/src/demos/measure/REHEARSAL.md
+  s_222f345225f7a0::t_247644d5fc5ec0 1-13
+docs/demos/src/demos/measure/measure.tsx
+  s_222f345225f7a0::t_2fe08c35f0f395 1-11
+docs/demos/src/demos/nodes-specimen/nodes-specimen.tsx
+  s_222f345225f7a0::t_efe6b11f22a276 1-40
+docs/demos/src/demos/overlays-specimen/overlays-specimen.tsx
+  s_222f345225f7a0::t_7ed659c65f2ab7 1-41
+docs/demos/src/demos/polygon-tool/BRIEF.md
+  s_222f345225f7a0::t_c3e8033dac9945 1-42
+docs/demos/src/demos/polygon-tool/REHEARSAL.md
+  s_222f345225f7a0::t_3f0a34266ca2a7 1-13
+docs/demos/src/demos/polygon-tool/polygon-tool.tsx
+  s_222f345225f7a0::t_924ecb7ac180e1 1-13
+docs/demos/src/demos/polygon/BRIEF.md
+  s_222f345225f7a0::t_bfde00a25f1822 1-41
+docs/demos/src/demos/polygon/REHEARSAL.md
+  s_222f345225f7a0::t_b02ad594b430ef 1-14
+docs/demos/src/demos/polygon/polygon.tsx
+  s_222f345225f7a0::t_aed72fc04a02f9 1-11
+docs/demos/src/demos/rectangle-node/BRIEF.md
+  s_222f345225f7a0::t_69c65fe915fa60 1-40
+docs/demos/src/demos/rectangle-node/REHEARSAL.md
+  s_222f345225f7a0::t_1294692db60873 1-15
+docs/demos/src/demos/rectangle-node/rectangle-node.css
+  s_222f345225f7a0::t_02a7d30887affa 1-50
+docs/demos/src/demos/rectangle-node/rectangle-node.tsx
+  s_222f345225f7a0::t_f441ebb8b245b5 1-104
+docs/demos/src/demos/rectangle-tool/BRIEF.md
+  s_222f345225f7a0::t_1ee43962156cdd 1-41
+docs/demos/src/demos/rectangle-tool/REHEARSAL.md
+  s_222f345225f7a0::t_4127acb2b931a5 1-18
+docs/demos/src/demos/rectangle-tool/rectangle-tool.css
+  s_222f345225f7a0::t_09f8583ce1bda2 1-50
+docs/demos/src/demos/rectangle-tool/rectangle-tool.tsx
+  s_222f345225f7a0::t_90e0923bed0e96 1-102
+docs/demos/src/demos/regular-polygon-tool/BRIEF.md
+  s_222f345225f7a0::t_0877017b0469c2 1-42
+docs/demos/src/demos/regular-polygon-tool/REHEARSAL.md
+  s_222f345225f7a0::t_3b6f76f2f672b2 1-13
+docs/demos/src/demos/regular-polygon-tool/regular-polygon-tool.tsx
+  s_222f345225f7a0::t_010ce813b9d73e 1-13
+docs/demos/src/demos/regular-polygon/BRIEF.md
+  s_222f345225f7a0::t_5a477a1b7b9d23 1-41
+docs/demos/src/demos/regular-polygon/REHEARSAL.md
+  s_222f345225f7a0::t_897aff8c6d3590 1-14
+docs/demos/src/demos/regular-polygon/regular-polygon.tsx
+  s_222f345225f7a0::t_c27d87031cf6c6 1-11
+docs/demos/src/demos/specimen/REHEARSAL.md
+  s_222f345225f7a0::t_ff919cb4d67698 1-15
+docs/demos/src/demos/specimen/specimen.tsx
+  s_222f345225f7a0::t_461050d7bd915f 1-28
+docs/demos/src/demos/star-tool/BRIEF.md
+  s_222f345225f7a0::t_d17455f5bab828 1-42
+docs/demos/src/demos/star-tool/REHEARSAL.md
+  s_222f345225f7a0::t_2483ffc4340c3c 1-13
+docs/demos/src/demos/star-tool/star-tool.tsx
+  s_222f345225f7a0::t_abc06556d37f7a 1-13
+docs/demos/src/demos/star/BRIEF.md
+  s_222f345225f7a0::t_252a3fdcaa85e6 1-41
+docs/demos/src/demos/star/REHEARSAL.md
+  s_222f345225f7a0::t_7591dc96b40691 1-14
+docs/demos/src/demos/star/star.tsx
+  s_222f345225f7a0::t_47e5cebc144170 1-11
+docs/demos/src/demos/sticky-note-tool/BRIEF.md
+  s_222f345225f7a0::t_ad672c30aa5cb9 1-42
+docs/demos/src/demos/sticky-note-tool/REHEARSAL.md
+  s_222f345225f7a0::t_1cc04339816fb6 1-13
+docs/demos/src/demos/sticky-note-tool/sticky-note-tool.tsx
+  s_222f345225f7a0::t_082daaa82bc4fa 1-13
+docs/demos/src/demos/sticky-note/BRIEF.md
+  s_222f345225f7a0::t_93c21016683c34 1-41
+docs/demos/src/demos/sticky-note/REHEARSAL.md
+  s_222f345225f7a0::t_9450a68ee3aab8 1-13
+docs/demos/src/demos/sticky-note/sticky-note.tsx
+  s_222f345225f7a0::t_24df22b01da277 1-11
+docs/demos/src/demos/text-tool/BRIEF.md
+  s_222f345225f7a0::t_1e71dd90a6379d 1-43
+docs/demos/src/demos/text-tool/REHEARSAL.md
+  s_222f345225f7a0::t_9d11cb6e734336 1-14
+docs/demos/src/demos/text-tool/text-tool.tsx
+  s_222f345225f7a0::t_be17805685aea5 1-10
+docs/demos/src/demos/text-v2/BRIEF.md
+  s_222f345225f7a0::t_f63debd2c09fa2 1-42
+docs/demos/src/demos/text-v2/REHEARSAL.md
+  s_222f345225f7a0::t_e7105cce8e63ae 1-16
+docs/demos/src/demos/text-v2/text-v2.tsx
+  s_222f345225f7a0::t_a1d414031f0768 1-10
+docs/demos/src/demos/text/BRIEF.md
+  s_222f345225f7a0::t_a286939ffaadd4 1-41
+docs/demos/src/demos/text/REHEARSAL.md
+  s_222f345225f7a0::t_f215b219d7987c 1-13
+docs/demos/src/demos/text/text.tsx
+  s_222f345225f7a0::t_dd12e76f7009d6 1-10
+docs/demos/src/demos/video-tool/BRIEF.md
+  s_222f345225f7a0::t_0290d03d9ee52a 1-42
+docs/demos/src/demos/video-tool/REHEARSAL.md
+  s_222f345225f7a0::t_d7b1024864661c 1-13
+docs/demos/src/demos/video-tool/video-tool.tsx
+  s_222f345225f7a0::t_70f607afc86ebd 1-22
+docs/demos/src/demos/video/BRIEF.md
+  s_222f345225f7a0::t_f7b52447abace1 1-41
+docs/demos/src/demos/video/REHEARSAL.md
+  s_222f345225f7a0::t_08f38cb5a84958 1-13
+docs/demos/src/demos/video/video.tsx
+  s_222f345225f7a0::t_114829e3d8b30e 1-10
+docs/demos/src/loader-core.test.tsx
+  s_222f345225f7a0::t_b2818399002ce8 1-199
+docs/demos/src/loader-core.ts
+  s_222f345225f7a0::t_5f0bd1939579a8 1-128
+docs/demos/src/loader.css
+  s_222f345225f7a0::t_39c76ca7a2d35d 1-24
+docs/demos/src/loader.ts
+  s_222f345225f7a0::t_8705ed61de62bf 1-12
+docs/demos/src/looks/fonts.ts
+  s_222f345225f7a0::t_5f4a68a3fa5290 1-25
+docs/demos/src/looks/weave.ts
+  s_222f345225f7a0::t_3b2472e47658c6 1-59
+docs/demos/src/registry.ts
+  s_222f345225f7a0::t_58370fbb546f11 1-46
+docs/demos/src/types.ts
+  s_222f345225f7a0::t_f50324b8fa9561 1-13
+docs/demos/src/weave-ui/canvas.tsx
+  s_222f345225f7a0::t_583a858aefc0fe 1-15
+docs/demos/src/weave-ui/fill.css
+  s_222f345225f7a0::t_d2ef062e4ab551 1-14
+docs/demos/src/weave-ui/flow/flow.css
+  s_222f345225f7a0::t_08c4804551f373 1-80
+docs/demos/src/weave-ui/flow/flow.tsx
+  s_222f345225f7a0::t_4551f1dab71682 1-41
+docs/demos/src/weave-ui/nodes/nodes.css
+  s_222f345225f7a0::t_452c97c6c92065 1-88
+docs/demos/src/weave-ui/nodes/nodes.tsx
+  s_222f345225f7a0::t_d7372bd495ac64 1-245
+docs/demos/src/weave-ui/overlays/overlays.css
+  s_222f345225f7a0::t_c21e3d1aad601a 1-223
+docs/demos/src/weave-ui/overlays/overlays.tsx
+  s_222f345225f7a0::t_e26786cb77cd3b 1-132
+docs/demos/src/weave-ui/peer.css
+  s_222f345225f7a0::t_16b3d4e07a3cd5 1-53
+docs/demos/src/weave-ui/peer.tsx
+  s_222f345225f7a0::t_62c6f5a2210967 1-32
+docs/demos/src/weave-ui/room.css
+  s_222f345225f7a0::t_06bc65d8e9b293 1-74
+docs/demos/src/weave-ui/room.tsx
+  s_222f345225f7a0::t_2572df05dda33a 1-39
+docs/demos/src/weave-ui/scenes/comment-scene.css
+  s_222f345225f7a0::t_40325a9e9dd929 1-105
+docs/demos/src/weave-ui/scenes/comment-scene.tsx
+  s_222f345225f7a0::t_8e3bd076b09ca4 1-174
+docs/demos/src/weave-ui/scenes/connector-scene.tsx
+  s_222f345225f7a0::t_8d0da4b31b7705 1-161
+docs/demos/src/weave-ui/scenes/frame-scene.css
+  s_222f345225f7a0::t_99a2066650c4ae 1-27
+docs/demos/src/weave-ui/scenes/frame-scene.tsx
+  s_222f345225f7a0::t_ecc373c837f5da 1-159
+docs/demos/src/weave-ui/scenes/line-scene.tsx
+  s_222f345225f7a0::t_86a5b284522bac 1-163
+docs/demos/src/weave-ui/scenes/media-scene.css
+  s_222f345225f7a0::t_a064b6ee832b93 1-52
+docs/demos/src/weave-ui/scenes/media-scene.tsx
+  s_4debfd5921c031::t_cfc55ea141c308 1-248
+docs/demos/src/weave-ui/scenes/node-scene.tsx
+  s_222f345225f7a0::t_b454229db2f15c 1-97
+docs/demos/src/weave-ui/scenes/scenes.css
+  s_222f345225f7a0::t_2b593f216d5c88 1-26
+docs/demos/src/weave-ui/scenes/text-scene.css
+  s_222f345225f7a0::t_7b55c132a30817 1-128
+docs/demos/src/weave-ui/scenes/text-scene.tsx
+  s_222f345225f7a0::t_41d7c64f0e6579 1-257
+docs/demos/src/weave-ui/scenes/tool-scene.tsx
+  s_222f345225f7a0::t_dfcbb578bef0d4 1-97
+docs/demos/src/weave-ui/selection.css
+  s_222f345225f7a0::t_cf29777eaf23f9 1-34
+docs/demos/src/weave-ui/selection.tsx
+  s_222f345225f7a0::t_bc829037ca3544 1-27
+docs/demos/src/weave-ui/toolbar.css
+  s_222f345225f7a0::t_7d8eccd74cffe3 1-114
+docs/demos/src/weave-ui/toolbar.tsx
+  s_222f345225f7a0::t_2a2127881d6d6b 1-120
+docs/demos/tsconfig.json
+  s_222f345225f7a0::t_de3c3be1d15c63 1-14
+docs/demos/vite.config.ts
+  s_222f345225f7a0::t_e8ac8a9a24a3b0 1-49
+docs/package.json
+  s_222f345225f7a0::t_a7a03594ce17b0 12-14,18
+docs/src/modules/ROOT/pages/index.adoc
+  s_222f345225f7a0::t_c58f8314f89e7f 8-10
+docs/src/modules/main/pages/build/actions/arrow-tool.adoc
+  s_222f345225f7a0::t_67f6a2e280f6da 4
+docs/src/modules/main/pages/build/actions/comment-tool.adoc
+  s_222f345225f7a0::t_4172391c9dfd05 4
+docs/src/modules/main/pages/build/actions/connector-tool.adoc
+  s_222f345225f7a0::t_941d232413150f 4
+docs/src/modules/main/pages/build/actions/ellipse-tool.adoc
+  s_222f345225f7a0::t_a538fdcb4ca560 4
+docs/src/modules/main/pages/build/actions/frame-tool.adoc
+  s_222f345225f7a0::t_42876f455a3d05 4
+docs/src/modules/main/pages/build/actions/image-tool.adoc
+  s_222f345225f7a0::t_2bf20829f16288 4
+docs/src/modules/main/pages/build/actions/images-tool.adoc
+  s_222f345225f7a0::t_6c6d56fe045783 4
+docs/src/modules/main/pages/build/actions/line-tool.adoc
+  s_222f345225f7a0::t_e1195b790a3373 4
+docs/src/modules/main/pages/build/actions/measure-tool.adoc
+  s_222f345225f7a0::t_0442ae8ad550c5 4
+docs/src/modules/main/pages/build/actions/polygon-tool.adoc
+  s_222f345225f7a0::t_1adcb7677c29fc 4-5
+docs/src/modules/main/pages/build/actions/rectangle-tool.adoc
+  s_222f345225f7a0::t_0f3d6b0a0ee387 4
+docs/src/modules/main/pages/build/actions/regular-polygon-tool.adoc
+  s_222f345225f7a0::t_38f1d6dbb8c1e1 10
+docs/src/modules/main/pages/build/actions/star-tool.adoc
+  s_222f345225f7a0::t_72be5b3152dac5 4
+docs/src/modules/main/pages/build/actions/sticky-note-tool.adoc
+  s_222f345225f7a0::t_506fd0b9043d84 4-5
+docs/src/modules/main/pages/build/actions/text-tool.adoc
+  s_222f345225f7a0::t_7059711d46b54d 4
+docs/src/modules/main/pages/build/actions/video-tool.adoc
+  s_222f345225f7a0::t_36aba62c778558 4
+docs/src/modules/main/pages/build/nodes/arrow.adoc
+  s_222f345225f7a0::t_298a53dc892dfa 4
+docs/src/modules/main/pages/build/nodes/comment.adoc
+  s_222f345225f7a0::t_2501237008597d 4
+docs/src/modules/main/pages/build/nodes/connector.adoc
+  s_222f345225f7a0::t_6d9c85014d451e 4
+docs/src/modules/main/pages/build/nodes/ellipse.adoc
+  s_222f345225f7a0::t_83dede0ec29b0e 4
+docs/src/modules/main/pages/build/nodes/frame.adoc
+  s_222f345225f7a0::t_f525a192c7aac4 4
+docs/src/modules/main/pages/build/nodes/group.adoc
+  s_222f345225f7a0::t_f8d077a05a6e59 4
+docs/src/modules/main/pages/build/nodes/image.adoc
+  s_222f345225f7a0::t_7e5adb13de2a97 4
+docs/src/modules/main/pages/build/nodes/line.adoc
+  s_222f345225f7a0::t_543f1b83ccfaaf 4
+docs/src/modules/main/pages/build/nodes/measure.adoc
+  s_222f345225f7a0::t_e5e35bcbcd6c58 4
+docs/src/modules/main/pages/build/nodes/polygon.adoc
+  s_222f345225f7a0::t_c2e44d2af0b254 4-5
+docs/src/modules/main/pages/build/nodes/rectangle.adoc
+  s_222f345225f7a0::t_e747ec9400508e 4
+docs/src/modules/main/pages/build/nodes/regular-polygon.adoc
+  s_222f345225f7a0::t_eca7b8086750ba 10
+docs/src/modules/main/pages/build/nodes/star.adoc
+  s_222f345225f7a0::t_bd1f3552751ef0 4
+docs/src/modules/main/pages/build/nodes/sticky-note.adoc
+  s_222f345225f7a0::t_8f4cd691b6e7ca 4-5
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_222f345225f7a0::t_08bedcb2f1df03 4-5
+docs/src/modules/main/pages/build/nodes/text.adoc
+  s_222f345225f7a0::t_3fa24d707a0664 4
+docs/src/modules/main/pages/build/nodes/video.adoc
+  s_222f345225f7a0::t_910576c895f92c 4
+docs/supplemental-ui/fonts/LICENSE-Inter.txt
+  s_222f345225f7a0::t_85d6bae95a7585 1-92
+docs/supplemental-ui/fonts/LICENSE-NotoSansMono.txt
+  s_222f345225f7a0::t_181358c2c82d1f 1-93
+docs/supplemental-ui/fonts/README.md
+  s_222f345225f7a0::t_553c1a092b5506 1-9
+docs/supplemental-ui/partials/footer-scripts.hbs
+  s_222f345225f7a0::t_84163d03d615e2 1-16
+docs/supplemental-ui/partials/home-hero.hbs
+  s_222f345225f7a0::t_ce671bbe6212cb 1-164
+openspec/changes/docs-faux-ui-demos-rollout/.openspec.yaml
+  s_222f345225f7a0::t_3eea0f28b45e64 1-2
+openspec/changes/docs-faux-ui-demos-rollout/design.md
+  s_222f345225f7a0::t_096b0946eda77d 1-50
+openspec/changes/docs-faux-ui-demos-rollout/proposal.md
+  s_222f345225f7a0::t_5c1b6159a140af 1-33
+openspec/changes/docs-faux-ui-demos-rollout/specs/docs-demos/coverage/spec.md
+  s_222f345225f7a0::t_50d626e72b17d4 1-65
+openspec/changes/docs-faux-ui-demos-rollout/tasks.md
+  s_222f345225f7a0::t_e78425b12113a8 1-114
+openspec/changes/docs-faux-ui-demos/.openspec.yaml
+  s_222f345225f7a0::t_62df388105b94d 1-2
+openspec/changes/docs-faux-ui-demos/design.md
+  s_222f345225f7a0::t_a6a02e0268d8f9 1-65
+openspec/changes/docs-faux-ui-demos/proposal.md
+  s_222f345225f7a0::t_b92853c2804e5d 1-36
+openspec/changes/docs-faux-ui-demos/specs/docs-demos/live-demos/spec.md
+  s_222f345225f7a0::t_d5c3f07530baa9 1-102
+openspec/changes/docs-faux-ui-demos/tasks.md
+  s_222f345225f7a0::t_63391a4bf7ee40 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "89cec6eaf617277b0b15429855d1df9360c553aa",
+  "prompts": {},
+  "sessions": {
+    "s_222f345225f7a0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0753ddc2ffesWccUTS2hhG3si",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_4debfd5921c031": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0b8fcf75ffebGOj80waLrHc4M",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
