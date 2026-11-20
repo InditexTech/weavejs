@@ -1,0 +1,53 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.wv-peer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.95s cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.wv-peer[data-slow] {
+  transition-duration: 1.1s;
+}
+
+/* Both cursors stay mounted and cross-fade, each anchored so its hot spot is the peer's origin;
+   swapping one element for the other would shift the tip. */
+.wv-peer svg {
+  position: absolute;
+  display: block;
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.2));
+  transition: opacity 0.12s ease;
+}
+
+.wv-peer .wv-peer__arrow {
+  top: -1.5px;
+  left: -1.5px;
+}
+
+.wv-peer .wv-peer__cross {
+  top: -9px;
+  left: -9px;
+}
+
+.wv-peer svg[data-hidden] {
+  opacity: 0;
+}
+
+.wv-peer__flag {
+  position: absolute;
+  top: 16px;
+  left: 11px;
+  padding: 3px 7px;
+  border-radius: 0;
+  background: var(--who);
+  color: #fff;
+  font: 600 11px/1.2 var(--ss-font);
+  white-space: nowrap;
+}

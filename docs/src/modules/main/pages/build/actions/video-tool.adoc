@@ -1,8 +1,7 @@
 = Video Tool
 :description: Add a video to the canvas
 
-image::actions/video-tool.gif[Video Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/video-tool-poster-light.png[The Video tool is picked in the toolbar then a preview follows the pointer and a click places the video on the canvas,width=960,height=540,role="weave-demo weave-demo--video-tool"]
 == Introduction
 
 This action allows users to add videos to the canvas by selecting a video file, we support the

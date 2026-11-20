@@ -1,0 +1,105 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.wv-thread {
+  position: absolute;
+  z-index: 16;
+  width: 280px;
+  padding: 14px 16px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  color: var(--ss-text-strong);
+  font: 400 14px/1.4 var(--ss-font);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  will-change: transform, opacity;
+}
+
+.wv-thread[data-show] {
+  opacity: 1;
+  transform: none;
+}
+
+.wv-thread__msg {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  transition: opacity 0.2s ease;
+}
+
+.wv-thread__msg[data-hidden] {
+  opacity: 0;
+}
+
+.wv-thread__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--who);
+  color: #fff;
+  font: 600 11px/1 var(--ss-font);
+}
+
+.wv-thread__name {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--ss-text-faint);
+  font-size: 12px;
+}
+
+.wv-thread__field {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-strong);
+}
+
+.wv-thread__line {
+  position: relative;
+  display: inline-block;
+  min-width: 1em;
+}
+
+/* The placeholder sits over the line and fades out, so typing never moves the layout */
+.wv-thread__placeholder {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  color: var(--ss-text-faint);
+  transition: opacity 0.15s ease;
+}
+
+.wv-thread__placeholder[data-hide] {
+  opacity: 0;
+}
+
+/* The caret is a pseudo-element, so it has no element of its own to hop as the text grows */
+.wv-thread__typed::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin: 0 -2px 0 1px;
+  vertical-align: -0.18em;
+  background: var(--ss-text-strong);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wv-thread[data-editing] .wv-thread__typed::after {
+  opacity: 1;
+}
+
+.wv-thread__rest {
+  visibility: hidden;
+}

@@ -1,0 +1,27 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.ss-stage {
+  --wv-grid: #f1f1f3;
+  --wv-grid-major: #e4e4e7;
+}
+
+.ss-stage[data-theme='dark'] {
+  --wv-grid: #18181b;
+  --wv-grid-major: #27272a;
+}
+
+.wv-canvas {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--ss-canvas);
+  background-image:
+    linear-gradient(var(--wv-grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--wv-grid-major) 1px, transparent 1px),
+    linear-gradient(var(--wv-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--wv-grid) 1px, transparent 1px);
+  background-size: 160px 160px, 160px 160px, 20px 20px, 20px 20px;
+  background-position: -1px -1px;
+}

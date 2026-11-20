@@ -1,0 +1,35 @@
+/* Card */
+
+@layer stageshow {
+  .ss-card {
+    --ss-card-pad: 16px;
+    --ss-card-radius: calc(var(--ss-radius-md) + 4px);
+    --ss-card-inner: max(4px, calc(var(--ss-card-radius) - var(--ss-card-pad)));
+
+    display: grid;
+    align-content: start;
+    gap: var(--ss-card-gap, 12px);
+    box-sizing: border-box;
+    min-width: 0;
+    padding: var(--ss-card-pad);
+    border-radius: var(--ss-card-radius);
+    background: var(--ss-surface);
+    /* The ring is drawn inside, so it never adds to the padding */
+    box-shadow: inset 0 0 0 1px var(--ss-line), var(--ss-shadow-card);
+  }
+
+  .ss-card[data-pad="small"] { --ss-card-pad: 12px; --ss-card-radius: var(--ss-radius-lg); }
+  .ss-card[data-pad="large"] { --ss-card-pad: 20px; --ss-card-radius: calc(var(--ss-radius-lg) + 6px); }
+
+  .ss-card[data-tone="sunken"] { background: var(--ss-ink-1); box-shadow: none; }
+  .ss-card[data-lift] { box-shadow: inset 0 0 0 1px var(--ss-line), var(--ss-shadow-satellite); }
+
+  /* Sectioned: the children carry the padding and the rules run edge to edge */
+  .ss-card[data-flush] { padding: 0; gap: 0; }
+  .ss-card[data-flush] > * { padding: var(--ss-card-pad); }
+  .ss-card[data-flush] > * + * { border-top: 1px solid var(--ss-line); }
+
+  /* Spacing comes from the gap; a child's own margin would pad one side twice */
+  .ss-card > :first-child { margin-top: 0; }
+  .ss-card > :last-child { margin-bottom: 0; }
+}

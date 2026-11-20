@@ -1,0 +1,87 @@
+/* Roll */
+
+@layer stageshow {
+  .ss-roll {
+    white-space: pre;
+  }
+
+  /* Only the changed part rolls; it clips its own motion and eases to the new width */
+  .ss-roll__mid {
+    display: inline-grid;
+    /* The roll fades out past the line under a feathered mask, never a hard
+       clip; the padding gives the feather room and the margin takes it back,
+       so the line box is unchanged. The width never cuts text, because the
+       box holds the wider of the two lines while they swap */
+    padding-block: 0.45em;
+    margin-block: -0.45em;
+    -webkit-mask-image: linear-gradient(transparent, #000 0.5em, #000 calc(100% - 0.5em), transparent);
+    mask-image: linear-gradient(transparent, #000 0.5em, #000 calc(100% - 0.5em), transparent);
+    vertical-align: bottom;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ss-roll__item {
+    grid-area: 1 / 1;
+    justify-self: start;
+    width: max-content;
+  }
+
+  /* Pinned at its right edge: the words change against that edge, so a narrower
+     word doesn't ride the box's left edge as it closes */
+  .ss-roll[data-align='end'] .ss-roll__mid {
+    /* The column is the box itself, not the widest word, so the right edge
+       holds while the box eases and the wider word spills left, unclipped */
+    grid-template-columns: 100%;
+  }
+
+  .ss-roll[data-align='end'] .ss-roll__item {
+    justify-self: unsafe end;
+  }
+
+  .ss-roll__char {
+    display: inline-block;
+    white-space: pre;
+    animation: ss-roll-in 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  .ss-roll__item[data-out] {
+    /* Old and new travel together on one curve, like a drum: the line is
+       never empty, and no blur, which reads as flicker on small text */
+    animation: ss-roll-out 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  /* A full line of travel each way, so the old and new text never overlap */
+  @keyframes ss-roll-in {
+    from { opacity: 0; transform: translateY(100%); }
+  }
+
+  @keyframes ss-roll-out {
+    to { opacity: 0; transform: translateY(-100%); }
+  }
+
+  /* Labels on controls crossfade in place instead of rolling a full line */
+  .ss-roll[data-variant='fade'] .ss-roll__char {
+    animation-name: ss-fade-in;
+    animation-duration: 0.35s;
+    animation-delay: 0.12s;
+  }
+
+  .ss-roll[data-variant='fade'] .ss-roll__item[data-out] {
+    animation-name: ss-fade-out;
+    animation-duration: 0.16s;
+  }
+
+  /* The width eases in step with the crossfade, and nothing paints outside it */
+  .ss-roll[data-variant='fade'] .ss-roll__mid {
+    padding-block: 0;
+    margin-block: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+    clip-path: inset(0);
+    transition-duration: 0.4s;
+  }
+
+  @keyframes ss-fade-out {
+    to { opacity: 0; filter: blur(2px); transform: translateY(-3px); }
+  }
+}

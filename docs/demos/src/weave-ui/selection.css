@@ -1,0 +1,34 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.wv-selection {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.wv-selection[data-show] {
+  opacity: 1;
+}
+
+.wv-selection__box {
+  fill: none;
+  stroke: var(--ss-accent);
+  stroke-width: 1;
+}
+
+.wv-selection__anchor {
+  fill: #fff;
+  stroke: var(--ss-accent);
+  stroke-width: 1;
+}
+
+/* Anchors take the pointer only while the selection shows, so a scene can hover and drag them */
+.wv-selection[data-show] .wv-selection__anchor {
+  pointer-events: auto;
+}

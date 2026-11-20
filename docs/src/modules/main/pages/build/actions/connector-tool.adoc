@@ -1,8 +1,7 @@
 = Connector Tool
 :description: Add connectors to the canvas
 
-image::actions/connector-tool.gif[Connector Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/connector-tool-poster-light.png[The Connector tool is picked in the toolbar then an anchor on one rectangle and an anchor on another are clicked and a connector joins them,width=960,height=540,role="weave-demo weave-demo--connector-tool"]
 == Introduction
 
 This action enables users to create new connector nodes on the canvas.

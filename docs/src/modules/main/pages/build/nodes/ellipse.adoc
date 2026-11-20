@@ -1,8 +1,7 @@
 = Ellipse
 :description: Draw an ellipse (or circle) on the canvas
 
-image::nodes/ellipse.png[Ellipse on Weave.js showcase,role="zoom-in"]
-
+image::nodes/ellipse-poster-light.png[A ellipse node on the canvas is selected then moved and resized with its corner handle,width=960,height=540,role="weave-demo weave-demo--ellipse"]
 The Ellipse node is a simple, versatile primitive shape used to render ellipse
 elements on the canvas. Built on top of Konva’s https://konvajs.org/api/Konva.Ellipse.html[Ellipse],
 it supports customizable properties such as position, axis radius, fill color, stroke, radius (on both axis),

@@ -1,7 +1,7 @@
 = Rectangle
 :description: Draw a rectangle on the canvas
 
-image::nodes/rectangle.png[Rectangle on the Weave.js showcase,role="zoom-in"]
+image::nodes/rectangle-node-poster-light.png[A rectangle node on the canvas is selected then moved and resized with its corner handle,width=960,height=540,role="weave-demo weave-demo--rectangle-node"]
 
 The Rectangle node is a simple, versatile primitive shape used to render rectangular
 elements on the canvas. Built on top of Konva’s https://konvajs.org/api/Konva.Rect.html[Rect],

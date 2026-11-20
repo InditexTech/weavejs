@@ -1,8 +1,7 @@
 = Measure Tool
 :description: Add measures to the canvas
 
-image::actions/measure-tool.gif[Measure Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/measure-tool-poster-light.png[A measure is created on the canvas: the Measure tool is picked in the toolbar and used with the crosshair and the new node is selected with its end handles,width=960,height=540,role="weave-demo weave-demo--measure-tool"]
 == Introduction
 
 This action enables users to create new measure nodes on the canvas.

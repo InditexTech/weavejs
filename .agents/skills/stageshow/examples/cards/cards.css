@@ -1,0 +1,12 @@
+.cd-grid { position: absolute; inset: 40px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start; font-size: 13px; color: var(--ss-text-strong); }
+.cd-head { display: flex; align-items: center; gap: 8px; }
+.cd-who { font-weight: 600; }
+.cd-when { color: var(--ss-text-faint); }
+.cd-text { margin: 0; line-height: 1.45; }
+.cd-quote { border-radius: var(--ss-card-inner); }
+.cd-actions { display: flex; align-items: center; gap: 8px; }
+.cd-spacer { flex: 1; }
+.cd-side { display: grid; gap: 24px; }
+.cd-toolbar { display: flex; align-items: stretch; gap: 4px; }
+.cd-menu-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.cd-rest { position: absolute; right: 60px; bottom: 30px; width: 1px; height: 1px; }

@@ -1,0 +1,223 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.wv-menu {
+  position: absolute;
+  z-index: 15;
+  min-width: 200px;
+  padding: 4px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  color: var(--ss-text-strong);
+  font: 400 13px/1 var(--ss-font);
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.wv-menu[data-show] {
+  opacity: 1;
+  transform: none;
+}
+
+.wv-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+}
+
+.wv-menu__item[data-hover] {
+  background: var(--ss-well);
+}
+
+.wv-menu__item[data-disabled] {
+  opacity: 0.45;
+}
+
+.wv-menu__blank {
+  width: 16px;
+}
+
+.wv-menu__label {
+  flex: 1;
+}
+
+.wv-menu__shortcut {
+  color: var(--ss-text-faint);
+  font: 400 11px/1 var(--ss-mono);
+}
+
+.wv-menu__divider {
+  height: 1px;
+  margin: 4px -4px;
+  background: var(--ss-line);
+}
+
+.wv-zoom {
+  position: absolute;
+  height: 40px;
+  gap: 10px;
+  padding: 0 12px;
+  color: var(--ss-icon);
+}
+
+.wv-zoom__level {
+  min-width: 38px;
+  color: var(--ss-text);
+  text-align: center;
+  font: 400 13px/1 var(--ss-font);
+}
+
+.wv-minimap {
+  position: absolute;
+  width: 200px;
+  height: 125px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+}
+
+.wv-minimap__node {
+  fill: var(--ss-ink-4);
+  stroke: var(--ss-line);
+  stroke-width: 0.3;
+}
+
+.wv-minimap__view {
+  fill: rgba(0, 0, 0, 0.2);
+  stroke: #e12d3c;
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.ss-stage[data-theme='dark'] .wv-minimap__view {
+  fill: rgba(255, 255, 255, 0.14);
+}
+
+.wv-pin {
+  position: absolute;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px 14px 14px 0;
+  background: var(--who);
+  color: #fff;
+  font: 600 13px/1 var(--ss-font);
+  transform: translate(0, -100%) scale(0.85);
+  transform-origin: 0 100%;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.wv-pin[data-show] {
+  opacity: 1;
+  transform: translate(0, -100%);
+}
+
+.wv-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wv-guides__line {
+  stroke-width: 0.8;
+}
+
+.wv-guides__line--red {
+  stroke: #ff3b30;
+}
+
+.wv-guides__line--blue {
+  stroke: #0d99ff;
+  stroke-width: 1;
+}
+
+.wv-guides__tag {
+  fill: #ff3b30;
+}
+
+.wv-guides__text {
+  fill: #fff;
+  font: 500 10px var(--ss-font);
+}
+
+.wv-marquee {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.wv-marquee[data-show] {
+  opacity: 1;
+}
+
+.wv-marquee rect {
+  fill: rgba(26, 26, 255, 0.07);
+  stroke: #1a1aff;
+  stroke-width: 1;
+}
+
+.ss-stage[data-theme='dark'] .wv-marquee rect {
+  fill: rgba(107, 107, 255, 0.14);
+  stroke: #6b6bff;
+}
+
+.wv-drop {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  background: rgba(26, 26, 255, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.wv-drop[data-show] {
+  opacity: 1;
+}
+
+.wv-drop__box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 26px;
+  border: 1px dashed var(--ss-accent);
+  color: var(--ss-accent);
+  font: 500 14px/1 var(--ss-font);
+}
+
+.wv-file {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+  color: var(--ss-text-strong);
+  font: 400 12px/1 var(--ss-font);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.wv-file[data-show] {
+  opacity: 1;
+}

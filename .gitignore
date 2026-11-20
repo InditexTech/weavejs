@@ -5,3 +5,6 @@
 /.vscode
 
 .idea/
+
+# Stageshow skill tooling (installed on demand, see docs/demos/README.md)
+.agents/skills/stageshow/node_modules/

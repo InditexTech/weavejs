@@ -1,8 +1,7 @@
 = Image Tool
 :description: Add an image to the canvas
 
-image::actions/image-tool.gif[Image Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/image-tool-poster-light.png[The Image tool is picked in the toolbar then a preview follows the pointer and a click places the image on the canvas,width=960,height=540,role="weave-demo weave-demo--image-tool"]
 == Introduction
 
 This action allows users to add images to the canvas by:

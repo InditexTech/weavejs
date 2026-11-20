@@ -146,3 +146,37 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/actions/sticky-note-tool.adoc | `code/packages/sdk/src/actions/sticky-note-tool/*` | released in 5.9.0 |
 | main:build/server-side-rendering.adoc | `code/packages/sdk/src/backend.ts`, `code/packages/sdk/src/stores/store.ts` (`cancelPendingRender`), `code/packages/sdk/src/weave.ts` (`destroy`, `exportNodesServerSide`), `code/packages/sdk/src/nodes/video/video.ts`, `code/packages/store-standalone/src/store-standalone.ts` | released in 5.9.0 |
 | sdk:api-reference/weave/index.adoc (`exportNodesServerSide` / `exportAreaServerSide` signatures) | `code/packages/sdk/src/weave.ts` | released in 5.9.0 |
+| ROOT:index.adoc (home hero demo) | `docs/demos/src/demos/home-hero/*` (faux-UI demo, see `docs/demos/README.md`) | docs site only, not tied to a release |
+| main:build/actions/rectangle-tool.adoc (demo) | `docs/demos/src/demos/rectangle-tool/*`; behavior shown follows `code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/rectangle.adoc (demo) | `docs/demos/src/demos/rectangle-node/*`; behavior shown follows `code/packages/sdk/src/nodes/rectangle/` | docs site only, not tied to a release |
+| main:build/nodes/frame.adoc (demo) | `docs/demos/src/demos/frame/*`; behavior shown follows `code/packages/sdk/src/nodes/frame/` | docs site only, not tied to a release |
+| main:build/actions/frame-tool.adoc (demo) | `docs/demos/src/demos/frame-tool/*`; behavior shown follows `code/packages/sdk/src/actions/frame-tool/frame-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/sticky-note.adoc (demo) | `docs/demos/src/demos/sticky-note/*`; behavior shown follows `code/packages/sdk/src/nodes/sticky-note/` | docs site only, not tied to a release |
+| main:build/actions/sticky-note-tool.adoc (demo) | `docs/demos/src/demos/sticky-note-tool/*`; behavior shown follows `code/packages/sdk/src/actions/sticky-note-tool/sticky-note-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/group.adoc (demo) | `docs/demos/src/demos/group/*`; behavior shown follows `code/packages/sdk/src/nodes/group/` | docs site only, not tied to a release |
+| main:build/nodes/comment.adoc (demo) | `docs/demos/src/demos/comment/*`; behavior shown follows `code/packages/sdk/src/nodes/comment/` | docs site only, not tied to a release |
+| main:build/actions/comment-tool.adoc (demo) | `docs/demos/src/demos/comment-tool/*`; behavior shown follows `code/packages/sdk/src/actions/comment-tool/comment-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/image.adoc (demo) | `docs/demos/src/demos/image/*`; behavior shown follows `code/packages/sdk/src/nodes/image/` | docs site only, not tied to a release |
+| main:build/actions/image-tool.adoc (demo) | `docs/demos/src/demos/image-tool/*`; behavior shown follows `code/packages/sdk/src/actions/image-tool/image-tool.ts` | docs site only, not tied to a release |
+| main:build/actions/images-tool.adoc (demo) | `docs/demos/src/demos/images-tool/*`; behavior shown follows `code/packages/sdk/src/actions/images-tool/images-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/video.adoc (demo) | `docs/demos/src/demos/video/*`; behavior shown follows `code/packages/sdk/src/nodes/video/` | docs site only, not tied to a release |
+| main:build/actions/video-tool.adoc (demo) | `docs/demos/src/demos/video-tool/*`; behavior shown follows `code/packages/sdk/src/actions/video-tool/video-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/text.adoc (demo) | `docs/demos/src/demos/text/*`; behavior shown follows `code/packages/sdk/src/nodes/text/` | docs site only, not tied to a release |
+| main:build/actions/text-tool.adoc (demo) | `docs/demos/src/demos/text-tool/*`; behavior shown follows `code/packages/sdk/src/actions/text-tool/text-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/text-v2.adoc (demo) | `docs/demos/src/demos/text-v2/*`; behavior shown follows `code/packages/sdk/src/nodes/text-v2/` | docs site only, not tied to a release |
+| main:build/nodes/line.adoc (demo) | `docs/demos/src/demos/line/*`; behavior shown follows `code/packages/sdk/src/nodes/line/` | docs site only, not tied to a release |
+| main:build/actions/line-tool.adoc (demo) | `docs/demos/src/demos/line-tool/*`; behavior shown follows `code/packages/sdk/src/actions/line-tool/line-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/arrow.adoc (demo) | `docs/demos/src/demos/arrow/*`; behavior shown follows `code/packages/sdk/src/nodes/arrow/` | docs site only, not tied to a release |
+| main:build/actions/arrow-tool.adoc (demo) | `docs/demos/src/demos/arrow-tool/*`; behavior shown follows `code/packages/sdk/src/actions/arrow-tool/arrow-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/connector.adoc (demo) | `docs/demos/src/demos/connector/*`; behavior shown follows `code/packages/sdk/src/nodes/connector/` | docs site only, not tied to a release |
+| main:build/actions/connector-tool.adoc (demo) | `docs/demos/src/demos/connector-tool/*`; behavior shown follows `code/packages/sdk/src/actions/connector-tool/connector-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/measure.adoc (demo) | `docs/demos/src/demos/measure/*`; behavior shown follows `code/packages/sdk/src/nodes/measure/` | docs site only, not tied to a release |
+| main:build/actions/measure-tool.adoc (demo) | `docs/demos/src/demos/measure-tool/*`; behavior shown follows `code/packages/sdk/src/actions/measure-tool/measure-tool.ts` | docs site only, not tied to a release |
+| main:build/nodes/ellipse.adoc (demo) | `docs/demos/src/demos/ellipse/*`; behavior shown follows `code/packages/sdk/src/nodes/ellipse/` | docs site only, not tied to a release |
+| main:build/nodes/polygon.adoc (demo) | `docs/demos/src/demos/polygon/*`; behavior shown follows `code/packages/sdk/src/nodes/polygon/` | docs site only, not tied to a release |
+| main:build/nodes/regular-polygon.adoc (demo) | `docs/demos/src/demos/regular-polygon/*`; behavior shown follows `code/packages/sdk/src/nodes/regular-polygon/` | docs site only, not tied to a release |
+| main:build/nodes/star.adoc (demo) | `docs/demos/src/demos/star/*`; behavior shown follows `code/packages/sdk/src/nodes/star/` | docs site only, not tied to a release |
+| main:build/actions/star-tool.adoc (demo) | `docs/demos/src/demos/star-tool/*`; behavior shown follows `code/packages/sdk/src/actions/star-tool/star-tool.ts` | docs site only, not tied to a release |
+| main:build/actions/ellipse-tool.adoc (demo) | `docs/demos/src/demos/ellipse-tool/*`; behavior shown follows `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts` | docs site only, not tied to a release |
+| main:build/actions/polygon-tool.adoc (demo) | `docs/demos/src/demos/polygon-tool/*`; behavior shown follows `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts` | docs site only, not tied to a release |
+| main:build/actions/regular-polygon-tool.adoc (demo) | `docs/demos/src/demos/regular-polygon-tool/*`; behavior shown follows `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts` | docs site only, not tied to a release |

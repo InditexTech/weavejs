@@ -1,0 +1,96 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.hh .ss-stage {
+  overflow: hidden;
+}
+
+/* One browser window, shown whole with a gutter on every side for its shadow */
+.hh-win {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 912px;
+}
+
+.hh-canvas {
+  height: 454px;
+}
+
+.hh-toolbar {
+  position: absolute;
+  left: 16px;
+  top: 90px;
+}
+
+.hh-node {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.hh-ghosts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hh-ghost {
+  fill: var(--ss-well);
+  stroke: var(--ss-line);
+  stroke-width: 1;
+}
+
+/* The rectangle Maya draws: the SDK's defaults, white fill and a 1px black stroke.
+   Width and height ease with the same duration and curve as her cursor (peer.css),
+   so the corner stays under the tip while she drags. */
+.hh-node--shape {
+  display: grid;
+  place-items: center;
+  width: 0;
+  height: 0;
+  background: #fff;
+  border: 1px solid #000;
+  opacity: 0;
+  transition: width 0.95s cubic-bezier(0.45, 0, 0.25, 1), height 0.95s cubic-bezier(0.45, 0, 0.25, 1), opacity 0.3s ease;
+}
+
+.hh-node--shape[data-on] {
+  opacity: 1;
+}
+
+.hh-node--shape[data-grown] {
+  width: var(--w);
+  height: var(--h);
+}
+
+.hh-label {
+  display: inline-block;
+  color: #000;
+  font: 400 22px/1.2 var(--ss-font);
+  white-space: nowrap;
+}
+
+/* Jon's caret is a pseudo-element: it follows the typed text with no element of its own to hop */
+.hh-label__typed::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin: 0 -2px 0 1px;
+  vertical-align: -0.18em;
+  background: var(--who);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.hh-label__typed[data-caret]::after {
+  opacity: 1;
+}
+
+/* The words still to come hold their place, so the centered label never shifts as it types */
+.hh-label__rest {
+  visibility: hidden;
+}
+

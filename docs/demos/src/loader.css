@@ -1,0 +1,24 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* The placeholder's image is the poster. The loader wraps it in a frame that
+   shrink-wraps it, and the stage covers that frame once mounted. */
+.weave-demo__frame {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  line-height: 0;
+}
+
+.weave-demo__stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* Hidden only once a demo is in place, never before: a failed demo keeps its poster. */
+.weave-demo[data-demo-state='mounted'] .weave-demo__frame > img {
+  visibility: hidden;
+}

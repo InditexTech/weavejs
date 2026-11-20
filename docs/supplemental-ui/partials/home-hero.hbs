@@ -1,0 +1,164 @@
+{{!--
+SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+
+SPDX-License-Identifier: Apache-2.0
+--}}
+
+{{!--
+  Overrides the docouture UI bundle's home-hero.hbs (ui-bundle 1.4.1). The only
+  change is in the media slot: with `:page-hero-demo: <name>` the hero image
+  (`:page-hero-image:`) is wrapped as a `.weave-demo.weave-demo--<name>` block,
+  which the demos loader (docs/demos) turns into the live demo; the image stays
+  as its poster. Without the attribute the slot renders exactly as upstream. On
+  a docouture upgrade, diff this file against the new bundle's
+  partials/home-hero.hbs and re-apply the media-slot change.
+--}}
+
+{{!--
+  Landing hero (GH-19), Figma node 2696:54674 at breakpoint l (2696:54669 in
+  the page) and 2696:95574 at xs (2696:95558 in the page) — the left column of
+  the `home` layout, rendered into home.hbs's `.home__hero` aside.
+
+  Authored, not hardcoded: every value below comes from the landing document
+  or the playbook, so a site's hero is content rather than markup baked into
+  this template. Nothing here needs JavaScript — the calls to action are
+  plain anchors and the media slot is a native element.
+
+  Authoring surface — `page.title` is required (it is the document's own `=`
+  title, and Antora needs it), but the hero's `<h1>` itself renders
+  `site.title` (the docs title from the playbook), not the page title —
+  everything else below is optional:
+
+    = AMIGA Framework Java                  required by Antora, not shown
+    :page-tags: efficiency, speed, support  one .dt-label--grey chip each
+    :page-action: Go to tool                primary call to action
+    :page-action-url: https://tool.example  its target — page reference or URL
+    :page-action-secondary: Quickstart      secondary (outlined) call to action
+    :page-action-secondary-url: quickstart.adoc
+    :page-hero-image: hero.png              media slot: a still…
+    :page-hero-image-alt: A canvas…         …and its alternative text
+    :page-hero-image-bordered:               opt-in black/white frame, 10px radius
+    :page-hero-video: hero.mp4               …or a video, with an optional
+    :page-hero-video-poster: hero.png        still shown before it plays
+
+  The tag and action attributes are deliberately the SAME ones the page hero
+  reads (hero.hbs) rather than landing-specific spellings. A page renders one
+  hero or the other, never both, so there is no collision — and `:page-tags:`
+  meaning "chips beside the title" in both layouts is one idea to learn
+  instead of two.
+
+  The product mark is `site.keys.productLogo` — the playbook key the side
+  menu's brand block already uses (nav-brand.hbs), with the same
+  `productLogoDark` counterpart for a mark that cannot adapt on its own, and
+  the same reason it must be a second image rather than `currentColor`: an
+  externally-referenced `<img>` does not inherit CSS from the page embedding
+  it. Absent, the hero renders the product name alone rather than a
+  placeholder mark. Not a page attribute: the mark identifies the site, not
+  this page, and a landing that disagreed with its own side menu would be a
+  bug rather than a feature.
+
+  An action renders only when BOTH its label and url attributes are set — a
+  button that goes nowhere is worse than no button. `*-url` values resolve
+  through Antora's own `resolvePageURL` helper when they name a real page,
+  and fall through to the literal value otherwise (it returns undefined
+  rather than throwing for something that is not a page reference), exactly
+  as hero.hbs does.
+
+  That same fallthrough is what decides the external-link icon: a target
+  `resolvePageURL` cannot resolve is not a page in this site, so the primary
+  action gets `external-link` in its action slot —
+  which is what the frame draws on "go to tool", pointing out of the docs.
+  Derived, never authored: an author cannot forget it, and cannot put it on
+  a link that stays in the site.
+
+  Three deliberate deviations from the frames, all recorded rather than
+  silently taken:
+
+  1. The primary action comes first, in the DOM and visually; the frames draw
+     the outlined secondary to its LEFT. This matches hero.hbs, which made
+     the same call for the same reason — reading order should lead with the
+     action the page wants taken.
+  2. The video's play control is the browser's own (`controls`), not the
+     centred ghost `play-circle` button the frames draw over the panel.
+     Native controls are keyboard accessible, localised, and work with
+     JavaScript disabled, none of which a bespoke control gets for free.
+  3. The media is a bare slot by default, not the frames' 6px-bordered,
+     10px-radius, 713x425 panel — see home-hero.css for why the bundle leaves
+     the framing to the page unless `:page-hero-image-bordered:` opts in.
+     That attribute is checked with `(eq … undefined)` rather than a plain
+     `{{#if}}`: it is the first presence-only boolean on this partial, and a
+     bare `:attr:` (no value) is an empty string in Asciidoctor's own
+     attributes map, which Handlebars' `{{#if}}` treats as falsy same as JS
+     — only absence (`undefined`) should turn the modifier off.
+--}}
+<div class="home-hero">
+  <div class="home-hero__intro">
+{{#with site.keys.productLogo}}
+    <img class="home-hero__logo{{#if @root.site.keys.productLogoDark}} home-hero__logo--light{{/if}}" src="{{{relativize this}}}" width="40" height="40" alt="">
+{{/with}}
+{{#with site.keys.productLogoDark}}
+    <img class="home-hero__logo home-hero__logo--dark" src="{{{relativize this}}}" width="40" height="40" alt="">
+{{/with}}
+    <h1 class="home-hero__title">{{site.title}}</h1>
+{{#with (split page.attributes.tags ',')}}
+    <div class="home-hero__labels">
+    {{#each this}}
+      <div class="dt-label dt-label--grey">
+        <span class="dt-label__content">{{{this}}}</span>
+      </div>
+    {{/each}}
+    </div>
+{{/with}}
+{{#if (and page.attributes.action page.attributes.[action-url])}}
+    <div class="home-hero__actions">
+      <a class="dt-button dt-button--primary{{#unless (resolvePageURL page.attributes.[action-url])}} dt-button--icon-and-label dt-button--icon-action{{/unless}}" href="{{{relativize (or (resolvePageURL page.attributes.[action-url]) page.attributes.[action-url])}}}">
+        <span class="dt-button__content">{{{page.attributes.action}}}{{#unless (resolvePageURL page.attributes.[action-url])}}<span class="dt-button__icon dt-button__icon-action">{{icon "external-link"}}</span>{{/unless}}</span>
+      </a>
+    {{#if (and page.attributes.[action-secondary] page.attributes.[action-secondary-url])}}
+      <a class="dt-button dt-button--secondary{{#unless (resolvePageURL page.attributes.[action-secondary-url])}} dt-button--icon-and-label dt-button--icon-action{{/unless}}" href="{{{relativize (or (resolvePageURL page.attributes.[action-secondary-url]) page.attributes.[action-secondary-url])}}}">
+        <span class="dt-button__content">{{{page.attributes.[action-secondary]}}}{{#unless (resolvePageURL page.attributes.[action-secondary-url])}}<span class="dt-button__icon dt-button__icon-action">{{icon "external-link"}}</span>{{/unless}}</span>
+      </a>
+    {{/if}}
+    </div>
+{{/if}}
+  </div>
+{{!--
+    Media slot. Image and video are separate attributes rather than one
+    attribute whose value is sniffed for an extension: the author already
+    knows which they have, an extension is a poor proxy for a content type
+    (and absent entirely from plenty of URLs), and two attributes need no
+    escape hatch for when the guess is wrong. Video wins if a document
+    somehow sets both.
+
+    Each value is an AsciiDoc resource ID — `hero.png`, `_images/hero.png`,
+    `main:_images/hero.png`, an absolute URL, whatever `image::` itself would
+    accept — resolved through `resolveResourceURL`, the same idea as
+    `resolvePageURL` above but for a resource rather than a page: it calls
+    Antora's own `ContentCatalog#resolveResource` (family `image`) so the
+    published URL always includes this page's real component/version/module,
+    the way the actual site is laid out, rather than an author hand-typing
+    the site-root-relative path themselves (fragile — the path shifts with
+    the version, and briefly *was* wrong for exactly that reason on the
+    example site's own landing page, GH-103's follow-up). Falls through to the
+    literal attribute value, unresolved, when it doesn't resolve as a
+    resource — an already-absolute external URL — internally, so callers
+    don't need the `(or … this)` fallthrough the `action-url` attributes
+    above spell out explicitly. Only then does the result go through
+    `relativize`, same as `site.keys.productLogo` above.
+--}}
+{{#with page.attributes.[hero-video]}}
+  <video class="home-hero__media{{#unless (eq @root.page.attributes.[hero-image-bordered] undefined)}} home-hero__media--bordered{{/unless}}" src="{{{relativize (resolveResourceURL this)}}}" controls preload="metadata"{{#with @root.page.attributes.[hero-video-poster]}} poster="{{{relativize (resolveResourceURL this)}}}"{{/with}}></video>
+{{else}}
+  {{#with page.attributes.[hero-image]}}
+  {{#with @root.page.attributes.[hero-demo]}}
+  <div class="home-hero__media weave-demo weave-demo--{{{this}}}">
+    <div class="content">
+      <img src="{{{relativize (resolveResourceURL @root.page.attributes.[hero-image])}}}" alt="{{{@root.page.attributes.[hero-image-alt]}}}" width="960" height="540" style="display:block;max-width:100%;height:auto">
+    </div>
+  </div>
+  {{else}}
+  <img class="home-hero__media{{#unless (eq @root.page.attributes.[hero-image-bordered] undefined)}} home-hero__media--bordered{{/unless}}" src="{{{relativize (resolveResourceURL this)}}}" alt="{{{@root.page.attributes.[hero-image-alt]}}}">
+  {{/with}}
+  {{/with}}
+{{/with}}
+</div>

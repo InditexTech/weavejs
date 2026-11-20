@@ -1,7 +1,7 @@
 = Rectangle Tool
 :description: Add a rectangle to the canvas
 
-image::actions/rectangle-tool.gif[Rectangle Tool action on use on the Weave.js showcase,role="zoom-in"]
+image::actions/rectangle-tool-poster-light.png[A rectangle is drawn on the canvas: the Rectangle tool is picked in the toolbar and dragged out with the crosshair and the new shape is selected with its handles,width=960,height=540,role="weave-demo weave-demo--rectangle-tool"]
 
 == Introduction
 
