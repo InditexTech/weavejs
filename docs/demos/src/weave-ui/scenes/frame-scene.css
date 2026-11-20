@@ -1,0 +1,27 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* The frame's edge, highlighted while the pointer is within its hit width */
+.wv-frame__edge {
+  stroke: var(--ss-accent);
+  stroke-width: 3;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.wv-frame__edge[data-show] {
+  opacity: 0.7;
+}
+
+.wv-frame__marquee {
+  fill: rgba(26, 26, 255, 0.07);
+  stroke: #1a1aff;
+  stroke-width: 1;
+}
+
+.ss-stage[data-theme='dark'] .wv-frame__marquee {
+  fill: rgba(107, 107, 255, 0.14);
+  stroke: #6b6bff;
+}

@@ -1,0 +1,128 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* A text node as the canvas shows it: plain words, no fill. Edit mode adds the SDK's #0074ff outline. */
+.wv-text {
+  position: absolute;
+  padding: 4px 6px;
+  color: var(--wv-ink);
+  font: 400 20px/1.3 Arial, Helvetica, sans-serif;
+  white-space: pre;
+  outline: 1px solid transparent;
+  transition: outline-color 0.15s ease;
+}
+
+.wv-text[data-editing] {
+  outline-color: #0074ff;
+}
+
+/* The caret is a pseudo-element, so it has no element of its own to hop as the text grows */
+.wv-text__typed::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin: 0 -2px 0 1px;
+  vertical-align: -0.18em;
+  background: #0074ff;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wv-text[data-editing] .wv-text__typed::after {
+  opacity: 1;
+}
+
+.wv-text__rest {
+  visibility: hidden;
+}
+
+/* The floating text toolbar: a small square card of format buttons */
+.wv-format {
+  position: absolute;
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  color: var(--ss-icon);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.wv-format[data-show] {
+  opacity: 1;
+  transform: none;
+}
+
+.wv-format__button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+}
+
+.wv-format__button[data-hover] {
+  background: var(--ss-well);
+}
+
+.wv-format__button[data-on] {
+  background: var(--wv-toolbar-active-bg);
+  color: var(--wv-toolbar-active-fg);
+}
+
+.wv-format__divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--ss-line);
+}
+
+/* A rich text node: plain words on the canvas, no card around them: a paragraph, then a list whose rows can be indented */
+.wv-rich {
+  position: absolute;
+  width: max-content;
+  padding: 24px;
+  color: var(--wv-ink);
+  font: 400 20px/1.45 var(--ss-font);
+}
+
+.wv-rich__p {
+  margin: 0 0 10px;
+}
+
+.wv-rich__row {
+  display: flex;
+  gap: 10px;
+  margin: 2px 0;
+  transition: padding-left 0.25s ease;
+}
+
+.wv-rich__marker {
+  width: 14px;
+  color: var(--ss-text-faint);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wv-rich__row[data-list] .wv-rich__marker {
+  opacity: 1;
+}
+
+.wv-rich__row[data-indent] {
+  padding-left: 28px;
+}
+
+.wv-rich__sel {
+  background: rgba(0, 116, 255, 0.22);
+}
+
+.wv-rich__word[data-bold] {
+  font-weight: 700;
+}

@@ -1,6 +1,8 @@
 = Polygon
 :description: Draw a polygon on the canvas using a preset shape
 
+image::nodes/polygon-poster-light.png[A pentagon node on the canvas is selected then moved and resized with its corner handle,width=960,height=540,role="weave-demo weave-demo--polygon"]
+
 The Polygon node is a versatile primitive shape used to render polygon elements on the canvas.
 Unlike the xref:main:build/nodes/regular-polygon.adoc[Regular Polygon] node, it is based on a
 set of explicit vertex points and an inner bounding rectangle, enabling arbitrary convex

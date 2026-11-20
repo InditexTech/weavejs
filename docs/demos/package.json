@@ -1,0 +1,34 @@
+{
+  "name": "weavejs-docs-demos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Faux-UI demos for the Weave.js documentation site, built with the Stageshow kit",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5174",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "posters": "node scripts/posters.mjs",
+    "new-demo": "node scripts/new-demo.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^25.0.1",
+    "playwright-core": "~1.48.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.4.5",
+    "vitest": "^3.2.4"
+  }
+}

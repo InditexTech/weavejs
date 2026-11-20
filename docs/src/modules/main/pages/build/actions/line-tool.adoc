@@ -1,8 +1,7 @@
 = Line Tool (deprecated)
 :description: Add a simple line to the canvas
 
-image::actions/line-tool.gif[Pen Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/line-tool-poster-light.png[A line is created on the canvas: the Line tool is picked in the toolbar and used with the crosshair and the new node is selected with its end handles,width=960,height=540,role="weave-demo weave-demo--line-tool"]
 == Introduction
 
 This action allows users to draw a simple line on the canvas by click-and-drag. Also when the

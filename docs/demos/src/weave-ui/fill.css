@@ -1,0 +1,14 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* An SVG that fills its positioned parent. The docs UI sizes every SVG inside an
+   image block with \`.doc .imageblock svg { height: auto; max-width: 100% }\`, which
+   collapses a percentage height; this is more specific and restores it. */
+.weave-demo .weave-demo__stage svg.wv-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}

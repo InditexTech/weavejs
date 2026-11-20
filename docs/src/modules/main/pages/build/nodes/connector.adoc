@@ -1,8 +1,7 @@
 = Connector
 :description: Draw a connected line between nodes
 
-image::nodes/connector.png[Connector on the Weave.js showcase,role="zoom-in"]
-
+image::nodes/connector-poster-light.png[A connector node joins two rectangles and follows when the second one is moved,width=960,height=540,role="weave-demo weave-demo--connector"]
 The Connector node is a complex node used to render a line between two elements anchors, if the elements move
 the line also does automatically.
 

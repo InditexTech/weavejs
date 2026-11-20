@@ -1,8 +1,7 @@
 = Star Tool
 :description: Add a star to the canvas
 
-image::actions/star-tool.gif[Star Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/star-tool-poster-light.png[A star is drawn on the canvas: the Star tool is picked in the toolbar and dragged out with the crosshair and the new shape is selected with its handles,width=960,height=540,role="weave-demo weave-demo--star-tool"]
 == Introduction
 
 This action enables users to create new star nodes on the canvas.

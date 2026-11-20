@@ -1,6 +1,8 @@
 = Sticky Note Tool
 :description: Add a sticky note to the canvas
 
+image::actions/sticky-note-tool-poster-light.png[A sticky note is drawn on the canvas: the Sticky note tool is picked in the toolbar and dragged out with the crosshair and the new node is selected with its handles,width=960,height=540,role="weave-demo weave-demo--sticky-note-tool"]
+
 == Introduction
 
 This action enables users to create new sticky note nodes on the canvas by clicking, touching, or dragging.

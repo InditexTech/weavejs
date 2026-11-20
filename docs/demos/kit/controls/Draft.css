@@ -1,0 +1,90 @@
+/* Draft */
+
+@layer stageshow {
+  .ss-draft {
+    --ss-draft-pad-y: 7px;
+    --ss-draft-pad-x: 10px;
+    --ss-draft-ring: var(--ss-accent);
+    --ss-draft-radius: var(--ss-radius-sm);
+
+    position: relative;
+    display: block;
+    min-width: 0;
+  }
+
+  /* Arriving in its typing state, nothing about it eases, even a margin or
+     padding set on the Draft itself: !important inside the layer outranks the
+     page's own transition. Leaving (on post) eases as the page sets it. */
+  .ss-draft[data-editing] {
+    transition: none !important;
+  }
+
+  .ss-draft__box {
+    display: block;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: var(--ss-draft-radius);
+    /* The ring is drawn inside the box, so it never reaches past the column */
+    box-shadow: inset 0 0 0 1.5px transparent;
+    transition: padding 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+  }
+
+  /* Typing: the box takes its shape at once; only the way out eases */
+  .ss-draft[data-editing] > .ss-draft__box {
+    padding: var(--ss-draft-pad-y) var(--ss-draft-pad-x);
+    box-shadow: inset 0 0 0 1.5px var(--ss-draft-ring);
+    transition: none;
+  }
+
+  .ss-draft__words {
+    position: relative;
+    display: grid;
+  }
+
+  .ss-draft__size,
+  .ss-draft__typed,
+  .ss-draft__ph {
+    grid-area: 1 / 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .ss-draft__size {
+    visibility: hidden;
+  }
+
+  .ss-draft__ph {
+    color: var(--ss-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    pointer-events: none;
+  }
+
+  .ss-draft[data-editing][data-empty] .ss-draft__ph {
+    opacity: 1;
+  }
+
+  /* It leaves the moment the first letter lands, never under it */
+  .ss-draft:not([data-empty]) .ss-draft__ph {
+    transition: none;
+  }
+
+  /* Solid while typing (each keystroke remounts it), blinking once it rests */
+  .ss-draft__caret {
+    display: inline-block;
+    width: 1.5px;
+    height: 1.1em;
+    margin-left: 1px;
+    vertical-align: -0.2em;
+    border-radius: 1px;
+    background: var(--ss-draft-ring);
+    animation: ss-draft-caret 1.06s steps(1) 0.5s infinite;
+  }
+
+  @keyframes ss-draft-caret {
+    50% { opacity: 0; }
+  }
+}

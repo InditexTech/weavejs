@@ -1,8 +1,7 @@
 = Images Tool
 :description: Add multiple images to the canvas
 
-image::actions/images-tool.gif[Images Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/images-tool-poster-light.png[The Images tool is picked in the toolbar then a preview follows the pointer and a click places the set of images on the canvas,width=960,height=540,role="weave-demo weave-demo--images-tool"]
 == Introduction
 
 This action allows users to add multiple images to the canvas by:

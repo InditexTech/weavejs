@@ -2,3 +2,4 @@ node_modules/
 /build
 .DS_Store
 .npmrc
+/supplemental-ui/js/demos

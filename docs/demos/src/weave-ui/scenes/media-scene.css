@@ -1,0 +1,52 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* Crop mode: the SDK's black crop handles over the full image, which shows through under the crop window */
+.wv-crop__full {
+  fill: none;
+  stroke: var(--ss-line);
+  stroke-dasharray: 4 4;
+}
+
+.wv-crop__handle {
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1;
+  pointer-events: auto;
+}
+
+/* The small bar over a selected node */
+.wv-node-bar {
+  position: absolute;
+  z-index: 13;
+  display: flex;
+  padding: 4px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  color: var(--ss-icon);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wv-node-bar[data-show] {
+  opacity: 1;
+}
+
+.wv-node-bar__button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+}
+
+.wv-node-bar__button[data-hover] {
+  background: var(--ss-well);
+}
+
+.wv-node-bar__button[data-on] {
+  background: var(--wv-toolbar-active-bg);
+  color: var(--wv-toolbar-active-fg);
+}

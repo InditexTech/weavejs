@@ -1,6 +1,8 @@
 = Polygon Tool
 :description: Add a polygon to the canvas using a preset shape
 
+image::actions/polygon-tool-poster-light.png[A pentagon is drawn on the canvas: the Polygon tool is picked in the toolbar and dragged out with the crosshair and the new shape is selected with its handles,width=960,height=540,role="weave-demo weave-demo--polygon-tool"]
+
 == Introduction
 
 This action enables users to create new polygon nodes on the canvas by clicking, touching, or dragging.

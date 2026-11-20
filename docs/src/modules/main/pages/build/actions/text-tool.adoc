@@ -1,8 +1,7 @@
 = Text Tool
 :description: Add text to the canvas
 
-image::actions/text-tool.gif[Text Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/text-tool-poster-light.png[The Text tool is picked in the toolbar then the canvas is clicked and a text node is typed and selected,width=960,height=540,role="weave-demo weave-demo--text-tool"]
 == Introduction
 
 This action allows users to add new text nodes to the canvas by clicking or touching

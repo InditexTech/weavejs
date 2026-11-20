@@ -1,8 +1,7 @@
 = Text
 :description: Draw and edit text on the canvas
 
-image::nodes/text.png[Text on Weave.js showcase,role="zoom-in"]
-
+image::nodes/text-poster-light.png[A text node on the canvas is selected moved and edited by double clicking it,width=960,height=540,role="weave-demo weave-demo--text"]
 The Text node is used to display editable or static text on the canvas. Based on
 Konva’s https://konvajs.org/api/Konva.Text.html[Text] shape, it supports rich styling
 options including font size, family, color, alignment, and line height.

@@ -1,0 +1,50 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.rn .ss-stage {
+  overflow: hidden;
+}
+
+/* The canvas is the whole shot: the toolbar and a corner of the room, no window around it */
+.rn-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.rn-toolbar {
+  position: absolute;
+  left: 28px;
+  top: 40px;
+}
+
+.rn-ghosts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.rn-ghost {
+  fill: var(--ss-well);
+  stroke: var(--ss-line);
+  stroke-width: 1;
+}
+
+/* Moved and resized by the drag itself, so no transition on position or size */
+.rn-box {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.rn-box[data-show] {
+  opacity: 1;
+  transition-duration: 0.1s;
+}
+
+.rn-shape {
+  position: absolute;
+  inset: 0;
+  display: block;
+}

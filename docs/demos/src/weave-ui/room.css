@@ -1,0 +1,74 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.wv-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-strong);
+  font: 400 14px/1 var(--ss-font);
+}
+
+.wv-room__mark {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #3b2f8f, #1f8a9a);
+}
+
+.wv-room__name {
+  font-size: 16px;
+}
+
+.wv-status {
+  color: var(--ss-icon);
+}
+
+.wv-status__connected {
+  padding: 3px 6px;
+  background: #b9efe2;
+  color: #0f5a4a;
+  font: 400 10px/1 var(--ss-font);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ss-stage[data-theme='dark'] .wv-status__connected {
+  background: #134e43;
+  color: #9ff0dc;
+}
+
+.wv-status__people {
+  display: flex;
+}
+
+.wv-status__person {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-right: -3px;
+  border: 2px solid var(--ss-surface);
+  border-radius: 50%;
+  background: var(--who);
+  color: #fff;
+  font: 600 9px/1 var(--ss-font);
+}
+
+.wv-status__divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 2px 0 6px;
+  background: var(--ss-line);
+}
+
+.wv-status__zoom {
+  min-width: 34px;
+  color: var(--ss-text-faint);
+  text-align: right;
+}

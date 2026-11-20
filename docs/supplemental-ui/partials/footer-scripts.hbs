@@ -1,0 +1,16 @@
+{{!--
+SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+
+SPDX-License-Identifier: Apache-2.0
+--}}
+
+{{!--
+  Overrides the docouture UI bundle's footer-scripts.hbs (ui-bundle 1.4.1).
+  The first tag is the bundle's own and must stay identical to upstream; the
+  second loads the Weave.js demos loader (docs/demos), which stays inert on
+  pages without a `.weave-demo` placeholder. On a docouture upgrade, diff this
+  file against the new bundle's partials/footer-scripts.hbs and re-apply.
+--}}
+
+<script id="site-script" src="{{{uiRootPath}}}/js/site.js" data-ui-root-path="{{{uiRootPath}}}"></script>
+<script type="module" src="{{{uiRootPath}}}/js/demos/loader.js"></script>
