@@ -1,8 +1,7 @@
 = Stage Zoom
 :description: Activates support for zoom on the stage
 
-image::plugins/stage-panning.gif[Stage zoom on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/stage-zoom-poster-light.png[The zoom control zooms the canvas in from 50 percent to 100 percent,width=960,height=540,role="weave-demo weave-demo--stage-zoom"]
 == Introduction
 
 This plugin enables smooth zooming in and out of the canvas, allowing users to

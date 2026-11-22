@@ -1,0 +1,109 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* Stage grid plugin: no grid, lines (the canvas default) or dots */
+.wv-canvas[data-grid='off'] {
+  background-image: none;
+}
+
+.wv-canvas[data-grid='dots'] {
+  background-image: radial-gradient(circle, var(--wv-grid-major) 1.4px, transparent 1.8px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+}
+
+.wv-seg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  box-sizing: border-box;
+  height: 48px;
+  padding: 8px;
+  gap: 4px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  font: 400 13px/1 var(--ss-font);
+  color: var(--ss-text);
+}
+
+.wv-seg__item {
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  padding: 0 10px;
+}
+
+.wv-seg__item[data-on] {
+  background: var(--ss-well);
+  color: var(--ss-text-strong);
+}
+
+.wv-seg__item[data-hover] {
+  background: var(--ss-well);
+}
+
+/* Stage resize plugin: the container the stage fills */
+.wv-host {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  overflow: hidden;
+  background: var(--ss-canvas);
+  border: 1px solid var(--ss-line-strong, var(--ss-line));
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateX(-50%);
+  will-change: width;
+  transition: width 0.9s cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.wv-host__size {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 6px 10px;
+  background: var(--ss-surface);
+  border-top: 1px solid var(--ss-line);
+  border-right: 1px solid var(--ss-line);
+  color: var(--ss-text);
+  font: 400 11px/1 var(--ss-mono);
+}
+
+/* Comments renderer: the app's model, and the render() call that paints it */
+.wv-model {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  width: 300px;
+  padding: 12px 16px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text);
+  font: 400 12px/1.5 var(--ss-mono);
+}
+
+.wv-model__row[data-new] {
+  color: var(--ss-text-strong);
+}
+
+.wv-model__call {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-faint);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.wv-model__call[data-on] {
+  background: var(--ss-well);
+  color: var(--ss-text-strong);
+}
+
+.wv-pinfade {
+  transition: opacity 0.25s ease;
+}

@@ -89,16 +89,16 @@ Every demo task below is done only when the demo meets the DoD (design.md, decis
 
 ## 10. Canvas-behavior plugins
 
-- [ ] 10.1 Context menu: registry key `context-menu`, replaces `plugins/context-menu.gif`; meets the DoD
-- [ ] 10.2 Copy and paste nodes: registry key `copy-paste-nodes`, replaces `plugins/copy-paste.gif`; meets the DoD
-- [ ] 10.3 Comments renderer: registry key `comments-renderer`, replaces `plugins/comments-renderer.gif`; meets the DoD
-- [ ] 10.4 Stage panning: registry key `stage-panning`, replaces `plugins/stage-panning.gif`; meets the DoD
-- [ ] 10.5 Stage zoom (currently reuses the panning GIF): registry key `stage-zoom`, replaces `plugins/stage-panning.gif`; meets the DoD
-- [ ] 10.6 Stage resize: registry key `stage-resize`, replaces `none`; meets the DoD
-- [ ] 10.7 Stage grid: registry key `stage-grid`, replaces `none`; meets the DoD
-- [ ] 10.8 Stage minimap: registry key `stage-minimap`, replaces `none`; meets the DoD
-- [ ] 10.9 Stage keyboard move: registry key `stage-keyboard-move`, replaces `none`; meets the DoD
-- [ ] 10.10 Stage drop area (a file dragged in from the desktop): registry key `stage-drop-area`, replaces `plugins/stage-drop-area.gif`; meets the DoD
+- [x] 10.1 Context menu: registry key `context-menu`, replaces `plugins/context-menu.gif`; meets the DoD
+- [x] 10.2 Copy and paste nodes: registry key `copy-paste-nodes`, replaces `plugins/copy-paste.gif`; meets the DoD
+- [x] 10.3 Comments renderer: registry key `comments-renderer`, replaces `plugins/comments-renderer.gif`; meets the DoD
+- [x] 10.4 Stage panning: registry key `stage-panning`, replaces `plugins/stage-panning.gif`; meets the DoD
+- [x] 10.5 Stage zoom (currently reuses the panning GIF): registry key `stage-zoom`, replaces `plugins/stage-panning.gif`; meets the DoD
+- [x] 10.6 Stage resize: registry key `stage-resize`, replaces `none`; meets the DoD
+- [x] 10.7 Stage grid: registry key `stage-grid`, replaces `none`; meets the DoD
+- [x] 10.8 Stage minimap: registry key `stage-minimap`, replaces `none`; meets the DoD
+- [x] 10.9 Stage keyboard move: registry key `stage-keyboard-move`, replaces `none`; meets the DoD
+- [x] 10.10 Stage drop area (a file dragged in from the desktop): registry key `stage-drop-area`, replaces `plugins/stage-drop-area.gif`; meets the DoD
 
 ## 11. Stores
 

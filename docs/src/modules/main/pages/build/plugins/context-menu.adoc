@@ -1,8 +1,7 @@
 = Context Menu
 :description: Trigger a contextual menu on the canvas
 
-image::plugins/context-menu.gif[Context Menu plugin on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/context-menu-poster-light.png[A right click on a rectangle opens a menu with Copy Paste and Delete and Delete removes the rectangle,width=960,height=540,role="weave-demo weave-demo--context-menu"]
 == Introduction
 
 This plugin adds custom right-click menus to the canvas, enabling users to access

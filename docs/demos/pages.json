@@ -54,5 +54,15 @@
   "connected-users": "main/images/plugins",
   "nodes-selection": "main/images/plugins",
   "nodes-multi-selection-feedback": "main/images/plugins",
-  "nodes-snapping": "main/images/plugins"
+  "nodes-snapping": "main/images/plugins",
+  "context-menu": "main/images/plugins",
+  "copy-paste-nodes": "main/images/plugins",
+  "comments-renderer": "main/images/plugins",
+  "stage-panning": "main/images/plugins",
+  "stage-zoom": "main/images/plugins",
+  "stage-resize": "main/images/plugins",
+  "stage-grid": "main/images/plugins",
+  "stage-minimap": "main/images/plugins",
+  "stage-keyboard-move": "main/images/plugins",
+  "stage-drop-area": "main/images/plugins"
 }

@@ -6,6 +6,16 @@ import type { DemoModule } from './types'
 
 // One lazy chunk per demo. Keys are the `data-demo` values used in pages.
 export const demos: Record<string, () => Promise<DemoModule>> = {
+  'stage-drop-area': () => import('./demos/stage-drop-area/stage-drop-area'),
+  'stage-keyboard-move': () => import('./demos/stage-keyboard-move/stage-keyboard-move'),
+  'stage-minimap': () => import('./demos/stage-minimap/stage-minimap'),
+  'stage-grid': () => import('./demos/stage-grid/stage-grid'),
+  'stage-resize': () => import('./demos/stage-resize/stage-resize'),
+  'stage-zoom': () => import('./demos/stage-zoom/stage-zoom'),
+  'stage-panning': () => import('./demos/stage-panning/stage-panning'),
+  'comments-renderer': () => import('./demos/comments-renderer/comments-renderer'),
+  'copy-paste-nodes': () => import('./demos/copy-paste-nodes/copy-paste-nodes'),
+  'context-menu': () => import('./demos/context-menu/context-menu'),
   'nodes-snapping': () => import('./demos/nodes-snapping/nodes-snapping'),
   'nodes-multi-selection-feedback': () => import('./demos/nodes-multi-selection-feedback/nodes-multi-selection-feedback'),
   'nodes-selection': () => import('./demos/nodes-selection/nodes-selection'),

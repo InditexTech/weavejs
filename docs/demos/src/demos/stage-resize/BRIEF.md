@@ -1,0 +1,40 @@
+# Brief: stage-resize
+
+- **Page:** `main:build/plugins/stage-resize.adoc` (top of the page, replacing `none`)
+- **Registry key:** `stage-resize`
+- **Size:** 960x540 (16:9). The canvas fills the stage, so the PNG posters are opaque; there is no plate or window.
+- **Poster alpha:** not required (it fills its stage)
+- **Look:** Weave (`weaveTokens(theme)`), light and dark.
+- **Chrome:** none. Crop to the toolbar and a corner of the canvas. Every node is shown whole, none cut by an edge.
+- **Scene:** `StageResizeScene` (`weave-ui/scenes`) (no local cursor).
+- **Cursor:** kit cursor, `real` style with `ripple`no local cursor.
+- **Behavior source:** `code/packages/sdk/src/plugins/stage-resize/ (the stage follows its container)`
+
+## Story
+
+The Stage resize plugin keeps the stage the size of its container, so the canvas is responsive.
+
+Beats (about 10 s):
+
+1. A stage sits in a container, 760 x 400, a rectangle in its middle.
+2. The container shrinks to 460 x 300: the stage shrinks with it and the rectangle stays in the middle.
+3. Payoff (holds about 2.8 s).
+4. The container grows back to 760 x 400.
+
+## Screen
+
+Real strings: the size tag.
+
+Focal object: the resize.
+
+## Crop
+
+Toolbar one gutter from the left, canvas full-bleed, every node whole; the resize keeps clear of the other nodes and the toolbar.
+
+## Poster
+
+The container shrunk with the rectangle in its middle.
+
+## Out of scope
+
+Dragging the container edge, window resize events, compact (phone-column) layout.
