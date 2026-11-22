@@ -1,0 +1,221 @@
+AGENTS.md
+  s_222f345225f7a0::t_1fa70274963b55 152-173
+docs/demos/pages.json
+  s_222f345225f7a0::t_7b9a5451646257 35-57
+docs/demos/src/demos/align-nodes-tool/BRIEF.md
+  s_222f345225f7a0::t_ce3c914e2b992d 1-41
+docs/demos/src/demos/align-nodes-tool/REHEARSAL.md
+  s_222f345225f7a0::t_2040dbcbd09ada 1-13
+docs/demos/src/demos/align-nodes-tool/align-nodes-tool.tsx
+  s_222f345225f7a0::t_c484a5431abd7c 1-10
+docs/demos/src/demos/brush-tool/BRIEF.md
+  s_222f345225f7a0::t_d6cecd9b2fce13 1-42
+docs/demos/src/demos/brush-tool/REHEARSAL.md
+  s_222f345225f7a0::t_085e8f3dd91a44 1-13
+docs/demos/src/demos/brush-tool/brush-tool.tsx
+  s_222f345225f7a0::t_b48fdfc05c7177 1-12
+docs/demos/src/demos/connected-users/BRIEF.md
+  s_222f345225f7a0::t_7622f7456f3819 1-41
+docs/demos/src/demos/connected-users/REHEARSAL.md
+  s_222f345225f7a0::t_5aa993a00b81f9 1-13
+docs/demos/src/demos/connected-users/connected-users.tsx
+  s_222f345225f7a0::t_a71534e54cbf0e 1-10
+docs/demos/src/demos/eraser-tool/BRIEF.md
+  s_222f345225f7a0::t_1576cd7e26bf92 1-42
+docs/demos/src/demos/eraser-tool/REHEARSAL.md
+  s_222f345225f7a0::t_c63f9fee7304aa 1-13
+docs/demos/src/demos/eraser-tool/eraser-tool.tsx
+  s_222f345225f7a0::t_467ca220c513e1 1-12
+docs/demos/src/demos/export-node-tool/BRIEF.md
+  s_222f345225f7a0::t_2a77ed83eb58b8 1-41
+docs/demos/src/demos/export-node-tool/REHEARSAL.md
+  s_222f345225f7a0::t_dee5f9caa093d0 1-13
+docs/demos/src/demos/export-node-tool/export-node-tool.tsx
+  s_222f345225f7a0::t_35bc8c5958f126 1-10
+docs/demos/src/demos/export-stage-tool/BRIEF.md
+  s_222f345225f7a0::t_dad48c0a955685 1-41
+docs/demos/src/demos/export-stage-tool/REHEARSAL.md
+  s_222f345225f7a0::t_2ec654f2fc0108 1-13
+docs/demos/src/demos/export-stage-tool/export-stage-tool.tsx
+  s_222f345225f7a0::t_c3a4888d504106 1-10
+docs/demos/src/demos/fit-to-screen-tool/BRIEF.md
+  s_222f345225f7a0::t_cbddc7cbe18421 1-41
+docs/demos/src/demos/fit-to-screen-tool/REHEARSAL.md
+  s_222f345225f7a0::t_81292bc1acd60d 1-14
+docs/demos/src/demos/fit-to-screen-tool/fit-to-screen-tool.tsx
+  s_222f345225f7a0::t_43fb28d376ac23 1-10
+docs/demos/src/demos/fit-to-selection-tool/BRIEF.md
+  s_222f345225f7a0::t_37cb9935f8af47 1-41
+docs/demos/src/demos/fit-to-selection-tool/REHEARSAL.md
+  s_222f345225f7a0::t_7f5ff615ac3854 1-15
+docs/demos/src/demos/fit-to-selection-tool/fit-to-selection-tool.tsx
+  s_222f345225f7a0::t_68a89acaa24bac 1-10
+docs/demos/src/demos/move-tool/BRIEF.md
+  s_222f345225f7a0::t_cb44508b157930 1-42
+docs/demos/src/demos/move-tool/REHEARSAL.md
+  s_222f345225f7a0::t_42f2639e6531e4 1-13
+docs/demos/src/demos/move-tool/move-tool.tsx
+  s_222f345225f7a0::t_9b031f33980966 1-10
+docs/demos/src/demos/nodes-multi-selection-feedback/BRIEF.md
+  s_222f345225f7a0::t_698682d4db6bc8 1-41
+docs/demos/src/demos/nodes-multi-selection-feedback/REHEARSAL.md
+  s_222f345225f7a0::t_8f98b1d8b9f6ac 1-13
+docs/demos/src/demos/nodes-multi-selection-feedback/nodes-multi-selection-feedback.tsx
+  s_222f345225f7a0::t_85c43686cfd661 1-10
+docs/demos/src/demos/nodes-selection/BRIEF.md
+  s_222f345225f7a0::t_903de8e6f64aa1 1-41
+docs/demos/src/demos/nodes-selection/REHEARSAL.md
+  s_222f345225f7a0::t_b4c1ce872f1c33 1-13
+docs/demos/src/demos/nodes-selection/nodes-selection.tsx
+  s_222f345225f7a0::t_979a85a3f3398a 1-10
+docs/demos/src/demos/nodes-snapping/BRIEF.md
+  s_222f345225f7a0::t_830c5ca4469a4c 1-41
+docs/demos/src/demos/nodes-snapping/REHEARSAL.md
+  s_222f345225f7a0::t_69d7139a5462fb 1-13
+docs/demos/src/demos/nodes-snapping/nodes-snapping.tsx
+  s_222f345225f7a0::t_af405df72b1e15 1-10
+docs/demos/src/demos/pen-tool/BRIEF.md
+  s_222f345225f7a0::t_a98afb19b1c8a8 1-42
+docs/demos/src/demos/pen-tool/REHEARSAL.md
+  s_222f345225f7a0::t_3e6f8ca8781b22 1-13
+docs/demos/src/demos/pen-tool/pen-tool.tsx
+  s_222f345225f7a0::t_1331a136d1f4c4 1-12
+docs/demos/src/demos/selection-tool/BRIEF.md
+  s_222f345225f7a0::t_7ac76700b8bbce 1-42
+docs/demos/src/demos/selection-tool/REHEARSAL.md
+  s_222f345225f7a0::t_23a1ba3b7f18ae 1-13
+docs/demos/src/demos/selection-tool/selection-tool.tsx
+  s_222f345225f7a0::t_2a37e60c13f757 1-10
+docs/demos/src/demos/stroke-single/BRIEF.md
+  s_222f345225f7a0::t_4c06933eec6f34 1-41
+docs/demos/src/demos/stroke-single/REHEARSAL.md
+  s_222f345225f7a0::t_a5344c646f1722 1-13
+docs/demos/src/demos/stroke-single/stroke-single.tsx
+  s_222f345225f7a0::t_9f66b0bab7f627 1-23
+docs/demos/src/demos/stroke-tool/BRIEF.md
+  s_222f345225f7a0::t_6c3f9d041efedf 1-42
+docs/demos/src/demos/stroke-tool/REHEARSAL.md
+  s_222f345225f7a0::t_e542bb68ddbcec 1-13
+docs/demos/src/demos/stroke-tool/stroke-tool.tsx
+  s_222f345225f7a0::t_1b3a6031739d80 1-27
+docs/demos/src/demos/stroke/BRIEF.md
+  s_222f345225f7a0::t_2870e861ee745f 1-41
+docs/demos/src/demos/stroke/REHEARSAL.md
+  s_222f345225f7a0::t_ed391368291dab 1-13
+docs/demos/src/demos/stroke/stroke.tsx
+  s_222f345225f7a0::t_fc45f6c9b704bf 1-14
+docs/demos/src/demos/users-pointers/BRIEF.md
+  s_222f345225f7a0::t_c60e24b3a9811c 1-41
+docs/demos/src/demos/users-pointers/REHEARSAL.md
+  s_222f345225f7a0::t_212809a703e816 1-13
+docs/demos/src/demos/users-pointers/users-pointers.tsx
+  s_222f345225f7a0::t_861d1f1761737e 1-10
+docs/demos/src/demos/users-presence/BRIEF.md
+  s_222f345225f7a0::t_c2f92c71956651 1-41
+docs/demos/src/demos/users-presence/REHEARSAL.md
+  s_222f345225f7a0::t_2b32243cca84f0 1-13
+docs/demos/src/demos/users-presence/users-presence.tsx
+  s_222f345225f7a0::t_85de2243245cb4 1-10
+docs/demos/src/demos/users-selector/BRIEF.md
+  s_222f345225f7a0::t_ca55f3e266aaea 1-41
+docs/demos/src/demos/users-selector/REHEARSAL.md
+  s_222f345225f7a0::t_009bbd616a1e1f 1-13
+docs/demos/src/demos/users-selector/users-selector.tsx
+  s_222f345225f7a0::t_9dcaeff1451e12 1-10
+docs/demos/src/demos/zoom-in-tool/BRIEF.md
+  s_222f345225f7a0::t_34ffca39379a80 1-41
+docs/demos/src/demos/zoom-in-tool/REHEARSAL.md
+  s_222f345225f7a0::t_6d1e72d0ab3b46 1-14
+docs/demos/src/demos/zoom-in-tool/zoom-in-tool.tsx
+  s_222f345225f7a0::t_aa6bd1e1beb349 1-10
+docs/demos/src/demos/zoom-out-tool/BRIEF.md
+  s_222f345225f7a0::t_a263ef48f66aa0 1-41
+docs/demos/src/demos/zoom-out-tool/REHEARSAL.md
+  s_222f345225f7a0::t_b8b443d6df8f56 1-14
+docs/demos/src/demos/zoom-out-tool/zoom-out-tool.tsx
+  s_222f345225f7a0::t_f6b850eb0cbcc7 1-10
+docs/demos/src/registry.ts
+  s_222f345225f7a0::t_0a04305a61c4e4 9-30
+docs/demos/src/weave-ui/overlays/overlays.css
+  s_222f345225f7a0::t_397ce6672916a5 64-65,69-79
+docs/demos/src/weave-ui/overlays/overlays.tsx
+  s_222f345225f7a0::t_b539650b02d9d5 7,44-49,52,54-56
+docs/demos/src/weave-ui/scenes/action-scenes.css
+  s_222f345225f7a0::t_a7e9507ff837a1 1-57
+docs/demos/src/weave-ui/scenes/action-scenes.tsx
+  s_222f345225f7a0::t_91d2c4643a50e4 1-258
+docs/demos/src/weave-ui/scenes/collab-scenes.css
+  s_222f345225f7a0::t_9ed8ab76df8670 1-134
+docs/demos/src/weave-ui/scenes/collab-scenes.tsx
+  s_222f345225f7a0::t_4eb8836f863bfb 1-252
+docs/demos/src/weave-ui/scenes/draw-scene.tsx
+  s_222f345225f7a0::t_77fbaa17c801fa 1-189
+docs/demos/src/weave-ui/scenes/viewport-scene.css
+  s_222f345225f7a0::t_01723220008bd4 1-24
+docs/demos/src/weave-ui/scenes/viewport-scene.tsx
+  s_222f345225f7a0::t_856c1f04b8066b 1-155
+docs/demos/src/weave-ui/toolbar.tsx
+  s_222f345225f7a0::t_5f6e2073211b2e 6,20,38-39,47
+docs/src/modules/main/pages/build/actions/align-nodes-tool.adoc
+  s_222f345225f7a0::t_e3876f91b65a44 4
+docs/src/modules/main/pages/build/actions/brush-tool.adoc
+  s_222f345225f7a0::t_ea27df6cfe926a 4
+docs/src/modules/main/pages/build/actions/eraser-tool.adoc
+  s_222f345225f7a0::t_096b69782ae080 4
+docs/src/modules/main/pages/build/actions/export-node-tool.adoc
+  s_222f345225f7a0::t_aeef85b4ffccbe 4
+docs/src/modules/main/pages/build/actions/export-stage-tool.adoc
+  s_222f345225f7a0::t_27a698b0db8984 4
+docs/src/modules/main/pages/build/actions/fit-to-screen-tool.adoc
+  s_222f345225f7a0::t_36face62cd902a 4
+docs/src/modules/main/pages/build/actions/fit-to-selection-tool.adoc
+  s_222f345225f7a0::t_bfc6186b2f7a3f 4
+docs/src/modules/main/pages/build/actions/move-tool.adoc
+  s_222f345225f7a0::t_b974f41cf4f215 4
+docs/src/modules/main/pages/build/actions/pen-tool.adoc
+  s_222f345225f7a0::t_96e2ecd073e454 4
+docs/src/modules/main/pages/build/actions/selection-tool.adoc
+  s_222f345225f7a0::t_090eec5a6979a8 4
+docs/src/modules/main/pages/build/actions/stroke-tool.adoc
+  s_222f345225f7a0::t_9f185dab2157de 4
+docs/src/modules/main/pages/build/actions/zoom-in-tool.adoc
+  s_222f345225f7a0::t_da256f66687dc3 4
+docs/src/modules/main/pages/build/actions/zoom-out-tool.adoc
+  s_222f345225f7a0::t_90476893a63f38 4
+docs/src/modules/main/pages/build/nodes/stroke-single.adoc
+  s_222f345225f7a0::t_a8d0a366e8af34 4
+docs/src/modules/main/pages/build/nodes/stroke.adoc
+  s_222f345225f7a0::t_fd66a62f4be595 4
+docs/src/modules/main/pages/build/plugins/connected-users.adoc
+  s_222f345225f7a0::t_12735dd6f57f4b 4
+docs/src/modules/main/pages/build/plugins/nodes-multi-selection-feedback.adoc
+  s_222f345225f7a0::t_18c324cf247497 4
+docs/src/modules/main/pages/build/plugins/nodes-selection.adoc
+  s_222f345225f7a0::t_b398adbe813d48 4
+docs/src/modules/main/pages/build/plugins/nodes-snapping.adoc
+  s_222f345225f7a0::t_1a51e4aaa50638 4
+docs/src/modules/main/pages/build/plugins/users-pointers.adoc
+  s_222f345225f7a0::t_1b4f6a7e0d4b93 4
+docs/src/modules/main/pages/build/plugins/users-presence.adoc
+  s_222f345225f7a0::t_8b71a5ef64528e 4
+docs/src/modules/main/pages/build/plugins/users-selector.adoc
+  s_222f345225f7a0::t_1d1f104f7f35e2 4
+openspec/changes/docs-faux-ui-demos-rollout/tasks.md
+  s_222f345225f7a0::t_e386ad9a0731c4 61-66,70-78,82-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "2a92f53b8f30c721911e331c566efc998bb08e75",
+  "prompts": {},
+  "sessions": {
+    "s_222f345225f7a0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0753ddc2ffesWccUTS2hhG3si",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
