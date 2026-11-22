@@ -1,0 +1,109 @@
+AGENTS.md
+  s_222f345225f7a0::t_8f080fa705d139 159-168
+docs/demos/pages.json
+  s_222f345225f7a0::t_5855958b232bd8 57-67
+docs/demos/src/demos/comments-renderer/BRIEF.md
+  s_222f345225f7a0::t_43435c2fed19bf 1-41
+docs/demos/src/demos/comments-renderer/REHEARSAL.md
+  s_222f345225f7a0::t_2ccf09e9e41cae 1-13
+docs/demos/src/demos/comments-renderer/comments-renderer.tsx
+  s_222f345225f7a0::t_7e3be20d580546 1-10
+docs/demos/src/demos/context-menu/BRIEF.md
+  s_222f345225f7a0::t_cc29c7b4ecb7af 1-41
+docs/demos/src/demos/context-menu/REHEARSAL.md
+  s_222f345225f7a0::t_06dc615f4f4da2 1-13
+docs/demos/src/demos/context-menu/context-menu.tsx
+  s_222f345225f7a0::t_9e8615a35321c2 1-10
+docs/demos/src/demos/copy-paste-nodes/BRIEF.md
+  s_222f345225f7a0::t_ec4ea5c84eeb54 1-41
+docs/demos/src/demos/copy-paste-nodes/REHEARSAL.md
+  s_222f345225f7a0::t_d7330023100de8 1-13
+docs/demos/src/demos/copy-paste-nodes/copy-paste-nodes.tsx
+  s_222f345225f7a0::t_d940492c3a4236 1-10
+docs/demos/src/demos/stage-drop-area/BRIEF.md
+  s_222f345225f7a0::t_b377ea22458edc 1-41
+docs/demos/src/demos/stage-drop-area/REHEARSAL.md
+  s_222f345225f7a0::t_c3f2b1dd571d53 1-13
+docs/demos/src/demos/stage-drop-area/stage-drop-area.tsx
+  s_222f345225f7a0::t_ca488bccebd075 1-10
+docs/demos/src/demos/stage-grid/BRIEF.md
+  s_222f345225f7a0::t_fb1528a9963fcb 1-41
+docs/demos/src/demos/stage-grid/REHEARSAL.md
+  s_222f345225f7a0::t_b16dff39f60255 1-13
+docs/demos/src/demos/stage-grid/stage-grid.tsx
+  s_222f345225f7a0::t_2b236c83e30afe 1-10
+docs/demos/src/demos/stage-keyboard-move/BRIEF.md
+  s_222f345225f7a0::t_25990bbc622a8e 1-41
+docs/demos/src/demos/stage-keyboard-move/REHEARSAL.md
+  s_222f345225f7a0::t_08bb8f046bb730 1-13
+docs/demos/src/demos/stage-keyboard-move/stage-keyboard-move.tsx
+  s_222f345225f7a0::t_9f9359e2ccb200 1-10
+docs/demos/src/demos/stage-minimap/BRIEF.md
+  s_222f345225f7a0::t_5579ba82d6c275 1-41
+docs/demos/src/demos/stage-minimap/REHEARSAL.md
+  s_222f345225f7a0::t_0dbd471d52bed4 1-13
+docs/demos/src/demos/stage-minimap/stage-minimap.tsx
+  s_222f345225f7a0::t_de84100381b5cd 1-10
+docs/demos/src/demos/stage-panning/BRIEF.md
+  s_222f345225f7a0::t_7045b701c4f6ed 1-41
+docs/demos/src/demos/stage-panning/REHEARSAL.md
+  s_222f345225f7a0::t_d054bbb1be515a 1-13
+docs/demos/src/demos/stage-panning/stage-panning.tsx
+  s_222f345225f7a0::t_b8c5a3483a1278 1-10
+docs/demos/src/demos/stage-resize/BRIEF.md
+  s_222f345225f7a0::t_6a06ac73537b5a 1-40
+docs/demos/src/demos/stage-resize/REHEARSAL.md
+  s_222f345225f7a0::t_d003c636a4baed 1-13
+docs/demos/src/demos/stage-resize/stage-resize.tsx
+  s_222f345225f7a0::t_c8dc2b8733444e 1-10
+docs/demos/src/demos/stage-zoom/BRIEF.md
+  s_222f345225f7a0::t_91b10ee74dcbc8 1-41
+docs/demos/src/demos/stage-zoom/REHEARSAL.md
+  s_222f345225f7a0::t_318fa8c7087aaa 1-13
+docs/demos/src/demos/stage-zoom/stage-zoom.tsx
+  s_222f345225f7a0::t_4cb1db04bca00f 1-10
+docs/demos/src/registry.ts
+  s_222f345225f7a0::t_18974d1820d2ec 9-18
+docs/demos/src/weave-ui/scenes/canvas-plugin-scenes.css
+  s_222f345225f7a0::t_cfa5ca9a1f8fd9 1-109
+docs/demos/src/weave-ui/scenes/canvas-plugin-scenes.tsx
+  s_222f345225f7a0::t_a58a4f2a6996ad 1-450
+docs/src/modules/main/pages/build/plugins/comments-renderer.adoc
+  s_222f345225f7a0::t_7e259b4c4bc4e6 4
+docs/src/modules/main/pages/build/plugins/context-menu.adoc
+  s_222f345225f7a0::t_badd5c7ab389d5 4
+docs/src/modules/main/pages/build/plugins/copy-paste-nodes.adoc
+  s_222f345225f7a0::t_c115be6c8a9f9e 4
+docs/src/modules/main/pages/build/plugins/stage-drop-area.adoc
+  s_222f345225f7a0::t_87464f5a9215fc 4
+docs/src/modules/main/pages/build/plugins/stage-grid.adoc
+  s_222f345225f7a0::t_5b65e30356bfbd 4-5
+docs/src/modules/main/pages/build/plugins/stage-keyboard-move.adoc
+  s_222f345225f7a0::t_a77f4b07073267 4-5
+docs/src/modules/main/pages/build/plugins/stage-minimap.adoc
+  s_222f345225f7a0::t_4510fa82e035f5 4-5
+docs/src/modules/main/pages/build/plugins/stage-panning.adoc
+  s_222f345225f7a0::t_ece1fe2b7ef80e 4
+docs/src/modules/main/pages/build/plugins/stage-resize.adoc
+  s_222f345225f7a0::t_3b9cd4661f0139 4-5
+docs/src/modules/main/pages/build/plugins/stage-zoom.adoc
+  s_222f345225f7a0::t_f3682dd30cd62e 4
+openspec/changes/docs-faux-ui-demos-rollout/tasks.md
+  s_222f345225f7a0::t_c192ad0433ca40 92-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "7ca95646eee9bca304d91d7e84911cd5fc04b5ac",
+  "prompts": {},
+  "sessions": {
+    "s_222f345225f7a0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0753ddc2ffesWccUTS2hhG3si",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
