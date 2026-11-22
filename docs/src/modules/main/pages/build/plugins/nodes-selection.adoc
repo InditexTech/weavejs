@@ -1,8 +1,7 @@
 = Nodes Selection
 :description: Activate support to select nodes on the canvas
 
-image::plugins/nodes-selection.gif[Nodes selection plugin on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/nodes-selection-poster-light.png[Two rectangles are selected with a marquee moved together and deleted with the Delete key,width=960,height=540,role="weave-demo weave-demo--nodes-selection"]
 == Introduction
 
 This plugin enables users to select one or multiple nodes on the canvas through

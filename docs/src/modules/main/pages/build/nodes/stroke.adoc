@@ -1,8 +1,7 @@
 = Stroke
 :description: Draw a free-line on the canvas
 
-image::nodes/stroke.png[Stroke on Weave.js showcase,role="zoom-in"]
-
+image::nodes/stroke-poster-light.png[A stroke node on the canvas is selected then moved and resized with its corner handle,width=960,height=540,role="weave-demo weave-demo--stroke"]
 The Stroke node represents a customizable free-line on the canvas.
 It supports features like stroke color, width, dash patterns.
 

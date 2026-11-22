@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { LucideIcon } from 'lucide-react'
-import { Brush, Circle, Eraser, Frame, Hand, Hexagon, Image, Images, Waypoints, MessageSquare, MousePointer2, MoveUpRight, Pentagon, PenLine, PenTool, Redo2, Ruler, Square, Star, StickyNote, Type, Undo2, Video } from 'lucide-react'
+import { Brush, Circle, Eraser, Frame, Hand, Hexagon, Image, Images, Waypoints, MessageSquare, MousePointer2, MoveUpRight, Pentagon, PenLine, PenTool, Redo2, Ruler, Square, Spline, Star, StickyNote, Type, Undo2, Video } from 'lucide-react'
 import type { Rect } from '../../kit'
 import './toolbar.css'
 
@@ -17,6 +17,7 @@ export type ToolId =
   | 'star'
   | 'line'
   | 'arrow'
+  | 'stroke'
   | 'connector'
   | 'measure'
   | 'brush'
@@ -34,8 +35,8 @@ export type ToolId =
 
 // Icons and tooltip texts follow the showcase's tool hooks (use-*-tools.tsx): lucide, 1px strokes.
 export const TOOL_INFO: Record<ToolId, { icon: LucideIcon; label: string; key?: string }> = {
-  move: { icon: MousePointer2, label: 'Move tool', key: 'V' },
-  hand: { icon: Hand, label: 'Hand tool', key: 'H' },
+  move: { icon: MousePointer2, label: 'Selection tool' },
+  hand: { icon: Hand, label: 'Move tool', key: 'M' },
   rectangle: { icon: Square, label: 'Rectangle tool', key: 'R' },
   ellipse: { icon: Circle, label: 'Ellipse tool', key: 'E' },
   polygon: { icon: Pentagon, label: 'Polygon tool', key: 'P' },
@@ -43,6 +44,7 @@ export const TOOL_INFO: Record<ToolId, { icon: LucideIcon; label: string; key?: 
   star: { icon: Star, label: 'Star tool', key: 'J' },
   line: { icon: PenLine, label: 'Line tool', key: 'L' },
   arrow: { icon: MoveUpRight, label: 'Arrow tool' },
+  stroke: { icon: Spline, label: 'Stroke tool' },
   connector: { icon: Waypoints, label: 'Connector tool' },
   measure: { icon: Ruler, label: 'Measure tool' },
   brush: { icon: Brush, label: 'Brush tool', key: 'B' },

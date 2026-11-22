@@ -61,9 +61,20 @@
 .wv-zoom {
   position: absolute;
   height: 40px;
-  gap: 10px;
-  padding: 0 12px;
+  gap: 4px;
+  padding: 0 8px;
   color: var(--ss-icon);
+}
+
+.wv-zoom__button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+}
+
+.wv-zoom__button[data-hover] {
+  background: var(--ss-well);
 }
 
 .wv-zoom__level {

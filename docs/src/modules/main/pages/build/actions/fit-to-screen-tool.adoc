@@ -1,8 +1,7 @@
 = Fit to Screen Tool
 :description: Set the zoom level so all the nodes on the stage are entirely visible on the screen
 
-image::actions/fit-to-screen-tool.gif[Fit to Screen Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/fit-to-screen-tool-poster-light.png[The canvas is zoomed in on one corner then Fit to screen is clicked and all the nodes come into view,width=960,height=540,role="weave-demo weave-demo--fit-to-screen-tool"]
 == Introduction
 
 This action automatically adjusts the zoom and position of the Stage to ensure all

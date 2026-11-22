@@ -1,8 +1,7 @@
 = Fit to Selection Tool
 :description: Set the zoom level so all the selected nodes are entirely visible on the screen
 
-image::actions/fit-to-selection-tool.gif[Fit to Selection Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/fit-to-selection-tool-poster-light.png[A sticky note is selected then Fit to selection is clicked and the view zooms in to fit it,width=960,height=540,role="weave-demo weave-demo--fit-to-selection-tool"]
 == Introduction
 
 This action automatically adjusts the zoom and position of the Stage to ensure all

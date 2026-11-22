@@ -1,8 +1,7 @@
 = Export Node Tool
 :description: Export the selected node as an image
 
-image::actions/export-node-tool.gif[Export Node Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/export-node-tool-poster-light.png[A rectangle is selected then exported as an image and a download chip shows its file name,width=960,height=540,role="weave-demo weave-demo--export-node-tool"]
 == Introduction
 
 This action allows users to capture and download a node as an image file (jpeg, png or gif).

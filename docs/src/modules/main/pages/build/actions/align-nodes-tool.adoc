@@ -1,8 +1,7 @@
 = Align Nodes Tool
 :description: Select nodes and align among them
 
-image::actions/align-nodes-tool.gif[Align Nodes Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/align-nodes-tool-poster-light.png[Three rectangles at different positions are selected with a marquee and aligned to the left with the align bar,width=960,height=540,role="weave-demo weave-demo--align-nodes-tool"]
 == Introduction
 
 This action enables users to users to align selected nodes vertically or horizontally.

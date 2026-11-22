@@ -58,34 +58,34 @@ Every demo task below is done only when the demo meets the DoD (design.md, decis
 
 ## 7. Drawing
 
-- [ ] 7.1 Brush tool (input profiles): registry key `brush-tool`, replaces `actions/brush-tool.gif`; meets the DoD
-- [ ] 7.2 Pen tool: registry key `pen-tool`, replaces `actions/pen-tool.gif`; meets the DoD
-- [ ] 7.3 Eraser tool: registry key `eraser-tool`, replaces `actions/eraser-tool.gif`; meets the DoD
-- [ ] 7.4 Stroke node: registry key `stroke`, replaces `nodes/stroke.png`; meets the DoD
-- [ ] 7.5 Stroke single node: registry key `stroke-single`, replaces `nodes/stroke-single.png`; meets the DoD
-- [ ] 7.6 Stroke tool: registry key `stroke-tool`, replaces `actions/stroke-tool.gif`; meets the DoD
+- [x] 7.1 Brush tool (input profiles): registry key `brush-tool`, replaces `actions/brush-tool.gif`; meets the DoD
+- [x] 7.2 Pen tool: registry key `pen-tool`, replaces `actions/pen-tool.gif`; meets the DoD
+- [x] 7.3 Eraser tool: registry key `eraser-tool`, replaces `actions/eraser-tool.gif`; meets the DoD
+- [x] 7.4 Stroke node: registry key `stroke`, replaces `nodes/stroke.png`; meets the DoD
+- [x] 7.5 Stroke single node: registry key `stroke-single`, replaces `nodes/stroke-single.png`; meets the DoD
+- [x] 7.6 Stroke tool: registry key `stroke-tool`, replaces `actions/stroke-tool.gif`; meets the DoD
 
 ## 8. Selection, viewport and export tools
 
-- [ ] 8.1 Move tool: registry key `move-tool`, replaces `actions/move-tool.gif`; meets the DoD
-- [ ] 8.2 Selection tool: registry key `selection-tool`, replaces `actions/selection-tool.gif`; meets the DoD
-- [ ] 8.3 Align nodes tool: registry key `align-nodes-tool`, replaces `actions/align-nodes-tool.gif`; meets the DoD
-- [ ] 8.4 Fit to screen tool: registry key `fit-to-screen-tool`, replaces `actions/fit-to-screen-tool.gif`; meets the DoD
-- [ ] 8.5 Fit to selection tool: registry key `fit-to-selection-tool`, replaces `actions/fit-to-selection-tool.gif`; meets the DoD
-- [ ] 8.6 Zoom in tool: registry key `zoom-in-tool`, replaces `actions/zoom-in-tool.gif`; meets the DoD
-- [ ] 8.7 Zoom out tool: registry key `zoom-out-tool`, replaces `actions/zoom-out-tool.gif`; meets the DoD
-- [ ] 8.8 Export node tool: registry key `export-node-tool`, replaces `actions/export-node-tool.gif`; meets the DoD
-- [ ] 8.9 Export stage tool: registry key `export-stage-tool`, replaces `actions/export-stage-tool.gif`; meets the DoD
+- [x] 8.1 Move tool: registry key `move-tool`, replaces `actions/move-tool.gif`; meets the DoD
+- [x] 8.2 Selection tool: registry key `selection-tool`, replaces `actions/selection-tool.gif`; meets the DoD
+- [x] 8.3 Align nodes tool: registry key `align-nodes-tool`, replaces `actions/align-nodes-tool.gif`; meets the DoD
+- [x] 8.4 Fit to screen tool: registry key `fit-to-screen-tool`, replaces `actions/fit-to-screen-tool.gif`; meets the DoD
+- [x] 8.5 Fit to selection tool: registry key `fit-to-selection-tool`, replaces `actions/fit-to-selection-tool.gif`; meets the DoD
+- [x] 8.6 Zoom in tool: registry key `zoom-in-tool`, replaces `actions/zoom-in-tool.gif`; meets the DoD
+- [x] 8.7 Zoom out tool: registry key `zoom-out-tool`, replaces `actions/zoom-out-tool.gif`; meets the DoD
+- [x] 8.8 Export node tool: registry key `export-node-tool`, replaces `actions/export-node-tool.gif`; meets the DoD
+- [x] 8.9 Export stage tool: registry key `export-stage-tool`, replaces `actions/export-stage-tool.gif`; meets the DoD
 
 ## 9. Collaboration and selection plugins
 
-- [ ] 9.1 Users presence: registry key `users-presence`, replaces `plugins/users-presence.gif`; meets the DoD
-- [ ] 9.2 Users pointers: registry key `users-pointers`, replaces `plugins/users-pointers.gif`; meets the DoD
-- [ ] 9.3 Users selector: registry key `users-selector`, replaces `plugins/users-selector.gif`; meets the DoD
-- [ ] 9.4 Connected users: registry key `connected-users`, replaces `plugins/connected-users.gif`; meets the DoD
-- [ ] 9.5 Nodes selection: registry key `nodes-selection`, replaces `plugins/nodes-selection.gif`; meets the DoD
-- [ ] 9.6 Nodes multi-selection feedback: registry key `nodes-multi-selection-feedback`, replaces `plugins/nodes-multi-selection-feedback.gif`; meets the DoD
-- [ ] 9.7 Nodes snapping: registry key `nodes-snapping`, replaces `plugins/nodes-snapping.gif`; meets the DoD
+- [x] 9.1 Users presence: registry key `users-presence`, replaces `plugins/users-presence.gif`; meets the DoD
+- [x] 9.2 Users pointers: registry key `users-pointers`, replaces `plugins/users-pointers.gif`; meets the DoD
+- [x] 9.3 Users selector: registry key `users-selector`, replaces `plugins/users-selector.gif`; meets the DoD
+- [x] 9.4 Connected users: registry key `connected-users`, replaces `plugins/connected-users.gif`; meets the DoD
+- [x] 9.5 Nodes selection: registry key `nodes-selection`, replaces `plugins/nodes-selection.gif`; meets the DoD
+- [x] 9.6 Nodes multi-selection feedback: registry key `nodes-multi-selection-feedback`, replaces `plugins/nodes-multi-selection-feedback.gif`; meets the DoD
+- [x] 9.7 Nodes snapping: registry key `nodes-snapping`, replaces `plugins/nodes-snapping.gif`; meets the DoD
 
 ## 10. Canvas-behavior plugins
 

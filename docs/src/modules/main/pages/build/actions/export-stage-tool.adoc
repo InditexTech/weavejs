@@ -1,8 +1,7 @@
 = Export Stage Tool
 :description: Export the entire stage (all nodes) node as an image
 
-image::actions/export-stage-tool.gif[Export Stage Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/export-stage-tool-poster-light.png[The Export page as image button is clicked and the whole canvas is exported and a download chip shows its file name,width=960,height=540,role="weave-demo weave-demo--export-stage-tool"]
 == Introduction
 
 This action allows users to capture and download the current canvas Stage view as an

@@ -1,0 +1,57 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.wv-slide {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wv-toast {
+  position: absolute;
+  z-index: 18;
+  right: 28px;
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 148px;
+  height: 40px;
+  padding: 0 0 0 14px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  color: var(--ss-text-strong);
+  font: 400 13px/1 var(--ss-font);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  will-change: transform, opacity;
+}
+
+.wv-toast[data-show] {
+  opacity: 1;
+  transform: none;
+}
+
+.wv-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 17;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.wv-flash[data-show] {
+  opacity: 0.7;
+  transition-duration: 0.06s;
+}
+
+.wv-export {
+  position: absolute;
+  left: 112px;
+  top: 28px;
+}

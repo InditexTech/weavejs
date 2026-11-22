@@ -1,8 +1,7 @@
 = Zoom In Tool
 :description: Increases one step the stage zoom level
 
-image::actions/zoom-in-tool.gif[Zoom In Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/zoom-in-tool-poster-light.png[The Zoom in button is clicked twice and the canvas and grid zoom in step by step,width=960,height=540,role="weave-demo weave-demo--zoom-in-tool"]
 == Introduction
 
 This action allows users to incrementally zoom into the canvas, providing a more detailed

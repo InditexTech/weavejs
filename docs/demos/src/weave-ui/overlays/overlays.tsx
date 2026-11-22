@@ -4,7 +4,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Cloud, Maximize, Minus, Plus, Upload, ZoomIn, ZoomOut } from 'lucide-react'
+import { Cloud, Fullscreen, Maximize, Minus, Plus, Upload, ZoomIn, ZoomOut } from 'lucide-react'
 import '../fill.css'
 import '../room.css'
 import './overlays.css'
@@ -41,13 +41,19 @@ export function ContextMenu({ items, at, show, className }: { items: MenuItem[];
 }
 
 /** Zoom controls as a small card: out, the level, in, fit. */
-export function ZoomBar({ zoom, className, style }: { zoom: string; className?: string; style?: CSSProperties }) {
+export function ZoomBar({ zoom, className, style, hovered }: { zoom: string; className?: string; style?: CSSProperties; hovered?: 'zoom-in' | 'zoom-out' | 'zoom-fit' | 'zoom-selection' | null }) {
+  const icon = (Icon: LucideIcon, target: 'zoom-in' | 'zoom-out' | 'zoom-fit' | 'zoom-selection') => (
+    <span className="wv-zoom__button" data-target={target} data-hover={hovered === target || undefined}>
+      <Icon size={16} strokeWidth={1.25} />
+    </span>
+  )
   return (
     <div className={cx('wv-card wv-zoom', className)} style={style}>
-      <ZoomOut size={16} strokeWidth={1.25} data-target="zoom-out" />
+      {icon(ZoomOut, 'zoom-out')}
       <span className="wv-zoom__level">{zoom}</span>
-      <ZoomIn size={16} strokeWidth={1.25} data-target="zoom-in" />
-      <Maximize size={16} strokeWidth={1.25} data-target="zoom-fit" />
+      {icon(ZoomIn, 'zoom-in')}
+      {icon(Maximize, 'zoom-fit')}
+      {icon(Fullscreen, 'zoom-selection')}
     </div>
   )
 }

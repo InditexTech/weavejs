@@ -1,8 +1,7 @@
 = Move Tool
 :description: Activate the panning or movement of the canvas
 
-image::actions/move-tool.gif[Move Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/move-tool-poster-light.png[The Move tool is picked in the toolbar then the canvas is dragged and pans with its nodes and grid,width=960,height=540,role="weave-demo weave-demo--move-tool"]
 == Introduction
 
 This action allows users enable/disable the panning of Stage canvas.
