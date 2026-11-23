@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { createElement } from 'react'
+import { createElement, useLayoutEffect, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { DemoModule, DocsTheme } from './types'
 
@@ -45,6 +45,14 @@ export function syncPoster(el: Element, theme: DocsTheme) {
   if (next !== src) img.setAttribute('src', next)
 }
 
+/** Calls `onReady` once its children have committed, before the browser's next paint. */
+function Ready({ onReady, children }: { onReady: () => void; children?: ReactNode }) {
+  useLayoutEffect(() => {
+    onReady()
+  }, [])
+  return children
+}
+
 interface Mounted {
   host: HTMLElement
   root: Root
@@ -84,9 +92,13 @@ export function initDemos({ registry, prepare, rootMargin = '200px' }: LoaderOpt
         frame.append(host)
       }
       const root = createRoot(host)
-      root.render(createElement(Demo, { theme: currentTheme() }))
+      // The poster keeps showing until the stage has painted its first frame (the same frame the poster
+      // shows), so there is never a moment with neither: hiding it on render would leave a blank gap.
+      const onReady = () => {
+        requestAnimationFrame(() => requestAnimationFrame(() => (el.dataset.demoState = 'mounted')))
+      }
+      root.render(createElement(Ready, { onReady }, createElement(Demo, { theme: currentTheme() })))
       mounted.add({ host, root, Demo })
-      el.dataset.demoState = 'mounted'
     } catch {
       el.dataset.demoState = 'failed'
     }

@@ -34,7 +34,7 @@ The whole window is visible (912 x 492 in the 960 x 540 stage, 24 px on every si
 
 ## Poster
 
-Rectangle selected and labelled "Roadmap", Jon's caret on it, Maya resting at the bottom right, tool on select.
+The first frame of the loop (the start state, cursor at rest), exported with `?frame=initial`. The page shows it until the live demo paints the same frame, so nothing jumps at load.
 
 ## Out of scope
 

@@ -20,7 +20,7 @@ Use the poster as a normal AsciiDoc image and give it the `weave-demo` role plus
 image::rectangle-tool-poster.png[A rectangle is drawn on the canvas,width=960,height=540,role="weave-demo weave-demo--rectangle-tool"]
 ```
 
-The image is what readers see without JavaScript and while the demo loads, and it stays if the demo fails. Once the block nears the viewport the loader (`src/loader.ts`, added by `docs/supplemental-ui/partials/footer-scripts.hbs`) mounts the demo over it, follows the docs light/dark toggle, and the kit's `Stage` pauses it off-screen and shows its poster state under reduced motion.
+The image is what readers see without JavaScript and while the demo loads, and it stays if the demo fails. It is the demo's **first frame** (start state, cursor at rest), not its last: the loader keeps it visible until the stage has painted that same frame (two animation frames after React commits), so the hand-over has no jump and no blank gap. Once the block nears the viewport the loader (`src/loader.ts`, added by `docs/supplemental-ui/partials/footer-scripts.hbs`) mounts the demo over it, follows the docs light/dark toggle, and the kit's `Stage` pauses it off-screen and shows its poster state under reduced motion.
 
 On the home page the hero slot is a demo too: set `:page-hero-image:` to the poster and `:page-hero-demo: <name>` (supported by the overridden `supplemental-ui/partials/home-hero.hbs`).
 
@@ -50,11 +50,11 @@ npm run build        # to ../supplemental-ui/js/demos
 
 ### Poster PNGs for every demo
 
-`npm run posters` exports the light and dark pair of every registered demo (or only the keys you name: `npm run posters -- ellipse-tool`). It writes them next to the demo and, when `pages.json` maps the key to a folder under `docs/src/modules`, copies them there for the page to embed. It starts the dev server if none is running and exits non-zero if any export fails. A demo whose `BRIEF.md` says `**Poster alpha:** required` must produce a PNG with an alpha channel.
+`npm run posters` exports the light and dark pair of every registered demo, each from the stage's first frame (`?frame=initial` on the dev route, which freezes every Stage before its script runs) (or only the keys you name: `npm run posters -- ellipse-tool`). It writes them next to the demo and, when `pages.json` maps the key to a folder under `docs/src/modules`, copies them there for the page to embed. It starts the dev server if none is running and exits non-zero if any export fails. A demo whose `BRIEF.md` says `**Poster alpha:** required` must produce a PNG with an alpha channel.
 
 ### One poster by hand (transparent)
 
-`scripts/poster.mjs` screenshots one element with an alpha channel (Stageshow's `film.mjs --still` is opaque). `--reduced` makes the stage show its poster state; `--require-alpha` fails if the PNG has no alpha channel (use `--check-alpha` instead for a demo that fills its whole stage, such as a cropped canvas, which is fully opaque):
+`scripts/poster.mjs` screenshots one element with an alpha channel (Stageshow's `film.mjs --still` is opaque). `--reduced` makes the stage show its poster state (use the dev route's `&frame=initial` instead for a page poster); `--require-alpha` fails if the PNG has no alpha channel (use `--check-alpha` instead for a demo that fills its whole stage, such as a cropped canvas, which is fully opaque):
 
 ```sh
 node scripts/poster.mjs 'http://127.0.0.1:5174/?demo=<name>' --select '#root' --out src/demos/<name>/<name>-poster-light.png --reduced --require-alpha

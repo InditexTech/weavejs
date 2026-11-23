@@ -31,6 +31,8 @@ class FakeIO {
 
 const flush = async () => {
   for (let i = 0; i < 3; i++) await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  // The poster is only hidden two animation frames after the stage has committed
+  await new Promise<void>((resolve) => setTimeout(resolve, 80))
 }
 
 const reveal = async (el: Element) => {
@@ -38,6 +40,8 @@ const reveal = async (el: Element) => {
     observers.forEach(({ cb, targets }) => targets.includes(el) && cb([{ isIntersecting: true, target: el }]))
     await flush()
   })
+  // React commits (and the poster hand-over starts) when act exits; give the two frames time to run
+  await new Promise<void>((resolve) => setTimeout(resolve, 40))
 }
 
 const placeholder = (name: string) => {
@@ -53,6 +57,8 @@ const Demo = ({ theme }: DemoProps) => <p data-testid="demo">demo:{theme}</p>
 let handle: ReturnType<typeof initDemos> | undefined
 
 beforeEach(() => {
+  // jsdom has no animation frames: run them on the next tick
+  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(() => cb(0), 0))
   observers = []
   document.body.innerHTML = ''
   document.documentElement.className = ''
@@ -125,6 +131,7 @@ describe('initDemos', () => {
       release()
       await flush()
     })
+    await new Promise<void>((resolve) => setTimeout(resolve, 40))
     expect(el.dataset.demoState).toBe('mounted')
   })
 

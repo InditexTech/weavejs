@@ -141,7 +141,9 @@ export function Stage<S extends object>({
   const scaleRef = useRef(1)
   scaleRef.current = scale
   // film.mjs can slow every stage down (--slow) and film any stage dark (--dark)
-  const film = typeof window === 'undefined' ? {} : ((window as unknown as { __stageshow?: { slow?: number; theme?: Theme } }).__stageshow ?? {})
+  const film = typeof window === 'undefined' ? {} : ((window as unknown as { __stageshow?: { slow?: number; theme?: Theme; frame?: string } }).__stageshow ?? {})
+  // Poster export: \`frame: 'initial'\` shows the scene's first frame, cursor included, without running the script, so the poster image is exactly what the live demo starts from
+  const frozen = film.frame === 'initial'
   const speed = speedProp / (film.slow ?? 1)
   const theme = film.theme ?? themeProp
   const [kind, setKind] = useState<CursorKind>(cursor?.kind ?? 'pointer')
@@ -409,6 +411,11 @@ export function Stage<S extends object>({
   // Run the loop only while the stage is on screen and the tab is visible.
   useEffect(() => {
     const stage = rootRef.current!
+    if (frozen && script && !reduced) {
+      reset()
+      stage.removeAttribute('data-offscreen')
+      return cancelReset
+    }
     if (still || !script) {
       reset()
       stage.removeAttribute('data-offscreen')

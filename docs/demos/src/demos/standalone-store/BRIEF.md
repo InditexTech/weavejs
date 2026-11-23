@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the stand
 
 ## Poster
 
-The store with its rendered room and the image ready.
+The first frame of the loop (the start state, cursor at rest), exported with `?frame=initial`. The page shows it until the live demo paints the same frame, so nothing jumps at load.
 
 ## Out of scope
 

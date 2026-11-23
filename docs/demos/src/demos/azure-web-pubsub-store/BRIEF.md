@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the azure
 
 ## Poster
 
-Both clients connected, the database persisted and the broadcast on its way back, no cursor.
+The first frame of the loop (the start state, cursor at rest), exported with `?frame=initial`. The page shows it until the live demo paints the same frame, so nothing jumps at load.
 
 ## Out of scope
 

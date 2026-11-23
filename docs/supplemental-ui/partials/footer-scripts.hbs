@@ -13,4 +13,15 @@ SPDX-License-Identifier: Apache-2.0
 --}}
 
 <script id="site-script" src="{{{uiRootPath}}}/js/site.js" data-ui-root-path="{{{uiRootPath}}}"></script>
+{{!-- Dark theme: point the demo posters at their dark pair right away, before the loader module runs, so a dark page never paints the light poster first --}}
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
 <script type="module" src="{{{uiRootPath}}}/js/demos/loader.js"></script>

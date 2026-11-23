@@ -15,6 +15,10 @@ const theme: DocsTheme = params.get('theme') === 'dark' ? 'dark' : 'light'
 document.documentElement.style.colorScheme = theme
 document.body.style.background = 'transparent'
 
+// ?frame=initial freezes every stage on its first frame (the poster export)
+const frame = params.get('frame')
+if (frame) (window as unknown as { __stageshow?: Record<string, unknown> }).__stageshow = { ...((window as unknown as { __stageshow?: Record<string, unknown> }).__stageshow ?? {}), frame }
+
 const slot = document.getElementById('root')!
 slot.style.cssText = 'width:960px;aspect-ratio:16/9;margin:24px'
 slot.dataset.demo = name

@@ -70,7 +70,7 @@ try {
     for (const theme of ['light', 'dark']) {
       const out = join(root, 'src/demos', dir, `${key}-poster-${theme}.png`)
       try {
-        const { hasAlpha } = await capturePoster(browser, { url: `${base}/?demo=${key}&theme=${theme}`, out, dark: theme === 'dark', reduced: true })
+        const { hasAlpha } = await capturePoster(browser, { url: `${base}/?demo=${key}&theme=${theme}&frame=initial`, out, dark: theme === 'dark', reduced: false })
         if (alphaRequired(dir) && !hasAlpha) throw new Error('PNG has no alpha channel but the brief requires one')
         const target = pages[key]
         if (target) {

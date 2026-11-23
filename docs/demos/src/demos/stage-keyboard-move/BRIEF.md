@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the keybo
 
 ## Poster
 
-The rectangle moved right and down from where it began, selected.
+The first frame of the loop (the start state, cursor at rest), exported with `?frame=initial`. The page shows it until the live demo paints the same frame, so nothing jumps at load.
 
 ## Out of scope
 
