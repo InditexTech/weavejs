@@ -20,6 +20,7 @@
 }
 
 .wv-flow__icon {
+  flex: none;
   display: grid;
   place-items: center;
   width: 36px;

@@ -1,6 +1,8 @@
 = Standalone
 :description: Store that just renders a Weave.js room, useful for server-side image exporting
 
+image::stores/standalone-store-poster-light.png[Room data goes into the standalone store which renders it and an image comes out,width=960,height=540,role="weave-demo weave-demo--standalone-store"]
+
 == Introduction
 
 The Standalone Store is store for Weave.js that directly renders a room, just pass the room

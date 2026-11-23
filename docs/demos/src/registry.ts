@@ -6,6 +6,10 @@ import type { DemoModule } from './types'
 
 // One lazy chunk per demo. Keys are the `data-demo` values used in pages.
 export const demos: Record<string, () => Promise<DemoModule>> = {
+  'stores-index': () => import('./demos/stores-index/stores-index'),
+  'standalone-store': () => import('./demos/standalone-store/standalone-store'),
+  'azure-web-pubsub-store': () => import('./demos/azure-web-pubsub-store/azure-web-pubsub-store'),
+  'websockets-store': () => import('./demos/websockets-store/websockets-store'),
   'stage-drop-area': () => import('./demos/stage-drop-area/stage-drop-area'),
   'stage-keyboard-move': () => import('./demos/stage-keyboard-move/stage-keyboard-move'),
   'stage-minimap': () => import('./demos/stage-minimap/stage-minimap'),

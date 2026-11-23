@@ -1,6 +1,8 @@
 = Stores
 :description: Stores maintained by Weave.js team
 
+image::stores/stores-index-poster-light.png[A Weave.js app is connected to a store and a backend and the store changes from WebSockets to Azure Web PubSub to Standalone,width=960,height=540,role="weave-demo weave-demo--stores-index"]
+
 == Introduction
 
 A Store in Weave.js is a shared, real-time data layer that keeps all users in sync. It manages

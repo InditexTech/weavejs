@@ -1,6 +1,8 @@
 = Azure Web PubSub
 :description: Store that uses Azure Web PubSub infrastructure as the transport layer
 
+image::stores/azure-web-pubsub-store-poster-light.png[A rectangle dragged in client A sends an update through Azure Web PubSub and moves in client B,width=960,height=540,role="weave-demo weave-demo--azure-web-pubsub-store"]
+
 == Introduction
 
 The Azure Web PubSub Store is store for Weave.js that leverages https://azure.microsoft.com/es-es/products/web-pubsub[Azure Web PubSub]

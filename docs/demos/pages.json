@@ -64,5 +64,9 @@
   "stage-grid": "main/images/plugins",
   "stage-minimap": "main/images/plugins",
   "stage-keyboard-move": "main/images/plugins",
-  "stage-drop-area": "main/images/plugins"
+  "stage-drop-area": "main/images/plugins",
+  "websockets-store": "main/images/stores",
+  "azure-web-pubsub-store": "main/images/stores",
+  "standalone-store": "main/images/stores",
+  "stores-index": "main/images/stores"
 }

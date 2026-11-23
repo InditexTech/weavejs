@@ -1,6 +1,8 @@
 = WebSockets
 :description: Store that uses the WebSockets API as the transport layer
 
+image::stores/websockets-store-poster-light.png[A rectangle dragged in client A sends an update through the WebSocket server and moves in client B,width=960,height=540,role="weave-demo weave-demo--websockets-store"]
+
 == Introduction
 
 The WebSocket Store is a store for Weave.js that uses the https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API[WebSockets API]

@@ -103,8 +103,8 @@ Every demo task below is done only when the demo meets the DoD (design.md, decis
 ## 11. Stores
 
 - [ ] 11.1 Standalone store: one client, local state, nothing to sync: registry key `standalone-store`, replaces `none`; meets the DoD
-- [ ] 11.2 WebSockets store: an edit travels client, server, client; keep the mermaid diagram below: registry key `websockets-store`, replaces `none (mermaid)`; meets the DoD
-- [ ] 11.3 Azure Web PubSub store: clients, Web PubSub, your backend; keep the mermaid diagram below: registry key `azure-web-pubsub-store`, replaces `none (mermaid)`; meets the DoD
+- [x] 11.2 WebSockets store: an edit travels client, server, client; keep the mermaid diagram below: registry key `websockets-store`, replaces `none (mermaid)`; meets the DoD
+- [x] 11.3 Azure Web PubSub store: clients, Web PubSub, your backend; keep the mermaid diagram below: registry key `azure-web-pubsub-store`, replaces `none (mermaid)`; meets the DoD
 - [ ] 11.4 Stores overview: the same edit reaching two clients through each transport; names the transports the page compares: registry key `stores-index`, replaces `none`; meets the DoD
 
 ## 12. Integration
