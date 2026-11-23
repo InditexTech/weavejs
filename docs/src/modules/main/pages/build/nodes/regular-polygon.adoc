@@ -7,8 +7,7 @@
 This node is deprecated. Use the xref:main:build/nodes/polygon.adoc[Polygon] node instead.
 ====
 
-image::nodes/regular-polygon.png[Regular Polygon on Weave.js showcase,role="zoom-in"]
-
+image::nodes/regular-polygon-poster-light.png[A regular pentagon node in a square box is selected then moved and resized with its corner handle,width=960,height=540,role="weave-demo weave-demo--regular-polygon"]
 The Regular Polygon node is a simple, versatile primitive shape used to render star
 elements on the canvas. Built on top of Konva’s https://konvajs.org/api/Konva.RegularPolygon.html[RegularPolygon],
 it supports customizable properties such as amount of sides, position, radius, fill color, stroke, radius (on both axis),

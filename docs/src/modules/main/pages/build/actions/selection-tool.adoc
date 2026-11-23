@@ -1,8 +1,7 @@
 = Selection Tool
 :description: Activate the selection of canvas nodes
 
-image::actions/selection-tool.gif[Selection Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/selection-tool-poster-light.png[Rectangles are selected by clicking by shift clicking and by dragging a marquee over empty canvas,width=960,height=540,role="weave-demo weave-demo--selection-tool"]
 == Introduction
 
 This action toggles the selection of nodes within the canvas on or off.

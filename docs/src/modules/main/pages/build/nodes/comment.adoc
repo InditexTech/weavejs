@@ -1,8 +1,7 @@
 = Comment
 :description: Give feedback and collaborate with other users.
 
-image::nodes/comment.png[Comment on Weave.js showcase,role="zoom-in"]
-
+image::nodes/comment-poster-light.png[A comment pin on the canvas is clicked to open its thread and a reply is typed and posted,width=960,height=540,role="weave-demo weave-demo--comment"]
 The Comment node is a simple, versatile shape used to point to where an user added a
 comment to share with other peers, this node renders a shape that resembles an arrow
 pointing to some content on the stage.

@@ -1,6 +1,8 @@
 = Text (native editing)
 :description: Text node with editing drawn natively on the canvas
 
+image::nodes/text-v2-poster-light.png[A rich text node is selected then a word is double clicked and made bold and two rows are selected and turned into a list with the floating toolbar,width=960,height=540,role="weave-demo weave-demo--text-v2"]
+
 The Text (native editing) node is a drop-in replacement for the xref:main:build/nodes/text.adoc[Text]
 node. Instead of overlaying a DOM textarea while you edit, it draws the caret and the selection
 directly on the canvas, so the text looks the same while editing and while idle, at any zoom level.

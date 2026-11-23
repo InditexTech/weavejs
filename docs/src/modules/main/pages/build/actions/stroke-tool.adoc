@@ -1,8 +1,7 @@
 = Stroke Tool
 :description: Add a simple line to the canvas
 
-image::actions/stroke-tool.gif[Stroke Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/stroke-tool-poster-light.png[A single stroke with a round tip and an arrow tip is drawn on the canvas with the Stroke tool and is then selected with its end handles,width=960,height=540,role="weave-demo weave-demo--stroke-tool"]
 == Introduction
 
 This action allows users to draw a single-segment line on the canvas by click-and-drag. Also when the

@@ -1,0 +1,32 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* Strokes stay 1px as the stage zooms, as the canvas draws them */
+.wv-viewport .wv-node rect,
+.wv-viewport .wv-node ellipse,
+.wv-viewport .wv-node polygon,
+.wv-viewport .wv-node line,
+.wv-viewport .wv-node path,
+.wv-viewport .wv-selection__box {
+  vector-effect: non-scaling-stroke;
+}
+
+.wv-viewport__world {
+  transform-origin: 0 0;
+}
+
+.wv-viewport__zoom {
+  position: absolute;
+  left: 112px;
+  top: 468px;
+}
+
+/* Zoom controls centered at the bottom of the stage, with space below */
+.wv-viewport__zoom--center {
+  top: auto;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+}

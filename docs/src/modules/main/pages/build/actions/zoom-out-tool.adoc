@@ -1,8 +1,7 @@
 = Zoom Out Tool
 :description: Decreases one step the stage zoom level
 
-image::actions/zoom-out-tool.gif[Zoom Out Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/zoom-out-tool-poster-light.png[The Zoom out button is clicked twice and the canvas and grid zoom out step by step,width=960,height=540,role="weave-demo weave-demo--zoom-out-tool"]
 == Introduction
 
 This action allows users to incrementally zoom out the canvas, providing a more

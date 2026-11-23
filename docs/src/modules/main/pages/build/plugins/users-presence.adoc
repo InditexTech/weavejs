@@ -1,8 +1,7 @@
 = Users Presence
 :description: Showcase what the users are doing on the canvas
 
-image::plugins/users-presence.gif[Users showcase plugin on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/users-presence-poster-light.png[Two teammates Jon and Maya do different things at once Jon drags a rectangle and Maya resizes an ellipse and each shows a selection box in their own color,width=960,height=540,role="weave-demo weave-demo--users-presence"]
 == Introduction
 
 This plugin displays in real-time what connected users are doing on the canvas. For example

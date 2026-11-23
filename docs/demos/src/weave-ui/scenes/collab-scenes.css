@@ -1,0 +1,132 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* A node that follows a remote user's cursor: same duration and curve as the peer (peer.css), so the node stays under the pointer */
+.wv-follow {
+  transition: transform 0.95s cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.wv-follow[data-slow] {
+  transition-duration: 1.1s;
+}
+
+/* A remote user's selection: their color, their name on a flag at the top left */
+.wv-usersel__flag {
+  fill: var(--ss-accent);
+}
+
+.wv-usersel__name {
+  fill: #fff;
+  font: 600 11px var(--ss-font);
+}
+
+.wv-usersel {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wv-usersel[data-show] {
+  opacity: 1;
+}
+
+/* The multi-selection feedback plugin: a 2px #ff2c2c outline on each selected node */
+.wv-multi {
+  fill: none;
+  stroke: #ff2c2c;
+  stroke-width: 2;
+  opacity: 0;
+}
+
+.wv-multi[data-show] {
+  opacity: 1;
+}
+
+/* Connected users: a panel docked to the top right edge, as a sidebar would be */
+.wv-people {
+  position: absolute;
+  top: 40px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+  width: 300px;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-strong);
+  font: 400 13px/1 var(--ss-font);
+}
+
+.wv-people__avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: -6px;
+  border: 2px solid var(--ss-surface);
+  border-radius: 50%;
+  background: var(--who);
+  color: #fff;
+  font: 600 10px/1 var(--ss-font);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.wv-people__avatar:first-child {
+  margin-left: 0;
+}
+
+.wv-people__avatar[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+.wv-people__count {
+  margin-left: 12px;
+  min-width: 14px;
+  color: var(--ss-text);
+}
+
+.wv-roster {
+  position: absolute;
+  top: 87px;
+  right: 28px;
+  box-sizing: border-box;
+  width: 300px;
+  padding: 8px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-strong);
+  font: 400 13px/1.3 var(--ss-font);
+}
+
+.wv-roster__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wv-roster__row[data-on] {
+  opacity: 1;
+}
+
+.wv-roster__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wv-roster__mail {
+  color: var(--ss-text-faint);
+  font-size: 12px;
+}

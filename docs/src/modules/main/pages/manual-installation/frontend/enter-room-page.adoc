@@ -3,8 +3,7 @@
 
 In this guide, you will build the *Enter Room page*:
 
-image::enter-room-manual.png[Enter room page,role="zoom-in"]
-
+image::enter-room-page-poster-light.png[The Enter Room page where a user types a room name and a username and presses Enter the room and lands in the room,width=960,height=540,role="weave-demo weave-demo--enter-room-page"]
 This page allows users to define the room they wish to join and set their username.
 
 == Prerequisites

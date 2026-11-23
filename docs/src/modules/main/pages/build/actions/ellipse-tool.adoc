@@ -1,8 +1,7 @@
 = Ellipse Tool
 :description: Add an ellipse to the canvas
 
-image::actions/ellipse-tool.gif[Ellipse Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/ellipse-tool-poster-light.png[A ellipse is drawn on the canvas: the Ellipse tool is picked in the toolbar and dragged out with the crosshair and the new shape is selected with its handles,width=960,height=540,role="weave-demo weave-demo--ellipse-tool"]
 == Introduction
 
 This action enables users to create new ellipses nodes on the canvas.

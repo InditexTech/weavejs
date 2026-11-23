@@ -1,0 +1,7 @@
+.bn-win { position: absolute; inset: 40px; }
+.bn-body { display: grid; gap: 22px; padding: 24px; font-size: 13px; }
+.bn-row { display: flex; align-items: center; gap: 8px; }
+.bn-spacer { flex: 1; }
+.bn-narrow { display: flex; align-items: center; gap: 12px; width: 260px; padding: 8px 8px 8px 12px; border-radius: 10px; background: var(--ss-ink-1); }
+.bn-long { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ss-text-strong); }
+.bn-rest { position: absolute; right: 70px; bottom: 60px; width: 1px; height: 1px; }

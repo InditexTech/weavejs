@@ -1,8 +1,7 @@
 = Frame
 :description: Canvas-in-canvas element
 
-image::nodes/frame.png[Frame on Weave.js showcase,role="zoom-in"]
-
+image::nodes/frame-poster-light.png[An element is dragged into a frame that highlights and the frame is then selected by its title and by its border and moved with everything inside,width=960,height=540,role="weave-demo weave-demo--frame"]
 The Frame node is a container-like visual element used to group and organize other
 nodes within a pre-defined boundary. It functions as a structured layout region, often
 used to represent panels, sections, or modular components on the canvas.

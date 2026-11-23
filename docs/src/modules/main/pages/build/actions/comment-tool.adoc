@@ -1,8 +1,7 @@
 = Comment Tool
 :description: Allow users to comment on top of the stage content.
 
-image::actions/comment-tool.png[Comment Tool action on the Weave.js showcase,role="zoom-in"]
-
+image::actions/comment-tool-poster-light.png[The Comment tool is picked in the toolbar then the canvas is clicked and a comment is typed and posted,width=960,height=540,role="weave-demo weave-demo--comment-tool"]
 == Introduction
 
 This action enables users to attach inline feedback on top of the stage content, useful to communicate

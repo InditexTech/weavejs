@@ -1,0 +1,27 @@
+{{!--
+SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+
+SPDX-License-Identifier: Apache-2.0
+--}}
+
+{{!--
+  Overrides the docouture UI bundle's footer-scripts.hbs (ui-bundle 1.4.1).
+  The first tag is the bundle's own and must stay identical to upstream; the
+  second loads the Weave.js demos loader (docs/demos), which stays inert on
+  pages without a `.weave-demo` placeholder. On a docouture upgrade, diff this
+  file against the new bundle's partials/footer-scripts.hbs and re-apply.
+--}}
+
+<script id="site-script" src="{{{uiRootPath}}}/js/site.js" data-ui-root-path="{{{uiRootPath}}}"></script>
+{{!-- Dark theme: point the demo posters at their dark pair right away, before the loader module runs, so a dark page never paints the light poster first --}}
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="{{{uiRootPath}}}/js/demos/loader.js"></script>

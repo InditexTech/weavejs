@@ -7,8 +7,7 @@
 This action is deprecated. Use the xref:main:build/actions/polygon-tool.adoc[Polygon Tool] action instead.
 ====
 
-image::actions/regular-polygon-tool.gif[Regular Polygon Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/regular-polygon-tool-poster-light.png[The Regular polygon tool is dragged out as a square box and creates a regular octagon that is selected,width=960,height=540,role="weave-demo weave-demo--regular-polygon-tool"]
 == Introduction
 
 This action enables users to create new regular polygons nodes on the canvas.

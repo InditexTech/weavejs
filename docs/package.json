@@ -9,10 +9,13 @@
   },
   "packageManager": "npm@11.11.0",
   "scripts": {
+    "build:demos": "npm --prefix demos ci && npm --prefix demos run build",
+    "postinstall": "npm run build:demos",
+    "prebuild": "npm --prefix demos run build",
     "build": "antora --fetch antora-playbook.yml",
     "dev": "docouture dev",
     "clean": "node -e \"require('fs').rmSync('build', { recursive: true, force: true })\"",
-    "git:pre-push": "antora --fetch antora-playbook.local.yml"
+    "git:pre-push": "npm --prefix demos run build && antora --fetch antora-playbook.local.yml"
   },
   "devDependencies": {
     "@inditextech/docouture-cli": "1.4.1",

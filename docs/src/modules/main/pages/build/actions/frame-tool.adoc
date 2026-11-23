@@ -1,8 +1,7 @@
 = Frame Tool
 :description: Allows to add a canvas in canvas area
 
-image::actions/frame-tool.gif[Frame Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/frame-tool-poster-light.png[The Frame tool is picked then a single click on the canvas creates a frame of a predefined size at that spot and selects it,width=960,height=540,role="weave-demo weave-demo--frame-tool"]
 == Introduction
 
 This action allows users to create frame nodes by clicking and position the frame on

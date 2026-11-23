@@ -1,8 +1,7 @@
 = Users Pointers
 :description: Showcase the position of the users mouse pointer on the canvas
 
-image::plugins/users-pointers.gif[Users pointers plugin on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/users-pointers-poster-light.png[Three teammates named Maya Jon and Ana each have a visible labeled cursor moving around the canvas,width=960,height=540,role="weave-demo weave-demo--users-pointers"]
 == Introduction
 
 This plugin displays real-time cursors or pointers for all connected users on the

@@ -1,0 +1,17 @@
+/* Divider */
+
+@layer stageshow {
+  .ss-divider {
+    display: block;
+    flex: none;
+    align-self: stretch;
+    height: 1px;
+    background: var(--ss-line);
+  }
+
+  .ss-divider[data-vertical] {
+    width: 1px;
+    height: auto;
+    margin-block: 4px;
+  }
+}

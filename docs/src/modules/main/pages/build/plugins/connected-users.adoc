@@ -1,8 +1,7 @@
 = Connected Users
 :description: Get an structure with information about the connected users
 
-image::plugins/connected-users.gif[Connected Users plugin on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/connected-users-poster-light.png[Three teammates join a room one after another and their cursors move on the canvas while the avatars and a roster with their names and emails appear,width=960,height=540,role="weave-demo weave-demo--connected-users"]
 == Introduction
 
 This plugin returns the list of users currently active in a collaborative session.

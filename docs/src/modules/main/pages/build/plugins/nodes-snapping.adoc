@@ -1,8 +1,7 @@
 = Nodes Snapping
 :description: Allow to snap nodes to guides and to themselves
 
-image::plugins/nodes-snapping.gif[Nodes Snapping plugin on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/nodes-snapping-poster-light.png[A rectangle snaps to another with a red guide across the whole stage then a third rectangle snaps to equal spacing with the same distance shown in both gaps,width=960,height=540,role="weave-demo weave-demo--nodes-snapping"]
 == Introduction
 
 This plugin adds smart alignment assistance by enabling nodes to snap to guides or

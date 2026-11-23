@@ -1,8 +1,7 @@
 = Eraser Tool
 :description: Activate the deletion of nodes from the canvas
 
-image::actions/eraser-tool.gif[Eraser Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/eraser-tool-poster-light.png[The Eraser tool is picked in the toolbar then dragged across a rectangle and an ellipse which are removed while a squiggle is left,width=960,height=540,role="weave-demo weave-demo--eraser-tool"]
 == Introduction
 
 This action allows users to erase (delete) elements from the Stage canvas.

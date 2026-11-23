@@ -1,8 +1,7 @@
 = Pen Tool (deprecated)
 :description: Add line segments to the canvas
 
-image::actions/pen-tool.gif[Pen Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/pen-tool-poster-light.png[A freehand stroke is drawn on the canvas: the Pen tool is picked in the toolbar and dragged along a wave then the stroke is selected,width=960,height=540,role="weave-demo weave-demo--pen-tool"]
 == Introduction
 
 This action allows users to draw continuos lines on the canvas with N segments, by

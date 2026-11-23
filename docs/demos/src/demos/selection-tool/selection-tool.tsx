@@ -1,0 +1,10 @@
+// SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+import { SelectionToolScene } from '../../weave-ui/scenes/action-scenes'
+import type { DemoProps } from '../../types'
+
+export default function SelectionTool({ theme }: DemoProps) {
+  return <SelectionToolScene theme={theme} name="selection-tool" />
+}

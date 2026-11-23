@@ -1,8 +1,7 @@
 = Stage Drop Area
 :description: Activate support to drop elements on the canvas
 
-image::plugins/stage-drop-area.gif[Stage Drop Area on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/stage-drop-area-poster-light.png[A file is dragged from a Finder window onto the canvas and dropped and an image node appears where it was dropped,width=960,height=540,role="weave-demo weave-demo--stage-drop-area"]
 == Introduction
 
 This plugin enables drag-and-drop support on the canvas, allowing users to drop

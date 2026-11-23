@@ -1,6 +1,8 @@
 = Stage Resize
 :description: Activates the stage resizing (responsive support)
 
+image::plugins/stage-resize-poster-light.png[A window holding the canvas on a black desktop is resized by dragging its corner and the stage inside follows the window size,width=960,height=540,role="weave-demo weave-demo--stage-resize"]
+
 == Introduction
 
 This plugin automatically adjusts the canvas size to fit its container or the

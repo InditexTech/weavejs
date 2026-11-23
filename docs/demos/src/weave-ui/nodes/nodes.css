@@ -1,0 +1,93 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.ss-stage {
+  --wv-ink: #000;
+}
+
+.ss-stage[data-theme='dark'] {
+  --wv-ink: #fafafa;
+}
+
+.wv-node-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wv-node {
+  font-family: var(--ss-font);
+}
+
+.wv-node--text,
+.wv-node__title {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.wv-node__well {
+  fill: var(--ss-well);
+  stroke: var(--ss-line);
+  stroke-width: 1;
+}
+
+.wv-node__glyph {
+  fill: var(--ss-icon-faint);
+}
+
+.wv-node__sticky {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.14));
+}
+
+.wv-node__fold {
+  fill: rgba(255, 255, 255, 0.35);
+}
+
+.wv-node__anchor {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1;
+}
+
+.wv-node__measure {
+  font-family: var(--ss-mono);
+}
+
+.wv-node-selection {
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.wv-node-selection[data-show] {
+  opacity: 1;
+}
+
+/* Anchors take the pointer only while the selection shows, so a scene can hover and drag them */
+.wv-node-selection[data-show] circle {
+  pointer-events: auto;
+}
+
+.wv-node__play {
+  fill: var(--ss-surface);
+  stroke: var(--ss-line);
+  stroke-width: 1;
+}
+
+.wv-node__glyph-solid {
+  fill: var(--ss-icon);
+}
+
+.wv-node__track {
+  fill: var(--ss-ink-4);
+}
+
+.wv-node__bar {
+  fill: var(--ss-accent);
+  transition: width 0.2s linear;
+}
+
+/* A selection that appears and moves at once, as the SDK draws it */
+.wv-node-selection.wv-instant {
+  transition: none;
+}

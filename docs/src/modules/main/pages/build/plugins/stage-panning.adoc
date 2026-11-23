@@ -1,8 +1,7 @@
 = Stage Panning
 :description: Activates the panning (move) of the stage
 
-image::plugins/stage-panning.gif[Stage panning on use on the Weave.js showcase,role="zoom-in"]
-
+image::plugins/stage-panning-poster-light.png[The hand tool drags the canvas and the grid and nodes follow the pointer,width=960,height=540,role="weave-demo weave-demo--stage-panning"]
 == Introduction
 
 This plugin enables users to navigate the canvas by dragging to move around the

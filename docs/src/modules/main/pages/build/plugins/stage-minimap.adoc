@@ -1,6 +1,8 @@
 = Stage minimap
 :description: Renders a minimap from the main stage
 
+image::plugins/stage-minimap-poster-light.png[Dragging the canvas moves the visible region outlined on the minimap in the corner,width=960,height=540,role="weave-demo weave-demo--stage-minimap"]
+
 == Introduction
 
 This plugin renders a minimap from the main stage, provides a scaled-down preview of the stage content,

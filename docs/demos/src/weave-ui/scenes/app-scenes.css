@@ -1,0 +1,217 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.app .ss-stage {
+  overflow: hidden;
+}
+
+/* One browser window, shown whole with an even gutter on every side for its shadow */
+.app-win {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 912px;
+}
+
+.app-body {
+  position: relative;
+  height: 454px;
+  overflow: hidden;
+  background: var(--ss-surface);
+}
+
+.app-page {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.app-page[data-on] {
+  opacity: 1;
+}
+
+/* The Enter Room page: a small card on a quiet ground, a mark, a title, two fields and one button */
+.app-page--form {
+  background: var(--ss-well);
+}
+
+.app-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 320px;
+  padding: 28px;
+  background: var(--ss-surface);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+  color: var(--ss-text-strong);
+  font-family: var(--ss-font);
+}
+
+/* The logo sits centered above a small title and its lead, with no rule around them */
+.app-form__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.app-form__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-form__mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b2f8f, #1f8a9a);
+}
+
+.app-form__title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: 600 11px/1.2 var(--ss-font);
+}
+
+.app-form__lead {
+  margin: 0;
+  color: var(--ss-text-faint);
+  font: 400 11px/1.35 var(--ss-font);
+}
+
+.app-form__label {
+  margin-bottom: 6px;
+  font: 500 11px/1 var(--ss-font);
+}
+
+.app-input {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 36px;
+  margin-bottom: 16px;
+  padding: 0 12px;
+  border: 1px solid var(--ss-line);
+  border-radius: 8px;
+  font: 400 13px/1 var(--ss-font);
+  transition: border-color 0.15s ease;
+}
+
+.app-input[data-focus] {
+  border-color: var(--ss-text-strong);
+}
+
+.app-input__placeholder {
+  color: var(--ss-text-faint);
+}
+
+.app-input__typed::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: -0.18em;
+  background: var(--ss-text-strong);
+  opacity: 0;
+}
+
+.app-input[data-focus] .app-input__typed::after {
+  opacity: 1;
+}
+
+.app-button {
+  display: grid;
+  place-items: center;
+  height: 38px;
+  margin-top: 6px;
+  border-radius: 8px;
+  background: var(--wv-toolbar-active-bg);
+  color: var(--wv-toolbar-active-fg);
+  font: 500 14px/1 var(--ss-font);
+  transition: opacity 0.15s ease;
+}
+
+.app-button[data-loading] {
+  opacity: 0.7;
+}
+
+.app-room {
+  position: absolute;
+  inset: 0;
+}
+
+.app-room__header {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+}
+
+.app-room__status {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+
+.app-room__tools {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+}
+
+/* Tooltip over a bottom-bar tool: dark, square, centered above its button */
+.app-tip {
+  position: absolute;
+  z-index: 16;
+  display: flex;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--wv-tooltip-bg);
+  color: var(--wv-tooltip-fg);
+  font: 400 12px/1 var(--ss-font);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.15s ease;
+}
+
+.app-tip[data-show] {
+  opacity: 1;
+}
+
+.app-tip__key {
+  opacity: 0.6;
+}
+
+/* The status card keeps one width: the connection chip and the people slots do not resize it */
+.app-room__status {
+  will-change: transform;
+}
+
+.app-room__status .wv-status__connected {
+  box-sizing: border-box;
+  min-width: 86px;
+  text-align: center;
+}
+
+.app-input__placeholder {
+  transition: opacity 0.15s ease;
+}
+
+.app-input__placeholder[data-hide] {
+  opacity: 0;
+}

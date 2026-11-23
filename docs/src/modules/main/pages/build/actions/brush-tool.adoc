@@ -1,8 +1,7 @@
 = Brush Tool
 :description: Paint freeform strokes on the canvas
 
-image::actions/brush-tool.gif[Brush Tool action on use on the Weave.js showcase,role="zoom-in"]
-
+image::actions/brush-tool-poster-light.png[A freehand stroke is drawn on the canvas: the Brush tool is picked in the toolbar and dragged along a wave then the stroke is selected,width=960,height=540,role="weave-demo weave-demo--brush-tool"]
 == Introduction
 
 This action enables users to paint freeform strokes on the canvas, similar to a
