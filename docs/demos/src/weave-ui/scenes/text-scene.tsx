@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Bold, Indent, Italic, List, Underline } from 'lucide-react'
+import { Bold, Italic, List, Underline } from 'lucide-react'
 import { Stage, type Act, type Point } from '../../../kit'
 import type { DemoProps } from '../../types'
 import { weaveTokens } from '../../looks/weave'
@@ -157,20 +157,27 @@ export function TextNodeScene({ theme, name }: DemoProps & { name: string }) {
 
 // ---- Rich text (text v2): select a word, make it bold, turn the next rows into an indented list --------------------
 
-type RichS = { sel: boolean; bold: boolean; list: boolean; indent: boolean; bar: boolean; barAt: 'word' | 'row'; hover: 'bold' | 'list' | 'indent' | null }
-const RICH0: RichS = { sel: false, bold: false, list: false, indent: false, bar: false, barAt: 'word', hover: null }
+type RichS = { node: boolean; sel: boolean; rows: boolean; bold: boolean; list: boolean; bar: boolean; hover: 'bold' | 'list' | null }
+const RICH0: RichS = { node: false, sel: false, rows: false, bold: false, list: false, bar: false, hover: null }
 
 export function RichTextScene({ theme, name }: DemoProps & { name: string }) {
-  const poster: RichS = { sel: false, bold: true, list: true, indent: true, bar: false, barAt: 'row', hover: null }
+  const poster: RichS = { node: true, sel: false, rows: false, bold: true, list: true, bar: false, hover: null }
 
   async function script(a: Act<RichS>) {
     await a.wait(700)
     a.mark('select')
+    const n = a.rect('richnode')
+    await a.move({ x: n.x + n.width / 2, y: n.y + n.height - 30 })
+    await a.click()
+    await a.set({ node: true })
+    await a.wait(900)
+    a.mark('edit')
     const w = a.rect('word')
     await a.move({ x: w.x + w.width / 2, y: w.y + w.height / 2 })
+    await a.wait(250)
     await a.click(undefined, { double: true })
-    await a.set({ sel: true, bar: true })
-    await a.wait(700)
+    await a.set({ sel: true, bar: true, node: false })
+    await a.wait(800)
     a.mark('bold')
     await a.move('fmt-bold')
     await a.set({ hover: 'bold' })
@@ -180,41 +187,39 @@ export function RichTextScene({ theme, name }: DemoProps & { name: string }) {
     await a.wait(700)
     await a.set({ bar: false })
     await a.wait(300)
-    await a.set({ sel: false, barAt: 'row' })
+    await a.set({ sel: false })
     a.mark('list')
-    const row = a.rect('row-1')
-    await a.move({ x: row.x + 90, y: row.y + row.height / 2 })
-    await a.click()
-    await a.set({ bar: true })
+    const r0 = a.rect('row-0')
+    const r1 = a.rect('row-1')
+    const start: Point = { x: r0.x - 6, y: r0.y + r0.height / 2 }
+    await a.move(start, { duration: 800 })
+    await a.wait(250)
+    await a.drag({ x: r1.x + r1.width, y: r1.y + r1.height / 2 }, (p) => a.put({ rows: p.y > r0.y + r0.height }), { duration: 1100 })
+    await a.set({ rows: true, bar: true })
     await a.wait(400)
     await a.move('fmt-list')
     await a.set({ hover: 'list' })
     await a.wait(300)
     await a.click({ at: 'fmt-list' })
     await a.set({ list: true, hover: null })
-    await a.wait(700)
-    a.mark('indent')
-    await a.move('fmt-indent')
-    await a.set({ hover: 'indent' })
-    await a.wait(300)
-    await a.click({ at: 'fmt-indent' })
-    await a.set({ indent: true, hover: null })
-    await a.wait(2000)
+    await a.wait(500)
+    await a.set({ rows: false })
+    await a.wait(1700)
     a.mark('reset')
     await a.set({ bar: false })
     await a.move(REST)
-    await a.set({ bold: false, list: false, indent: false })
-    await a.wait(300)
-    a.put({ barAt: 'word' })
+    await a.set({ bold: false, list: false, node: false, rows: false })
     await a.wait(700)
   }
 
   return (
     <Stage<RichS> width={960} height={540} theme={theme} tokens={weaveTokens(theme)} initial={RICH0} poster={poster} script={script} cursor={{ at: REST, style: 'real', ripple: true }} className={`wv-scene ${name}`}>
-      {(s) => {
+      {(s, rect) => {
+        const node = rect('richnode')
         return (
           <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
-            <div className="wv-rich" style={{ left: 190, top: 170 }}>
+            <NodeLayer>{node.width > 0 && <NodeSelection x={node.x} y={node.y} w={node.width} h={node.height} show={s.node} />}</NodeLayer>
+            <div className="wv-rich" data-target="richnode" style={{ left: 190, top: 170 }}>
               <p className="wv-rich__p">
                 Plan the{' '}
                 <span className={s.sel ? 'wv-rich__sel' : undefined} data-target="word">
@@ -224,12 +229,15 @@ export function RichTextScene({ theme, name }: DemoProps & { name: string }) {
               </p>
               <div className="wv-rich__row" data-list={s.list || undefined} data-target="row-0">
                 <span className="wv-rich__marker">•</span>
-                <span>Draft the roadmap</span>
+                <span className={s.rows ? 'wv-rich__sel' : undefined}>Draft the roadmap</span>
               </div>
-              <div className="wv-rich__row" data-list={s.list || undefined} data-indent={s.indent || undefined} data-target="row-1">
+              <div className="wv-rich__row" data-list={s.list || undefined} data-target="row-1">
                 <span className="wv-rich__marker">•</span>
-                <span>Review with design</span>
+                <span className={s.rows ? 'wv-rich__sel' : undefined}>Review with design</span>
               </div>
+            </div>
+            <div className="wv-scene__toolbar">
+              <WeaveToolbar active="move" />
             </div>
             <div className="wv-format" data-show={s.bar || undefined} style={{ left: 190, top: 118 }}>
               <span className="wv-format__button" data-on={s.bold || undefined} data-hover={s.hover === 'bold' || undefined} data-target="fmt-bold">
@@ -244,9 +252,6 @@ export function RichTextScene({ theme, name }: DemoProps & { name: string }) {
               <span className="wv-format__divider" />
               <span className="wv-format__button" data-on={s.list || undefined} data-hover={s.hover === 'list' || undefined} data-target="fmt-list">
                 <List size={16} strokeWidth={1.5} />
-              </span>
-              <span className="wv-format__button" data-on={s.indent || undefined} data-hover={s.hover === 'indent' || undefined} data-target="fmt-indent">
-                <Indent size={16} strokeWidth={1.5} />
               </span>
             </div>
           </WeaveCanvas>

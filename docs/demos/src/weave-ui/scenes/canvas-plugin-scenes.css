@@ -16,8 +16,8 @@
 
 .wv-seg {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 40px;
+  right: 28px;
   display: flex;
   box-sizing: border-box;
   height: 48px;
@@ -106,4 +106,189 @@
 
 .wv-pinfade {
   transition: opacity 0.25s ease;
+}
+
+/* Comments renderer: the app's comments list beside the canvas */
+.wv-cpanel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  width: 320px;
+  padding: 40px 16px 16px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-strong);
+  font: 400 13px/1.3 var(--ss-font);
+}
+
+.wv-cpanel__head {
+  padding: 4px 4px 10px;
+  color: var(--ss-text);
+  font-weight: 600;
+}
+
+.wv-cpanel__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wv-cpanel__row[data-on] {
+  opacity: 1;
+}
+
+.wv-cpanel__num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--who);
+  color: #fff;
+  font: 600 11px/1 var(--ss-font);
+}
+
+.wv-cpanel__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wv-cpanel__state {
+  color: var(--ss-text-faint);
+  font-size: 11px;
+}
+
+.wv-cpanel__state[data-wait] {
+  color: #d97706;
+}
+
+.wv-cpanel__call {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-faint);
+  font: 400 12px/1 var(--ss-mono);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.wv-cpanel__call[data-on] {
+  background: var(--ss-well);
+  color: var(--ss-text-strong);
+}
+
+/* Stage resize: the desktop and the window the stage lives in */
+.wv-desk {
+  position: absolute;
+  inset: 0;
+  background: var(--ss-well);
+}
+
+.wv-win {
+  position: absolute;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  will-change: width, height;
+}
+
+.wv-win__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--ss-line);
+}
+
+.wv-win__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ss-line);
+}
+
+.wv-win__title {
+  margin-left: 10px;
+  color: var(--ss-text);
+  font: 400 12px/1 var(--ss-font);
+}
+
+.wv-win__body {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.wv-win__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.wv-win__size {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text);
+  font: 400 11px/1 var(--ss-mono);
+}
+
+.wv-win__corner {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+}
+
+/* Stage drop area: a Finder window over the app */
+.wv-finder {
+  position: absolute;
+  z-index: 14;
+  box-sizing: border-box;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.wv-finder__grid {
+  display: flex;
+  gap: 18px;
+  padding: 26px 26px;
+}
+
+.wv-finder__file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 110px;
+  padding: 10px 0;
+  color: var(--ss-icon);
+}
+
+.wv-finder__name {
+  padding: 3px 6px;
+  color: var(--ss-text-strong);
+  font: 400 12px/1 var(--ss-font);
+}
+
+.wv-finder__file[data-sel] {
+  background: var(--ss-well);
+}
+
+.wv-finder__file[data-sel] .wv-finder__name {
+  background: #0074ff;
+  color: #fff;
 }

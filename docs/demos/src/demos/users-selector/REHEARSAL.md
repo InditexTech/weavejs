@@ -5,6 +5,7 @@ Beats: Jon selects, Maya selects, Jon changes, hold, reset, loop ~13s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: remote cursor arrows were invisible; fixed in peer.css.
 No local cursor; two remote users.
 Review: no fresh-eye subagent review run.
 Posters: `users-selector-poster-light.png`, `users-selector-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

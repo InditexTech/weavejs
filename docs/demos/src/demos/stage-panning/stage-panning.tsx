@@ -6,5 +6,5 @@ import { ViewportScene } from '../../weave-ui/scenes/viewport-scene'
 import type { DemoProps } from '../../types'
 
 export default function StagePanning({ theme }: DemoProps) {
-  return <ViewportScene theme={theme} kind="pan" name="stage-panning" />
+  return <ViewportScene theme={theme} kind="pan" zoomBar={false} name="stage-panning" />
 }

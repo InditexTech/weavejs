@@ -37,7 +37,6 @@
   stroke: #ff2c2c;
   stroke-width: 2;
   opacity: 0;
-  transition: opacity 0.18s ease;
 }
 
 .wv-multi[data-show] {
@@ -47,8 +46,8 @@
 /* Connected users: a panel docked to the top right edge, as a sidebar would be */
 .wv-people {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 40px;
+  right: 28px;
   display: flex;
   align-items: center;
   gap: 0;
@@ -96,8 +95,8 @@
 
 .wv-roster {
   position: absolute;
-  top: 47px;
-  right: 0;
+  top: 87px;
+  right: 28px;
   box-sizing: border-box;
   width: 300px;
   padding: 8px;

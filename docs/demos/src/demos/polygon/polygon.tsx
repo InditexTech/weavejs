@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NodeScene } from '../../weave-ui/scenes/node-scene'
-import { PENTAGON, PolygonNode } from '../../weave-ui/nodes/nodes'
+import { OCTAGON, PolygonNode } from '../../weave-ui/nodes/nodes'
 import type { DemoProps } from '../../types'
 
 export default function Polygon({ theme }: DemoProps) {
-  return <NodeScene theme={theme} name="polygon" shape={(box) => <PolygonNode {...box} points={PENTAGON} />} />
+  return <NodeScene theme={theme} name="polygon" shape={(box) => <PolygonNode {...box} points={OCTAGON} />} square />
 }

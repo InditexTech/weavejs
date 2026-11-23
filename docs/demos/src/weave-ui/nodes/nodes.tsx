@@ -53,6 +53,13 @@ export function PolygonNode({ x, y, w, h, points, ...p }: Box & Paint & { points
 /** The SDK's pentagon preset (nodes/polygon/presets.ts), as fractions of the box. */
 export const PENTAGON: Array<[number, number]> = [[0.5, 0], [0.975528, 0.345492], [0.793893, 0.904508], [0.206107, 0.904508], [0.024472, 0.345492]]
 
+/** A regular octagon with flat sides, scaled to touch all four sides of a square box. */
+export const OCTAGON: Array<[number, number]> = Array.from({ length: 8 }, (_, i) => {
+  const a = Math.PI / 8 + (i * Math.PI) / 4
+  const r = 0.5 / Math.cos(Math.PI / 8)
+  return [0.5 + r * Math.cos(a), 0.5 + r * Math.sin(a)] as [number, number]
+})
+
 /** A regular polygon with `sides` sides inscribed in the box's ellipse, first vertex at the top. */
 export function regularPoints(sides: number): Array<[number, number]> {
   return Array.from({ length: sides }, (_, i) => {

@@ -1,7 +1,7 @@
 = Stage Grid
 :description: Renders a reference grid behind the nodes layer
 
-image::plugins/stage-grid-poster-light.png[The grid switches from none to lines and to dots behind two nodes,width=960,height=540,role="weave-demo weave-demo--stage-grid"]
+image::plugins/stage-grid-poster-light.png[The grid switches from none to lines and to dots behind two nodes from a selector padded from the top and right,width=960,height=540,role="weave-demo weave-demo--stage-grid"]
 
 == Introduction
 

@@ -12,15 +12,15 @@
 
 ## Story
 
-A stroke node is a freehand line: select it, drag it, scale it from a corner.
+A stroke node is a freehand path, so its shape is irregular.
 
-Beats (about 12 s):
+Beats:
 
-1. The cursor goes to the stroke and clicks: it is selected with its bounding box.
-2. Press and drag: the stroke moves with the pointer, up and to the right.
-3. The cursor goes to the bottom-right corner anchor (the cursor becomes a resize cursor) and drags: the stroke scales with its box.
+1. The cursor selects the stroke.
+2. A drag moves it.
+3. The corner anchor resizes it, scaling the path.
 4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the selection and node fade out, the stroke comes back at its starting place and size.
+5. Reset with a cause: the cursor leaves and the stroke returns.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the strok
 
 ## Poster
 
-The stroke moved, scaled and selected with its handles, no cursor.
+The larger stroke, selected, no cursor.
 
 ## Out of scope
 

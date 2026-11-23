@@ -5,6 +5,7 @@ Beats: pick hand, drag the canvas, hold, reset, loop ~15s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: the zoom controls are removed from this demo.
 Shares the move-tool pan story (ViewportScene pan).
 Review: no fresh-eye subagent review run.
 Posters: `stage-panning-poster-light.png`, `stage-panning-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

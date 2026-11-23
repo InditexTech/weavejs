@@ -12,15 +12,16 @@
 
 ## Story
 
-The Nodes snapping plugin snaps a node to the edges of other nodes as it is dragged, with a guide and the distance between them.
+The Nodes snapping plugin snaps a node to others as it is dragged, in two ways: alignment guides that run across the whole stage, and equal spacing between nodes.
 
-Beats (about 13 s):
+Beats:
 
-1. The cursor grabs the lower rectangle.
-2. It drags it left and up toward the upper rectangle: as the left edges come close, a red guide appears with the distance tag and the node snaps onto the guide while the pointer keeps going a few pixels further.
-3. Release: the guide goes and the rectangle rests aligned with the one above.
-4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves and the rectangle returns to where it began.
+1. The cursor grabs the lower rectangle and drags it left toward the upper one. As the left edges align, the node snaps and a red guide runs across the whole stage.
+2. Release: the guide goes and the two rectangles stay aligned.
+3. The scene changes to three rectangles in a row: A and B with a 60 px gap, C far to the right.
+4. The cursor drags C toward B. When the gap matches the one between A and B, C snaps and both gaps show the same distance tag (60).
+5. Payoff (holds about 2.8 s).
+6. Reset with a cause: the cursor leaves and the scene returns to the first pair.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the snapp
 
 ## Poster
 
-The lower rectangle aligned to the left edge of the upper one, no cursor.
+Three rectangles with equal gaps and the 60 px distance tags in both gaps, no cursor.
 
 ## Out of scope
 

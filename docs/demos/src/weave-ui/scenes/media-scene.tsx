@@ -105,31 +105,42 @@ export function PlaceToolScene({ theme, tool, groups, boxes, render, name }: Pla
 
 // ---- Image node: select, crop from an edge, flip horizontally ----------------------------------------------------
 
-type ImgS = { crop: number; cropping: boolean; selected: boolean; flipped: boolean; show: boolean }
+type ImgS = { w: number; crop: number; cropping: boolean; selected: boolean; flipped: boolean; show: boolean }
+const IMG_RATIO = 220 / 360
 const IMG: Box = { x: 300, y: 170, w: 360, h: 220 }
+const IMG_SMALL = 240
 const CROPPED = 120 // px cut from the right edge
-const initialImg: ImgS = { crop: 0, cropping: false, selected: false, flipped: false, show: true }
-const posterImg: ImgS = { crop: CROPPED, cropping: false, selected: true, flipped: true, show: true }
+const initialImg: ImgS = { w: IMG_SMALL, crop: 0, cropping: false, selected: false, flipped: false, show: true }
+const posterImg: ImgS = { w: IMG.w, crop: CROPPED, cropping: false, selected: true, flipped: true, show: true }
+const imgBox = (w: number): Box => ({ x: IMG.x, y: IMG.y, w, h: w * IMG_RATIO })
 
 export function ImageNodeScene({ theme, name }: DemoProps & { name: string }) {
   async function script(a: Act<ImgS>) {
     await a.wait(700)
     a.mark('select')
-    await a.move({ x: IMG.x + IMG.w / 2, y: IMG.y + IMG.h / 2 })
+    const small = imgBox(IMG_SMALL)
+    await a.move({ x: small.x + small.w / 2, y: small.y + small.h / 2 })
     await a.click()
     await a.set({ selected: true })
     await a.wait(600)
+    a.mark('resize')
+    const anchor: Point = { x: small.x + small.w, y: small.y + small.h }
+    await a.move(anchor, { duration: 700 })
+    await a.wait(250)
+    // The corner keeps the image's proportions: the width follows the pointer, the height follows the width
+    await a.move({ x: anchor.x + (IMG.w - IMG_SMALL), y: anchor.y + (imgBox(IMG.w).h - small.h) }, { duration: 1200, path: STRAIGHT, onMove: (p) => a.put({ w: IMG_SMALL + (p.x - anchor.x) }) })
+    await a.wait(700)
     a.mark('crop')
     await a.click(undefined, { double: true })
     await a.set({ cropping: true })
-    await a.wait(500)
+    await a.wait(900)
     const edge: Point = { x: IMG.x + IMG.w, y: IMG.y + IMG.h / 2 }
     await a.move(edge, { duration: 700 })
     await a.wait(250)
     await a.move({ x: edge.x - CROPPED, y: edge.y }, { duration: 1100, path: STRAIGHT, onMove: (p) => a.put({ crop: edge.x - p.x }) })
-    await a.wait(500)
+    await a.wait(600)
     await a.set({ cropping: false })
-    await a.wait(400)
+    await a.wait(500)
     a.mark('flip')
     await a.move('flip')
     await a.wait(300)
@@ -141,16 +152,16 @@ export function ImageNodeScene({ theme, name }: DemoProps & { name: string }) {
     await a.set({ selected: false })
     await a.set({ show: false })
     await a.wait(300)
-    a.put({ crop: 0, flipped: false })
+    a.put({ w: IMG_SMALL, crop: 0, flipped: false })
     await a.set({ show: true })
     await a.wait(700)
   }
 
-  const visible = (s: ImgS): Box => ({ ...IMG, w: IMG.w - s.crop })
   return (
     <Stage<ImgS> width={960} height={540} theme={theme} tokens={weaveTokens(theme)} initial={initialImg} poster={posterImg} script={script} cursor={{ at: REST, style: 'real', ripple: true }} className={`wv-scene ${name}`}>
       {(s) => {
-        const v = visible(s)
+        const full = imgBox(s.w)
+        const v: Box = { ...full, w: full.w - s.crop }
         const cx = v.x + v.w / 2
         return (
           <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
@@ -165,10 +176,10 @@ export function ImageNodeScene({ theme, name }: DemoProps & { name: string }) {
                 {/* The full image stays in place under the crop window; flipping mirrors the visible part about its center */}
                 <g transform={s.flipped ? `translate(${cx * 2} 0) scale(-1 1)` : undefined} style={{ transition: 'transform 0.35s ease' }}>
                   <g clipPath={`url(#${name}-clip)`}>
-                    <ImageNode {...IMG} />
+                    <ImageNode {...full} />
                   </g>
                 </g>
-                {s.cropping && <rect className="wv-crop__full" x={IMG.x} y={IMG.y} width={IMG.w} height={IMG.h} />}
+                {s.cropping && <rect className="wv-crop__full" x={full.x} y={full.y} width={full.w} height={full.h} />}
               </g>
               <NodeSelection {...v} show={s.selected && !s.cropping} />
               {s.cropping && (
@@ -178,6 +189,9 @@ export function ImageNodeScene({ theme, name }: DemoProps & { name: string }) {
                 </g>
               )}
             </NodeLayer>
+            <div className="wv-caption" data-show={s.cropping || undefined} style={{ left: v.x, top: v.y - 44 }}>
+              Cropping
+            </div>
             <div className="wv-node-bar" data-show={(s.selected && !s.cropping) || undefined} style={{ left: v.x + v.w / 2 - 20, top: v.y - 52 }}>
               <span className="wv-node-bar__button" data-on={s.flipped || undefined} data-target="flip">
                 <FlipHorizontal size={16} strokeWidth={1.5} />

@@ -19,9 +19,11 @@
 
 /* Both cursors stay mounted and cross-fade, each anchored so its hot spot is the peer's origin;
    swapping one element for the other would shift the tip. */
-.wv-peer svg {
+.wv-peer svg,
+.weave-demo .weave-demo__stage .wv-peer svg {
   position: absolute;
   display: block;
+  max-width: none;
   filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.2));
   transition: opacity 0.12s ease;
 }
@@ -50,4 +52,15 @@
   color: #fff;
   font: 600 11px/1.2 var(--ss-font);
   white-space: nowrap;
+}
+
+/* The docs UI caps every SVG inside an image block at its parent (max-width: 100%), and a peer has no width, so the cursor needs its size stated here */
+.weave-demo .weave-demo__stage .wv-peer svg.wv-peer__arrow {
+  width: 16px;
+  height: 18px;
+}
+
+.weave-demo .weave-demo__stage .wv-peer svg.wv-peer__cross {
+  width: 18px;
+  height: 18px;
 }

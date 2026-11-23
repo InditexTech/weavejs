@@ -1,7 +1,7 @@
 = Stage Keyboard Move
 :description: Activates moving elements with shift + keyboard arrows
 
-image::plugins/stage-keyboard-move-poster-light.png[A selected rectangle moves in small steps with Shift and the arrow keys,width=960,height=540,role="weave-demo weave-demo--stage-keyboard-move"]
+image::plugins/stage-keyboard-move-poster-light.png[A selected rectangle moves in instant steps with Shift and the arrow keys,width=960,height=540,role="weave-demo weave-demo--stage-keyboard-move"]
 
 == Introduction
 

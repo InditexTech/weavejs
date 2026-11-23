@@ -86,3 +86,8 @@
   fill: var(--ss-accent);
   transition: width 0.2s linear;
 }
+
+/* A selection that appears and moves at once, as the SDK draws it */
+.wv-node-selection.wv-instant {
+  transition: none;
+}

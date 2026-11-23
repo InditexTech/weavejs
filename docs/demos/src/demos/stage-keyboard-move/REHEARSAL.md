@@ -5,6 +5,7 @@ Beats: select, Shift+right x6, Shift+down x3, hold, reset, loop ~13s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: the selection box and the node move instantly with each key press (no animation).
 Jumps are the 10px key steps, by design. The page says the default is 5; the code default for Shift is 10 (page text to check).
 Review: no fresh-eye subagent review run.
 Posters: `stage-keyboard-move-poster-light.png`, `stage-keyboard-move-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

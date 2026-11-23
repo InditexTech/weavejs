@@ -1,7 +1,7 @@
 = Sticky Note
 :description: Add interactive sticky notes to the canvas
 
-image::nodes/sticky-note-poster-light.png[A sticky note node on the canvas is selected then moved and resized with its corner handle,width=960,height=540,role="weave-demo weave-demo--sticky-note"]
+image::nodes/sticky-note-poster-light.png[A sticky note is moved made bigger and its text is changed from Idea to Ship the docs,width=960,height=540,role="weave-demo weave-demo--sticky-note"]
 
 The Sticky Note node renders a paper-like note on the canvas with a drop shadow, top adhesive strip, bottom-right dog-ear fold flap, an optional author attribution row, and an inline editable label.
 

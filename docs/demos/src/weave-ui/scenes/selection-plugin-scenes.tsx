@@ -9,7 +9,6 @@ import { WeaveCanvas } from '../canvas'
 import { NodeLayer, NodeSelection, RectNode, type Box } from '../nodes/nodes'
 import { SnapGuides } from '../overlays/overlays'
 import { WeaveToolbar } from '../toolbar'
-import { EasedSelection } from './action-scenes'
 import './scenes.css'
 import './frame-scene.css'
 import './collab-scenes.css'
@@ -141,7 +140,7 @@ export function MultiSelectionFeedbackScene({ theme, name }: DemoProps & { name:
                   <rect className="wv-multi" data-show={(multi && s.sel.includes(id)) || undefined} x={b.x} y={b.y} width={b.w} height={b.h} />
                 </g>
               ))}
-              {last && <EasedSelection {...box(last)} show />}
+              {last && <NodeSelection className="wv-instant" {...box(last)} show />}
             </NodeLayer>
             <Toolbar />
           </WeaveCanvas>
@@ -151,63 +150,112 @@ export function MultiSelectionFeedbackScene({ theme, name }: DemoProps & { name:
   )
 }
 
-// ---- Nodes snapping: a node dragged near another snaps to its edge, with a guide and the distance ----------------
+// ---- Nodes snapping: edge alignment guides across the whole stage, then equal spacing between three nodes -------------
 
-type SnapS = { x: number; y: number; guide: boolean; dropped: boolean; show: boolean }
-const FIX: Box = { x: 300, y: 160, w: 170, h: 110 }
-const DRAG0: Box = { x: 600, y: 360, w: 170, h: 110 }
-const SNAP_X = FIX.x
+type SnapS = { act: 1 | 2; dx: number; dy: number; guide: boolean; cx: number; space: boolean; show: boolean }
+const FIX: Box = { x: 300, y: 110, w: 170, h: 100 }
+const DRAG0: Box = { x: 620, y: 340, w: 170, h: 100 }
 const THRESH = 14
+const SA: Box = { x: 230, y: 230, w: 120, h: 90 }
+const SB: Box = { x: 410, y: 230, w: 120, h: 90 }
+const SC_Y = 230
+const SC0 = 720
+const SC_SNAP = 590 // the same 60px gap as between A and B
 
 export function SnappingScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: SnapS = { x: DRAG0.x, y: DRAG0.y, guide: false, dropped: false, show: true }
-  const poster: SnapS = { x: SNAP_X, y: 340, guide: false, dropped: true, show: true }
+  const initial: SnapS = { act: 1, dx: DRAG0.x, dy: DRAG0.y, guide: false, cx: SC0, space: false, show: true }
+  const poster: SnapS = { act: 2, dx: DRAG0.x, dy: DRAG0.y, guide: false, cx: SC_SNAP, space: true, show: true }
 
   async function script(a: Act<SnapS>) {
     await a.wait(700)
-    a.mark('grab')
-    const grab: Point = { x: DRAG0.x + 85, y: DRAG0.y + 55 }
+    a.mark('align')
+    const grab: Point = { x: DRAG0.x + 85, y: DRAG0.y + 50 }
     await a.move(grab)
     await a.wait(300)
     await a.click()
-    a.mark('drag')
-    // The pointer ends 9px right of the guide: the node snaps onto it
-    const end: Point = { x: SNAP_X + 9 + 85, y: 340 + 55 }
+    // The pointer ends 9px past the guide: the node snaps onto it, and a guide runs across the whole stage
+    const end: Point = { x: FIX.x + 9 + 85, y: DRAG0.y + 50 }
     await a.move(end, {
       duration: 1800,
       path: STRAIGHT,
       onMove: (p) => {
         const nx = p.x - 85
-        const near = Math.abs(nx - SNAP_X) < THRESH
-        a.put({ x: near ? SNAP_X : nx, y: p.y - 55, guide: near })
+        const near = Math.abs(nx - FIX.x) < THRESH
+        a.put({ dx: near ? FIX.x : nx, guide: near })
       },
     })
-    await a.wait(900)
-    await a.set({ guide: false, dropped: true })
-    await a.wait(2400)
+    await a.wait(1100)
+    await a.set({ guide: false })
+    await a.wait(1400)
+    a.mark('spacing')
+    await a.set({ show: false })
+    await a.wait(300)
+    await a.set({ act: 2 })
+    await a.set({ show: true })
+    await a.wait(700)
+    const grabC: Point = { x: SC0 + 60, y: SC_Y + 45 }
+    await a.move(grabC, { duration: 900 })
+    await a.wait(300)
+    await a.click()
+    // Dragged toward B: when the gap matches the one between A and B, C snaps and both gaps show the same distance
+    const endC: Point = { x: SC_SNAP - 8 + 60, y: SC_Y + 45 }
+    await a.move(endC, {
+      duration: 1800,
+      path: STRAIGHT,
+      onMove: (p) => {
+        const nx = p.x - 60
+        const near = Math.abs(nx - SC_SNAP) < THRESH
+        a.put({ cx: near ? SC_SNAP : nx, space: near })
+      },
+    })
+    await a.wait(2800)
     a.mark('reset')
     await a.move(REST)
-    await a.set({ dropped: false, show: false })
+    await a.set({ show: false, space: false })
     await a.wait(300)
-    a.put({ x: DRAG0.x, y: DRAG0.y, guide: false })
+    a.put({ act: 1, dx: DRAG0.x, dy: DRAG0.y, cx: SC0 })
     await a.set({ show: true })
     await a.wait(700)
   }
 
+  const mid = SA.y + SA.h / 2
   return (
     <Stage<SnapS> width={960} height={540} theme={theme} tokens={weaveTokens(theme)} initial={initial} poster={poster} script={script} cursor={{ at: REST, style: 'real', ripple: true }} className={`wv-scene ${name}`}>
       {(s) => (
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
-            <RectNode {...box(FIX)} />
             <g style={{ opacity: s.show ? 1 : 0, transition: 'opacity 0.3s ease' }}>
-              <RectNode x={s.x} y={s.y} w={DRAG0.w} h={DRAG0.h} />
+              {s.act === 1 ? (
+                <>
+                  <RectNode {...box(FIX)} />
+                  <RectNode x={s.dx} y={s.dy} w={DRAG0.w} h={DRAG0.h} />
+                </>
+              ) : (
+                <>
+                  <RectNode {...box(SA)} />
+                  <RectNode {...box(SB)} />
+                  <RectNode x={s.cx} y={SC_Y} w={SB.w} h={SB.h} />
+                </>
+              )}
             </g>
           </NodeLayer>
-          <div style={{ position: 'absolute', inset: 0, opacity: s.guide ? 1 : 0, transition: 'opacity 0.1s ease' }}>
+          <div style={{ position: 'absolute', inset: 0, opacity: s.act === 1 && s.guide ? 1 : 0 }}>
+            <SnapGuides lines={[{ x1: FIX.x, y1: 0, x2: FIX.x, y2: 540 }]} />
+          </div>
+          <div style={{ position: 'absolute', inset: 0, opacity: s.act === 2 && s.space ? 1 : 0 }}>
             <SnapGuides
-              lines={[{ x1: SNAP_X, y1: FIX.y - 16, x2: SNAP_X, y2: s.y + DRAG0.h + 16 }]}
-              tags={[{ x: SNAP_X, y: (FIX.y + FIX.h + s.y) / 2, text: `${Math.round(s.y - FIX.y - FIX.h)}` }]}
+              lines={[
+                { x1: SA.x + SA.w, y1: mid, x2: SB.x, y2: mid },
+                { x1: SB.x + SB.w, y1: mid, x2: SC_SNAP, y2: mid },
+                { x1: SA.x + SA.w, y1: mid - 8, x2: SA.x + SA.w, y2: mid + 8 },
+                { x1: SB.x, y1: mid - 8, x2: SB.x, y2: mid + 8 },
+                { x1: SB.x + SB.w, y1: mid - 8, x2: SB.x + SB.w, y2: mid + 8 },
+                { x1: SC_SNAP, y1: mid - 8, x2: SC_SNAP, y2: mid + 8 },
+              ]}
+              tags={[
+                { x: (SA.x + SA.w + SB.x) / 2, y: mid, text: '60' },
+                { x: (SB.x + SB.w + SC_SNAP) / 2 + 0.01, y: mid, text: '60' },
+              ]}
             />
           </div>
           <Toolbar />

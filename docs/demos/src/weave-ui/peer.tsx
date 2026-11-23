@@ -20,11 +20,11 @@ export function Peer({ name, color, at, crosshair, slow }: PeerProps) {
   return (
     <span className="wv-peer" data-slow={slow || undefined} style={{ transform: `translate(${at.x}px, ${at.y}px)`, '--who': color } as CSSProperties}>
       <svg className="wv-peer__arrow" width="16" height="18" viewBox="0 0 16 18" aria-hidden data-hidden={crosshair || undefined}>
-        <path d="M1.5 1.5v13.2l3.6-3.3 2.4 5.4 2.4-1-2.4-5.3h5.1Z" fill="var(--who)" stroke="#fff" strokeWidth="1.4" strokeLinejoin="round" />
+        <path d="M1.5 1.5v13.2l3.6-3.3 2.4 5.4 2.4-1-2.4-5.3h5.1Z" style={{ fill: 'var(--who)' }} stroke="#fff" strokeWidth="1.4" strokeLinejoin="round" />
       </svg>
       <svg className="wv-peer__cross" width="18" height="18" viewBox="0 0 18 18" aria-hidden data-hidden={!crosshair || undefined}>
         <path d="M9 1.5v15M1.5 9h15" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-        <path d="M9 1.5v15M1.5 9h15" stroke="var(--who)" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M9 1.5v15M1.5 9h15" style={{ stroke: 'var(--who)' }} strokeWidth="1.4" strokeLinecap="round" />
       </svg>
       <span className="wv-peer__flag">{name}</span>
     </span>

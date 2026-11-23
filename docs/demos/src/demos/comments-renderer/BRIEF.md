@@ -12,15 +12,15 @@
 
 ## Story
 
-The Comments renderer plugin paints the comments your app gives it on a layer of its own. It does not paint by itself: you call render().
+The Comments renderer plugin paints your app's comments as pins on a layer of its own. It does not paint by itself: when the comments change, you call render().
 
-Beats (about 11 s):
+Beats:
 
-1. Two comment pins stand on the canvas; a small panel shows the app's model: two comments.
-2. A third comment is added to the model: the panel changes, the canvas does not.
-3. render() lights up: the third pin appears.
-4. Payoff (holds about 3 s).
-5. Reset with a cause: the model goes back to two comments.
+1. Your app lists two comments (numbered 1 and 2); the canvas shows pins 1 and 2 on their nodes. Both read "On the canvas".
+2. A third comment arrives in the app list. It reads "Not on the canvas yet", and the canvas has no pin 3.
+3. commentsRenderer.render() lights up in the panel: pin 3 appears on its node and the comment reads "On the canvas".
+4. Payoff (holds about 3.2 s).
+5. Reset with a cause: the call dims and the list goes back to two comments.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the comme
 
 ## Poster
 
-Three pins on the canvas and render() lit.
+Three pins on the canvas and three comments listed, render() lit.
 
 ## Out of scope
 

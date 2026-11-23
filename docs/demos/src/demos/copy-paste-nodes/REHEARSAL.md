@@ -5,6 +5,7 @@ Beats: select, copy, paste, hold, reset, loop ~12s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: after copying, the cursor moves and the paste lands with its top-left corner at the cursor. The selection boxes appear instantly.
 Clean gate.
 Review: no fresh-eye subagent review run.
 Posters: `copy-paste-nodes-poster-light.png`, `copy-paste-nodes-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

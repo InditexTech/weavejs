@@ -1,7 +1,7 @@
 = Image
 :description: Render images on the canvas
 
-image::nodes/image-poster-light.png[An image node on the canvas is selected then cropped from its right edge and flipped horizontally,width=960,height=540,role="weave-demo weave-demo--image"]
+image::nodes/image-poster-light.png[An image is resized keeping its proportions then cropped from its right edge with a Cropping label and flipped horizontally,width=960,height=540,role="weave-demo weave-demo--image"]
 The Image Node allows you to render images directly onto the canvas. Built on top
 of Konva’s https://konvajs.org/api/Konva.Image.html[Image] shape, it supports
 properties like position, scale, opacity, and filters.

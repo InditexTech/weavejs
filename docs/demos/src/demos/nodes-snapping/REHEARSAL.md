@@ -1,10 +1,11 @@
 # Rehearsal: nodes-snapping
 
 Gold: `rectangle-node` (kept: the measured drag where the node follows the pointer; changed: a snap with a guide and a distance tag instead of a free drag).
-Beats: grab, drag, snap with a guide and distance, drop, hold, reset, loop ~13s
+Beats: alignment snap with a full-stage guide, release, three-node equal spacing snap with two tags, hold, reset, loop ~22s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: two examples (alignment with a full-stage guide, then equal spacing with three nodes). The 14 px snap threshold and the 60 px gap are illustrative.
 The ~14px jump is the snap itself.
 Review: no fresh-eye subagent review run.
 Posters: `nodes-snapping-poster-light.png`, `nodes-snapping-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

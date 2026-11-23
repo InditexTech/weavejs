@@ -1,10 +1,11 @@
 # Rehearsal: stage-drop-area
 
 Gold: `image-tool` (kept: a file drop from outside the canvas; the drag-in and the drop target overlay; changed:  (drag a file in from the desktop)).
-Beats: drag a file in, drop target, drop, image appears, hold, reset, loop ~13s
+Beats: select a file in the Finder, drag it to the canvas, drop, image appears, hold, reset, loop ~14s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework (complete): the file now comes from a Finder window and is dragged onto the canvas. The Finder is a faux window over the app; the gate flags it as an uneven-gutters panel (placed 40 px from the right and bottom).
 The 8px jumps are the chip offset from the cursor; the chip lands over the drop label at drop time.
 Review: no fresh-eye subagent review run.
 Posters: `stage-drop-area-poster-light.png`, `stage-drop-area-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

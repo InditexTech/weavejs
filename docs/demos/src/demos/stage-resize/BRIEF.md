@@ -12,14 +12,15 @@
 
 ## Story
 
-The Stage resize plugin keeps the stage the size of its container, so the canvas is responsive.
+The Stage resize plugin keeps the stage the size of its container, so resizing the window resizes the canvas.
 
-Beats (about 10 s):
+Beats:
 
-1. A stage sits in a container, 760 x 400, a rectangle in its middle.
-2. The container shrinks to 460 x 300: the stage shrinks with it and the rectangle stays in the middle.
-3. Payoff (holds about 2.8 s).
-4. The container grows back to 760 x 400.
+1. An app window holds the canvas, with a rectangle and an ellipse in its middle and a size tag.
+2. The cursor drags the window's bottom-right corner in: the window shrinks and the stage and its content follow, staying centered; the size tag updates.
+3. Payoff (holds about 2 s).
+4. The cursor drags the corner back out: the window and the stage grow again.
+5. The cursor leaves.
 
 ## Screen
 
@@ -33,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the resiz
 
 ## Poster
 
-The container shrunk with the rectangle in its middle.
+The smaller window with the stage and its content centered, no cursor.
 
 ## Out of scope
 

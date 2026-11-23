@@ -5,6 +5,7 @@ Beats: Maya is in, Jon joins, Ana joins, hold, reset, loop ~11s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: the panel has padding from the top (40 px) and right (28 px). The gate flags the roster as an uneven-gutters panel; this is the requested corner placement.
 No local cursor; panel docked to the top right edge for even gutters.
 Review: no fresh-eye subagent review run.
 Posters: `connected-users-poster-light.png`, `connected-users-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

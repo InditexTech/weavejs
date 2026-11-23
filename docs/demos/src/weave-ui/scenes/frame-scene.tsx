@@ -7,6 +7,8 @@ import type { DemoProps } from '../../types'
 import { weaveTokens } from '../../looks/weave'
 import { WeaveCanvas } from '../canvas'
 import { FrameNode, NodeLayer, NodeSelection, RectNode, StickyNode, type Box } from '../nodes/nodes'
+import { Copy, Group as GroupIcon, Trash2, Ungroup } from 'lucide-react'
+import { ContextMenu } from '../overlays/overlays'
 import { WeaveToolbar } from '../toolbar'
 import './scenes.css'
 import './frame-scene.css'
@@ -14,46 +16,66 @@ import './frame-scene.css'
 const REST: Point = { x: 790, y: 460 }
 const STRAIGHT = (t: number, from: Point, to: Point): Point => ({ x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t })
 
-// ---- Frame node: a click inside the frame leaves it alone, a click on its edge selects it -----------------------------
+// ---- Frame node: drag an element into the frame, then select the frame by its title or by its border -------------------
 
-type FrameS = { dx: number; dy: number; selected: boolean; edge: boolean; show: boolean }
-const FRAME: Box = { x: 250, y: 170, w: 420, h: 260 }
-const CHILD: Box = { x: 320, y: 250, w: 130, h: 120 }
-const MOVE = { dx: 110, dy: -50 }
+type FrameS = { el: Point; fd: Point; over: boolean; hov: boolean; selected: boolean; show: boolean }
+const FMOVE = { dx: -90, dy: -30 }
+const FRAME: Box = { x: 420, y: 150, w: 380, h: 260 }
+const EL = { w: 130, h: 110 }
+const EL0: Point = { x: 190, y: 290 }
+const EL1: Point = { x: 480, y: 230 }
 
 export function FrameNodeScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: FrameS = { dx: 0, dy: 0, selected: false, edge: false, show: true }
-  const poster: FrameS = { dx: MOVE.dx, dy: MOVE.dy, selected: true, edge: false, show: true }
+  const initial: FrameS = { el: EL0, fd: { x: 0, y: 0 }, over: false, hov: false, selected: false, show: true }
+  const poster: FrameS = { el: EL1, fd: { x: FMOVE.dx, y: FMOVE.dy }, over: false, hov: false, selected: true, show: true }
 
   async function script(a: Act<FrameS>) {
     await a.wait(700)
-    a.mark('inside')
-    await a.move({ x: FRAME.x + 300, y: FRAME.y + 120 })
+    a.mark('move')
+    const from: Point = { x: EL0.x + EL.w / 2, y: EL0.y + EL.h / 2 }
+    await a.move(from)
     await a.wait(300)
-    await a.click()
+    await a.move({ x: EL1.x + EL.w / 2, y: EL1.y + EL.h / 2 }, {
+      duration: 1400,
+      path: STRAIGHT,
+      onMove: (p) => {
+        const inside = p.x > FRAME.x && p.x < FRAME.x + FRAME.w && p.y > FRAME.y && p.y < FRAME.y + FRAME.h
+        a.put({ el: { x: EL0.x + (p.x - from.x), y: EL0.y + (p.y - from.y) }, over: inside })
+      },
+    })
+    await a.wait(700)
+    await a.set({ over: false })
     await a.wait(900)
-    a.mark('edge')
-    const edge: Point = { x: FRAME.x + 220, y: FRAME.y }
-    await a.move(edge, { duration: 800 })
-    await a.set({ edge: true })
+    a.mark('title')
+    const title: Point = { x: FRAME.x + 28, y: FRAME.y - 8 }
+    await a.move(title, { duration: 800 })
+    await a.set({ hov: true })
     await a.wait(400)
     await a.click()
-    await a.set({ selected: true })
-    await a.wait(700)
-    a.mark('move')
-    await a.move({ x: edge.x + MOVE.dx, y: edge.y + MOVE.dy }, {
-      duration: 1200,
-      path: STRAIGHT,
-      onMove: (p) => a.put({ dx: p.x - edge.x, dy: p.y - edge.y }),
-    })
-    await a.set({ edge: false })
+    await a.set({ selected: true, hov: false })
+    await a.wait(1400)
+    a.mark('deselect')
+    await a.move({ x: 300, y: 190 }, { duration: 800 })
+    await a.click()
+    await a.set({ selected: false })
+    await a.wait(800)
+    a.mark('border')
+    const border: Point = { x: FRAME.x + FRAME.w, y: FRAME.y + 170 }
+    await a.move(border, { duration: 900 })
+    await a.set({ hov: true })
+    await a.wait(400)
+    await a.click()
+    await a.set({ selected: true, hov: false })
+    await a.wait(800)
+    a.mark('carry')
+    await a.drag({ x: border.x + FMOVE.dx, y: border.y + FMOVE.dy }, (p) => a.put({ fd: { x: p.x - border.x, y: p.y - border.y } }), { duration: 1300 })
     await a.wait(2400)
     a.mark('reset')
     await a.move(REST)
     await a.set({ selected: false })
     await a.set({ show: false })
     await a.wait(300)
-    a.put({ dx: 0, dy: 0 })
+    a.put({ el: EL0, fd: { x: 0, y: 0 } })
     await a.set({ show: true })
     await a.wait(700)
   }
@@ -61,22 +83,21 @@ export function FrameNodeScene({ theme, name }: DemoProps & { name: string }) {
   return (
     <Stage<FrameS> width={960} height={540} theme={theme} tokens={weaveTokens(theme)} initial={initial} poster={poster} script={script} cursor={{ at: REST, style: 'real', ripple: true }} className={`wv-scene ${name}`}>
       {(s) => {
-        const f: Box = { ...FRAME, x: FRAME.x + s.dx, y: FRAME.y + s.dy }
+        const fr: Box = { ...FRAME, x: FRAME.x + s.fd.x, y: FRAME.y + s.fd.y }
         return (
-          <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
-            <NodeLayer>
-              <g style={{ opacity: s.show ? 1 : 0, transition: 'opacity 0.3s ease' }}>
-                <FrameNode {...f} title="Frame 1" />
-                <StickyNode x={CHILD.x + s.dx} y={CHILD.y + s.dy} w={CHILD.w} h={CHILD.h} text="Idea" />
-                <RectNode x={CHILD.x + s.dx + 170} y={CHILD.y + s.dy + 20} w={90} h={70} />
-              </g>
-              <line className="wv-frame__edge" data-show={s.edge || undefined} x1={f.x} y1={f.y} x2={f.x + f.w} y2={f.y} />
-              <NodeSelection {...f} show={s.selected} />
-            </NodeLayer>
-            <div className="wv-scene__toolbar">
-              <WeaveToolbar active="move" />
-            </div>
-          </WeaveCanvas>
+        <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
+          <NodeLayer>
+            <g style={{ opacity: s.show ? 1 : 0, transition: 'opacity 0.3s ease' }}>
+              <FrameNode {...fr} title="Frame 1" />
+              <StickyNode x={s.el.x + s.fd.x} y={s.el.y + s.fd.y} w={EL.w} h={EL.h} text="Idea" />
+            </g>
+            <rect className="wv-frame__edge" data-show={s.hov || s.over || undefined} x={fr.x} y={fr.y} width={fr.w} height={fr.h} fill="none" />
+            <NodeSelection {...fr} show={s.selected} />
+          </NodeLayer>
+          <div className="wv-scene__toolbar">
+            <WeaveToolbar active="move" />
+          </div>
+        </WeaveCanvas>
         )
       }}
     </Stage>
@@ -85,15 +106,15 @@ export function FrameNodeScene({ theme, name }: DemoProps & { name: string }) {
 
 // ---- Group node: select two nodes, group them, move them as one -------------------------------------------------
 
-type GroupS = { marquee: Box | null; picked: boolean; grouped: boolean; dx: number; dy: number; show: boolean }
+type GroupS = { marquee: Box | null; picked: boolean; grouped: boolean; dx: number; dy: number; show: boolean; menu: boolean; hov: boolean }
 const A: Box = { x: 240, y: 210, w: 150, h: 100 }
 const B: Box = { x: 430, y: 280, w: 150, h: 100 }
 const BOUNDS: Box = { x: 240, y: 210, w: 340, h: 170 }
 const GMOVE = { dx: 150, dy: -60 }
 
 export function GroupNodeScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: GroupS = { marquee: null, picked: false, grouped: false, dx: 0, dy: 0, show: true }
-  const poster: GroupS = { marquee: null, picked: false, grouped: true, dx: GMOVE.dx, dy: GMOVE.dy, show: true }
+  const initial: GroupS = { marquee: null, picked: false, grouped: false, dx: 0, dy: 0, show: true, menu: false, hov: false }
+  const poster: GroupS = { marquee: null, picked: false, grouped: true, dx: GMOVE.dx, dy: GMOVE.dy, show: true, menu: false, hov: false }
 
   async function script(a: Act<GroupS>) {
     await a.wait(700)
@@ -107,8 +128,17 @@ export function GroupNodeScene({ theme, name }: DemoProps & { name: string }) {
     await a.set({ marquee: null, picked: true })
     await a.wait(700)
     a.mark('group')
-    await a.key('Ctrl G')
-    await a.set({ grouped: true, picked: false })
+    const press: Point = { x: A.x + 110, y: A.y + 60 }
+    await a.move(press, { duration: 800 })
+    await a.wait(300)
+    await a.click(undefined, { right: true })
+    await a.set({ menu: true })
+    await a.wait(900)
+    await a.move('menu-group', { duration: 700 })
+    await a.set({ hov: true })
+    await a.wait(600)
+    await a.click({ at: 'menu-group' })
+    await a.set({ menu: false, hov: false, grouped: true, picked: false })
     await a.wait(900)
     a.mark('move')
     const from: Point = { x: BOUNDS.x + 80, y: BOUNDS.y + 40 }
@@ -131,7 +161,7 @@ export function GroupNodeScene({ theme, name }: DemoProps & { name: string }) {
   }
 
   return (
-    <Stage<GroupS> width={960} height={540} theme={theme} tokens={weaveTokens(theme)} initial={initial} poster={poster} script={script} keys="top" cursor={{ at: REST, style: 'real', ripple: true }} className={`wv-scene ${name}`}>
+    <Stage<GroupS> width={960} height={540} theme={theme} tokens={weaveTokens(theme)} initial={initial} poster={poster} script={script} cursor={{ at: REST, style: 'real', ripple: true }} className={`wv-scene ${name}`}>
       {(s) => {
         const b: Box = { ...BOUNDS, x: BOUNDS.x + s.dx, y: BOUNDS.y + s.dy }
         return (
@@ -148,6 +178,16 @@ export function GroupNodeScene({ theme, name }: DemoProps & { name: string }) {
               </g>
               <NodeSelection {...b} show={s.grouped} />
             </NodeLayer>
+            <ContextMenu
+              show={s.menu}
+              at={{ x: A.x + 118, y: A.y + 68 }}
+              items={[
+                { label: 'Copy', icon: Copy, shortcut: 'Ctrl C' },
+                { label: 'Group', icon: GroupIcon, shortcut: 'Ctrl G', hovered: s.hov },
+                { label: 'Ungroup', icon: Ungroup, shortcut: 'Ctrl Shift G', disabled: true },
+                { label: 'Delete', icon: Trash2, shortcut: 'Del', divider: true },
+              ]}
+            />
             <div className="wv-scene__toolbar">
               <WeaveToolbar active="move" />
             </div>

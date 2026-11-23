@@ -1,7 +1,7 @@
 = Measure
 :description: Draw measure reference distance on the canvas
 
-image::nodes/measure-poster-light.png[A measure node on the canvas is selected then moved and stretched from its end handle,width=960,height=540,role="weave-demo weave-demo--measure"]
+image::nodes/measure-poster-light.png[A measure node sits along the top of a rectangle and its end is dragged to the rectangle corner so it reads the rectangle width,width=960,height=540,role="weave-demo weave-demo--measure"]
 The Measure node is a complex node used to render a representation of the the distance between
 two points on the canvas. It needs:
 

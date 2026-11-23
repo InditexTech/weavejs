@@ -50,3 +50,19 @@
   background: var(--wv-toolbar-active-bg);
   color: var(--wv-toolbar-active-fg);
 }
+
+/* A short caption that says what mode the node is in */
+.wv-caption {
+  position: absolute;
+  z-index: 13;
+  padding: 8px 12px;
+  background: var(--ss-text-strong);
+  color: var(--ss-surface);
+  font: 500 13px/1 var(--ss-font);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wv-caption[data-show] {
+  opacity: 1;
+}

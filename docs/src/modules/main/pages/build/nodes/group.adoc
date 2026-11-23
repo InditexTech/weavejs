@@ -1,7 +1,7 @@
 = Group
 :description: Group nodes and manipulate them
 
-image::nodes/group-poster-light.png[Two rectangles are selected with a marquee grouped with a shortcut and moved together as one,width=960,height=540,role="weave-demo weave-demo--group"]
+image::nodes/group-poster-light.png[Two rectangles are selected with a marquee grouped from the context menu and moved together as one,width=960,height=540,role="weave-demo weave-demo--group"]
 The Group node is a container for organizing multiple nodes into a single, movable
 and transformable unit. Based on Konva’s https://konvajs.org/api/Konva.Group.html[Group],
 it allows you to nest shapes or other groups together, enabling you to apply

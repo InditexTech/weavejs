@@ -12,15 +12,16 @@
 
 ## Story
 
-A Sticky note node is an ordinary node: select it, drag it, resize it from a corner.
+A sticky note moves and resizes like any node, and its text is edited in place.
 
-Beats (about 12 s):
+Beats:
 
-1. The cursor goes to the sticky note and clicks: it is selected, handles appear.
-2. Press and drag: the sticky note moves with the pointer, up and to the right.
-3. The cursor goes to its bottom-right corner anchor (the cursor becomes a resize cursor) and drags: the sticky note grows.
-4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the selection and shape fade out, the sticky note comes back at its starting place and size.
+1. The cursor selects the note ("Idea").
+2. A drag moves it up and to the right.
+3. The corner anchor makes it bigger.
+4. A double click edits it: Ctrl A (a keycap shows), then the text becomes "Ship the docs".
+5. Payoff (holds about 2.2 s).
+6. Reset with a cause: the cursor leaves and the note returns with its first text.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the stick
 
 ## Poster
 
-The sticky note moved, enlarged and selected with its handles, no cursor.
+The big note moved and showing the new text, selected, no cursor.
 
 ## Out of scope
 

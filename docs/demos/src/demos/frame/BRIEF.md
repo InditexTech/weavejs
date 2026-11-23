@@ -12,15 +12,18 @@
 
 ## Story
 
-A frame is selected by its edge, so the nodes inside it stay easy to click: click inside to leave it alone, click the edge to select and move it with its contents.
+A frame holds the elements dropped into it, and it can be selected by its title or by its border (not by clicking inside it).
 
-Beats (about 13 s):
+Beats:
 
-1. The cursor clicks inside the frame on empty canvas: nothing is selected.
-2. The cursor goes to the frame's top edge: the edge highlights; a click selects the frame.
-3. Press and drag: the frame moves and carries its sticky note and rectangle with it.
-4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the selection and frame fade out, the frame comes back where it began.
+1. A sticky note sits outside the frame; the cursor drags it toward the frame. While the note is over the frame, the frame outline highlights (the drop feedback).
+2. The note is dropped inside and the highlight goes.
+3. The cursor goes to the frame title: the frame highlights and a click selects it.
+4. A click on empty canvas deselects it.
+5. The cursor goes to the frame border: it highlights and a click selects the frame again.
+6. A drag on the border moves the frame and the note inside moves along with it.
+7. Payoff (holds about 2.4 s).
+8. Reset with a cause: the cursor leaves, everything fades and the note is back outside the frame.
 
 ## Screen
 
@@ -34,7 +37,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the frame
 
 ## Poster
 
-The frame moved and selected with its contents, no cursor.
+The frame moved with the note inside it, selected, no cursor.
 
 ## Out of scope
 

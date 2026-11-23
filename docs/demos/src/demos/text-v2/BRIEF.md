@@ -12,16 +12,17 @@
 
 ## Story
 
-Text v2 is rich text: select a word to make it bold, turn rows into a list and indent one.
+A rich text node is selected first, then edited in place: select a word, make it bold, turn rows into a list.
 
-Beats (about 16 s):
+Beats:
 
-1. The cursor double-clicks the word "launch": it is selected and the floating text toolbar appears.
-2. Click Bold: the word becomes bold.
-3. The cursor clicks the next rows and Bullet list is clicked: the rows become a list.
-4. Click Indent: the second row moves in by one step.
-5. Payoff (holds about 2 s).
-6. Reset with a cause: the toolbar goes, the formatting is undone while the cursor leaves.
+1. The cursor clicks the text node: it is selected with its box.
+2. A double click on a word enters edit mode and selects it; the floating toolbar appears.
+3. The cursor clicks Bold.
+4. The cursor drags across the two rows: both are selected.
+5. It clicks List: both rows get bullets (at the left edge of the paragraph above, in line with its first line, no indent).
+6. Payoff (holds about 2.2 s).
+7. Reset with a cause: the cursor leaves and the text goes back to plain.
 
 ## Screen
 
@@ -35,7 +36,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the rich 
 
 ## Poster
 
-The word in bold and the two rows as a list with the second one indented, no cursor.
+The text with a bold word and a bullet list, selected, no cursor.
 
 ## Out of scope
 

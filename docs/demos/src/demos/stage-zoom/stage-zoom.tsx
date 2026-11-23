@@ -6,5 +6,5 @@ import { ViewportScene } from '../../weave-ui/scenes/viewport-scene'
 import type { DemoProps } from '../../types'
 
 export default function StageZoom({ theme }: DemoProps) {
-  return <ViewportScene theme={theme} kind="zoom-in" name="stage-zoom" />
+  return <ViewportScene theme={theme} kind="zoom" name="stage-zoom" />
 }

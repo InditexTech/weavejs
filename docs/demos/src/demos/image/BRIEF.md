@@ -12,16 +12,16 @@
 
 ## Story
 
-An image node can be cropped and flipped in place, without generating a new asset.
+An image node resizes without breaking its aspect ratio, crops in place and flips, without generating a new asset.
 
-Beats (about 13 s):
+Beats:
 
-1. The cursor goes to the image and clicks: it is selected.
-2. A double click enters crop mode: the black crop handles appear and the full image shows dashed under the crop window.
-3. The cursor drags the right handle in: the visible part shrinks while the picture stays put.
-4. Crop mode ends and the node bar appears; the cursor clicks Flip horizontal and the image mirrors.
+1. The cursor selects a small image.
+2. It drags the corner anchor: the image grows and keeps its proportions.
+3. A double click enters crop mode; a "Cropping" label says so, and the cursor drags the right crop handle in.
+4. Crop mode ends; the cursor clicks Flip horizontal and the image mirrors.
 5. Payoff (holds about 2.4 s).
-6. Reset with a cause: the cursor leaves, the selection and image fade out, the image comes back whole and unflipped.
+6. Reset with a cause: the cursor leaves and the image goes back to its small, uncropped state.
 
 ## Screen
 
@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the image
 
 ## Poster
 
-The image cropped, flipped and selected, no cursor.
+The image resized, cropped and flipped, selected, no cursor.
 
 ## Out of scope
 

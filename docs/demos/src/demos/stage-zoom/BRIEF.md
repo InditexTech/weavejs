@@ -14,13 +14,13 @@
 
 The Stage zoom plugin zooms the canvas in and out, from the wheel, the trackpad or controls.
 
-Beats (about 15 s):
+Beats:
 
-1. The canvas shows the room small at 50%.
-2. The cursor goes to Zoom in (tooltip) and clicks.
-3. The view zooms in step by step to 100%.
-4. Payoff (holds about 2.8 s).
-5. Reset with a cause: the cursor leaves and the view returns.
+1. The canvas at 100%.
+2. The cursor goes to Zoom in (tooltip) and clicks twice: 125%, then 150%.
+3. It goes to Zoom out (tooltip) and clicks three times: 125%, 100%, 75%.
+4. Payoff (holds about 2.4 s).
+5. Reset with a cause: the cursor leaves and the view returns to 100%.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the zoom 
 
 ## Poster
 
-The canvas at 100%.
+The canvas zoomed out to 75%, no cursor.
 
 ## Out of scope
 

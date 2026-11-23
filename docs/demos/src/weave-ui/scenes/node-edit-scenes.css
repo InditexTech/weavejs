@@ -1,0 +1,71 @@
+/* SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* The note while its text is edited: the SDK's #0074ff outline */
+.wv-note-edit {
+  fill: none;
+  stroke: #0074ff;
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wv-note-edit[data-show] {
+  opacity: 1;
+}
+
+/* The tip picker: a small card with a Start and an End group */
+.wv-tips {
+  position: absolute;
+  z-index: 13;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 10px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  color: var(--ss-icon);
+  font: 400 12px/1 var(--ss-font);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wv-tips[data-show] {
+  opacity: 1;
+}
+
+.wv-tips__group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wv-tips__label {
+  margin-right: 4px;
+  color: var(--ss-text-faint);
+}
+
+.wv-tips__button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 32px;
+}
+
+.wv-tips__button[data-hover] {
+  background: var(--ss-well);
+}
+
+.wv-tips__button[data-on] {
+  background: var(--wv-toolbar-active-bg);
+  color: var(--wv-toolbar-active-fg);
+}
+
+.wv-tips__divider {
+  width: 1px;
+  height: 22px;
+  background: var(--ss-line);
+}

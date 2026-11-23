@@ -7,5 +7,5 @@ import { StarNode } from '../../weave-ui/nodes/nodes'
 import type { DemoProps } from '../../types'
 
 export default function Star({ theme }: DemoProps) {
-  return <NodeScene theme={theme} name="star" shape={(box) => <StarNode {...box} tips={5} inner={0.38} />} />
+  return <NodeScene theme={theme} name="star" shape={(box) => <StarNode {...box} tips={5} inner={0.4} />} square />
 }

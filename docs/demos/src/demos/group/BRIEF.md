@@ -12,15 +12,16 @@
 
 ## Story
 
-A group node holds several nodes and moves and transforms them as one.
+A group moves and scales its nodes as one; here it is made from the context menu.
 
-Beats (about 14 s):
+Beats:
 
-1. The cursor drags a marquee over empty canvas around two rectangles: both are selected.
-2. Ctrl+G (shown as keycaps): the two selections become one group with a single selection box.
-3. Press and drag the group: both rectangles move together, up and to the right.
-4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the group fades out and the two rectangles come back where they began.
+1. The cursor drags a marquee over two rectangles: both are selected.
+2. A right click on the selection opens the context menu (Copy, Group, Ungroup disabled, Delete).
+3. The cursor goes to Group and clicks: the selection becomes one group box.
+4. A press and drag moves the group as one.
+5. Payoff (holds about 2.4 s).
+6. Reset with a cause: the cursor leaves and the rectangles come back apart.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the group
 
 ## Poster
 
-The two rectangles grouped, moved together and selected as one, no cursor.
+The grouped rectangles moved and selected as one, no cursor.
 
 ## Out of scope
 

@@ -17,3 +17,4 @@ Posters: `home-hero-poster-light.png`, `home-hero-poster-dark.png` (transparent,
 Assumptions: the real room toolbar at wide breakpoints is the vertical square one (`weavejs-frontend` main, Nov 2026); the rectangle keeps the SDK's default white fill and 1px black stroke in both themes (the real default).
 Unresolved: none.
 Not checked: side-by-side against a live screenshot of the running frontend; compact (phone-column) layout, deliberately not designed, the 16:9 stage scales down and its small text is illustrative at 390 px; Safari and Firefox; fresh-eye review.
+Update: the remote cursor arrows now render (the docs UI SVG rule had collapsed them to 0 px); posters regenerated.

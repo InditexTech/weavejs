@@ -12,15 +12,16 @@
 
 ## Story
 
-The Stage drop area plugin lets users drop files and elements on the canvas and tells your app where.
+The Stage drop area plugin lets users drop files from their desktop onto the canvas and tells your app where.
 
-Beats (about 13 s):
+Beats:
 
-1. A file chip (photo.png) is dragged from the top right toward the canvas; the canvas shows a drop target.
-2. It reaches the middle of the canvas.
-3. Drop: the target goes and an image node appears there.
-4. Payoff (holds about 2.8 s).
-5. Reset with a cause: the cursor leaves and the image goes.
+1. A Finder window ("Downloads") sits over the app with two files: photo.png and notes.pdf.
+2. The cursor selects photo.png.
+3. The cursor drags it out of the Finder: a file chip follows and, as it enters the canvas, a drop target ("Drop to add") appears.
+4. It reaches the middle of the canvas and is released: the target goes and an image node appears there.
+5. Payoff (holds about 2.8 s).
+6. Reset with a cause: the cursor leaves and the image goes.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the drop 
 
 ## Poster
 
-The image node placed in the middle of the canvas.
+The image node placed in the middle of the canvas, the Finder still open, no cursor.
 
 ## Out of scope
 

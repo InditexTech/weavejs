@@ -1,7 +1,7 @@
 = Nodes Multi-selection Feedback
 :description: Activate support to provide more feedback to the user when multi-selecting nodes
 
-image::plugins/nodes-multi-selection-feedback-poster-light.png[Rectangles are shift clicked one after another and each selected one gets a red outline inside the shared selection box,width=960,height=540,role="weave-demo weave-demo--nodes-multi-selection-feedback"]
+image::plugins/nodes-multi-selection-feedback-poster-light.png[Rectangles are shift clicked one after another and the blue selection box and each red outline appear instantly,width=960,height=540,role="weave-demo weave-demo--nodes-multi-selection-feedback"]
 == Introduction
 
 This plugin enables more feedback to users when selecting multiple nodes on the canvas.

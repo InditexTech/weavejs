@@ -99,24 +99,21 @@
 
 .wv-rich__row {
   display: flex;
-  gap: 10px;
   margin: 2px 0;
-  transition: padding-left 0.25s ease;
 }
 
+/* The bullet sits at the paragraph's left edge, in line with the first line's text; the row text follows it */
 .wv-rich__marker {
-  width: 14px;
+  width: 0;
+  overflow: hidden;
   color: var(--ss-text-faint);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: width 0.2s ease, opacity 0.2s ease;
 }
 
 .wv-rich__row[data-list] .wv-rich__marker {
+  width: 18px;
   opacity: 1;
-}
-
-.wv-rich__row[data-indent] {
-  padding-left: 28px;
 }
 
 .wv-rich__sel {

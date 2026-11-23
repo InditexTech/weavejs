@@ -12,15 +12,17 @@
 
 ## Story
 
-A stroke single node is one line with optional tips: select it, drag it, scale it from a corner.
+A single stroke is a straight line; its start and its end can each be a dot or an arrow.
 
-Beats (about 12 s):
+Beats:
 
-1. The cursor goes to the single stroke and clicks: it is selected with its bounding box.
-2. Press and drag: the single stroke moves with the pointer, up and to the right.
-3. The cursor goes to the bottom-right corner anchor (the cursor becomes a resize cursor) and drags: the single stroke scales with its box.
-4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the selection and node fade out, the single stroke comes back at its starting place and size.
+1. A plain straight line on the canvas.
+2. The cursor selects it: end handles and a Start / End picker appear.
+3. The cursor picks the dot for the start: a dot tip appears.
+4. It picks the arrow for the end: an arrow tip appears.
+5. A drag on the line moves it, with its tips and the picker.
+6. Payoff (holds about 2.4 s).
+7. Reset with a cause: the cursor leaves and the line returns with no tips.
 
 ## Screen
 
@@ -34,7 +36,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the singl
 
 ## Poster
 
-The single stroke moved, scaled and selected with its handles, no cursor.
+The moved line with a dot at the start and an arrow at the end, selected, no cursor.
 
 ## Out of scope
 

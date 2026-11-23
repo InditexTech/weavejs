@@ -12,15 +12,15 @@
 
 ## Story
 
-A Measure node is defined by two end points: select it, drag it, drag an end handle to a new length, and read the label update.
+A measure node reads a distance; here it sits on an element and measures its width.
 
-Beats (about 12 s):
+Beats:
 
-1. The cursor goes to the measure and clicks: it is selected, its two end handles appear.
-2. Press and drag: the whole measure moves with the pointer, up and to the right.
-3. The cursor goes to the end handle and drags: the measure stretches and its length label follows.
-4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the selection and node fade out, the measure comes back where it began.
+1. A rectangle with a measure along its top edge, reading 120.00 px.
+2. The cursor selects the measure: its end handles show.
+3. It drags the right end to the rectangle's corner: the label updates to 240.00 px, the rectangle's width.
+4. Payoff (holds about 2.8 s).
+5. Reset with a cause: the cursor leaves and the measure goes back to its short length.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the measu
 
 ## Poster
 
-The measure moved, stretched and selected with its end handles, no cursor.
+The measure spanning the rectangle width, selected, no cursor.
 
 ## Out of scope
 

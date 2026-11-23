@@ -5,6 +5,7 @@ Beats: three labeled cursors move around, rest, reset, loop ~12s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework: remote cursor arrows were invisible (collapsed to 0 px by the docs UI SVG rule); fixed in peer.css. Affects every demo with remote peers, home-hero included.
 No local cursor; three remote cursors, Jon slightly slower.
 Review: no fresh-eye subagent review run.
 Posters: `users-pointers-poster-light.png`, `users-pointers-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

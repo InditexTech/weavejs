@@ -1,7 +1,7 @@
 = Copy & Paste Nodes
 :description: Activate support to copy and paste the nodes
 
-image::plugins/copy-paste-nodes-poster-light.png[A rectangle is selected copied with Control C and pasted with Control V as a second rectangle in the middle of the view,width=960,height=540,role="weave-demo weave-demo--copy-paste-nodes"]
+image::plugins/copy-paste-nodes-poster-light.png[A rectangle is selected and copied with Control C then the cursor moves and Control V pastes the copy with its top left corner at the cursor,width=960,height=540,role="weave-demo weave-demo--copy-paste-nodes"]
 == Introduction
 
 This plugin enables users to copy & paste selected nodes.

@@ -12,15 +12,15 @@
 
 ## Story
 
-A Regular polygon node is an ordinary node: select it, drag it, resize it from a corner.
+A regular polygon has equal sides; here a pentagon in a square box.
 
-Beats (about 12 s):
+Beats:
 
-1. The cursor goes to the regular polygon and clicks: it is selected, handles appear.
-2. Press and drag: the regular polygon moves with the pointer, up and to the right.
-3. The cursor goes to its bottom-right corner anchor (the cursor becomes a resize cursor) and drags: the regular polygon grows.
+1. The cursor selects the pentagon.
+2. A drag moves it.
+3. The corner anchor grows it, keeping the square box.
 4. Payoff (holds about 2.4 s).
-5. Reset with a cause: the cursor leaves, the selection and shape fade out, the regular polygon comes back at its starting place and size.
+5. Reset with a cause: the cursor leaves and the pentagon returns.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the regul
 
 ## Poster
 
-The regular polygon moved, enlarged and selected with its handles, no cursor.
+The larger pentagon, selected, no cursor.
 
 ## Out of scope
 

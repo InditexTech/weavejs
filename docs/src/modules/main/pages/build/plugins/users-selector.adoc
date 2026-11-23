@@ -1,7 +1,7 @@
 = Users Selector
 :description: Showcase the selection of the users on the canvas
 
-image::plugins/users-selector-poster-light.png[Two teammates each select a rectangle and their selections show in their own colors with their names,width=960,height=540,role="weave-demo weave-demo--users-selector"]
+image::plugins/users-selector-poster-light.png[Two teammates each select a rectangle and their selections show in their own colors with their names and visible cursors,width=960,height=540,role="weave-demo weave-demo--users-selector"]
 == Introduction
 
 This plugin displays real-time the user selection for all connected users on the

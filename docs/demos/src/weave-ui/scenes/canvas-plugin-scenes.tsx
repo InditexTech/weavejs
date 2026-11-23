@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CSSProperties } from 'react'
-import { Copy, Trash2 } from 'lucide-react'
+import { Copy, FileImage, FileText, Trash2 } from 'lucide-react'
 import { Stage, type Act, type Point } from '../../../kit'
 import type { DemoProps } from '../../types'
 import { weaveTokens } from '../../looks/weave'
 import { WeaveCanvas } from '../canvas'
-import { EllipseNode, ImageNode, NodeLayer, RectNode, StarNode, type Box } from '../nodes/nodes'
+import { EllipseNode, ImageNode, NodeLayer, NodeSelection, RectNode, StarNode, type Box } from '../nodes/nodes'
 import { CommentPin, ContextMenu, DropTarget, FileChip, Minimap } from '../overlays/overlays'
 import { WeaveToolbar } from '../toolbar'
 import { EasedSelection } from './action-scenes'
@@ -92,7 +92,8 @@ export function ContextMenuScene({ theme, name }: DemoProps & { name: string }) 
 
 type CpS = { sel: boolean; pasted: boolean }
 const CP_SRC: Box = { x: 230, y: 200, w: 170, h: 110 }
-const CP_COPY: Box = { x: 435, y: 215, w: 170, h: 110 }
+const PASTE_AT: Point = { x: 520, y: 300 }
+const CP_COPY: Box = { x: PASTE_AT.x, y: PASTE_AT.y, w: 170, h: 110 }
 
 export function CopyPasteScene({ theme, name }: DemoProps & { name: string }) {
   const initial: CpS = { sel: false, pasted: false }
@@ -107,8 +108,10 @@ export function CopyPasteScene({ theme, name }: DemoProps & { name: string }) {
     await a.wait(800)
     a.mark('copy')
     await a.key('ctrl+c')
-    await a.wait(900)
+    await a.wait(700)
     a.mark('paste')
+    await a.move(PASTE_AT, { duration: 1000 })
+    await a.wait(500)
     await a.key('ctrl+v')
     await a.set({ pasted: true })
     await a.wait(2600)
@@ -124,11 +127,11 @@ export function CopyPasteScene({ theme, name }: DemoProps & { name: string }) {
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
             <RectNode {...box(CP_SRC)} />
-            <g style={{ opacity: s.pasted ? 1 : 0, transition: 'opacity 0.25s ease' }}>
+            <g style={{ opacity: s.pasted ? 1 : 0 }}>
               <RectNode {...box(CP_COPY)} />
             </g>
-            <EasedSelection {...box(CP_SRC)} show={s.sel && !s.pasted} />
-            <EasedSelection {...box(CP_COPY)} show={s.pasted} />
+            <NodeSelection className="wv-instant" {...box(CP_SRC)} show={s.sel && !s.pasted} />
+            <NodeSelection className="wv-instant" {...box(CP_COPY)} show={s.pasted} />
           </NodeLayer>
           <Toolbar />
         </WeaveCanvas>
@@ -137,29 +140,38 @@ export function CopyPasteScene({ theme, name }: DemoProps & { name: string }) {
   )
 }
 
-// ---- Comments renderer: the app hands over a model; nothing paints until render() runs ----------------------------------
+// ---- Comments renderer: the app's comments list is the model; the plugin paints a pin per comment when render() runs -----
 
-type CrS = { added: boolean; rendered: boolean }
-const PINS: Array<{ at: Point; color: string }> = [
-  { at: { x: 330, y: 230 }, color: MAYA },
-  { at: { x: 640, y: 330 }, color: JON },
+type CrS = { n: 2 | 3; rendered: boolean; call: boolean }
+const CR_PEOPLE = [
+  { name: 'Maya', text: 'Align this with the grid', color: MAYA },
+  { name: 'Jon', text: 'Can we make it wider?', color: JON },
+  { name: 'Maya', text: 'Check this edge', color: MAYA },
 ]
-const NEW_PIN = { at: { x: 500, y: 410 }, color: MAYA }
+const CR_PINS: Point[] = [
+  { x: 345, y: 205 },
+  { x: 560, y: 175 },
+  { x: 430, y: 365 },
+]
 
 export function CommentsRendererScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: CrS = { added: false, rendered: true }
-  const poster: CrS = { added: true, rendered: true }
+  const initial: CrS = { n: 2, rendered: false, call: false }
+  const poster: CrS = { n: 3, rendered: true, call: true }
 
   async function script(a: Act<CrS>) {
-    await a.wait(1200)
-    a.mark('model')
-    await a.set({ added: true, rendered: false })
-    await a.wait(2000)
+    await a.wait(1400)
+    a.mark('new')
+    await a.set({ n: 3 })
+    await a.wait(2600)
     a.mark('render')
+    await a.set({ call: true })
+    await a.wait(500)
     await a.set({ rendered: true })
-    await a.wait(3000)
+    await a.wait(3200)
     a.mark('reset')
-    await a.set({ added: false })
+    await a.set({ call: false })
+    await a.wait(300)
+    await a.set({ n: 2, rendered: false })
     await a.wait(1200)
   }
 
@@ -168,21 +180,33 @@ export function CommentsRendererScene({ theme, name }: DemoProps & { name: strin
       {(s) => (
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
-            <RectNode x={260} y={240} w={170} h={110} />
-            <EllipseNode x={560} y={200} w={180} h={120} />
+            <RectNode x={180} y={205} w={170} h={110} />
+            <EllipseNode x={400} y={175} w={170} h={110} />
+            <RectNode x={270} y={365} w={160} h={90} />
           </NodeLayer>
-          {PINS.map((p, i) => (
-            <CommentPin key={i} at={p.at} color={p.color} count={1} />
+          {CR_PINS.map((at, i) => (
+            <CommentPin key={i} at={at} color={CR_PEOPLE[i].color} count={i + 1} show={i < 2 || (s.n === 3 && s.rendered)} />
           ))}
-          <CommentPin at={NEW_PIN.at} color={NEW_PIN.color} count={1} show={s.added && s.rendered} />
-          <div className="wv-model">
-            <div className="wv-model__row">comments: {s.added ? 3 : 2}</div>
-            <div className="wv-model__row" data-new={s.added || undefined}>
-              {s.added ? '+ Maya: "Check this edge"' : 'Maya, Jon'}
+          <div className="wv-cpanel">
+            <div className="wv-cpanel__head">Comments in your app ({s.n})</div>
+            {CR_PEOPLE.map((c, i) => (
+              <div key={i} className="wv-cpanel__row" data-on={i < s.n || undefined}>
+                <span className="wv-cpanel__num" style={{ '--who': c.color } as CSSProperties}>
+                  {i + 1}
+                </span>
+                <span className="wv-cpanel__text">
+                  <span>
+                    {c.name}: {c.text}
+                  </span>
+                  <span className="wv-cpanel__state" data-wait={(i === 2 && !s.rendered) || undefined}>
+                    {i === 2 && !s.rendered ? 'Not on the canvas yet' : 'On the canvas'}
+                  </span>
+                </span>
+              </div>
+            ))}
+            <div className="wv-cpanel__call" data-on={s.call || undefined}>
+              commentsRenderer.render()
             </div>
-            <span className="wv-model__call" data-on={(s.added && s.rendered) || undefined}>
-              render()
-            </span>
           </div>
           <Toolbar />
         </WeaveCanvas>
@@ -244,41 +268,59 @@ export function StageGridScene({ theme, name }: DemoProps & { name: string }) {
   )
 }
 
-// ---- Stage resize: the stage follows its container ----------------------------------------------------------------------
+// ---- Stage resize: the stage fills its window, so resizing the window resizes the stage -------------------------------
 
 type RsS = { w: number; h: number }
-const HOST_BIG: RsS = { w: 760, h: 540 }
-const HOST_SMALL: RsS = { w: 460, h: 540 }
+const WIN = { x: 60, y: 60, bar: 36 }
+const WIN_BIG: RsS = { w: 840, h: 420 }
+const WIN_SMALL: RsS = { w: 520, h: 340 }
 
 export function StageResizeScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: RsS = HOST_BIG
-  const poster: RsS = HOST_SMALL
+  const initial: RsS = WIN_BIG
+  const poster: RsS = WIN_SMALL
 
   async function script(a: Act<RsS>) {
-    await a.wait(1400)
+    await a.wait(1200)
     a.mark('shrink')
-    await a.set(HOST_SMALL)
-    await a.wait(2800)
+    await a.move('win-corner', { duration: 900 })
+    await a.wait(300)
+    const from: Point = { x: WIN.x + WIN_BIG.w, y: WIN.y + WIN_BIG.h }
+    await a.drag({ x: WIN.x + WIN_SMALL.w, y: WIN.y + WIN_SMALL.h }, (p) => a.put({ w: p.x - WIN.x, h: p.y - WIN.y }), { duration: 1500 })
+    await a.wait(2000)
     a.mark('grow')
-    await a.set(HOST_BIG)
-    await a.wait(2400)
+    await a.drag(from, (p) => a.put({ w: p.x - WIN.x, h: p.y - WIN.y }), { duration: 1500 })
+    await a.wait(1400)
+    await a.move(REST, { duration: 800 })
+    await a.wait(600)
   }
 
   return (
-    <Stage<RsS> {...stage(theme, name)} initial={initial} poster={poster} script={script}>
+    <Stage<RsS> {...stage(theme, name)} initial={initial} poster={poster} script={script} cursor={{ at: REST, style: 'real', ripple: true }}>
       {(s) => (
-        <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
-          <div className="wv-host" style={{ width: s.w, height: s.h }}>
-            <svg className="wv-fill" width="100%" height="100%" aria-hidden>
-              <g className="wv-follow" style={{ transform: `translate(${s.w / 2}px, ${s.h / 2}px)`, transition: 'transform 0.9s cubic-bezier(0.45, 0, 0.25, 1)' }}>
-                <RectNode x={-90} y={-60} w={180} h={120} />
-              </g>
-            </svg>
-            <span className="wv-host__size">
-              {s.w} x {s.h}
-            </span>
+        <div className="wv-desk" data-target="canvas">
+          <div className="wv-win" style={{ left: WIN.x, top: WIN.y, width: s.w, height: s.h }}>
+            <div className="wv-win__bar" style={{ height: WIN.bar }}>
+              <span className="wv-win__dot" />
+              <span className="wv-win__dot" />
+              <span className="wv-win__dot" />
+              <span className="wv-win__title">Weave app</span>
+            </div>
+            <div className="wv-win__body">
+              <WeaveCanvas className="wv-win__canvas">
+                <svg className="wv-fill" width="100%" height="100%" aria-hidden>
+                  <g className="wv-win__nodes" style={{ transform: `translate(${s.w / 2}px, ${(s.h - WIN.bar) / 2}px)` }}>
+                    <RectNode x={-150} y={-60} w={140} h={90} />
+                    <EllipseNode x={20} y={-10} w={120} h={80} />
+                  </g>
+                </svg>
+                <span className="wv-win__size">
+                  {Math.round(s.w)} x {Math.round(s.h - WIN.bar)}
+                </span>
+              </WeaveCanvas>
+            </div>
+            <span className="wv-win__corner" data-target="win-corner" data-cursor="resize-nwse" />
           </div>
-        </WeaveCanvas>
+        </div>
       )}
     </Stage>
   )
@@ -390,7 +432,7 @@ export function KeyboardMoveScene({ theme, name }: DemoProps & { name: string })
             <NodeLayer>
               <EllipseNode x={620} y={300} w={150} h={100} />
               <RectNode {...b} />
-              <EasedSelection {...b} show={s.sel} />
+              <NodeSelection className="wv-instant" {...b} show={s.sel} />
             </NodeLayer>
             <Toolbar />
           </WeaveCanvas>
@@ -400,38 +442,38 @@ export function KeyboardMoveScene({ theme, name }: DemoProps & { name: string })
   )
 }
 
-// ---- Stage drop area: drag a file in from the desktop and drop it on the canvas -----------------------------------------
+// ---- Stage drop area: drag a file from the Finder onto the canvas ---------------------------------------------------------
 
-type DrS = { at: Point; chip: boolean; over: boolean; dropped: boolean }
-const DROP_AT: Point = { x: 470, y: 250 }
-const CHIP_FROM: Point = { x: 820, y: 130 }
+type DrS = { at: Point; chip: boolean; over: boolean; dropped: boolean; sel: boolean }
+const DROP_AT: Point = { x: 400, y: 250 }
+const FINDER = { right: 40, bottom: 40, w: 320, h: 220 }
+const FINDER_LEFT = 960 - FINDER.right - FINDER.w
 
 export function DropAreaScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: DrS = { at: CHIP_FROM, chip: false, over: false, dropped: false }
-  const poster: DrS = { at: DROP_AT, chip: false, over: false, dropped: true }
+  const initial: DrS = { at: { x: 0, y: 0 }, chip: false, over: false, dropped: false, sel: false }
+  const poster: DrS = { at: DROP_AT, chip: false, over: false, dropped: true, sel: false }
 
   async function script(a: Act<DrS>) {
     await a.wait(900)
-    a.mark('drag')
-    a.put({ chip: true })
+    a.mark('pick')
+    await a.move('file-photo', { duration: 900 })
     await a.wait(300)
-    await a.move(CHIP_FROM, { duration: 10 })
-    await a.set({ over: true })
-    await a.move(DROP_AT, { duration: 1600, path: STRAIGHT, onMove: (p) => a.put({ at: { x: p.x + 8, y: p.y + 8 } }) })
-    await a.wait(700)
+    await a.set({ sel: true })
+    await a.wait(400)
+    a.mark('drag')
+    await a.drag(DROP_AT, (p) => a.put({ at: { x: p.x + 10, y: p.y + 10 }, chip: true, over: p.x < FINDER_LEFT }), { duration: 1900 })
+    await a.wait(900)
     a.mark('drop')
-    await a.set({ chip: false, over: false, dropped: true })
+    await a.set({ chip: false, over: false, dropped: true, sel: false })
     await a.wait(2800)
     a.mark('reset')
     await a.move(REST)
     await a.set({ dropped: false })
-    await a.wait(300)
-    a.put({ at: CHIP_FROM })
-    await a.wait(700)
+    await a.wait(900)
   }
 
   return (
-    <Stage<DrS> {...stage(theme, name)} initial={initial} poster={poster} script={script} cursor={{ at: CHIP_FROM, style: 'real', ripple: true }}>
+    <Stage<DrS> {...stage(theme, name)} initial={initial} poster={poster} script={script} cursor={{ at: REST, style: 'real', ripple: true }}>
       {(s) => (
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
@@ -441,8 +483,26 @@ export function DropAreaScene({ theme, name }: DemoProps & { name: string }) {
             </g>
           </NodeLayer>
           <DropTarget show={s.over}>Drop to add</DropTarget>
-          <FileChip name="photo.png" at={s.at} show={s.chip} />
           <Toolbar />
+          <div className="wv-finder" style={{ right: FINDER.right, bottom: FINDER.bottom, width: FINDER.w, height: FINDER.h }}>
+            <div className="wv-win__bar" style={{ height: 36 }}>
+              <span className="wv-win__dot" />
+              <span className="wv-win__dot" />
+              <span className="wv-win__dot" />
+              <span className="wv-win__title">Downloads</span>
+            </div>
+            <div className="wv-finder__grid">
+              <span className="wv-finder__file" data-sel={s.sel || undefined} data-target="file-photo">
+                <FileImage size={40} strokeWidth={1.1} />
+                <span className="wv-finder__name">photo.png</span>
+              </span>
+              <span className="wv-finder__file">
+                <FileText size={40} strokeWidth={1.1} />
+                <span className="wv-finder__name">notes.pdf</span>
+              </span>
+            </div>
+          </div>
+          <FileChip name="photo.png" at={s.at} show={s.chip} />
         </WeaveCanvas>
       )}
     </Stage>
