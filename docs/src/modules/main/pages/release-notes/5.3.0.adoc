@@ -1,0 +1,32 @@
+= v5.3.0
+:description: Opt-in "fully enclosed" drag-selection.
+
+== 🔷 Choose how drag-selection picks nodes.
+
+*Release date:* September 7, 2026
+
+== Changes
+
+=== "Fully Enclosed" Drag-Selection Mode
+
+By default a drag-selection rectangle selects every node it merely overlaps. The Nodes Selection plugin now has an opt-in `selectionMode` option:
+
+* `'intersects'` (default): select nodes whose bounding box overlaps the rectangle
+* `'contains'`: select only nodes whose bounding box is *fully inside* the rectangle
+
+For groups, containment is checked against the group's outer bounding box, not per child. Frames are always selected by containment, as before.
+
+[source,ts]
+----
+new WeaveNodesSelectionPlugin({
+  config: { selectionMode: 'contains' },
+});
+----
+
+See xref:main:build/plugins/nodes-selection.adoc[Nodes Selection].
+
+https://github.com/InditexTech/weavejs/issues/1158[https://github.com/InditexTech/weavejs/issues/1158]
+
+== Migration Steps
+
+None. The default behaviour is unchanged.

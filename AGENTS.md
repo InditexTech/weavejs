@@ -102,6 +102,8 @@ npx skills@latest add InditexTech/docouture --all
 
 ## Documentation state
 
+Release notes: every major and minor release gets a `release-notes/X.Y.Z.adoc` page (patches never do; a minor with no `Added` entry or breaking change may be skipped and is covered by the Changelog). Seed it with `node .github/scripts/release-notes-seed.mjs X.Y.Z --write`, then edit.
+
 <!-- maintained by the docouture-documenting-changes skill — do not hand-edit structure, only content -->
 
 | doc page          | derived from          | status |
@@ -219,3 +221,10 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/actions/ellipse-tool.adoc (demo) | `docs/demos/src/demos/ellipse-tool/*`; behavior shown follows `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts` | docs site only, not tied to a release |
 | main:build/actions/polygon-tool.adoc (demo) | `docs/demos/src/demos/polygon-tool/*`; behavior shown follows `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts` | docs site only, not tied to a release |
 | main:build/actions/regular-polygon-tool.adoc (demo) | `docs/demos/src/demos/regular-polygon-tool/*`; behavior shown follows `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts` | docs site only, not tied to a release |
+| main:release-notes/5.1.0.adoc | `code/CHANGELOG.md` (`[5.1.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.1.0 |
+| main:release-notes/5.3.0.adoc | `code/CHANGELOG.md` (`[5.3.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.3.0 |
+| main:release-notes/5.4.0.adoc | `code/CHANGELOG.md` (`[5.4.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.4.0 |
+| main:release-notes/5.6.0.adoc | `code/CHANGELOG.md` (`[5.6.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.6.0 |
+| main:release-notes/5.7.0.adoc | `code/CHANGELOG.md` (`[5.7.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.7.0 |
+| main:release-notes/5.8.0.adoc | `code/CHANGELOG.md` (`[5.8.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.8.0 |
+| main:release-notes/5.9.0.adoc | `code/CHANGELOG.md` (`[5.9.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.9.0 |

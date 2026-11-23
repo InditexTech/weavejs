@@ -1,0 +1,42 @@
+= v5.7.0
+:description: Native on-canvas text editing, rich text and a new shape label engine.
+
+== 🔷 Text editing moves onto the canvas.
+
+*Release date:* October 26, 2026
+
+This release replaces the DOM textarea overlay used to edit text with a *native on-canvas editor*, and adds rich text formatting.
+
+== Changes
+
+=== Native On-Canvas Text Editing
+
+The text node is edited directly on the canvas instead of through a DOM textarea overlay. The editor is part of the stage, so it renders like the rest of the canvas.
+
+See xref:main:build/nodes/text-v2.adoc[Text V2].
+
+https://github.com/InditexTech/weavejs/issues/1224[https://github.com/InditexTech/weavejs/issues/1224]
+
+=== Rich Text Formatting
+
+The text node supports rich text formatting, enabled through the node configuration.
+
+https://github.com/InditexTech/weavejs/issues/1225[https://github.com/InditexTech/weavejs/issues/1225]
+
+=== Shape Labels Use the Same Text Engine
+
+Labels on rectangle, ellipse and polygon nodes now use the same native text engine and editor session, so editing a label behaves like editing a text node.
+
+https://github.com/InditexTech/weavejs/issues/1226[https://github.com/InditexTech/weavejs/issues/1226]
+
+== Fixes
+
+* Some node types registered per-render event listeners that were never removed (https://github.com/InditexTech/weavejs/issues/1215[#1215])
+* Grouping and ungrouping leaked the event listeners of the moved nodes' descendants (https://github.com/InditexTech/weavejs/issues/1214[#1214])
+* The server backend setup set the backend flag even when the native backend failed to load (https://github.com/InditexTech/weavejs/issues/1222[#1222])
+
+== Migration Steps
+
+None required. Rich text is opt-in through node configuration.
+
+NOTE: 5.7.1 contains text fixes and a dependency security update only. See the xref:main:changelog/index.adoc[Changelog].

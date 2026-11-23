@@ -89,7 +89,15 @@
 * xref:main:build/server-side-rendering.adoc[Server-side rendering]
 * Additional information
 * xref:main:release-notes/index.adoc[Release notes]
-** xref:main:release-notes/5.0.0.adoc[v5.0.0]
+** v5.x
+*** xref:main:release-notes/5.9.0.adoc[v5.9.0]
+*** xref:main:release-notes/5.8.0.adoc[v5.8.0]
+*** xref:main:release-notes/5.7.0.adoc[v5.7.0]
+*** xref:main:release-notes/5.6.0.adoc[v5.6.0]
+*** xref:main:release-notes/5.4.0.adoc[v5.4.0]
+*** xref:main:release-notes/5.3.0.adoc[v5.3.0]
+*** xref:main:release-notes/5.1.0.adoc[v5.1.0]
+*** xref:main:release-notes/5.0.0.adoc[v5.0.0]
 ** xref:main:release-notes/4.0.0.adoc[v4.0.0]
 ** xref:main:release-notes/3.0.0.adoc[v3.0.0]
 ** xref:main:release-notes/2.0.0.adoc[v2.0.0]

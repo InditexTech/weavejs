@@ -1,9 +1,25 @@
 = Release notes
 :description: Discover what's new in Weave.js
 
+Release notes cover every *major* and *minor* release, and describe what changed for users and
+how to upgrade. Patch releases (`X.Y.Z` with `Z` above 0) have no page of their own, and neither
+do minors with no user-facing change. Both are listed in the xref:main:changelog/index.adoc[Changelog].
+
 == Release versions
 
+=== 5.x
+
+* xref:main:release-notes/5.9.0.adoc[*5.9.0*]
+* xref:main:release-notes/5.8.0.adoc[*5.8.0*]
+* xref:main:release-notes/5.7.0.adoc[*5.7.0*]
+* xref:main:release-notes/5.6.0.adoc[*5.6.0*]
+* xref:main:release-notes/5.4.0.adoc[*5.4.0*]
+* xref:main:release-notes/5.3.0.adoc[*5.3.0*]
+* xref:main:release-notes/5.1.0.adoc[*5.1.0*]
 * xref:main:release-notes/5.0.0.adoc[*5.0.0*]
+
+=== Earlier majors
+
 * xref:main:release-notes/4.0.0.adoc[*4.0.0*]
 * xref:main:release-notes/3.0.0.adoc[*3.0.0*]
 * xref:main:release-notes/2.0.0.adoc[*2.0.0*]

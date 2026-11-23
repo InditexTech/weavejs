@@ -1,0 +1,22 @@
+= v5.4.0
+:description: Hyperlinks on text nodes.
+
+== 🔷 Clickable text.
+
+*Release date:* September 9, 2026
+
+== Changes
+
+=== Hyperlinks on Text Nodes
+
+A text node can now carry a URL. When defined, the *whole text is clickable* and opens the link.
+
+See xref:main:build/nodes/text.adoc[Text] for the node and its `link` property.
+
+https://github.com/InditexTech/weavejs/issues/1167[https://github.com/InditexTech/weavejs/issues/1167]
+
+== Migration Steps
+
+None.
+
+NOTE: 5.4.1 contains a brush tool fix only (pressure smoothing, stroke accuracy and drawing performance). See the xref:main:changelog/index.adoc[Changelog].

@@ -1,0 +1,52 @@
+= v5.6.0
+:description: ESM-only packages made explicit, optional native canvas peers, shape modifiers and image flipping.
+
+== 🔷 Cleaner package metadata, shape modifiers and image flipping.
+
+*Release date:* October 22, 2026
+
+This release fixes how the packages are published and installed, and adds two drawing features.
+
+== Changes
+
+=== Shift and Alt/Option Modifiers When Drawing Shapes
+
+While drawing a shape with its tool:
+
+* Hold *Shift* to keep proportions (square, circle)
+* Hold *Alt/Option* to draw from the center
+
+https://github.com/InditexTech/weavejs/issues/1177[https://github.com/InditexTech/weavejs/issues/1177]
+
+=== Native Image Flipping
+
+Images can be flipped horizontally and vertically with the new `weave.flipImage` method and the `flipX` / `flipY` image node properties. Flipping works together with crop, resize, rotation and server-side rendering.
+
+See xref:main:build/nodes/image.adoc[Image].
+
+https://github.com/InditexTech/weavejs/issues/1205[https://github.com/InditexTech/weavejs/issues/1205]
+
+== Fixes
+
+=== Packages Are ESM Only
+
+The published packages declared CommonJS entry points that did not exist. The packages are *ESM only*, and the metadata now says so. Loading them with `require()` needs Node.js 20.19+ or 22.12+.
+
+https://github.com/InditexTech/weavejs/issues/1200[https://github.com/InditexTech/weavejs/issues/1200]
+
+=== Native Canvas Peers No Longer Installed in Browser Apps
+
+The native canvas and skia-canvas peers were installed in every consumer, including browser apps. They are now optional.
+
+https://github.com/InditexTech/weavejs/issues/1202[https://github.com/InditexTech/weavejs/issues/1202]
+
+=== Node Event Listener Leak
+
+Node event listeners were registered on every render and never removed on destroy. They are now cleaned up.
+
+https://github.com/InditexTech/weavejs/issues/1198[https://github.com/InditexTech/weavejs/issues/1198]
+
+== Migration Steps
+
+. If you load a Weave.js package with `require()`, make sure you run Node.js 20.19+ or 22.12+, or switch to `import`.
+. If you render on the server, install the native canvas peer yourself. See xref:main:build/server-side-rendering.adoc[Server-side rendering].
