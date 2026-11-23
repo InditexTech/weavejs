@@ -1,0 +1,1 @@
+.weave-demo__frame{position:relative;display:block;width:fit-content;max-width:100%;line-height:0}.weave-demo__stage{position:absolute;inset:0}.weave-demo[data-demo-state=mounted] .weave-demo__frame>img{visibility:hidden}

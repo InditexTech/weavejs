@@ -1363,9 +1363,9 @@
 <article class="doc">
 <div id="preamble">
 <div class="sectionbody">
-<div class="imageblock zoom-in">
+<div class="imageblock weave-demo weave-demo--comments-renderer">
 <div class="content">
-<img src="../../../_images/plugins/comments-renderer.gif" alt="Comment Renderer plugin on use on the Weave.js showcase">
+<img src="../../../_images/plugins/comments-renderer-poster-light.png" alt="A user opens a comment thread and replies and the pin count only changes when the app calls render" width="960" height="540">
 </div>
 </div>
 </div>
@@ -1534,7 +1534,19 @@ tool headless from all points of view: UI, Backend and Entity model.</p>
 </footer>
 
 
+
 <script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="../../../../../_/js/demos/loader.js"></script>
 
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">

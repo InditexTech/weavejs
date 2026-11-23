@@ -1353,6 +1353,18 @@ If you typed the URL of this page manually, please double check that you entered
   </div>
 </footer>
 
+
 <script id="site-script" src="/weavejs/_/js/site.js" data-ui-root-path="/weavejs/_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="/weavejs/_/js/demos/loader.js"></script>
   </body>
 </html>

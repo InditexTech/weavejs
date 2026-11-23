@@ -1363,9 +1363,9 @@
 <article class="doc">
 <div id="preamble">
 <div class="sectionbody">
-<div class="imageblock zoom-in">
+<div class="imageblock weave-demo weave-demo--line">
 <div class="content">
-<img src="../../../_images/nodes/line.png" alt="Line on Weave.js showcase">
+<img src="../../../_images/nodes/line-poster-light.png" alt="A line node on the canvas is selected then moved and stretched from its end handle" width="960" height="540">
 </div>
 </div>
 <div class="paragraph">
@@ -1495,7 +1495,19 @@ to the application by free-hand (mouse or digital pencil).</p>
 </footer>
 
 
+
 <script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="../../../../../_/js/demos/loader.js"></script>
 
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">

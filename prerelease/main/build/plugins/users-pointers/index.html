@@ -1363,9 +1363,9 @@
 <article class="doc">
 <div id="preamble">
 <div class="sectionbody">
-<div class="imageblock zoom-in">
+<div class="imageblock weave-demo weave-demo--users-pointers">
 <div class="content">
-<img src="../../../_images/plugins/users-pointers.gif" alt="Users pointers plugin on use on the Weave.js showcase">
+<img src="../../../_images/plugins/users-pointers-poster-light.png" alt="Three teammates named Maya Jon and Ana each have a visible labeled cursor moving around the canvas" width="960" height="540">
 </div>
 </div>
 </div>
@@ -1576,7 +1576,19 @@ the instance user will be able to see the other users pointers, and the others u
 </footer>
 
 
+
 <script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="../../../../../_/js/demos/loader.js"></script>
 
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">

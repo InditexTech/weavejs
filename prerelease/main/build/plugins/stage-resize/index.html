@@ -1361,6 +1361,15 @@
 </aside>
 
 <article class="doc">
+<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock weave-demo weave-demo--stage-resize">
+<div class="content">
+<img src="../../../_images/plugins/stage-resize-poster-light.png" alt="A window holding the canvas on a black desktop is resized by dragging its corner and the stage inside follows the window size" width="960" height="540">
+</div>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
 <div class="sectionbody">
@@ -1473,7 +1482,19 @@ flexibility and visibility are key.</p>
 </footer>
 
 
+
 <script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="../../../../../_/js/demos/loader.js"></script>
 
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">

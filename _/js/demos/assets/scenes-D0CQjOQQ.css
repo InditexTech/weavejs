@@ -1,0 +1,1 @@
+.wv-scene .ss-stage{overflow:hidden}.wv-scene__canvas{position:absolute;inset:0}.wv-scene__toolbar{position:absolute;left:28px;top:40px}.wv-scene__ghost{fill:var(--ss-well);stroke:var(--ss-line);stroke-width:1}.wv-frame__marquee{fill:#1a1aff12;stroke:#1a1aff;stroke-width:1}.ss-stage[data-theme=dark] .wv-frame__marquee{fill:#6b6bff24;stroke:#6b6bff}

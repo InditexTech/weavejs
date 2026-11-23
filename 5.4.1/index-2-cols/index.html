@@ -1291,6 +1291,7 @@
 <div class="side-menu-scrim"></div>
       <main class="home dt-grid-layout dt-grid-layout--with-margin">
         <aside class="home__hero">
+
 <div class="home-hero">
   <div class="home-hero__intro">
     <img class="home-hero__logo" src="../../_/product-logo.png" width="40" height="40" alt="">
@@ -1481,6 +1482,18 @@ and open discussions that will help us improve our product further.</p>
   </div>
 </footer>
 
+
 <script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="../../_/js/demos/loader.js"></script>
   </body>
 </html>

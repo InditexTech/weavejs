@@ -1363,6 +1363,11 @@
 <article class="doc">
 <div id="preamble">
 <div class="sectionbody">
+<div class="imageblock weave-demo weave-demo--sticky-note">
+<div class="content">
+<img src="../../../_images/nodes/sticky-note-poster-light.png" alt="A sticky note is moved made bigger and its text is changed from Idea to Ship the docs" width="960" height="540">
+</div>
+</div>
 <div class="paragraph">
 <p>The Sticky Note node renders a paper-like note on the canvas with a drop shadow, top adhesive strip, bottom-right dog-ear fold flap, an optional author attribution row, and an inline editable label.</p>
 </div>
@@ -1494,7 +1499,19 @@ allows users to add Sticky Note nodes to the canvas.</p>
 </footer>
 
 
+
 <script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+<script>
+  (function () {
+    if (!document.documentElement.classList.contains('dt-theme-dark')) return
+    document.querySelectorAll('.weave-demo img').forEach(function (img) {
+      var src = img.getAttribute('src') || ''
+      var dark = src.replace(/-light(\.\w+)(\?.*)?$/, '-dark$1$2')
+      if (dark !== src) img.setAttribute('src', dark)
+    })
+  })()
+</script>
+<script type="module" src="../../../../../_/js/demos/loader.js"></script>
 
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
