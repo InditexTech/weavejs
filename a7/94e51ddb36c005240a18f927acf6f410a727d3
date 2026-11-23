@@ -1,0 +1,181 @@
+.agents/skills/weave-demos/SKILL.md
+  s_222f345225f7a0::t_8254d2ff4bf8fd 37
+docs/demos/README.md
+  s_222f345225f7a0::t_0642b72ec8491c 23,53,57
+docs/demos/kit/stage.tsx
+  s_222f345225f7a0::t_dbef9e54c66a55 144-146,414-418
+docs/demos/package-lock.json
+  s_222f345225f7a0::t_215e965fa40874 32,46,53,68,78,110,127,144,154,168,186,196,206,216,226,240,256,272,288,303,322,336,356,380,408,432,453,470,487,504,521,538,555,572,589,606,623,640,657,674,691,708,725,742,759,776,793,810,827,844,861,878,895,906,917,927,934,945,952,966,980,994,1008,1022,1036,1050,1064,1078,1092,1106,1120,1134,1148,1162,1176,1190,1204,1218,1232,1246,1260,1274,1288,1302,1316,1330,1340,1351,1361,1372,1379,1386,1393,1405,1415,1436,1453,1480,1493,1508,1523,1536,1551,1561,1571,1578,1591,1626,1636,1650,1671,1688,1698,1711,1718,1732,1739,1746,1760,1778,1785,1795,1805,1820,1827,1840,1850,1860,1867,1880,1896,1938,1948,1958,1968,1986,2003,2018,2028,2038,2063,2077,2090,2103,2119,2132,2145,2159,2173,2186,2193,2199,2241,2254,2267,2279,2286,2296,2305,2315,2325,2335,2348,2355,2374,2384,2391,2404,2411,2421,2428,2442,2455,2484,2494,2507,2520,2530,2576,2583,2590,2603,2612,2622,2629,2639,2646,2653,2666,2673,2680,2687,2694,2711,2721,2731,2741,2754,2761,2774,2787,2801,2832,2908,2931,3004,3017,3027,3041,3051,3065,3082,3104,3114,3121
+docs/demos/scripts/posters.mjs
+  s_222f345225f7a0::t_cb0f4ca6fe0f0b 73
+docs/demos/src/demos/align-nodes-tool/BRIEF.md
+  s_222f345225f7a0::t_1b2de82c7ddf8b 37
+docs/demos/src/demos/arrow-tool/BRIEF.md
+  s_222f345225f7a0::t_c5981302c886b6 38
+docs/demos/src/demos/arrow/BRIEF.md
+  s_222f345225f7a0::t_8fe249c4cf7f53 37
+docs/demos/src/demos/azure-web-pubsub-store/BRIEF.md
+  s_222f345225f7a0::t_156b103c7f23cf 38
+docs/demos/src/demos/brush-tool/BRIEF.md
+  s_222f345225f7a0::t_4bb0300c97796e 38
+docs/demos/src/demos/comment-tool/BRIEF.md
+  s_222f345225f7a0::t_ec49ac1ff04b96 38
+docs/demos/src/demos/comment/BRIEF.md
+  s_222f345225f7a0::t_5ed0bfb60de6d5 37
+docs/demos/src/demos/comments-renderer/BRIEF.md
+  s_222f345225f7a0::t_f5bc2a4fddb17d 38
+docs/demos/src/demos/connected-users/BRIEF.md
+  s_222f345225f7a0::t_1388342a8c9521 37
+docs/demos/src/demos/connector-tool/BRIEF.md
+  s_222f345225f7a0::t_2f98e3b840d39e 39
+docs/demos/src/demos/connector/BRIEF.md
+  s_222f345225f7a0::t_8ec0c7bc770b00 36
+docs/demos/src/demos/context-menu/BRIEF.md
+  s_222f345225f7a0::t_517774eee4d8c9 37
+docs/demos/src/demos/copy-paste-nodes/BRIEF.md
+  s_222f345225f7a0::t_b79902358504b0 37
+docs/demos/src/demos/ellipse-tool/BRIEF.md
+  s_222f345225f7a0::t_2a398ad7ef173f 38
+docs/demos/src/demos/ellipse/BRIEF.md
+  s_222f345225f7a0::t_31e07b47d652e7 37
+docs/demos/src/demos/enter-room-page/BRIEF.md
+  s_222f345225f7a0::t_105ca1a996f5be 38
+docs/demos/src/demos/eraser-tool/BRIEF.md
+  s_222f345225f7a0::t_34415a64f39231 38
+docs/demos/src/demos/export-node-tool/BRIEF.md
+  s_222f345225f7a0::t_0686bf83dbcda6 37
+docs/demos/src/demos/export-stage-tool/BRIEF.md
+  s_222f345225f7a0::t_345360687757dc 37
+docs/demos/src/demos/fit-to-screen-tool/BRIEF.md
+  s_222f345225f7a0::t_245c12c5d6b32d 37
+docs/demos/src/demos/fit-to-selection-tool/BRIEF.md
+  s_222f345225f7a0::t_266cfa2db6d6ae 37
+docs/demos/src/demos/frame-tool/BRIEF.md
+  s_222f345225f7a0::t_86a0666818a965 37
+docs/demos/src/demos/frame/BRIEF.md
+  s_222f345225f7a0::t_6b0b802e22909f 40
+docs/demos/src/demos/group/BRIEF.md
+  s_222f345225f7a0::t_313fa1f1337fbb 38
+docs/demos/src/demos/home-hero/BRIEF.md
+  s_222f345225f7a0::t_3f01691c75f031 37
+docs/demos/src/demos/image-tool/BRIEF.md
+  s_222f345225f7a0::t_e0ae26244c39e0 38
+docs/demos/src/demos/image/BRIEF.md
+  s_222f345225f7a0::t_cbab9b35346117 38
+docs/demos/src/demos/images-tool/BRIEF.md
+  s_222f345225f7a0::t_4dfac511e7e2c8 38
+docs/demos/src/demos/line-tool/BRIEF.md
+  s_222f345225f7a0::t_54ebaa3918f6e5 38
+docs/demos/src/demos/line/BRIEF.md
+  s_222f345225f7a0::t_6e8618a72903fd 37
+docs/demos/src/demos/measure-tool/BRIEF.md
+  s_222f345225f7a0::t_73a45068a8f6d6 38
+docs/demos/src/demos/measure/BRIEF.md
+  s_222f345225f7a0::t_d9be7841c1d22d 37
+docs/demos/src/demos/move-tool/BRIEF.md
+  s_222f345225f7a0::t_7f0be55e80f621 38
+docs/demos/src/demos/nodes-multi-selection-feedback/BRIEF.md
+  s_222f345225f7a0::t_75d55577d95b7a 37
+docs/demos/src/demos/nodes-selection/BRIEF.md
+  s_222f345225f7a0::t_d09007b2cdd90e 37
+docs/demos/src/demos/nodes-snapping/BRIEF.md
+  s_222f345225f7a0::t_f9227ee744a385 38
+docs/demos/src/demos/pen-tool/BRIEF.md
+  s_222f345225f7a0::t_3c520c3d784037 38
+docs/demos/src/demos/polygon-tool/BRIEF.md
+  s_222f345225f7a0::t_52ecd1d727514c 38
+docs/demos/src/demos/polygon/BRIEF.md
+  s_222f345225f7a0::t_0f8ecf7b373e20 37
+docs/demos/src/demos/quickstart-app/BRIEF.md
+  s_222f345225f7a0::t_81072089226c49 39
+docs/demos/src/demos/rectangle-node/BRIEF.md
+  s_222f345225f7a0::t_97dbcf339d96ad 36
+docs/demos/src/demos/rectangle-tool/BRIEF.md
+  s_222f345225f7a0::t_0cc79664ec1576 37
+docs/demos/src/demos/regular-polygon-tool/BRIEF.md
+  s_222f345225f7a0::t_d55d6002ce5e76 38
+docs/demos/src/demos/regular-polygon/BRIEF.md
+  s_222f345225f7a0::t_2cce1cbd79992a 37
+docs/demos/src/demos/room-page/BRIEF.md
+  s_222f345225f7a0::t_0d4f6a98c09846 39
+docs/demos/src/demos/selection-tool/BRIEF.md
+  s_222f345225f7a0::t_c665222ff5075c 38
+docs/demos/src/demos/stage-drop-area/BRIEF.md
+  s_222f345225f7a0::t_1da3eade17ace9 38
+docs/demos/src/demos/stage-grid/BRIEF.md
+  s_222f345225f7a0::t_edf5080669844d 37
+docs/demos/src/demos/stage-keyboard-move/BRIEF.md
+  s_222f345225f7a0::t_d773f3d42ad2b9 37
+docs/demos/src/demos/stage-minimap/BRIEF.md
+  s_222f345225f7a0::t_4238375515f801 37
+docs/demos/src/demos/stage-panning/BRIEF.md
+  s_222f345225f7a0::t_b2c465e410ca61 37
+docs/demos/src/demos/stage-resize/BRIEF.md
+  s_222f345225f7a0::t_6774d474d1089b 37
+docs/demos/src/demos/stage-zoom/BRIEF.md
+  s_222f345225f7a0::t_50861d359a27df 37
+docs/demos/src/demos/standalone-store/BRIEF.md
+  s_222f345225f7a0::t_4606bc6f4411ff 37
+docs/demos/src/demos/star-tool/BRIEF.md
+  s_222f345225f7a0::t_4771e77d1b273c 38
+docs/demos/src/demos/star/BRIEF.md
+  s_222f345225f7a0::t_2fb63eb5ef58c5 37
+docs/demos/src/demos/sticky-note-tool/BRIEF.md
+  s_222f345225f7a0::t_e0c89441c74517 38
+docs/demos/src/demos/sticky-note/BRIEF.md
+  s_222f345225f7a0::t_56e70a91040e78 38
+docs/demos/src/demos/stores-index/BRIEF.md
+  s_222f345225f7a0::t_ebc77fb8901e36 38
+docs/demos/src/demos/stroke-single/BRIEF.md
+  s_222f345225f7a0::t_f302487033100e 39
+docs/demos/src/demos/stroke-tool/BRIEF.md
+  s_222f345225f7a0::t_6a710b9984172c 38
+docs/demos/src/demos/stroke/BRIEF.md
+  s_222f345225f7a0::t_69112c933511f4 37
+docs/demos/src/demos/text-tool/BRIEF.md
+  s_222f345225f7a0::t_bbcf0d6702567c 39
+docs/demos/src/demos/text-v2/BRIEF.md
+  s_222f345225f7a0::t_83e6d2ba171e37 39
+docs/demos/src/demos/text/BRIEF.md
+  s_222f345225f7a0::t_e1e87855330207 37
+docs/demos/src/demos/users-pointers/BRIEF.md
+  s_222f345225f7a0::t_964376e091ae90 37
+docs/demos/src/demos/users-presence/BRIEF.md
+  s_222f345225f7a0::t_ac093efd34f1fe 37
+docs/demos/src/demos/users-selector/BRIEF.md
+  s_222f345225f7a0::t_f4f504f8bc89e6 37
+docs/demos/src/demos/video-tool/BRIEF.md
+  s_222f345225f7a0::t_a1e0a690b5aecd 38
+docs/demos/src/demos/video/BRIEF.md
+  s_222f345225f7a0::t_830fefd7e423c4 37
+docs/demos/src/demos/websockets-store/BRIEF.md
+  s_222f345225f7a0::t_16f3a308bdc213 37
+docs/demos/src/demos/zoom-in-tool/BRIEF.md
+  s_222f345225f7a0::t_37a78e132ce1c0 37
+docs/demos/src/demos/zoom-out-tool/BRIEF.md
+  s_222f345225f7a0::t_718e9d138774f0 37
+docs/demos/src/dev.tsx
+  s_222f345225f7a0::t_8060eff6ba41f1 18-21
+docs/demos/src/loader-core.test.tsx
+  s_222f345225f7a0::t_09758d670e2f88 34-35,43-44,60-61,134
+docs/demos/src/loader-core.ts
+  s_222f345225f7a0::t_8c7980e1476197 5,48-55,95-100
+docs/supplemental-ui/partials/footer-scripts.hbs
+  s_222f345225f7a0::t_7630e261b2c840 16-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "a794e51ddb36c005240a18f927acf6f410a727d3",
+  "prompts": {},
+  "sessions": {
+    "s_222f345225f7a0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0753ddc2ffesWccUTS2hhG3si",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
