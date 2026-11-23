@@ -1,0 +1,63 @@
+AGENTS.md
+  s_222f345225f7a0::t_d58b71c03ee8eb 169-172
+docs/demos/pages.json
+  s_222f345225f7a0::t_52d6d4071d7f45 67-71
+docs/demos/src/demos/azure-web-pubsub-store/BRIEF.md
+  s_222f345225f7a0::t_b01c0c7a2dbcca 1-41
+docs/demos/src/demos/azure-web-pubsub-store/REHEARSAL.md
+  s_222f345225f7a0::t_ad1ba51064ecaa 1-13
+docs/demos/src/demos/azure-web-pubsub-store/azure-web-pubsub-store.tsx
+  s_222f345225f7a0::t_47ca1af237f776 1-10
+docs/demos/src/demos/standalone-store/BRIEF.md
+  s_222f345225f7a0::t_3c6a161b63a1b9 1-41
+docs/demos/src/demos/standalone-store/REHEARSAL.md
+  s_222f345225f7a0::t_e842d3adda1abc 1-13
+docs/demos/src/demos/standalone-store/standalone-store.tsx
+  s_222f345225f7a0::t_2e7f91a3c5f7c5 1-10
+docs/demos/src/demos/stores-index/BRIEF.md
+  s_222f345225f7a0::t_fd57b1f10d43c6 1-41
+docs/demos/src/demos/stores-index/REHEARSAL.md
+  s_222f345225f7a0::t_38605dc93fde2b 1-13
+docs/demos/src/demos/stores-index/stores-index.tsx
+  s_222f345225f7a0::t_e5527854ff240c 1-10
+docs/demos/src/demos/websockets-store/BRIEF.md
+  s_222f345225f7a0::t_378d80e201aabc 1-41
+docs/demos/src/demos/websockets-store/REHEARSAL.md
+  s_222f345225f7a0::t_a4772179cfe512 1-13
+docs/demos/src/demos/websockets-store/websockets-store.tsx
+  s_222f345225f7a0::t_24f8b145f7fb2a 1-10
+docs/demos/src/registry.ts
+  s_222f345225f7a0::t_dd013ae37f9133 9-12
+docs/demos/src/weave-ui/flow/flow.css
+  s_222f345225f7a0::t_f00f23c715817b 23
+docs/demos/src/weave-ui/scenes/store-scenes.css
+  s_222f345225f7a0::t_0de3ca35e1a28e 1-31
+docs/demos/src/weave-ui/scenes/store-scenes.tsx
+  s_222f345225f7a0::t_1e0105eea32817 1-233
+docs/src/modules/main/pages/build/stores/azure-web-pubsub-store.adoc
+  s_222f345225f7a0::t_1e980ba8b46a43 4-5
+docs/src/modules/main/pages/build/stores/index.adoc
+  s_222f345225f7a0::t_f4fb0ab8e7efdc 4-5
+docs/src/modules/main/pages/build/stores/standalone-store.adoc
+  s_222f345225f7a0::t_009f5ee8536464 4-5
+docs/src/modules/main/pages/build/stores/websockets-store.adoc
+  s_222f345225f7a0::t_fafd9f57d77c57 4-5
+openspec/changes/docs-faux-ui-demos-rollout/tasks.md
+  s_222f345225f7a0::t_a0d3107ce78287 106-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "ba176f4e7f4be769ea5ec5eefb6021d21acbc8a7",
+  "prompts": {},
+  "sessions": {
+    "s_222f345225f7a0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0753ddc2ffesWccUTS2hhG3si",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
