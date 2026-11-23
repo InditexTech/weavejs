@@ -1,0 +1,37 @@
+AGENTS.md
+  s_9b04af72fa5e3f::t_544b58b583e607 105-106,224-230
+docs/src/modules/main/nav.adoc
+  s_9b04af72fa5e3f::t_7cf9abca942265 92-100
+docs/src/modules/main/pages/release-notes/5.1.0.adoc
+  s_9b04af72fa5e3f::t_ae941da1e3aa79 1-25
+docs/src/modules/main/pages/release-notes/5.3.0.adoc
+  s_9b04af72fa5e3f::t_53bc6197b5a64a 1-32
+docs/src/modules/main/pages/release-notes/5.4.0.adoc
+  s_9b04af72fa5e3f::t_e25e62399d7095 1-22
+docs/src/modules/main/pages/release-notes/5.6.0.adoc
+  s_9b04af72fa5e3f::t_6f38509f086483 1-52
+docs/src/modules/main/pages/release-notes/5.7.0.adoc
+  s_9b04af72fa5e3f::t_ef545307722057 1-42
+docs/src/modules/main/pages/release-notes/5.8.0.adoc
+  s_9b04af72fa5e3f::t_7efdb014e6564a 1-46
+docs/src/modules/main/pages/release-notes/5.9.0.adoc
+  s_9b04af72fa5e3f::t_7b9d5bc8053ef0 1-30
+docs/src/modules/main/pages/release-notes/index.adoc
+  s_9b04af72fa5e3f::t_7d413a3b3bf6a6 4-7,10-18,20-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "65aef244c9273c32cdd007b9da025a6577ffedee",
+  "prompts": {},
+  "sessions": {
+    "s_9b04af72fa5e3f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df6c44e94ffeKb0T4hWMb6cYV3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
