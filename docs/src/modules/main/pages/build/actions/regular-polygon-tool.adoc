@@ -7,7 +7,7 @@
 This action is deprecated. Use the xref:main:build/actions/polygon-tool.adoc[Polygon Tool] action instead.
 ====
 
-image::actions/regular-polygon-tool-poster-light.png[A regular polygon is drawn on the canvas: the Regular polygon tool is picked in the toolbar and dragged out with the crosshair and the new shape is selected with its handles,width=960,height=540,role="weave-demo weave-demo--regular-polygon-tool"]
+image::actions/regular-polygon-tool-poster-light.png[The Regular polygon tool is dragged out as a square box and creates a regular octagon that is selected,width=960,height=540,role="weave-demo weave-demo--regular-polygon-tool"]
 == Introduction
 
 This action enables users to create new regular polygons nodes on the canvas.

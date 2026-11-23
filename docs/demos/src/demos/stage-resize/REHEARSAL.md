@@ -6,6 +6,8 @@ Captured: widths 960 and 390, themes light and dark, reduced motion (poster stat
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
 - Rework (complete): the canvas lives in a window and the window is resized with the cursor. The window is anchored top-left; the gate flags uneven gutters while it is smaller than the stage (inherent to a resizing window).
+- Rework 2: the desktop behind the window is black.
+- Rework 3: the desktop behind the window is #f7f7f7 (dark theme: near black).
 No local cursor; container bleeds top and bottom, even gutters left and right. Size tag moves by layout (warning only).
 Review: no fresh-eye subagent review run.
 Posters: `stage-resize-poster-light.png`, `stage-resize-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

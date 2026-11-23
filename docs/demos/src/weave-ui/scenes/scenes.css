@@ -24,3 +24,15 @@
   stroke: var(--ss-line);
   stroke-width: 1;
 }
+
+/* The marquee a drag on empty canvas draws: transparent fill so the nodes under it stay visible */
+.wv-frame__marquee {
+  fill: rgba(26, 26, 255, 0.07);
+  stroke: #1a1aff;
+  stroke-width: 1;
+}
+
+.ss-stage[data-theme='dark'] .wv-frame__marquee {
+  fill: rgba(107, 107, 255, 0.14);
+  stroke: #6b6bff;
+}

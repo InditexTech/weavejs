@@ -1,7 +1,7 @@
 = Azure Web PubSub
 :description: Store that uses Azure Web PubSub infrastructure as the transport layer
 
-image::stores/azure-web-pubsub-store-poster-light.png[A rectangle dragged in client A sends an update through Azure Web PubSub and moves in client B,width=960,height=540,role="weave-demo weave-demo--azure-web-pubsub-store"]
+image::stores/azure-web-pubsub-store-poster-light.png[A rectangle dragged in client A goes to Azure Web PubSub the queue then to the Express backend which persists it in the database and then the update is broadcast back through the queue to client B,width=960,height=540,role="weave-demo weave-demo--azure-web-pubsub-store"]
 
 == Introduction
 

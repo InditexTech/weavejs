@@ -12,15 +12,16 @@
 
 ## Story
 
-A Weave.js app talks to a store, and you pick the store by the transport and backend you need.
+The Store is installed on every client and holds that client's own model of the room. A Transport carries each change to the Store backend, which sends it back through the Transport to the other clients.
 
-Beats (about 11 s):
+Beats:
 
-1. A Weave.js app on the left, a store in the middle labeled WebSockets, a backend on the right (Express server).
-2. The store changes to Azure Web PubSub and the backend with it.
-3. It changes to Standalone, with a Node renderer.
-4. Payoff (holds about 2.6 s).
-5. Reset: back to WebSockets.
+1. Two clients, each with its canvas over the Store installed on it (a small JSON model), a Transport box between them and a Store (Backend) box behind the Transport; two-way links join client, Transport and client.
+2. Step 1, "A client's Store applies the change to its own model": the cursor drags the rectangle in Client A; the Store's JSON line on that client updates and highlights.
+3. Step 2, "The Transport carries it to the Store backend": a "change" package goes from Client A to the Transport and down to the Store backend, which lights up.
+4. Step 3, "The backend sends it back, and every other client's Store applies it": the package goes back up through the Transport to Client B, whose Store updates its model and whose rectangle moves.
+5. The same the other way: Client B drags the ellipse and the package goes B, Transport, backend, Transport, A.
+6. Reset with a cause: the cursor leaves and both clients return to their start.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the store
 
 ## Poster
 
-The app with the Azure Web PubSub store and its backend.
+Client A's moved rectangle with its Store model line highlighted and the package on its way to the Transport, step 1 to 2 in the caption, no cursor.
 
 ## Out of scope
 

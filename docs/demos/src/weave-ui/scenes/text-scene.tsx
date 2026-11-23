@@ -68,7 +68,6 @@ export function TextToolScene({ theme, name }: DemoProps & { name: string }) {
               </NodeLayer>
               <div className="wv-text" data-target="textnode" data-editing={s.editing || undefined} style={{ left: AT.x, top: AT.y - 14, opacity: s.placed ? 1 : 0, transition: 'opacity 0.2s ease, outline-color 0.15s ease' }}>
                 <span className="wv-text__typed">{s.text}</span>
-                <span className="wv-text__rest">{WORDS.slice(s.text.length)}</span>
               </div>
               <div className="wv-scene__toolbar">
                 <WeaveToolbar active={s.tool} hovered={s.hover ? 'text' : undefined} groups={GROUPS_TEXT} />

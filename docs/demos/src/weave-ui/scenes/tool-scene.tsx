@@ -22,7 +22,12 @@ const REST: Point = { x: 780, y: 420 }
 const START: Point = { x: FINAL.x, y: FINAL.y }
 const END: Point = { x: FINAL.x + FINAL.w, y: FINAL.y + FINAL.h }
 
-const boxOf = (a: Point, b: Point): Box => ({ x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(b.x - a.x), h: Math.abs(b.y - a.y) })
+const boxOf = (a: Point, b: Point, square?: boolean): Box => {
+  const w = Math.abs(b.x - a.x)
+  const h = Math.abs(b.y - a.y)
+  const side = Math.max(w, h)
+  return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: square ? side : w, h: square ? side : h }
+}
 const straight = (t: number, from: Point, to: Point): Point => ({ x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t })
 
 export interface ToolSceneProps extends DemoProps {
@@ -32,14 +37,17 @@ export interface ToolSceneProps extends DemoProps {
   groups: ToolId[][]
   /** Draws the node inside the dragged box. */
   shape: (box: Box) => ReactNode
+  /** The dragged box is a square (a regular shape). */
+  square?: boolean
   /** The registry key, used as the scene's class so its styles never clash. */
   name: string
 }
 
-export function ToolScene({ theme, tool, groups, shape, name }: ToolSceneProps) {
+export function ToolScene({ theme, tool, groups, shape, name, square }: ToolSceneProps) {
   const info = TOOL_INFO[tool]
   const initial: S = { tool: 'move', hover: false, box: null, selected: false, show: false }
-  const poster: S = { tool: 'move', hover: false, box: FINAL, selected: true, show: true }
+  const end = square ? { x: START.x + FINAL.h, y: START.y + FINAL.h } : END
+  const poster: S = { tool: 'move', hover: false, box: boxOf(START, end, square), selected: true, show: true }
 
   async function script(a: Act<S>) {
     await a.wait(600)
@@ -56,7 +64,7 @@ export function ToolScene({ theme, tool, groups, shape, name }: ToolSceneProps) 
     // A straight drag with the button down: the ripple marks the press, and the corner of the
     // node rides the tip of the crosshair the whole way
     await a.click()
-    await a.move(END, { duration: 1300, path: straight, onMove: (p) => a.put({ box: boxOf(START, p), show: true }) })
+    await a.move(end, { duration: 1300, path: straight, onMove: (p) => a.put({ box: boxOf(START, p, square), show: true }) })
     await a.set({ tool: 'move', selected: true })
     await a.wait(2600)
     a.mark('reset')

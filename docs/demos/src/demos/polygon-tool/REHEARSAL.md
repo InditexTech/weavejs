@@ -6,6 +6,7 @@ Captured: widths 960 and 390, themes light and dark, reduced motion (poster stat
 Gate: `rehearsal passed (necessary, not sufficient: references/verify.md and the fresh eye in review.md still stand)` at 960 light, 390 and dark
 Film:
 - `manual: same-box content change` -> the shape is redrawn as the drag sizes it; watched in motion, its box rides the crosshair tip (stands)
+- Rework 3: the pentagon is regular, in a square box (the drag is constrained to a square).
 Review: no fresh-eye subagent review run.
 Posters: `polygon-tool-poster-light.png`, `polygon-tool-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)
 Assumptions: shape proportions follow the SDK defaults for this node; cursor style `real` (macOS set) for its crosshair and resize cursors.

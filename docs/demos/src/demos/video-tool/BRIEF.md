@@ -12,16 +12,16 @@
 
 ## Story
 
-Activating the Video tool and clicking the canvas places the chosen video where the preview was.
+The Video tool first asks the OS for the video file, then a click on the canvas places it.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Video button; its tooltip shows.
-2. Click: the button lights up and a translucent preview of the video appears.
-3. The cursor moves onto the canvas and the preview rides it (one video).
-4. Click: the video is placed, the tool returns to select and the node is selected with its handles.
-5. Payoff (holds about 2.6 s).
-6. Reset with a cause: the selection and node fade out, the cursor returns to where it began.
+1. The cursor goes to the Video tool; its tooltip shows; it clicks and the tool lights up.
+2. The OS file picker opens: the cursor selects demo.mov and clicks Open.
+3. A dashed preview follows the pointer onto the canvas.
+4. A click places the video there, selected, and the tool returns to selection.
+5. Payoff (holds about 2.8 s).
+6. Reset with a cause: the cursor leaves and the video fades out.
 
 ## Screen
 
@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the video
 
 ## Poster
 
-The video placed and selected, tool back on select, no cursor.
+The video placed and selected, no cursor.
 
 ## Out of scope
 

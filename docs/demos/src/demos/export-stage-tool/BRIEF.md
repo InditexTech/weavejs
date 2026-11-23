@@ -14,13 +14,13 @@
 
 The Export stage tool captures the whole canvas as an image file and downloads it.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Export button at the top left; its tooltip shows ("Export page as image").
-2. Click: the canvas flashes for an instant.
-3. A download chip, "weave-room.png", rises in at the bottom right.
-4. Payoff (holds about 3 s).
-5. Reset with a cause: the cursor leaves and the chip goes.
+1. Two nodes sit on the canvas (a rectangle and an ellipse).
+2. The cursor goes to the app's own toolbar and clicks Export stage: a flash and a download chip ("weave-room.png") appear.
+3. The cursor clicks the downloaded file: the OS opens it in Preview and the exported image, with both nodes, is visible.
+4. Payoff (holds about 3.4 s).
+5. Reset with a cause: the cursor leaves, the Preview window closes and the chip goes.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the stage
 
 ## Poster
 
-The download chip showing over the canvas, no cursor.
+The Preview window open on weave-room.png with both nodes, no cursor.
 
 ## Out of scope
 

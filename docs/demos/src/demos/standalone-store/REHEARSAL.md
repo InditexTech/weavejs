@@ -5,6 +5,8 @@ Beats: data in, render, png out, hold, reset, loop ~14s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework 5: the flat gray #f7f7f7 ground replaces the grid, and the message chips ride in front of the arrows.
+- Rework 6: the package rides above the connectors.
 No local cursor. Chip fades in before it travels; image box fades up when ready.
 Review: no fresh-eye subagent review run.
 Posters: `standalone-store-poster-light.png`, `standalone-store-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

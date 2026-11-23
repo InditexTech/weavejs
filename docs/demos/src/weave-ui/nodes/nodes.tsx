@@ -166,7 +166,7 @@ export function ConnectorNode({ x1, y1, x2, y2, arrow = true, className }: { x1:
 }
 
 /** A measure node: a dimension line with end ticks and its length in the SDK's #FF3366 monospace. */
-export function MeasureNode({ x1, y1, x2, y2, label, className }: { x1: number; y1: number; x2: number; y2: number; label: string; className?: string }) {
+export function MeasureNode({ x1, y1, x2, y2, label, className, side }: { x1: number; y1: number; x2: number; y2: number; label: string; className?: string; side?: 'right' }) {
   const a = Math.atan2(y2 - y1, x2 - x1)
   const nx = -Math.sin(a) * 6
   const ny = Math.cos(a) * 6
@@ -175,7 +175,7 @@ export function MeasureNode({ x1, y1, x2, y2, label, className }: { x1: number; 
       <line x1={x1} y1={y1} x2={x2} y2={y2} />
       <line x1={x1 - nx} y1={y1 - ny} x2={x1 + nx} y2={y1 + ny} />
       <line x1={x2 - nx} y1={y2 - ny} x2={x2 + nx} y2={y2 + ny} />
-      <text className="wv-node__measure" x={(x1 + x2) / 2} y={(y1 + y2) / 2 - 10} fontSize={14} fill="#FF3366" stroke="none" textAnchor="middle">
+      <text className="wv-node__measure" x={(x1 + x2) / 2 + (side ? 14 : 0)} y={(y1 + y2) / 2 + (side ? 5 : -10)} fontSize={14} fill="#FF3366" stroke="none" textAnchor={side ? 'start' : 'middle'}>
         {label}
       </text>
     </g>

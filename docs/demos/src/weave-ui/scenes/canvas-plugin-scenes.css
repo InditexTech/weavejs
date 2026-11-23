@@ -187,7 +187,7 @@
 .wv-desk {
   position: absolute;
   inset: 0;
-  background: var(--ss-well);
+  background: #f7f7f7;
 }
 
 .wv-win {
@@ -256,16 +256,99 @@
 .wv-finder {
   position: absolute;
   z-index: 14;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;
   background: var(--ss-surface);
   border: 1px solid var(--ss-line);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  color: var(--ss-text-strong);
+  font: 400 12px/1 var(--ss-font);
+}
+
+.wv-finder__bar {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 38px;
+  padding: 0 14px;
+  background: var(--ss-well);
+  border-bottom: 1px solid var(--ss-line);
+}
+
+.wv-finder__lights {
+  display: flex;
+  gap: 8px;
+}
+
+.wv-finder__lights i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.wv-finder__nav {
+  display: flex;
+  gap: 6px;
+  color: var(--ss-text-faint);
+}
+
+.wv-finder__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.wv-finder__body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.wv-finder__side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 140px;
+  padding: 12px 8px;
+  background: var(--ss-well);
+  border-right: 1px solid var(--ss-line);
+}
+
+.wv-finder__group {
+  padding: 0 8px 6px;
+  color: var(--ss-text-faint);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.wv-finder__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 5px;
+  color: var(--ss-text);
+}
+
+.wv-finder__item[data-on] {
+  background: var(--ss-line);
+  color: var(--ss-text-strong);
 }
 
 .wv-finder__grid {
+  flex: 1;
   display: flex;
-  gap: 18px;
-  padding: 26px 26px;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 22px 18px;
 }
 
 .wv-finder__file {
@@ -273,22 +356,108 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 110px;
-  padding: 10px 0;
-  color: var(--ss-icon);
-}
-
-.wv-finder__name {
-  padding: 3px 6px;
-  color: var(--ss-text-strong);
-  font: 400 12px/1 var(--ss-font);
+  width: 92px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 6px;
 }
 
 .wv-finder__file[data-sel] {
   background: var(--ss-well);
 }
 
+.wv-finder__name {
+  max-width: 84px;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
 .wv-finder__file[data-sel] .wv-finder__name {
-  background: #0074ff;
+  background: #0a64d8;
   color: #fff;
+}
+
+/* A document page, and a folder, drawn as the Finder's icons are */
+.wv-finder__page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 58px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+  color: var(--ss-icon);
+}
+
+.wv-finder__page[data-kind='image'] {
+  background: var(--ss-well);
+}
+
+.wv-finder__ext {
+  padding: 3px 5px;
+  background: #e5484d;
+  border-radius: 2px;
+  color: #fff;
+  font: 700 10px/1 var(--ss-font);
+}
+
+.wv-finder__folder {
+  position: relative;
+  width: 56px;
+  height: 44px;
+  margin-top: 8px;
+  background: #5ab4f5;
+  border-radius: 5px;
+}
+
+.wv-finder__folder::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -7px;
+  width: 24px;
+  height: 10px;
+  background: #5ab4f5;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Comments renderer: the call your app makes */
+.wv-render {
+  position: absolute;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wv-render[data-show] {
+  opacity: 1;
+}
+
+.wv-render__code {
+  align-self: flex-start;
+  padding: 8px 10px;
+  border: 1px solid var(--ss-line);
+  background: var(--ss-surface);
+  color: var(--ss-text-faint);
+  font: 400 12px/1 var(--ss-mono);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.wv-render[data-on] .wv-render__code {
+  background: var(--ss-well);
+  color: var(--ss-text-strong);
+}
+
+.ss-stage[data-theme='dark'] .wv-desk {
+  background: #0b0b0c;
+}
+
+.wv-render__note {
+  color: var(--ss-text-faint);
+  font: 400 11px/1 var(--ss-font);
 }

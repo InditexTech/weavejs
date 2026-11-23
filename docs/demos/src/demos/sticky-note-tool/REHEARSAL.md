@@ -1,11 +1,13 @@
 # Rehearsal: sticky-note-tool
 
 Gold: `rectangle-tool` pilot, generalized as `ToolScene` (kept: the measured drag where the shape follows the pointer, a reset with a cause; changed: the shape drawn).
-Beats: pick tool (tooltip), press and drag, select and hold, reset, loop ~11s
+Beats: pick the tool, drag the note out (empty), type the text, hold, reset, loop ~16s
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `rehearsal passed (necessary, not sufficient: references/verify.md and the fresh eye in review.md still stand)` at 960 light, 390 and dark
 Film:
 - `drift: wv-node__fold and text "Idea"` while the note is dragged out -> same, the fold follows the corner and the text the origin (stands)
+- Rework 3: the note is created empty first, then its text is typed (the text no longer shows before the note exists).
+- Rework 4: while the note is edited, a hint ("Type your note"), a blue caret and larger text make it clear the user is typing.
 Review: no fresh-eye subagent review run.
 Posters: `sticky-note-tool-poster-light.png`, `sticky-note-tool-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)
 Assumptions: shape proportions follow the SDK defaults for this node; cursor style `real` (macOS set) for its crosshair and resize cursors.

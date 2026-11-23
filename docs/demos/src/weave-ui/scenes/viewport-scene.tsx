@@ -59,9 +59,11 @@ export interface ViewportSceneProps extends DemoProps {
   name: string
   /** The zoom controls card; on by default. */
   zoomBar?: boolean
+  /** Put the zoom controls bottom-center instead of bottom-left. */
+  zoomCentered?: boolean
 }
 
-export function ViewportScene({ theme, kind, name, zoomBar = true }: ViewportSceneProps) {
+export function ViewportScene({ theme, kind, name, zoomBar = true, zoomCentered }: ViewportSceneProps) {
   const initial: S = { ...START[kind], tool: 'move', hover: false, bar: null, selected: false, animate: true, show: true }
   const poster: S = { ...END[kind], tool: kind === 'pan' ? 'hand' : 'move', hover: false, bar: null, selected: kind === 'fit-selection', animate: true, show: true }
   const barTarget: Target | null = kind === 'zoom-in' ? 'zoom-in' : kind === 'zoom-out' ? 'zoom-out' : kind === 'fit-screen' ? 'zoom-fit' : kind === 'fit-selection' ? 'zoom-selection' : null
@@ -169,7 +171,7 @@ export function ViewportScene({ theme, kind, name, zoomBar = true }: ViewportSce
               <div className="wv-scene__toolbar">
                 <WeaveToolbar active={s.tool} groups={[['move'], ['hand', 'rectangle', 'ellipse', 'star'], ['undo', 'redo']]} />
               </div>
-              {zoomBar && <ZoomBar className="wv-viewport__zoom" zoom={pct(s.z)} hovered={s.bar} />}
+              {zoomBar && <ZoomBar className={`wv-viewport__zoom${zoomCentered ? ' wv-viewport__zoom--center' : ''}`} zoom={pct(s.z)} hovered={s.bar} />}
             </WeaveCanvas>
             <WeaveTooltip show={kind === 'pan' ? s.hover : s.bar !== null} at={tipAt(rect, s)} shortcut={'key' in t ? (t.key as string) : undefined}>
               {t.label}

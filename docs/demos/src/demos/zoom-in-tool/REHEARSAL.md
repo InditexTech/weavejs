@@ -7,6 +7,7 @@ Gate: `rehearsal passed (necessary, not sufficient: references/verify.md and the
 Film:
 - `drift: wv-node__fold and text "Idea"` while the camera zooms -> the sticky note's fold and text scale about different points; that is the geometry, it stands
 - `jump: wv-tooltip x` when the tooltip's target changed while hidden -> the tooltip now stays on its own button for the whole scene (fixed)
+- Rework 3: the zoom controls are centered at the bottom of the stage with 28 px below them.
 Review: no fresh-eye subagent review run.
 Posters: `zoom-in-tool-poster-light.png`, `zoom-in-tool-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)
 Assumptions: shape proportions follow the SDK defaults for this node; cursor style `real` (macOS set) for its crosshair and resize cursors.

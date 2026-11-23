@@ -12,15 +12,16 @@
 
 ## Story
 
-The Azure Web PubSub store uses Azure Web PubSub as its transport, with your Express backend for persistence.
+With the Azure Web PubSub store, an update does not go straight to the other clients: it goes to Azure Web PubSub (the queue), then to your backend, which persists it, and is then broadcast back through Azure to the other clients.
 
-Beats (about 14 s):
+Beats:
 
-1. Two clients, Azure Web PubSub in the middle and an Express backend below it: both clients read "connecting".
-2. The connections draw (the backend one dashed) and both read "connected".
-3. The cursor drags the rectangle in client A.
-4. An update travels from A through Azure Web PubSub to B and the rectangle in B moves.
-5. Payoff (holds about 2.6 s), then reset.
+1. Two clients, Azure Web PubSub (the queue), your Express backend and a database: both clients read "connecting", then "connected".
+2. The cursor drags the rectangle in client A.
+3. An "update" goes from A to Azure Web PubSub, and an "event" goes down to the Express backend.
+4. The backend sends "persist" to the database, which lights up as "persisted".
+5. A "broadcast" goes back up through Azure Web PubSub and an "update" goes out to both clients; client B's rectangle moves.
+6. Payoff (holds about 2.6 s), then reset.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the azure
 
 ## Poster
 
-Both clients connected, A moved and the update on its way to B.
+Both clients connected, the database persisted and the broadcast on its way back, no cursor.
 
 ## Out of scope
 

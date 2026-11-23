@@ -12,15 +12,16 @@
 
 ## Story
 
-The Comments renderer plugin paints your app's comments as pins on a layer of its own. It does not paint by itself: when the comments change, you call render().
+The Comments renderer plugin paints the comments of a room as pins on a layer of its own. The thread window where users read, type and reply is your app's UI; the plugin does nothing more than render, and repainting the pins after a change is your code's job: you call render().
 
 Beats:
 
-1. Your app lists two comments (numbered 1 and 2); the canvas shows pins 1 and 2 on their nodes. Both read "On the canvas".
-2. A third comment arrives in the app list. It reads "Not on the canvas yet", and the canvas has no pin 3.
-3. commentsRenderer.render() lights up in the panel: pin 3 appears on its node and the comment reads "On the canvas".
-4. Payoff (holds about 3.2 s).
-5. Reset with a cause: the call dims and the list goes back to two comments.
+1. Two pins stand on the canvas (painted by the plugin): pin 1 shows 2 comments, pin 2 shows 1.
+2. The cursor clicks pin 1: the thread window opens (your UI) with Maya's and Jon's messages.
+3. The cursor clicks the reply field, types "Done, thanks!" and presses Enter: the reply joins the thread. Pin 1 still reads 2.
+4. After a moment the pin repaints: pin 1 now reads 3.
+5. Payoff (holds about 3 s).
+6. Reset with a cause: the cursor leaves, the thread closes and the pin goes back to 2.
 
 ## Screen
 
@@ -34,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the comme
 
 ## Poster
 
-Three pins on the canvas and three comments listed, render() lit.
+The thread open with the reply, render() lit and pin 1 reading 3, no cursor.
 
 ## Out of scope
 

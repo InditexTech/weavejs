@@ -12,16 +12,16 @@
 
 ## Story
 
-Activating the Images tool and clicking the canvas places several chosen images together as a row.
+The Images tool asks the OS for several files, shows them as a stack of cards while you choose where to put them, and places them as a row.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Images button; its tooltip shows ("Images tool O").
-2. Click: the button lights up and a translucent preview of the set of images appears.
-3. The cursor moves onto the canvas and the preview rides it (a row of three previews).
-4. Click: the set of images is placed, the tool returns to select and the node is selected with its handles.
-5. Payoff (holds about 2.6 s).
-6. Reset with a cause: the selection and node fade out, the cursor returns to where it began.
+1. The cursor goes to the Images tool; its tooltip shows; it clicks and the tool lights up.
+2. The OS file picker opens: the cursor selects sunset.jpg and then adds city.jpg and desert.jpg with the Cmd key (keycap shown), and clicks Open.
+3. A stack of three cards follows the pointer onto the canvas.
+4. A click places them: the three images appear at once as a one-row grid, selected as a group.
+5. Payoff (holds about 2.8 s).
+6. Reset with a cause: the cursor leaves and the images fade out.
 
 ## Screen
 
@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the set o
 
 ## Poster
 
-The three images placed in a row and selected, tool back on select, no cursor.
+The three images in one row, selected, no cursor.
 
 ## Out of scope
 

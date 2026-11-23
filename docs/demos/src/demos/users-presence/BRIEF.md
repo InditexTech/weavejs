@@ -12,15 +12,15 @@
 
 ## Story
 
-The Users presence plugin shows what a connected user is doing while they do it: you see a remote drag happen, not only where it ended.
+The Users presence plugin shows what each connected user is doing while they do it, in their own color: you see a remote drag or resize happen, not only where it ended.
 
-Beats (about 12 s):
+Beats:
 
-1. A teammate's cursor (Jon, teal) arrives on a rectangle and grabs it.
-2. Jon drags: the rectangle travels with his cursor across the canvas, frame by frame, down and to the right.
-3. He lets go and the rectangle rests at its new place.
-4. Payoff (holds about 2.2 s).
-5. Reset with a cause: Jon's cursor goes back to where it began and the rectangle returns with it.
+1. Two teammates' cursors arrive: Jon (teal) on a rectangle, Maya (pink) on the corner of an ellipse.
+2. Both select what they work on: a teal selection box around the rectangle, a pink one around the ellipse.
+3. At the same time Jon drags the rectangle (box and rectangle travel with his cursor) and Maya resizes the ellipse from its corner (box and ellipse grow with her cursor).
+4. Payoff (holds about 2.4 s).
+5. Reset with a cause: the selections clear and both cursors go back to where they began.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the remot
 
 ## Poster
 
-Jon's drag finished: the rectangle in its new place with Jon at it.
+Both selections in place: the moved rectangle in teal and the larger ellipse in pink, both cursors visible.
 
 ## Out of scope
 

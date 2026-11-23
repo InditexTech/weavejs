@@ -6,6 +6,7 @@ Captured: widths 960 and 390, themes light and dark, reduced motion (poster stat
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
 - Rework: zoom out is shown after zoom in.
+- Rework 2: the zoom controls are centered at the bottom of the stage with 28 px below them.
 Shares the zoom-in story; gate notes a fold/text drift on the sticky note while zooming (scale, not a bug). Wheel and trackpad not drawn.
 Review: no fresh-eye subagent review run.
 Posters: `stage-zoom-poster-light.png`, `stage-zoom-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

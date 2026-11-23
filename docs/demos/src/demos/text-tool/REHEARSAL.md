@@ -7,6 +7,7 @@ Gate: `rehearsal passed (necessary, not sufficient: references/verify.md and the
 Film:
 - `appears with no entrance / vanishes with no exit: div.wv-text` -> the text node was mounted and unmounted with the scene; it now stays mounted and fades (fixed)
 - `jump: wv-text__typed width +18.9px` per typed word chunk -> the typed text grows left to right with the outline following it; it is the typing itself (stands)
+- Rework 3: the blue edit outline now grows with the typed text (the invisible rest of the sentence no longer takes width).
 Review: no fresh-eye subagent review run.
 Posters: `text-tool-poster-light.png`, `text-tool-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)
 Assumptions: shape proportions follow the SDK defaults for this node; cursor style `real` (macOS set) for its crosshair and resize cursors.

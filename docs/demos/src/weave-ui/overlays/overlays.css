@@ -227,6 +227,7 @@
   opacity: 0;
   pointer-events: none;
   will-change: transform;
+  transition: opacity 0.15s ease;
 }
 
 .wv-file[data-show] {

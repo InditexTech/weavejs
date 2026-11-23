@@ -12,16 +12,16 @@
 
 ## Story
 
-Activating the Measure tool and clicking the start and then the end on the canvas creates a measure node.
+The Measure tool measures a distance with two clicks; here it measures the width and the height of a rectangle that is already on the canvas.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Measure button; its tooltip shows.
-2. Click: the button lights up, the cursor over the canvas becomes a crosshair.
-3. A click sets the start, the cursor moves and the live measure follows it, a second click sets the end.
-4. The tool returns to select and the new measure is selected with its end handles.
+1. A rectangle is on the canvas. The cursor picks the Measure tool (tooltip).
+2. It clicks point A (the top-left corner), moves along the top edge and clicks point B (the top-right corner): the measure reads the width (260.00 px) and is selected.
+3. The cursor drags the measure away from the rectangle (up) so it sits apart.
+4. It picks the tool again and adds a second measure the same way from the top-right to the bottom-right corner: 150.00 px, then drags it away to the right.
 5. Payoff (holds about 2.6 s).
-6. Reset with a cause: the selection and node fade out, the cursor returns to where it began.
+6. Reset with a cause: the cursor leaves and the measures go.
 
 ## Screen
 
@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the measu
 
 ## Poster
 
-The measure drawn and selected with its end handles, tool back on select, no cursor.
+The rectangle with its width measure above and its height measure to the right, both separated from it, no cursor.
 
 ## Out of scope
 

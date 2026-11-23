@@ -29,3 +29,91 @@
 .wv-store .wv-store__center {
   justify-content: center;
 }
+
+/* The flat ground the system flows sit on */
+.wv-store__ground {
+  position: absolute;
+  inset: 0;
+  background: #f7f7f7;
+}
+
+.ss-stage[data-theme='dark'] .wv-store__ground {
+  background: #0b0b0c;
+}
+
+.wv-store .wv-store__seg {
+  top: 36px;
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.wv-store .wv-store__seg .wv-seg__item {
+  min-width: 130px;
+}
+
+.wv-store__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 420px;
+  margin: 0;
+  color: var(--ss-text);
+  font: 400 15px/1.3 var(--ss-font);
+  text-align: center;
+}
+
+/* The package rides above every connector */
+.wv-store .wv-chip {
+  z-index: 40;
+}
+
+.wv-store__step {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--ss-accent);
+  color: #fff;
+  font: 600 11px/1 var(--ss-font);
+}
+
+/* The store's model: a small JSON document under the Store header */
+.wv-model-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-line);
+  color: var(--ss-text-strong);
+  font: 400 10.5px/1.5 var(--ss-mono);
+  white-space: pre;
+}
+
+.wv-model-card__line--in {
+  padding: 2px 0 2px 14px;
+  transition: background 0.25s ease;
+}
+
+.wv-model-card__line--in[data-hl] {
+  background: rgba(26, 26, 255, 0.12);
+}
+
+.ss-stage[data-theme='dark'] .wv-model-card__line--in[data-hl] {
+  background: rgba(107, 107, 255, 0.22);
+}
+
+.wv-model-card__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--ss-text);
+  font: 600 11px/1 var(--ss-font);
+}

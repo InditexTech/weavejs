@@ -2,12 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { ToolScene } from '../../weave-ui/scenes/tool-scene'
-import { FrameNode } from '../../weave-ui/nodes/nodes'
+import { FrameToolScene } from '../../weave-ui/scenes/os-scenes'
 import type { DemoProps } from '../../types'
 
-const GROUPS: Parameters<typeof ToolScene>[0]['groups'] = [['move', 'hand'], ['rectangle', 'frame', 'sticky'], ['undo', 'redo']]
-
 export default function FrameTool({ theme }: DemoProps) {
-  return <ToolScene theme={theme} name="frame-tool" tool="frame" groups={GROUPS} shape={(box) => <FrameNode {...box} title="Frame 1" />} />
+  return <FrameToolScene theme={theme} name="frame-tool" />
 }

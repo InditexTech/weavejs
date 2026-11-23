@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { CSSProperties } from 'react'
-import { Copy, FileImage, FileText, Trash2 } from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
+import { ChevronLeft, ChevronRight, Clock, Copy, Download, FileText, Image as ImageIcon, Monitor, Radio, Rocket, Trash2 } from 'lucide-react'
 import { Stage, type Act, type Point } from '../../../kit'
 import type { DemoProps } from '../../types'
 import { weaveTokens } from '../../looks/weave'
@@ -12,6 +12,7 @@ import { EllipseNode, ImageNode, NodeLayer, NodeSelection, RectNode, StarNode, t
 import { CommentPin, ContextMenu, DropTarget, FileChip, Minimap } from '../overlays/overlays'
 import { WeaveToolbar } from '../toolbar'
 import { EasedSelection } from './action-scenes'
+import { Msg } from './comment-scene'
 import './scenes.css'
 import './viewport-scene.css'
 import './comment-scene.css'
@@ -140,72 +141,66 @@ export function CopyPasteScene({ theme, name }: DemoProps & { name: string }) {
   )
 }
 
-// ---- Comments renderer: the app's comments list is the model; the plugin paints a pin per comment when render() runs -----
+// ---- Comments renderer: the plugin paints the pins; the thread window is your UI, and repainting is your code's job ------
 
-type CrS = { n: 2 | 3; rendered: boolean; call: boolean }
-const CR_PEOPLE = [
-  { name: 'Maya', text: 'Align this with the grid', color: MAYA },
-  { name: 'Jon', text: 'Can we make it wider?', color: JON },
-  { name: 'Maya', text: 'Check this edge', color: MAYA },
-]
-const CR_PINS: Point[] = [
-  { x: 345, y: 205 },
-  { x: 560, y: 175 },
-  { x: 430, y: 365 },
-]
+type CrS = { open: boolean; typing: boolean; reply: string; posted: boolean; call: boolean }
+const CR_PIN: Point = { x: 400, y: 285 }
+const CR_PIN2: Point = { x: 640, y: 215 }
+const CR_REPLY = 'Done, thanks!'
 
 export function CommentsRendererScene({ theme, name }: DemoProps & { name: string }) {
-  const initial: CrS = { n: 2, rendered: false, call: false }
-  const poster: CrS = { n: 3, rendered: true, call: true }
+  const initial: CrS = { open: false, typing: false, reply: '', posted: false, call: false }
+  const poster: CrS = { open: true, typing: false, reply: CR_REPLY, posted: true, call: true }
 
   async function script(a: Act<CrS>) {
-    await a.wait(1400)
-    a.mark('new')
-    await a.set({ n: 3 })
-    await a.wait(2600)
+    await a.wait(900)
+    a.mark('open')
+    await a.move({ x: CR_PIN.x + 14, y: CR_PIN.y - 14 }, { duration: 900 })
+    await a.wait(250)
+    await a.click()
+    await a.set({ open: true })
+    await a.wait(1300)
+    a.mark('reply')
+    await a.move({ x: CR_PIN.x + 120, y: CR_PIN.y + 52 }, { duration: 800 })
+    await a.click()
+    await a.set({ typing: true })
+    await a.wait(300)
+    await a.type('reply', CR_REPLY, { interval: 90 })
+    await a.wait(400)
+    await a.key('Enter')
+    await a.set({ typing: false, posted: true })
+    await a.wait(1800)
     a.mark('render')
     await a.set({ call: true })
-    await a.wait(500)
-    await a.set({ rendered: true })
-    await a.wait(3200)
+    await a.wait(3000)
     a.mark('reset')
-    await a.set({ call: false })
+    await a.move(REST)
+    await a.set({ open: false, call: false })
     await a.wait(300)
-    await a.set({ n: 2, rendered: false })
-    await a.wait(1200)
+    a.put({ reply: '', posted: false })
+    await a.wait(700)
   }
 
   return (
-    <Stage<CrS> {...stage(theme, name)} initial={initial} poster={poster} script={script}>
+    <Stage<CrS> {...stage(theme, name)} initial={initial} poster={poster} script={script} keys="top" cursor={{ at: REST, style: 'real', ripple: true }}>
       {(s) => (
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
-            <RectNode x={180} y={205} w={170} h={110} />
-            <EllipseNode x={400} y={175} w={170} h={110} />
-            <RectNode x={270} y={365} w={160} h={90} />
+            <RectNode x={300} y={300} w={230} h={130} />
+            <EllipseNode x={600} y={230} w={170} h={110} />
           </NodeLayer>
-          {CR_PINS.map((at, i) => (
-            <CommentPin key={i} at={at} color={CR_PEOPLE[i].color} count={i + 1} show={i < 2 || (s.n === 3 && s.rendered)} />
-          ))}
-          <div className="wv-cpanel">
-            <div className="wv-cpanel__head">Comments in your app ({s.n})</div>
-            {CR_PEOPLE.map((c, i) => (
-              <div key={i} className="wv-cpanel__row" data-on={i < s.n || undefined}>
-                <span className="wv-cpanel__num" style={{ '--who': c.color } as CSSProperties}>
-                  {i + 1}
-                </span>
-                <span className="wv-cpanel__text">
-                  <span>
-                    {c.name}: {c.text}
-                  </span>
-                  <span className="wv-cpanel__state" data-wait={(i === 2 && !s.rendered) || undefined}>
-                    {i === 2 && !s.rendered ? 'Not on the canvas yet' : 'On the canvas'}
-                  </span>
-                </span>
-              </div>
-            ))}
-            <div className="wv-cpanel__call" data-on={s.call || undefined}>
-              commentsRenderer.render()
+          <CommentPin at={CR_PIN} color={MAYA} count={s.call ? 3 : 2} />
+          <CommentPin at={CR_PIN2} color={JON} count={1} />
+          <div className="wv-thread" data-show={s.open || undefined} data-editing={s.typing || undefined} style={{ left: CR_PIN.x + 36, top: CR_PIN.y - 120 }}>
+            <Msg who="Maya" color={MAYA} initials="MC">Can we shorten the title?</Msg>
+            <Msg who="Jon" color={JON} initials="JP">On it.</Msg>
+            <Msg who="Maya" color={MAYA} initials="MC" hidden={!s.posted}>{CR_REPLY}</Msg>
+            <div className="wv-thread__field" style={{ opacity: s.posted ? 0 : 1, transition: 'opacity 0.2s ease' }}>
+              <span className="wv-thread__line">
+                <span className="wv-thread__placeholder" data-hide={s.reply.length > 0 || s.typing || undefined}>Reply</span>
+                <span className="wv-thread__typed">{s.reply}</span>
+                <span className="wv-thread__rest">{CR_REPLY.slice(s.reply.length)}</span>
+              </span>
             </div>
           </div>
           <Toolbar />
@@ -445,9 +440,26 @@ export function KeyboardMoveScene({ theme, name }: DemoProps & { name: string })
 // ---- Stage drop area: drag a file from the Finder onto the canvas ---------------------------------------------------------
 
 type DrS = { at: Point; chip: boolean; over: boolean; dropped: boolean; sel: boolean }
-const DROP_AT: Point = { x: 400, y: 250 }
-const FINDER = { right: 40, bottom: 40, w: 320, h: 220 }
+const DROP_AT: Point = { x: 290, y: 230 }
+const FINDER = { right: 40, bottom: 40, w: 480, h: 290 }
 const FINDER_LEFT = 960 - FINDER.right - FINDER.w
+
+const SIDEBAR = [
+  { label: 'AirDrop', icon: Radio },
+  { label: 'Recents', icon: Clock },
+  { label: 'Applications', icon: Rocket },
+  { label: 'Desktop', icon: Monitor },
+  { label: 'Documents', icon: FileText },
+  { label: 'Downloads', icon: Download, on: true },
+]
+
+function PageIcon({ children, kind }: { children?: ReactNode; kind: 'image' | 'pdf' }) {
+  return (
+    <span className="wv-finder__page" data-kind={kind}>
+      {children}
+    </span>
+  )
+}
 
 export function DropAreaScene({ theme, name }: DemoProps & { name: string }) {
   const initial: DrS = { at: { x: 0, y: 0 }, chip: false, over: false, dropped: false, sel: false }
@@ -477,7 +489,7 @@ export function DropAreaScene({ theme, name }: DemoProps & { name: string }) {
       {(s) => (
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
-            <RectNode x={230} y={330} w={160} h={100} />
+            <RectNode x={150} y={380} w={150} h={90} />
             <g style={{ opacity: s.dropped ? 1 : 0, transition: 'opacity 0.25s ease' }}>
               <ImageNode x={DROP_AT.x - 90} y={DROP_AT.y - 60} w={180} h={120} />
             </g>
@@ -485,21 +497,49 @@ export function DropAreaScene({ theme, name }: DemoProps & { name: string }) {
           <DropTarget show={s.over}>Drop to add</DropTarget>
           <Toolbar />
           <div className="wv-finder" style={{ right: FINDER.right, bottom: FINDER.bottom, width: FINDER.w, height: FINDER.h }}>
-            <div className="wv-win__bar" style={{ height: 36 }}>
-              <span className="wv-win__dot" />
-              <span className="wv-win__dot" />
-              <span className="wv-win__dot" />
-              <span className="wv-win__title">Downloads</span>
+            <div className="wv-finder__bar">
+              <span className="wv-finder__lights">
+                <i style={{ background: '#ff5f57' }} />
+                <i style={{ background: '#febc2e' }} />
+                <i style={{ background: '#28c840' }} />
+              </span>
+              <span className="wv-finder__nav">
+                <ChevronLeft size={16} strokeWidth={1.5} />
+                <ChevronRight size={16} strokeWidth={1.5} />
+              </span>
+              <span className="wv-finder__title">
+                <Download size={14} strokeWidth={1.5} />
+                Downloads
+              </span>
             </div>
-            <div className="wv-finder__grid">
-              <span className="wv-finder__file" data-sel={s.sel || undefined} data-target="file-photo">
-                <FileImage size={40} strokeWidth={1.1} />
-                <span className="wv-finder__name">photo.png</span>
-              </span>
-              <span className="wv-finder__file">
-                <FileText size={40} strokeWidth={1.1} />
-                <span className="wv-finder__name">notes.pdf</span>
-              </span>
+            <div className="wv-finder__body">
+              <div className="wv-finder__side">
+                <span className="wv-finder__group">Favorites</span>
+                {SIDEBAR.map(({ label, icon: Icon, on }) => (
+                  <span key={label} className="wv-finder__item" data-on={on || undefined}>
+                    <Icon size={14} strokeWidth={1.5} />
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <div className="wv-finder__grid">
+                <span className="wv-finder__file" data-sel={s.sel || undefined} data-target="file-photo">
+                  <PageIcon kind="image">
+                    <ImageIcon size={26} strokeWidth={1.2} />
+                  </PageIcon>
+                  <span className="wv-finder__name">photo.png</span>
+                </span>
+                <span className="wv-finder__file">
+                  <PageIcon kind="pdf">
+                    <span className="wv-finder__ext">PDF</span>
+                  </PageIcon>
+                  <span className="wv-finder__name">notes.pdf</span>
+                </span>
+                <span className="wv-finder__file">
+                  <span className="wv-finder__folder" />
+                  <span className="wv-finder__name">Projects</span>
+                </span>
+              </div>
             </div>
           </div>
           <FileChip name="photo.png" at={s.at} show={s.chip} />

@@ -6,6 +6,7 @@ Captured: widths 960 and 390, themes light and dark, reduced motion (poster stat
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
 - Rework: remote cursor arrows were invisible; fixed in peer.css.
+- Rework 2: each selection shows only after that user's cursor has arrived (the selection used to appear as the cursor started moving).
 No local cursor; two remote users.
 Review: no fresh-eye subagent review run.
 Posters: `users-selector-poster-light.png`, `users-selector-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

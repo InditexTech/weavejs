@@ -68,5 +68,8 @@
   "websockets-store": "main/images/stores",
   "azure-web-pubsub-store": "main/images/stores",
   "standalone-store": "main/images/stores",
-  "stores-index": "main/images/stores"
+  "stores-index": "main/images/stores",
+  "quickstart-app": "main/images",
+  "enter-room-page": "main/images",
+  "room-page": "main/images"
 }

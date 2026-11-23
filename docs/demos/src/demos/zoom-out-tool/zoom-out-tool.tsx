@@ -6,5 +6,5 @@ import { ViewportScene } from '../../weave-ui/scenes/viewport-scene'
 import type { DemoProps } from '../../types'
 
 export default function ZoomOutTool({ theme }: DemoProps) {
-  return <ViewportScene theme={theme} name="zoom-out-tool" kind="zoom-out" />
+  return <ViewportScene theme={theme} name="zoom-out-tool" kind="zoom-out" zoomCentered />
 }

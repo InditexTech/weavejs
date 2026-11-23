@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExportScene } from '../../weave-ui/scenes/action-scenes'
+import { ExportScene } from '../../weave-ui/scenes/os-scenes'
 import type { DemoProps } from '../../types'
 
 export default function ExportNodeTool({ theme }: DemoProps) {

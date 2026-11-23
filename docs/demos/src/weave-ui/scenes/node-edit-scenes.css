@@ -69,3 +69,42 @@
   height: 22px;
   background: var(--ss-line);
 }
+
+/* Text typed into a sticky note as an overlay, with a caret and a hint while it is being edited */
+.wv-note-text {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  color: #1f2937;
+  font: 400 22px/1.2 var(--ss-font);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.wv-note-text__typed::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: #0074ff;
+  opacity: 0;
+}
+
+.wv-note-text[data-editing] .wv-note-text__typed::after {
+  opacity: 1;
+}
+
+.wv-note-text__hint {
+  margin-left: 4px;
+  color: rgba(31, 41, 55, 0.4);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wv-note-text__hint[data-show] {
+  opacity: 1;
+}

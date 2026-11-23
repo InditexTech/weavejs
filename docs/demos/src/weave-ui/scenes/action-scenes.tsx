@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AlignCenterVertical, AlignEndVertical, AlignStartVertical, Download, ImageDown } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { Stage, type Act, type Point } from '../../../kit'
 import type { DemoProps } from '../../types'
 import { weaveTokens } from '../../looks/weave'
@@ -66,11 +67,14 @@ export function SelectionToolScene({ theme, name }: DemoProps & { name: string }
         <WeaveCanvas className="wv-scene__canvas" data-target="canvas">
           <NodeLayer>
             {Object.entries(N).map(([id, b]) => (
-              <g key={id}>
-                <RectNode {...box(b)} />
-                <NodeSelection {...box(b)} show={s.sel.includes(id)} />
-              </g>
+              <RectNode key={id} {...box(b)} />
             ))}
+            {s.sel.length > 0 && (() => {
+              const bs = s.sel.map((id) => N[id])
+              const x = Math.min(...bs.map((b) => b.x))
+              const y = Math.min(...bs.map((b) => b.y))
+              return <NodeSelection x={x} y={y} w={Math.max(...bs.map((b) => b.x + b.w)) - x} h={Math.max(...bs.map((b) => b.y + b.h)) - y} show />
+            })()}
             {s.marquee && <rect className="wv-frame__marquee" x={s.marquee.x} y={s.marquee.y} width={Math.max(0, s.marquee.w)} height={Math.max(0, s.marquee.h)} />}
           </NodeLayer>
           <div className="wv-scene__toolbar">
@@ -83,8 +87,8 @@ export function SelectionToolScene({ theme, name }: DemoProps & { name: string }
 }
 
 /** A selection box whose geometry eases (CSS x, y, width, height), for a selection that follows nodes sliding together. */
-export function EasedSelection({ x, y, w, h, show }: Box & { show: boolean }) {
-  const ease = 'all 0.45s cubic-bezier(0.4, 0, 0.2, 1)'
+export function EasedSelection({ x, y, w, h, show, duration = 0.45, curve = 'cubic-bezier(0.4, 0, 0.2, 1)' }: Box & { show: boolean; duration?: number; curve?: string }) {
+  const ease = `all ${duration}s ${curve}`
   const pill = (cx: number, cy: number, pw: number, ph: number, key: string) => <rect key={key} className="wv-selection__anchor" rx={3} width={pw} height={ph} style={{ x: cx - pw / 2, y: cy - ph / 2, transition: ease }} />
   return (
     <g className="wv-node-selection" data-show={show || undefined}>
@@ -93,8 +97,30 @@ export function EasedSelection({ x, y, w, h, show }: Box & { show: boolean }) {
       {pill(x + w / 2, y + h, 18, 6, 's')}
       {pill(x, y + h / 2, 6, 18, 'w')}
       {pill(x + w, y + h / 2, 6, 18, 'e')}
-      {[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([cx, cy]) => (
-        <circle key={`${cx}${cy}`} className="wv-selection__anchor" r={4.5} style={{ cx, cy, transition: ease }} />
+      {[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([cx, cy], i) => (
+        <circle key={i} className="wv-selection__anchor" r={4.5} style={{ cx, cy, transition: ease }} />
+      ))}
+    </g>
+  )
+}
+
+/**
+ * A selection that rides along with a node the way a remote user's drag or resize does: every part moves by a
+ * CSS transform with the same duration and curve as the node (and the peer's cursor), so box and node stay on
+ * the same spot all the way. The box scales a unit square, with a non-scaling stroke, instead of animating its size.
+ */
+export function MovingSelection({ x, y, w, h, show, duration = 1.1, curve = 'cubic-bezier(0.45, 0, 0.25, 1)', color }: Box & { show: boolean; duration?: number; curve?: string; color?: string }) {
+  const transition = `transform ${duration}s ${curve}`
+  const at = (px: number, py: number) => ({ transform: `translate(${px}px, ${py}px)`, transition })
+  return (
+    <g className="wv-node-selection wv-instant" data-show={show || undefined} style={color ? ({ '--ss-accent': color } as CSSProperties) : undefined}>
+      <rect className="wv-selection__box" x={0} y={0} width={1} height={1} style={{ transform: `translate(${x}px, ${y}px) scale(${w}, ${h})`, transformOrigin: '0 0', vectorEffect: 'non-scaling-stroke', transition }} />
+      <rect className="wv-selection__anchor" x={-9} y={-3} width={18} height={6} rx={3} style={at(x + w / 2, y)} />
+      <rect className="wv-selection__anchor" x={-9} y={-3} width={18} height={6} rx={3} style={at(x + w / 2, y + h)} />
+      <rect className="wv-selection__anchor" x={-3} y={-9} width={6} height={18} rx={3} style={at(x, y + h / 2)} />
+      <rect className="wv-selection__anchor" x={-3} y={-9} width={6} height={18} rx={3} style={at(x + w, y + h / 2)} />
+      {[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([cx, cy], i) => (
+        <circle key={i} className="wv-selection__anchor" r={4.5} style={at(cx, cy)} />
       ))}
     </g>
   )

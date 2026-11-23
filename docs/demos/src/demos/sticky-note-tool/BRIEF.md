@@ -14,14 +14,14 @@
 
 Activating the Sticky note tool and dragging on the canvas creates a sticky note node.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Sticky note button; its tooltip shows ("Sticky note tool N").
-2. Click: the button lights up, the cursor over the canvas becomes a crosshair.
-3. A press and a drag from corner to corner: the sticky note's box rides the tip of the crosshair the whole way.
-4. Release: the tool returns to select and the new sticky note is selected with its handles.
-5. Payoff (holds about 2.6 s).
-6. Reset with a cause: the selection and node fade out, the cursor returns to where it began.
+1. The cursor goes to the Sticky note tool; its tooltip shows; it clicks and the tool lights up.
+2. It drags a note out on the canvas (crosshair): the empty note appears and enters text editing (blue outline).
+3. The text "Ship it" is typed into it.
+4. The note is selected with its handles.
+5. Payoff (holds about 2.4 s).
+6. Reset with a cause: the cursor leaves and the note fades out.
 
 ## Screen
 
@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the stick
 
 ## Poster
 
-The sticky note drawn and selected with handles, tool back on select, no cursor.
+The note with its text, selected, no cursor.
 
 ## Out of scope
 

@@ -3,8 +3,7 @@
 
 In this guide, you will build the *Room page*:
 
-image::room.png[Room page,role="zoom-in"]
-
+image::room-page-poster-light.png[The Room page connects and shows the room name and the status then a user picks the rectangle tool from the bottom tool bar and draws a rectangle and a second user joins and moves it,width=960,height=540,role="weave-demo weave-demo--room-page"]
 This page renders the collaborative canvas once a user joins the room.
 
 == Prerequisites

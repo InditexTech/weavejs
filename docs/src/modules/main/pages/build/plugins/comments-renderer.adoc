@@ -1,7 +1,7 @@
 = Comments Renderer
 :description: Render the comments of a room in a special layer
 
-image::plugins/comments-renderer-poster-light.png[A comments list in the app gets a third comment and its pin only appears on the canvas after render is called,width=960,height=540,role="weave-demo weave-demo--comments-renderer"]
+image::plugins/comments-renderer-poster-light.png[A user opens a comment thread and replies and the pin count only changes when the app calls render,width=960,height=540,role="weave-demo weave-demo--comments-renderer"]
 == Introduction
 
 This plugin renders the provided comments (as a model) on a special layer on the canvas,

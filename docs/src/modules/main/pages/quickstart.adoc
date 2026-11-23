@@ -5,8 +5,7 @@
 
 In this quickstart, you will learn how to set up your first real-time collaborative canvas project with Weave.js.
 
-image::sample-app.gif[Sample Weave.js app,role="zoom-in"]
-
+image::quickstart-app-poster-light.png[The sample app running in a browser where a user enters a room with a username then draws a rectangle and a second user joins and moves it,width=960,height=540,role="weave-demo weave-demo--quickstart-app"]
 == Prerequisites
 
 Before you begin, ensure you meet the xref:main:requirements.adoc[requirements].

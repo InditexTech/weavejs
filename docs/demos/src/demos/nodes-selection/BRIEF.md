@@ -14,11 +14,11 @@
 
 The Nodes selection plugin is the foundation for moving, grouping and deleting: select nodes with a marquee, then act on them together.
 
-Beats (about 14 s):
+Beats:
 
 1. The cursor presses on empty canvas and drags a marquee over two rectangles; on release both are selected with one box.
 2. A press and a drag on the selection: both rectangles move together, up and to the right.
-3. Delete (shown as a keycap): both selected rectangles are removed; the third one stays.
+3. A right click on the selection opens the context menu (Copy, Paste disabled, Delete); the cursor goes to Delete and clicks: both selected rectangles are removed; the third one stays.
 4. Payoff (holds about 2 s).
 5. Reset with a cause: the cursor leaves and the two rectangles come back where they began.
 

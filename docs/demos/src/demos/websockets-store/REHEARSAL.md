@@ -5,6 +5,8 @@ Beats: connect, drag in A, update A to server to B, B moves, hold, reset, loop ~
 Captured: widths 960 and 390, themes light and dark, reduced motion (poster state via `--reduced`), built page (mounted, no console errors, SVGs fill their parents)
 Gate: `film.mjs --gate` ends `rehearsal passed` at 960 and 390 widths in light and dark
 Film:
+- Rework 5: the grid background is replaced by the flat gray #f7f7f7; the message chip is drawn in front of the connectors.
+- Rework 6: the links are bidirectional (arrowheads at both ends) and the package rides above them (z-index above the connectors).
 Gate warnings left: 1px svg clip in the mini canvas and a title width change as "connecting" becomes "connected" (text, by design). The cursor drags in client A; the rest is a flow.
 Review: no fresh-eye subagent review run.
 Posters: `websockets-store-poster-light.png`, `websockets-store-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)

@@ -9,5 +9,5 @@ import type { DemoProps } from '../../types'
 const GROUPS: Parameters<typeof ToolScene>[0]['groups'] = [['move', 'hand'], ['rectangle', 'ellipse', 'polygon', 'star'], ['undo', 'redo']]
 
 export default function PolygonTool({ theme }: DemoProps) {
-  return <ToolScene theme={theme} name="polygon-tool" tool="polygon" groups={GROUPS} shape={(box) => <PolygonNode {...box} points={PENTAGON} />} />
+  return <ToolScene theme={theme} name="polygon-tool" tool="polygon" groups={GROUPS} shape={(box) => <PolygonNode {...box} points={PENTAGON} />} square />
 }

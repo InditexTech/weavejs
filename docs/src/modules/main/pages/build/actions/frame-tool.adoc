@@ -1,7 +1,7 @@
 = Frame Tool
 :description: Allows to add a canvas in canvas area
 
-image::actions/frame-tool-poster-light.png[A frame is drawn on the canvas: the Frame tool is picked in the toolbar and dragged out with the crosshair and the new node is selected with its handles,width=960,height=540,role="weave-demo weave-demo--frame-tool"]
+image::actions/frame-tool-poster-light.png[The Frame tool is picked then a single click on the canvas creates a frame of a predefined size at that spot and selects it,width=960,height=540,role="weave-demo weave-demo--frame-tool"]
 == Introduction
 
 This action allows users to create frame nodes by clicking and position the frame on

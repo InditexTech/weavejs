@@ -22,3 +22,11 @@
   left: 112px;
   top: 468px;
 }
+
+/* Zoom controls centered at the bottom of the stage, with space below */
+.wv-viewport__zoom--center {
+  top: auto;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+}

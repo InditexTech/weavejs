@@ -9,5 +9,5 @@ import type { DemoProps } from '../../types'
 const GROUPS: Parameters<typeof ToolScene>[0]['groups'] = [['move', 'hand'], ['rectangle', 'ellipse', 'polygon', 'star'], ['undo', 'redo']]
 
 export default function StarTool({ theme }: DemoProps) {
-  return <ToolScene theme={theme} name="star-tool" tool="star" groups={GROUPS} shape={(box) => <StarNode {...box} tips={5} inner={0.38} />} />
+  return <ToolScene theme={theme} name="star-tool" tool="star" groups={GROUPS} shape={(box) => <StarNode {...box} tips={5} inner={0.4} />} square />
 }

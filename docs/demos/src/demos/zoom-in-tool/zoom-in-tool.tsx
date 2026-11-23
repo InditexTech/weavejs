@@ -6,5 +6,5 @@ import { ViewportScene } from '../../weave-ui/scenes/viewport-scene'
 import type { DemoProps } from '../../types'
 
 export default function ZoomInTool({ theme }: DemoProps) {
-  return <ViewportScene theme={theme} name="zoom-in-tool" kind="zoom-in" />
+  return <ViewportScene theme={theme} name="zoom-in-tool" kind="zoom-in" zoomCentered />
 }

@@ -12,16 +12,15 @@
 
 ## Story
 
-Activating the Frame tool and dragging on the canvas creates a frame node.
+The Frame tool creates a frame of a predefined size where you click: no dragging.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Frame button; its tooltip shows.
-2. Click: the button lights up, the cursor over the canvas becomes a crosshair.
-3. A press and a drag from corner to corner: the frame's box rides the tip of the crosshair the whole way.
-4. Release: the tool returns to select and the new frame is selected with its handles.
-5. Payoff (holds about 2.6 s).
-6. Reset with a cause: the selection and node fade out, the cursor returns to where it began.
+1. The cursor goes to the Frame tool; its tooltip shows; it clicks and the tool lights up.
+2. The cursor moves onto the canvas (crosshair) and clicks once.
+3. A frame ("Frame 1") of a predefined size appears with its top-left corner at the click, selected, and the tool returns to selection.
+4. Payoff (holds about 2.8 s).
+5. Reset with a cause: the cursor leaves and the frame fades out.
 
 ## Screen
 
@@ -35,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the frame
 
 ## Poster
 
-The frame drawn and selected with handles, tool back on select, no cursor.
+The frame created and selected, no cursor.
 
 ## Out of scope
 

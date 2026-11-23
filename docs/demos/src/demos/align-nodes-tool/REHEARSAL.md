@@ -6,6 +6,7 @@ Captured: widths 960 and 390, themes light and dark, reduced motion (poster stat
 Gate: `rehearsal passed (necessary, not sufficient: references/verify.md and the fresh eye in review.md still stand)` at 960 light, 390 and dark
 Film:
 - `jump: wv-selection__box width -160px` -> the selection box snapped to its new size while the nodes eased; it now uses an eased selection (CSS x, y, width, height) so it follows the nodes (fixed)
+- Rework 3: the marquee was drawn opaque because its CSS was not loaded in this scene; it is now a translucent selection area.
 Review: no fresh-eye subagent review run.
 Posters: `align-nodes-tool-poster-light.png`, `align-nodes-tool-poster-dark.png` (2x via `npm run posters`; opaque, the canvas fills the stage)
 Assumptions: shape proportions follow the SDK defaults for this node; cursor style `real` (macOS set) for its crosshair and resize cursors.

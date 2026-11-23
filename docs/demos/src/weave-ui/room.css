@@ -72,3 +72,22 @@
   color: var(--ss-text-faint);
   text-align: right;
 }
+
+.wv-status__connected[data-connecting] {
+  background: var(--ss-well);
+  color: var(--ss-text);
+}
+
+.wv-room__rule {
+  width: 1px;
+  height: 24px;
+  background: var(--ss-line);
+}
+
+.wv-status__person[data-off] {
+  opacity: 0;
+}
+
+.wv-status__person {
+  transition: opacity 0.25s ease;
+}

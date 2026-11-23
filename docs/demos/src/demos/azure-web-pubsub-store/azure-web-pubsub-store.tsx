@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { StoreSyncScene } from '../../weave-ui/scenes/store-scenes'
+import { AzureSyncScene } from '../../weave-ui/scenes/store-scenes'
 import type { DemoProps } from '../../types'
 
 export default function AzureWebPubsubStore({ theme }: DemoProps) {
-  return <StoreSyncScene theme={theme} name="azure-web-pubsub-store" variant="azure" />
+  return <AzureSyncScene theme={theme} name="azure-web-pubsub-store" />
 }

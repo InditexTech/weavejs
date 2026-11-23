@@ -170,6 +170,9 @@ npx skills@latest add InditexTech/docouture --all
 | main:build/stores/azure-web-pubsub-store.adoc (demo) | `docs/demos/src/demos/azure-web-pubsub-store/*`; behavior shown follows `code/packages/store-azure-web-pubsub/` | docs site only, not tied to a release |
 | main:build/stores/standalone-store.adoc (demo) | `docs/demos/src/demos/standalone-store/*`; behavior shown follows `code/packages/store-standalone/` | docs site only, not tied to a release |
 | main:build/stores/index.adoc (demo) | `docs/demos/src/demos/stores-index/*`; behavior shown follows `code/packages/store-websockets/`, `code/packages/store-azure-web-pubsub/`, `code/packages/store-standalone/` | docs site only, not tied to a release |
+| main:quickstart.adoc (demo) | `docs/demos/src/demos/quickstart-app/*`; the showcase app scaffolded by `create-weave-frontend-app` | docs site only, not tied to a release |
+| main:manual-installation/frontend/enter-room-page.adoc (demo) | `docs/demos/src/demos/enter-room-page/*`; the Enter Room page of the manual installation | docs site only, not tied to a release |
+| main:manual-installation/frontend/room-page.adoc (demo) | `docs/demos/src/demos/room-page/*`; the Room page of the manual installation | docs site only, not tied to a release |
 | main:build/actions/move-tool.adoc (demo) | `docs/demos/src/demos/move-tool/*`; behavior shown follows `code/packages/sdk/src/actions/move-tool/move-tool.ts` | docs site only, not tied to a release |
 | main:build/actions/selection-tool.adoc (demo) | `docs/demos/src/demos/selection-tool/*`; behavior shown follows `code/packages/sdk/src/actions/selection-tool/selection-tool.ts` | docs site only, not tied to a release |
 | main:build/actions/align-nodes-tool.adoc (demo) | `docs/demos/src/demos/align-nodes-tool/*`; behavior shown follows `code/packages/sdk/src/actions/align-nodes-tool/align-nodes-tool.ts` | docs site only, not tied to a release |

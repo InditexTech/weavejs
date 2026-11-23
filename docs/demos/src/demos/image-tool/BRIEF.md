@@ -12,16 +12,16 @@
 
 ## Story
 
-Activating the Image tool and clicking the canvas places the chosen image where the preview was.
+The Image tool first asks the OS for the image file, then a click on the canvas places it.
 
-Beats (about 11 s):
+Beats:
 
-1. The cursor goes to the Image button; its tooltip shows ("Image tool I").
-2. Click: the button lights up and a translucent preview of the image appears.
-3. The cursor moves onto the canvas and the preview rides it (one image).
-4. Click: the image is placed, the tool returns to select and the node is selected with its handles.
-5. Payoff (holds about 2.6 s).
-6. Reset with a cause: the selection and node fade out, the cursor returns to where it began.
+1. The cursor goes to the Image tool; its tooltip shows; it clicks and the tool lights up.
+2. The OS file picker opens ("Open", Downloads): the cursor selects sunset.jpg and clicks Open.
+3. The picker closes and a dashed preview follows the pointer onto the canvas.
+4. A click places the image there, selected, and the tool returns to selection.
+5. Payoff (holds about 2.8 s).
+6. Reset with a cause: the cursor leaves and the image fades out.
 
 ## Screen
 
@@ -35,7 +35,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the image
 
 ## Poster
 
-The image placed and selected, tool back on select, no cursor.
+The image placed and selected, no cursor.
 
 ## Out of scope
 

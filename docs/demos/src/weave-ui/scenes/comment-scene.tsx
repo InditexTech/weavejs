@@ -21,7 +21,7 @@ const GROUPS: ToolId[][] = [['move', 'hand'], ['rectangle', 'comment', 'text'], 
 const ghost = <rect className="wv-scene__ghost" x="716.5" y="60.5" width="200" height="110" />
 const subject = <RectNode x={340} y={290} w={230} h={130} />
 
-function Msg({ who, color, initials, children, hidden }: { who: string; color: string; initials: string; children: string; hidden?: boolean }) {
+export function Msg({ who, color, initials, children, hidden }: { who: string; color: string; initials: string; children: string; hidden?: boolean }) {
   return (
     <div className="wv-thread__msg" data-hidden={hidden || undefined} style={{ '--who': color } as CSSProperties}>
       <span className="wv-thread__avatar">{initials}</span>

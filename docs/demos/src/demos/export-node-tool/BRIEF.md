@@ -14,13 +14,13 @@
 
 The Export node tool captures the selected node as an image file and downloads it.
 
-Beats (about 12 s):
+Beats:
 
-1. The cursor clicks the rectangle: it is selected and its node bar appears.
-2. The cursor goes to Export and clicks: the canvas flashes for an instant.
-3. A download chip, "rectangle.png", rises in at the bottom right.
-4. Payoff (holds about 3 s).
-5. Reset with a cause: the cursor leaves, the chip and selection go.
+1. The cursor selects the rectangle.
+2. It goes to the app's own toolbar (a card apart from the nodes) and clicks Export node: a download chip ("rectangle.png") appears.
+3. The cursor clicks the downloaded file: the OS opens it in Preview and the exported image, the rectangle alone, is visible.
+4. Payoff (holds about 3.4 s).
+5. Reset with a cause: the cursor leaves, the Preview window closes and the chip goes.
 
 ## Screen
 
@@ -34,7 +34,7 @@ Toolbar one gutter from the left, canvas full-bleed, every node whole; the node 
 
 ## Poster
 
-The rectangle selected and its download chip showing, no cursor.
+The Preview window open on rectangle.png, the download chip below, no cursor.
 
 ## Out of scope
 
