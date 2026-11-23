@@ -1,0 +1,201 @@
+docs/demos/src/demos/comments-renderer/BRIEF.md
+  s_222f345225f7a0::t_c0c7c51c25d77c 15,17,19-23,37
+docs/demos/src/demos/comments-renderer/REHEARSAL.md
+  s_222f345225f7a0::t_22e44487b022d4 4,8
+docs/demos/src/demos/connected-users/REHEARSAL.md
+  s_222f345225f7a0::t_4ebc34fdd45973 8
+docs/demos/src/demos/copy-paste-nodes/REHEARSAL.md
+  s_222f345225f7a0::t_d3d6a2b8912048 8
+docs/demos/src/demos/frame/BRIEF.md
+  s_222f345225f7a0::t_796d30d4cdf9f4 15,17,19-26,40
+docs/demos/src/demos/frame/REHEARSAL.md
+  s_222f345225f7a0::t_0cdab43898799f 4,8-9
+docs/demos/src/demos/group/BRIEF.md
+  s_222f345225f7a0::t_cc1fbc03a63ec0 15,17,19-24,38
+docs/demos/src/demos/group/REHEARSAL.md
+  s_222f345225f7a0::t_d79fa3987d532d 4,8
+docs/demos/src/demos/home-hero/REHEARSAL.md
+  s_222f345225f7a0::t_ff5d55ae53843a 20
+docs/demos/src/demos/image/BRIEF.md
+  s_222f345225f7a0::t_2fde8fa40d488a 15,17,19-22,24,38
+docs/demos/src/demos/image/REHEARSAL.md
+  s_222f345225f7a0::t_2f5fe249a126ec 4,8
+docs/demos/src/demos/measure/BRIEF.md
+  s_222f345225f7a0::t_2014ddfd75b93a 15,17,19-23,37
+docs/demos/src/demos/measure/REHEARSAL.md
+  s_222f345225f7a0::t_81c88087c2b9d5 4,8
+docs/demos/src/demos/measure/measure.tsx
+  s_222f345225f7a0::t_e372aaa3e7d3c8 5,9
+docs/demos/src/demos/nodes-multi-selection-feedback/REHEARSAL.md
+  s_222f345225f7a0::t_49cd54e58dd1a4 8
+docs/demos/src/demos/nodes-snapping/BRIEF.md
+  s_222f345225f7a0::t_a77bf7d9669228 15,17,19-24,38
+docs/demos/src/demos/nodes-snapping/REHEARSAL.md
+  s_222f345225f7a0::t_df7c7420a4a3a4 4,8
+docs/demos/src/demos/polygon/BRIEF.md
+  s_222f345225f7a0::t_ec44a72eef5f45 15,17,19-21,23,37
+docs/demos/src/demos/polygon/REHEARSAL.md
+  s_222f345225f7a0::t_a940e036b7f217 4,8
+docs/demos/src/demos/polygon/polygon.tsx
+  s_222f345225f7a0::t_fb7018fe0c1bd9 6,10
+docs/demos/src/demos/regular-polygon/BRIEF.md
+  s_222f345225f7a0::t_729a7e0b039176 15,17,19-21,23,37
+docs/demos/src/demos/regular-polygon/REHEARSAL.md
+  s_222f345225f7a0::t_2a85474576e926 4,8
+docs/demos/src/demos/regular-polygon/regular-polygon.tsx
+  s_222f345225f7a0::t_0c780f3d78154b 10
+docs/demos/src/demos/stage-drop-area/BRIEF.md
+  s_222f345225f7a0::t_97570f8539a430 15,17,19-24,38
+docs/demos/src/demos/stage-drop-area/REHEARSAL.md
+  s_222f345225f7a0::t_cd24bbcf325252 4,8
+docs/demos/src/demos/stage-grid/REHEARSAL.md
+  s_222f345225f7a0::t_fa8f11d87d3dad 8
+docs/demos/src/demos/stage-keyboard-move/REHEARSAL.md
+  s_222f345225f7a0::t_c1e6a3c5cc6750 8
+docs/demos/src/demos/stage-panning/REHEARSAL.md
+  s_222f345225f7a0::t_1ce8dcdb4bfbee 8
+docs/demos/src/demos/stage-panning/stage-panning.tsx
+  s_222f345225f7a0::t_3a2724b6a94367 9
+docs/demos/src/demos/stage-resize/BRIEF.md
+  s_222f345225f7a0::t_fa10862b39bffe 15,17,19-23,37
+docs/demos/src/demos/stage-resize/REHEARSAL.md
+  s_222f345225f7a0::t_b4881c08235a5a 4,8
+docs/demos/src/demos/stage-zoom/BRIEF.md
+  s_222f345225f7a0::t_024308dd762045 17,19-23,37
+docs/demos/src/demos/stage-zoom/REHEARSAL.md
+  s_222f345225f7a0::t_38a25192f00666 4,8
+docs/demos/src/demos/stage-zoom/stage-zoom.tsx
+  s_222f345225f7a0::t_b42bced042aa5e 9
+docs/demos/src/demos/star/BRIEF.md
+  s_222f345225f7a0::t_72a1c7bbad3619 15,17,19-21,23,37
+docs/demos/src/demos/star/REHEARSAL.md
+  s_222f345225f7a0::t_a553579e54249f 4,8
+docs/demos/src/demos/star/star.tsx
+  s_222f345225f7a0::t_83aaef7063c530 10
+docs/demos/src/demos/sticky-note/BRIEF.md
+  s_222f345225f7a0::t_fc99f096754ea1 15,17,19-24,38
+docs/demos/src/demos/sticky-note/REHEARSAL.md
+  s_222f345225f7a0::t_b0a2cfd65fafc5 4,8
+docs/demos/src/demos/sticky-note/sticky-note.tsx
+  s_222f345225f7a0::t_dc531dd1fc18d6 5,9
+docs/demos/src/demos/stroke-single/BRIEF.md
+  s_222f345225f7a0::t_ac4a9124ca6311 15,17,19-25,39
+docs/demos/src/demos/stroke-single/REHEARSAL.md
+  s_222f345225f7a0::t_0866dba290d257 4,8-9
+docs/demos/src/demos/stroke-single/stroke-single.tsx
+  s_222f345225f7a0::t_320e9e6994ea2c 5,9
+docs/demos/src/demos/stroke/BRIEF.md
+  s_222f345225f7a0::t_08c18298e39b8f 15,17,19-21,23,37
+docs/demos/src/demos/stroke/REHEARSAL.md
+  s_222f345225f7a0::t_db81344cd64fc2 4,8
+docs/demos/src/demos/stroke/stroke.tsx
+  s_222f345225f7a0::t_3d68ac863b1b72 10
+docs/demos/src/demos/text-v2/BRIEF.md
+  s_222f345225f7a0::t_768ff44e488845 15,17,19-25,39
+docs/demos/src/demos/text-v2/REHEARSAL.md
+  s_222f345225f7a0::t_51dd92149c34e9 4,8-9
+docs/demos/src/demos/users-pointers/REHEARSAL.md
+  s_222f345225f7a0::t_baf3c28321f736 8
+docs/demos/src/demos/users-presence/REHEARSAL.md
+  s_222f345225f7a0::t_af852fa5253104 8
+docs/demos/src/demos/users-selector/REHEARSAL.md
+  s_222f345225f7a0::t_9731bc9324b8f7 8
+docs/demos/src/weave-ui/nodes/nodes.css
+  s_222f345225f7a0::t_d47dd8f992afb6 89-93
+docs/demos/src/weave-ui/nodes/nodes.tsx
+  s_222f345225f7a0::t_26dc54bd215ae0 56-62
+docs/demos/src/weave-ui/peer.css
+  s_222f345225f7a0::t_d46493cdf0c32a 22-23,26,56-66
+docs/demos/src/weave-ui/peer.tsx
+  s_222f345225f7a0::t_b715c01b398f42 23,27
+docs/demos/src/weave-ui/scenes/canvas-plugin-scenes.css
+  s_222f345225f7a0::t_dac6c171d0cfb1 19-20,110-294
+docs/demos/src/weave-ui/scenes/canvas-plugin-scenes.tsx
+  s_222f345225f7a0::t_b3d0a4a7e08e4b 6,11,95-96,111,113-114,130,133-134,143,145-154,158-159,162-165,167-168,170,172-174,183-185,187-188,190-208,271,274-276,279-280,283,285-289,291-294,298,300-321,323,435,445,447-450,453-454,458-459,461-465,467,472,476,487-505
+docs/demos/src/weave-ui/scenes/collab-scenes.css
+  s_222f345225f7a0::t_77ce85f4b3c344 49-50,98-99
+docs/demos/src/weave-ui/scenes/frame-scene.tsx
+  s_222f345225f7a0::t_60a5f85a9eb596 10-11,19,21-26,29-30,34-36,38-47,49-52,55-71,78,86,88-100,109,116-117,131-141,164,181-190
+docs/demos/src/weave-ui/scenes/media-scene.css
+  s_222f345225f7a0::t_1b4c8c1174dc58 53-68
+docs/demos/src/weave-ui/scenes/media-scene.tsx
+  s_222f345225f7a0::t_095fb92b045512 108-109,111,113-115,121-122,126-132,136,141,143,155,163-164,179,182,192-194
+docs/demos/src/weave-ui/scenes/node-edit-scenes.css
+  s_222f345225f7a0::t_86fa86d9fa3a61 1-71
+docs/demos/src/weave-ui/scenes/node-edit-scenes.tsx
+  s_222f345225f7a0::t_1cc3eb9e6dfe3d 1-267
+docs/demos/src/weave-ui/scenes/node-scene.tsx
+  s_222f345225f7a0::t_f78fae63a4ce49 21-29,34-41,43-49,51-58,60-69,71-80,87-88,93-94
+docs/demos/src/weave-ui/scenes/selection-plugin-scenes.tsx
+  s_222f345225f7a0::t_a73af3614df46e 143,153,155-157,159-163,166-167,171-172,176-177,183-184,187-211,214,216,221,228-239,242-245,247-258
+docs/demos/src/weave-ui/scenes/text-scene.css
+  s_222f345225f7a0::t_3896e34dd63cbf 105,107-108,111,115
+docs/demos/src/weave-ui/scenes/text-scene.tsx
+  s_222f345225f7a0::t_8338e310ff1d1b 5,160-161,164,169-174,177,179-180,190,192-198,205-207,211,217-218,221-222,232,234,236,239-241
+docs/demos/src/weave-ui/scenes/viewport-scene.tsx
+  s_222f345225f7a0::t_e04bcae01be8f8 20,42,50,60-61,64,87-109,145,150,172
+docs/src/modules/main/pages/build/nodes/frame.adoc
+  s_222f345225f7a0::t_4a23615d75c4ce 4
+docs/src/modules/main/pages/build/nodes/group.adoc
+  s_222f345225f7a0::t_45d2baba4ff7d7 4
+docs/src/modules/main/pages/build/nodes/image.adoc
+  s_222f345225f7a0::t_e6ca37a0530e98 4
+docs/src/modules/main/pages/build/nodes/measure.adoc
+  s_222f345225f7a0::t_bced06bfcc77de 4
+docs/src/modules/main/pages/build/nodes/polygon.adoc
+  s_222f345225f7a0::t_76b39e55907b4b 4
+docs/src/modules/main/pages/build/nodes/regular-polygon.adoc
+  s_222f345225f7a0::t_aff47b002a83a8 10
+docs/src/modules/main/pages/build/nodes/star.adoc
+  s_222f345225f7a0::t_1a9ce684e8f69a 4
+docs/src/modules/main/pages/build/nodes/sticky-note.adoc
+  s_222f345225f7a0::t_7b558c459cf765 4
+docs/src/modules/main/pages/build/nodes/stroke-single.adoc
+  s_222f345225f7a0::t_42a157d61c5d68 4
+docs/src/modules/main/pages/build/nodes/stroke.adoc
+  s_222f345225f7a0::t_e0dc09fd2fdcd6 4
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_222f345225f7a0::t_28f43efc295a2a 4
+docs/src/modules/main/pages/build/plugins/comments-renderer.adoc
+  s_222f345225f7a0::t_5ec290ad23e3a0 4
+docs/src/modules/main/pages/build/plugins/connected-users.adoc
+  s_222f345225f7a0::t_0894d220c731c9 4
+docs/src/modules/main/pages/build/plugins/copy-paste-nodes.adoc
+  s_222f345225f7a0::t_88aafff5bf2e6d 4
+docs/src/modules/main/pages/build/plugins/nodes-multi-selection-feedback.adoc
+  s_222f345225f7a0::t_a2dafa523d13d6 4
+docs/src/modules/main/pages/build/plugins/nodes-snapping.adoc
+  s_222f345225f7a0::t_aa737ce3cdcaf7 4
+docs/src/modules/main/pages/build/plugins/stage-drop-area.adoc
+  s_222f345225f7a0::t_2e526b0903e1b9 4
+docs/src/modules/main/pages/build/plugins/stage-grid.adoc
+  s_222f345225f7a0::t_fb5d2ae0880ae9 4
+docs/src/modules/main/pages/build/plugins/stage-keyboard-move.adoc
+  s_222f345225f7a0::t_8baabeddd4bc16 4
+docs/src/modules/main/pages/build/plugins/stage-resize.adoc
+  s_222f345225f7a0::t_f791e39d987015 4
+docs/src/modules/main/pages/build/plugins/stage-zoom.adoc
+  s_222f345225f7a0::t_80692c0957b692 4
+docs/src/modules/main/pages/build/plugins/users-pointers.adoc
+  s_222f345225f7a0::t_846ec3ca77d69c 4
+docs/src/modules/main/pages/build/plugins/users-presence.adoc
+  s_222f345225f7a0::t_5374118e48f61e 4
+docs/src/modules/main/pages/build/plugins/users-selector.adoc
+  s_222f345225f7a0::t_db9a6440cc6a7f 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "d87537c2f8c73dbfb03465b642aa608dd38d7be7",
+  "prompts": {},
+  "sessions": {
+    "s_222f345225f7a0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e0753ddc2ffesWccUTS2hhG3si",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
