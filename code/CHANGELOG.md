@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.10.0] - 2026-11-23
+
+### Changed
+
+- [#1304](https://github.com/InditexTech/weavejs/issues/1304) docs: README links to a CLA.pdf that no longer exists
+
+### Security
+
+- [#1308](https://github.com/InditexTech/weavejs/issues/1308) Fix Dependabot vulnerabilities in app template and dev tooling
+
 ## [5.9.0] - 2026-11-12
 
 ### Added
@@ -2003,7 +2013,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.9.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.10.0...HEAD
+
+[5.10.0]: https://github.com/InditexTech/weavejs/compare/5.9.0...5.10.0
 
 [5.9.0]: https://github.com/InditexTech/weavejs/compare/5.8.0...5.9.0
 
