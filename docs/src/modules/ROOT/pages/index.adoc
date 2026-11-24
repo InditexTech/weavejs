@@ -9,8 +9,10 @@
 :page-hero-demo: home-hero
 :page-hero-image-alt: Two collaborators in a Weave.js room: one draws a rectangle on the canvas and the other types its label.
 
+[.text-left]
 Created for developers, Weave.js is an open-source library that provides all the building blocks, plugins, and APIs to develop visual collaborative tools at the speed of light.
 
+[.text-left]
 Weave.js abstracts the complexity of building real-time, collaborative apps from scratch by handling the three core pillars of any collaborative visual tool:
 
 - *Shared state model that allows collaboration*. A structured data layer to model your applications' needs.
@@ -125,6 +127,7 @@ https://github.com/InditexTech/weavejs-frontend/fork[Create a fork]
 
 == Frequently asked questions
 
+[.text-left]
 Have more questions? Contact us and we'll respond as quickly as possible.
 
 [accordion,aria-label="Frequently asked questions"]
