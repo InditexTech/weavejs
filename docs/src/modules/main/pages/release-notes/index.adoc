@@ -1,7 +1,7 @@
 = Release notes
 :description: Discover what's new in Weave.js
 
-What changed for users in every *major* and *minor* release, and how to upgrade. Patch releases and minors with no user-facing change are listed in the xref:main:changelog/index.adoc[Changelog].
+What changed for users in each release, and how to upgrade. Every new release gets a page, whatever its type: major, minor, patch or hotfix. Releases before 5.10 that have no page of their own (patches, and minors with no user-facing change) are listed in the xref:main:changelog/index.adoc[Changelog].
 
 [#v5x]
 == 5.x
