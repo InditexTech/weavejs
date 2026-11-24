@@ -1,0 +1,79 @@
+AGENTS.md
+  s_9b04af72fa5e3f::t_ef6f5482150e76 105,231-258
+docs/src/modules/main/nav.adoc
+  s_9b04af72fa5e3f::t_1bc038ca8ac92e 101-136
+docs/src/modules/main/pages/release-notes/1.3.0.adoc
+  s_9b04af72fa5e3f::t_55378521db2bed 1-20
+docs/src/modules/main/pages/release-notes/2.10.0.adoc
+  s_9b04af72fa5e3f::t_cafcc665ccfa67 1-20
+docs/src/modules/main/pages/release-notes/2.11.0.adoc
+  s_9b04af72fa5e3f::t_74731120afffe1 1-24
+docs/src/modules/main/pages/release-notes/2.12.0.adoc
+  s_9b04af72fa5e3f::t_60f0c9df7ffad8 1-26
+docs/src/modules/main/pages/release-notes/2.13.0.adoc
+  s_9b04af72fa5e3f::t_993194371bd347 1-26
+docs/src/modules/main/pages/release-notes/2.14.0.adoc
+  s_9b04af72fa5e3f::t_9a13ac94c2a99f 1-25
+docs/src/modules/main/pages/release-notes/2.15.0.adoc
+  s_9b04af72fa5e3f::t_800782b4519795 1-20
+docs/src/modules/main/pages/release-notes/2.17.0.adoc
+  s_9b04af72fa5e3f::t_ddaa83c53ff938 1-20
+docs/src/modules/main/pages/release-notes/2.18.0.adoc
+  s_9b04af72fa5e3f::t_d03642a8da28d4 1-26
+docs/src/modules/main/pages/release-notes/2.19.0.adoc
+  s_9b04af72fa5e3f::t_b696b3fb4be751 1-20
+docs/src/modules/main/pages/release-notes/2.2.0.adoc
+  s_9b04af72fa5e3f::t_643bc18d8709ea 1-26
+docs/src/modules/main/pages/release-notes/2.20.0.adoc
+  s_9b04af72fa5e3f::t_19aa5576fdac6e 1-24
+docs/src/modules/main/pages/release-notes/2.21.0.adoc
+  s_9b04af72fa5e3f::t_061607b6d3a358 1-32
+docs/src/modules/main/pages/release-notes/2.22.0.adoc
+  s_9b04af72fa5e3f::t_022e508c560809 1-32
+docs/src/modules/main/pages/release-notes/2.23.0.adoc
+  s_9b04af72fa5e3f::t_e04b660ff4340f 1-26
+docs/src/modules/main/pages/release-notes/2.3.0.adoc
+  s_9b04af72fa5e3f::t_252bc02c4e6df4 1-20
+docs/src/modules/main/pages/release-notes/2.4.0.adoc
+  s_9b04af72fa5e3f::t_6e8a3bdf2bba2a 1-20
+docs/src/modules/main/pages/release-notes/2.5.0.adoc
+  s_9b04af72fa5e3f::t_1414f67f7169de 1-20
+docs/src/modules/main/pages/release-notes/2.7.0.adoc
+  s_9b04af72fa5e3f::t_5fb1302774b66f 1-36
+docs/src/modules/main/pages/release-notes/2.9.0.adoc
+  s_9b04af72fa5e3f::t_6d969db6836bf1 1-43
+docs/src/modules/main/pages/release-notes/3.1.0.adoc
+  s_9b04af72fa5e3f::t_7de1c2b7529567 1-25
+docs/src/modules/main/pages/release-notes/3.2.0.adoc
+  s_9b04af72fa5e3f::t_f31c40b3affd16 1-30
+docs/src/modules/main/pages/release-notes/3.3.0.adoc
+  s_9b04af72fa5e3f::t_2c7e5f0e9795a2 1-20
+docs/src/modules/main/pages/release-notes/3.4.0.adoc
+  s_9b04af72fa5e3f::t_a4ac99757a3f91 1-30
+docs/src/modules/main/pages/release-notes/3.6.0.adoc
+  s_9b04af72fa5e3f::t_826e30a0f6197e 1-20
+docs/src/modules/main/pages/release-notes/3.7.0.adoc
+  s_9b04af72fa5e3f::t_91e43fd7562be5 1-31
+docs/src/modules/main/pages/release-notes/3.8.0.adoc
+  s_9b04af72fa5e3f::t_eef8bd71c5ed3b 1-30
+docs/src/modules/main/pages/release-notes/3.9.0.adoc
+  s_9b04af72fa5e3f::t_a4d633701bda95 1-24
+docs/src/modules/main/pages/release-notes/index.adoc
+  s_9b04af72fa5e3f::t_aa640545a5e534 4,6,8,10,12,14,16-174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "05b8a6289248ad3a5b5b18c815e52dbb08627a46",
+  "prompts": {},
+  "sessions": {
+    "s_9b04af72fa5e3f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df6c44e94ffeKb0T4hWMb6cYV3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
