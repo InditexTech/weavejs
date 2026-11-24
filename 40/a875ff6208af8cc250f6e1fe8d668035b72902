@@ -1,0 +1,53 @@
+AGENTS.md
+  s_9b04af72fa5e3f::t_47fe01e30ad221 105,259-272
+CONTRIBUTING.md
+  s_9b04af72fa5e3f::t_90dbde0105d93f 205
+docs/src/modules/main/nav.adoc
+  s_9b04af72fa5e3f::t_d8bc7e4d346543 93,96,99,102-108,112,115,128,148
+docs/src/modules/main/pages/release-notes/1.3.1.adoc
+  s_9b04af72fa5e3f::t_20c09f816c8069 1-17
+docs/src/modules/main/pages/release-notes/2.21.1.adoc
+  s_9b04af72fa5e3f::t_2809232d3867c2 1-16
+docs/src/modules/main/pages/release-notes/3.9.1.adoc
+  s_9b04af72fa5e3f::t_4ce1f8f06ad307 1-16
+docs/src/modules/main/pages/release-notes/4.1.1.adoc
+  s_9b04af72fa5e3f::t_91856fa07bf90c 1-16
+docs/src/modules/main/pages/release-notes/5.1.1.adoc
+  s_9b04af72fa5e3f::t_9e943281a5a302 1-21
+docs/src/modules/main/pages/release-notes/5.1.2.adoc
+  s_9b04af72fa5e3f::t_ffac545ba5f60f 1-17
+docs/src/modules/main/pages/release-notes/5.1.3.adoc
+  s_9b04af72fa5e3f::t_6ff6822b3b629a 1-16
+docs/src/modules/main/pages/release-notes/5.1.4.adoc
+  s_9b04af72fa5e3f::t_3e1daca10bbb5b 1-16
+docs/src/modules/main/pages/release-notes/5.1.5.adoc
+  s_9b04af72fa5e3f::t_21d310c70bffaf 1-17
+docs/src/modules/main/pages/release-notes/5.10.0.adoc
+  s_9b04af72fa5e3f::t_d96ac7572511fd 1-20
+docs/src/modules/main/pages/release-notes/5.2.1.adoc
+  s_9b04af72fa5e3f::t_323d63b01f3c1d 1-18
+docs/src/modules/main/pages/release-notes/5.2.2.adoc
+  s_9b04af72fa5e3f::t_c48fa78ef49f97 1-16
+docs/src/modules/main/pages/release-notes/5.4.1.adoc
+  s_9b04af72fa5e3f::t_c4aac207bcc363 1-16
+docs/src/modules/main/pages/release-notes/5.7.1.adoc
+  s_9b04af72fa5e3f::t_d0e5fd8ebcd30a 1-21
+docs/src/modules/main/pages/release-notes/index.adoc
+  s_9b04af72fa5e3f::t_354f2ab360a338 4,9-12,21-24,33-36,45-72,84-87,95-98,146-149,225-228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "40a875ff6208af8cc250f6e1fe8d668035b72902",
+  "prompts": {},
+  "sessions": {
+    "s_9b04af72fa5e3f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df6c44e94ffeKb0T4hWMb6cYV3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
