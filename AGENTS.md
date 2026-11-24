@@ -102,7 +102,7 @@ npx skills@latest add InditexTech/docouture --all
 
 ## Documentation state
 
-Release notes: every major and minor release gets a `release-notes/X.Y.Z.adoc` page (patches never do; a minor with no `Added` entry or breaking change may be skipped and is covered by the Changelog). Seed it with `node .github/scripts/release-notes-seed.mjs X.Y.Z --write`, then edit. Only the current major lists all its pages in `nav.adoc` and the index; each earlier major is a single `vN.x` entry pointing at its latest page, and a new major collapses the previous one.
+Release notes: every major and minor release gets a `release-notes/X.Y.Z.adoc` page (patches never do; a minor with no `Added` entry or breaking change may be skipped and is covered by the Changelog). Seed it with `node .github/scripts/release-notes-seed.mjs X.Y.Z --write`, then edit. Every major is a `vN.x` menu in `nav.adoc` and a `== N.x` section in the index, each listing its pages.
 
 <!-- maintained by the docouture-documenting-changes skill — do not hand-edit structure, only content -->
 
@@ -228,3 +228,31 @@ Release notes: every major and minor release gets a `release-notes/X.Y.Z.adoc` p
 | main:release-notes/5.7.0.adoc | `code/CHANGELOG.md` (`[5.7.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.7.0 |
 | main:release-notes/5.8.0.adoc | `code/CHANGELOG.md` (`[5.8.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.8.0 |
 | main:release-notes/5.9.0.adoc | `code/CHANGELOG.md` (`[5.9.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 5.9.0 |
+| main:release-notes/1.3.0.adoc | `code/CHANGELOG.md` (`[1.3.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 1.3.0 |
+| main:release-notes/2.2.0.adoc | `code/CHANGELOG.md` (`[2.2.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.2.0 |
+| main:release-notes/2.3.0.adoc | `code/CHANGELOG.md` (`[2.3.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.3.0 |
+| main:release-notes/2.4.0.adoc | `code/CHANGELOG.md` (`[2.4.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.4.0 |
+| main:release-notes/2.5.0.adoc | `code/CHANGELOG.md` (`[2.5.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.5.0 |
+| main:release-notes/2.7.0.adoc | `code/CHANGELOG.md` (`[2.7.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.7.0 |
+| main:release-notes/2.9.0.adoc | `code/CHANGELOG.md` (`[2.9.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.9.0 |
+| main:release-notes/2.10.0.adoc | `code/CHANGELOG.md` (`[2.10.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.10.0 |
+| main:release-notes/2.11.0.adoc | `code/CHANGELOG.md` (`[2.11.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.11.0 |
+| main:release-notes/2.12.0.adoc | `code/CHANGELOG.md` (`[2.12.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.12.0 |
+| main:release-notes/2.13.0.adoc | `code/CHANGELOG.md` (`[2.13.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.13.0 |
+| main:release-notes/2.14.0.adoc | `code/CHANGELOG.md` (`[2.14.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.14.0 |
+| main:release-notes/2.15.0.adoc | `code/CHANGELOG.md` (`[2.15.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.15.0 |
+| main:release-notes/2.17.0.adoc | `code/CHANGELOG.md` (`[2.17.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.17.0 |
+| main:release-notes/2.18.0.adoc | `code/CHANGELOG.md` (`[2.18.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.18.0 |
+| main:release-notes/2.19.0.adoc | `code/CHANGELOG.md` (`[2.19.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.19.0 |
+| main:release-notes/2.20.0.adoc | `code/CHANGELOG.md` (`[2.20.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.20.0 |
+| main:release-notes/2.21.0.adoc | `code/CHANGELOG.md` (`[2.21.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.21.0 |
+| main:release-notes/2.22.0.adoc | `code/CHANGELOG.md` (`[2.22.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.22.0 |
+| main:release-notes/2.23.0.adoc | `code/CHANGELOG.md` (`[2.23.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 2.23.0 |
+| main:release-notes/3.1.0.adoc | `code/CHANGELOG.md` (`[3.1.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.1.0 |
+| main:release-notes/3.2.0.adoc | `code/CHANGELOG.md` (`[3.2.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.2.0 |
+| main:release-notes/3.3.0.adoc | `code/CHANGELOG.md` (`[3.3.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.3.0 |
+| main:release-notes/3.4.0.adoc | `code/CHANGELOG.md` (`[3.4.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.4.0 |
+| main:release-notes/3.6.0.adoc | `code/CHANGELOG.md` (`[3.6.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.6.0 |
+| main:release-notes/3.7.0.adoc | `code/CHANGELOG.md` (`[3.7.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.7.0 |
+| main:release-notes/3.8.0.adoc | `code/CHANGELOG.md` (`[3.8.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.8.0 |
+| main:release-notes/3.9.0.adoc | `code/CHANGELOG.md` (`[3.9.0]` section), seeded with `.github/scripts/release-notes-seed.mjs` | released in 3.9.0 |

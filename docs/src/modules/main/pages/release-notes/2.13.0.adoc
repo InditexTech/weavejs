@@ -1,0 +1,26 @@
+= v2.13.0
+:description: Mutex for concurrent edits and the Users Presence plugin.
+
+== 👥 Presence and conflict avoidance.
+
+*Release date:* January 14, 2026
+
+This release helps collaborators avoid clashes and shows who is present.
+
+== Changes
+
+=== Mutex to Avoid Edit Clashes
+
+A mechanism avoids clashes when several users handle or edit the same element.
+
+https://github.com/InditexTech/weavejs/issues/861[https://github.com/InditexTech/weavejs/issues/861]
+
+=== Users Presence Plugin
+
+A new plugin tracks users present in the room.
+
+https://github.com/InditexTech/weavejs/issues/863[https://github.com/InditexTech/weavejs/issues/863]
+
+== Migration Steps
+
+None.

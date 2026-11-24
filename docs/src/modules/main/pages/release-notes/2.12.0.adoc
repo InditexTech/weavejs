@@ -1,0 +1,26 @@
+= v2.12.0
+:description: Connector node and action, and consistent line styles.
+
+== 🔗 Connectors.
+
+*Release date:* December 19, 2025
+
+This release adds connectors and aligns line styles.
+
+== Changes
+
+=== Connector Node and Action
+
+A new connector node and action join shapes on the canvas.
+
+https://github.com/InditexTech/weavejs/issues/725[https://github.com/InditexTech/weavejs/issues/725]
+
+=== Consistent Line, Arrow and Pen Styles
+
+The styles of the line, arrow and pen tools were homogenized.
+
+https://github.com/InditexTech/weavejs/issues/857[https://github.com/InditexTech/weavejs/issues/857]
+
+== Migration Steps
+
+None.

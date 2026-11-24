@@ -1,0 +1,32 @@
+= v2.22.0
+:description: Always-on text outline and better crop on downscale.
+
+== 🔤 Text outline and crop polish.
+
+*Release date:* February 24, 2026
+
+This release polishes text and images.
+
+== Changes
+
+=== Always-On Text Outline
+
+Text can have an outline that is always shown.
+
+https://github.com/InditexTech/weavejs/issues/928[https://github.com/InditexTech/weavejs/issues/928]
+
+=== `urlTransform` Informs the Node
+
+On Image nodes, the `urlTransform` property now also receives the node.
+
+https://github.com/InditexTech/weavejs/issues/915[https://github.com/InditexTech/weavejs/issues/915]
+
+=== Crop Adjusts on Downscale
+
+The crop is adjusted when an image is downscaled, keeping its aspect ratio.
+
+https://github.com/InditexTech/weavejs/issues/935[https://github.com/InditexTech/weavejs/issues/935]
+
+== Migration Steps
+
+None.

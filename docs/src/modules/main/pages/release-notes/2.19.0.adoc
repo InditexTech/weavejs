@@ -1,0 +1,20 @@
+= v2.19.0
+:description: Image node caching.
+
+== 🚀 Image caching.
+
+*Release date:* February 11, 2026
+
+This release speeds up image nodes.
+
+== Changes
+
+=== Image Node Caching
+
+The Image node can cache its rendering.
+
+https://github.com/InditexTech/weavejs/issues/903[https://github.com/InditexTech/weavejs/issues/903]
+
+== Migration Steps
+
+None.

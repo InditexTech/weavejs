@@ -1,0 +1,24 @@
+= v2.11.0
+:description: The measure node and action.
+
+== 📐 Measure.
+
+*Release date:* December 15, 2025
+
+This release adds a way to measure on the canvas.
+
+== Changes
+
+=== Measure Node and Action
+
+A new measure node and its action.
+
+https://github.com/InditexTech/weavejs/issues/847[https://github.com/InditexTech/weavejs/issues/847]
+
+== Fixes
+
+* The resize plugin did not change the stage size when no upscaling was defined (https://github.com/InditexTech/weavejs/issues/853[#853])
+
+== Migration Steps
+
+None.

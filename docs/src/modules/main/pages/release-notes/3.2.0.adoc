@@ -1,0 +1,30 @@
+= v3.2.0
+:description: Upload several images at once, and a revised Image Tool.
+
+== 🖼️ Multi-image upload.
+
+*Release date:* March 16, 2026
+
+This release adds a tool to upload several images in one go and improves the Image Tool.
+
+== Changes
+
+=== Tool to Upload Multiple Images
+
+A new tool lets users upload multiple images at once.
+
+https://github.com/InditexTech/weavejs/issues/969[https://github.com/InditexTech/weavejs/issues/969]
+
+=== Improved Image Tool API and UX
+
+The Image Tool API and its user experience were improved.
+
+https://github.com/InditexTech/weavejs/issues/968[https://github.com/InditexTech/weavejs/issues/968]
+
+== Fixes
+
+* Avoid race conditions in the Standalone Store with async elements (https://github.com/InditexTech/weavejs/issues/972[#972])
+
+== Migration Steps
+
+None.

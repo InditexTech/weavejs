@@ -1,0 +1,30 @@
+= v3.8.0
+:description: Keyboard move without Shift and a roomId getter.
+
+== ⌨️ Smoother keyboard interaction.
+
+*Release date:* April 24, 2026
+
+This release improves keyboard movement and exposes the room ID.
+
+== Changes
+
+=== Stage Keyboard Move Without Shift
+
+The Stage Keyboard Move plugin supports moving nodes without holding Shift.
+
+https://github.com/InditexTech/weavejs/issues/1029[https://github.com/InditexTech/weavejs/issues/1029]
+
+=== `roomId` Getter on the Store
+
+The room ID is exposed from the internal store instance.
+
+https://github.com/InditexTech/weavejs/issues/1030[https://github.com/InditexTech/weavejs/issues/1030]
+
+== Fixes
+
+* Inconsistent or missing modifier and focus signals (Cmd+Shift+5, Space key) made the interaction state unreliable (https://github.com/InditexTech/weavejs/issues/1028[#1028])
+
+== Migration Steps
+
+None.

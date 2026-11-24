@@ -1,0 +1,43 @@
+= v2.9.0
+:description: Zoom to a scale, JSON/Yjs conversion and a friendlier Standalone Store.
+
+== 🔧 New APIs and a friendlier Standalone Store.
+
+*Release date:* December 3, 2025
+
+This release adds new APIs and polishes the stores.
+
+== Changes
+
+=== Zoom to a Specific Scale
+
+`WeaveStageZoomPlugin` exposes a function to zoom to a specific scale.
+
+https://github.com/InditexTech/weavejs/issues/830[https://github.com/InditexTech/weavejs/issues/830]
+
+=== Convert Between JSON and Yjs Binary
+
+A new API converts from JSON to Yjs binary and back.
+
+https://github.com/InditexTech/weavejs/issues/831[https://github.com/InditexTech/weavejs/issues/831]
+
+=== Standalone Store Usability
+
+The Standalone Store is easier to use.
+
+https://github.com/InditexTech/weavejs/issues/825[https://github.com/InditexTech/weavejs/issues/825]
+
+=== No Buffer Dependency in the Azure Web PubSub Browser Client
+
+The Azure Web PubSub store no longer depends on `Buffer` in the browser.
+
+https://github.com/InditexTech/weavejs/issues/828[https://github.com/InditexTech/weavejs/issues/828]
+
+== Fixes
+
+* Text editing position now accounts for the canvas parent offset from the window (https://github.com/InditexTech/weavejs/issues/827[#827])
+* Cropping failed to activate (https://github.com/InditexTech/weavejs/issues/829[#829])
+
+== Migration Steps
+
+None.

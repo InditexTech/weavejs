@@ -1,0 +1,20 @@
+= v3.6.0
+:description: Export an area of the canvas.
+
+== 📤 Export a canvas area.
+
+*Release date:* April 7, 2026
+
+This release lets you export an arbitrary area of the canvas.
+
+== Changes
+
+=== Export an Area of the Canvas
+
+Export now supports exporting a chosen area of the canvas, not only whole stages or nodes.
+
+https://github.com/InditexTech/weavejs/issues/1011[https://github.com/InditexTech/weavejs/issues/1011]
+
+== Migration Steps
+
+None.

@@ -104,5 +104,3 @@ const instance = new Weave({
 . *Replace both snapping plugin imports* — remove `WeaveNodesEdgeSnappingPlugin` and `WeaveNodesDistanceSnappingPlugin` from your imports and plugin list. Add `WeaveNodesSnappingPlugin` in their place.
 . *Register `WeaveGuideToolAction`* — if you want users to be able to create custom ruler guides, register the new action.
 . *Update any direct Yjs snapping metadata reads* — if your code reads raw snapping/guide metadata from the Yjs document, update it to handle plain objects instead of JSON strings.
-
-NOTE: This is the latest release-notes page for the 4.x line. Later 4.x releases are listed in the xref:main:changelog/index.adoc[Changelog].

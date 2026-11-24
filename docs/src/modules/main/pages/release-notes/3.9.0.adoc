@@ -1,0 +1,24 @@
+= v3.9.0
+:description: Programmatic image cropping.
+
+== ✂️ Crop images from code.
+
+*Release date:* May 13, 2026
+
+This release adds an API to crop images programmatically.
+
+== Changes
+
+=== Programmatic Image Crop
+
+A new API crops an image given the image and an element (bounding box).
+
+https://github.com/InditexTech/weavejs/issues/1057[https://github.com/InditexTech/weavejs/issues/1057]
+
+== Fixes
+
+* Wrong heartbeat initialization on the Azure Web PubSub store (https://github.com/InditexTech/weavejs/issues/1059[#1059])
+
+== Migration Steps
+
+None.

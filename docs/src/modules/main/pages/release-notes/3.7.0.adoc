@@ -1,0 +1,31 @@
+= v3.7.0
+:description: Multi-page documents and client-side rendering to several formats.
+
+== 📄 Pages and client-side rendering.
+
+*Release date:* April 17, 2026
+
+This release adds *multi-page canvas documents* and client-side rendering with several output formats.
+
+== Changes
+
+=== Pages Support
+
+Canvas documents can have multiple pages.
+
+https://github.com/InditexTech/weavejs/issues/993[https://github.com/InditexTech/weavejs/issues/993]
+
+=== Client-Side Rendering With Multiple Output Formats
+
+Rendering on the client can output an Image, Blob, Canvas or DataURL.
+
+https://github.com/InditexTech/weavejs/issues/1016[https://github.com/InditexTech/weavejs/issues/1016]
+
+== Fixes
+
+* Frames occluded unrelated elements when rendering to an image (https://github.com/InditexTech/weavejs/issues/1015[#1015])
+* `Ctrl/Cmd + Tab` broke the modifier key state and blocked selection (https://github.com/InditexTech/weavejs/issues/1017[#1017])
+
+== Migration Steps
+
+None.

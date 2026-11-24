@@ -1,0 +1,20 @@
+= v2.15.0
+:description: An event with the atomic changes made by a user.
+
+== 📡 User change events.
+
+*Release date:* January 19, 2026
+
+This release exposes the changes a user makes.
+
+== Changes
+
+=== Event for Atomic User Changes
+
+An event sends the atomic changes performed by the user instance.
+
+https://github.com/InditexTech/weavejs/issues/874[https://github.com/InditexTech/weavejs/issues/874]
+
+== Migration Steps
+
+None.

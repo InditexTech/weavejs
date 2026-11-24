@@ -1,0 +1,26 @@
+= v2.18.0
+:description: Frame export bounding box helpers.
+
+== 🖼️ Easier frame export.
+
+*Release date:* February 6, 2026
+
+This release makes frames easier to export.
+
+== Changes
+
+=== `getExportBoundingBox`
+
+A new function makes exporting frame nodes easy.
+
+https://github.com/InditexTech/weavejs/issues/897[https://github.com/InditexTech/weavejs/issues/897]
+
+=== Frame Internal Export Bounds
+
+The frame node defines its internal area export bounds.
+
+https://github.com/InditexTech/weavejs/issues/899[https://github.com/InditexTech/weavejs/issues/899]
+
+== Migration Steps
+
+None.
