@@ -1,0 +1,26 @@
+AGENTS.md
+  h_c93d154c7c7074 105
+docs/src/modules/main/nav.adoc
+  h_c93d154c7c7074 101-104
+docs/src/modules/main/pages/release-notes/1.0.0.adoc
+  h_c93d154c7c7074 69-70
+docs/src/modules/main/pages/release-notes/2.0.0.adoc
+  h_c93d154c7c7074 71-72
+docs/src/modules/main/pages/release-notes/3.0.0.adoc
+  h_c93d154c7c7074 325-326
+docs/src/modules/main/pages/release-notes/4.0.0.adoc
+  h_c93d154c7c7074 107-108
+docs/src/modules/main/pages/release-notes/index.adoc
+  h_c93d154c7c7074 7,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "ae1fc7e41f9f7b11fb159e8c9b946f6079ec1622",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
