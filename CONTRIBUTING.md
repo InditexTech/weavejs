@@ -194,15 +194,15 @@ As you can see to test you can repeat steps 1-2 as many times as you want.
 
 ### Documentation Release Checklist
 
-Complete this checklist for every release, not for every individual change. You may still update it incrementally as changes are made to keep track of what is pending for the next release.
+Complete this checklist for **every release of any kind** (major, minor, patch or hotfix), not only for majors, and not for every individual change. Every released version gets its own release notes page. You may still update it incrementally as changes are made to keep track of what is pending for the next release.
 
 1. Identify the upcoming version: the one after the latest released version, matching the `release-type/*` label of the PR.
 2. Check the entries the release will add to `code/CHANGELOG.md`: they are generated from the issues closed by the PRs merged since the last release (see the release preview comment, or run `node .github/scripts/changelog-from-prs.mjs --dry-run` with a `GITHUB_TOKEN`). Fix wording or sections in the issues, not in the file.
 3. If the release includes public API changes, document them in the relevant API reference file under `docs`.
-4. Create or update the release notes page at `docs/src/modules/main/pages/release-notes/<version>.adoc`:
+4. Create or update the release notes page at `docs/src/modules/main/pages/release-notes/<version>.adoc`, whatever the release type. A quick way to start is `node .github/scripts/release-notes-seed.mjs <version> --write`, which drafts the page from the `code/CHANGELOG.md` section of that version:
    - If the page is new, add its title, description, release date, and change sections.
    - If the page already exists, add the release changes under the corresponding sections.
-5. Add the new page to the release notes tree in `docs/src/modules/main/nav.adoc`, keeping versions newest first.
+5. Keep the pattern: the current major lists every version; an older major keeps only its `.0.0` page, its minors with user-facing changes and its last patch (when a new major ships, drop the previous major's other patch pages from the nav and the index). Add the new page to the release notes tree in `docs/src/modules/main/nav.adoc` under its major (`vN.x`), and to its `== N.x` section in `docs/src/modules/main/pages/release-notes/index.adoc`, keeping versions newest first.
 6. Add an entry for the release at the top of `docs/src/modules/main/pages/changelog/index.adoc`.
 
 ### Before Submitting

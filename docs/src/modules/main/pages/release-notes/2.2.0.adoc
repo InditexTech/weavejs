@@ -1,0 +1,26 @@
+= v2.2.0
+:description: Chunked large messages on Azure Web PubSub and better transactional operations.
+
+== ☁️ Large messages on Azure Web PubSub.
+
+*Release date:* November 6, 2025
+
+This release handles big messages on the Azure Web PubSub store and hardens state operations.
+
+== Changes
+
+=== Big Messages Handled as Chunks
+
+The Azure Web PubSub store splits big messages into chunks.
+
+https://github.com/InditexTech/weavejs/issues/786[https://github.com/InditexTech/weavejs/issues/786]
+
+=== Improved Transactional State Operations
+
+State operations are more transactional.
+
+https://github.com/InditexTech/weavejs/issues/784[https://github.com/InditexTech/weavejs/issues/784]
+
+== Migration Steps
+
+None.

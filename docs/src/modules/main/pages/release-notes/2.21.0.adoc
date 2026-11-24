@@ -1,0 +1,32 @@
+= v2.21.0
+:description: Unified stroke tool, axis-constrained dragging and crop from corners.
+
+== ✏️ A unified stroke tool.
+
+*Release date:* February 24, 2026
+
+This release unifies stroke drawing and adds new image and drag shortcuts.
+
+== Changes
+
+=== Unified Stroke Tool
+
+A single stroke tool with single strokes and customizable tips.
+
+https://github.com/InditexTech/weavejs/issues/905[https://github.com/InditexTech/weavejs/issues/905]
+
+=== Axis-Constrained Dragging
+
+Holding Shift while dragging constrains the node to the horizontal or vertical axis.
+
+https://github.com/InditexTech/weavejs/issues/923[https://github.com/InditexTech/weavejs/issues/923]
+
+=== Crop by Pressing Cmd/Ctrl on Corners
+
+Images can be cropped by pressing Cmd/Ctrl on the corners.
+
+https://github.com/InditexTech/weavejs/issues/925[https://github.com/InditexTech/weavejs/issues/925]
+
+== Migration Steps
+
+None.

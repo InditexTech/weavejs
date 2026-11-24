@@ -1,0 +1,25 @@
+= v3.1.0
+:description: A smarter text node layout and UX.
+
+== 📝 A smarter text node.
+
+*Release date:* March 6, 2026
+
+This release reworks the layout and interaction of the text node.
+
+== Changes
+
+=== Smart Layout and UX for the Text Node
+
+The text node has a new smart layout and an improved editing experience.
+
+https://github.com/InditexTech/weavejs/issues/964[https://github.com/InditexTech/weavejs/issues/964]
+
+== Fixes
+
+* Pasting Weave.js nodes is now validated for transactionality (https://github.com/InditexTech/weavejs/issues/962[#962])
+* A grid type change was not rendered until the next zoom or pan interaction (https://github.com/InditexTech/weavejs/issues/966[#966])
+
+== Migration Steps
+
+None.

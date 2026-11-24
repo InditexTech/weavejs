@@ -1,0 +1,48 @@
+= v5.8.0
+:description: Paragraph indentation, artboard edge selection, smoother handwriting strokes and lighter custom nodes.
+
+== 🔷 Finer text control, easier artboard selection and smoother strokes.
+
+*Release date:* November 11, 2026
+
+This release gives *finer control over text* with paragraph indentation, makes artboards *easier to select* from any edge, and *smooths handwriting strokes* drawn with a Wacom pen. It also makes the lifecycle hooks of custom nodes, actions and plugins optional.
+
+== Changes
+
+=== Paragraph Indentation in Text
+
+Indentation now applies to a *single paragraph line*, not only to bulleted lists.
+
+See xref:main:build/nodes/text-v2.adoc[Text V2].
+
+https://github.com/InditexTech/weavejs/issues/1262[https://github.com/InditexTech/weavejs/issues/1262]
+
+=== Select an Artboard by Any of Its Edges
+
+An artboard (frame) can be selected by clicking *any of its edges*, not only the top bar. The edge hit width is configurable with `edgeHitWidth`.
+
+See xref:main:build/nodes/frame.adoc[Frame].
+
+https://github.com/InditexTech/weavejs/issues/1263[https://github.com/InditexTech/weavejs/issues/1263]
+
+=== Smoother Wacom Handwriting
+
+Strokes drawn with a Wacom pen were uneven and angular. The brush tool now smooths them using per-device input profiles.
+
+See xref:main:build/actions/brush-tool.adoc[Brush tool].
+
+https://github.com/InditexTech/weavejs/issues/1254[https://github.com/InditexTech/weavejs/issues/1254]
+
+== Fixes
+
+=== Lifecycle Hooks Are Optional for Custom Nodes, Actions and Plugins
+
+Optional lifecycle hooks were declared `abstract`, which forced every custom node, action and plugin to implement them. They are now optional. The API reference also lists the current hook names and `initialize`.
+
+https://github.com/InditexTech/weavejs/issues/1256[https://github.com/InditexTech/weavejs/issues/1256]
+
+* Text V2: list markers did not follow the text when a list was centered or right-aligned (https://github.com/InditexTech/weavejs/issues/1270[#1270])
+
+== Migration Steps
+
+If you removed empty hook implementations only to satisfy the compiler, no change is needed; you can delete the empty overrides.

@@ -1,0 +1,21 @@
+= v5.1.1
+:description: Azure Web PubSub signature verification and WebSocket close fixes.
+
+== 🔧 Azure Web PubSub signature verification and WebSocket close fixes.
+
+*Release date:* June 22, 2026
+
+Security and stability fixes for the stores.
+
+== Fixes
+
+* A single WebSocket close could disable room persistence (https://github.com/InditexTech/weavejs/issues/1116[#1116])
+* Denied WebSocket upgrades returned without closing sockets (https://github.com/InditexTech/weavejs/issues/1118[#1118])
+
+== Security
+
+* Azure Web PubSub `ce-signature` HMAC-SHA256 is now verified and `allowedEndpoints` is enforced on incoming CloudEvents POST requests (`store-azure-web-pubsub`) (https://github.com/InditexTech/weavejs/issues/1114[#1114])
+
+== Migration Steps
+
+None.

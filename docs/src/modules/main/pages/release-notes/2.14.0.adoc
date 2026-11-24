@@ -1,0 +1,25 @@
+= v2.14.0
+:description: Per-logger log levels and mutex and selection fixes.
+
+== 🪵 Per-logger log levels.
+
+*Release date:* January 15, 2026
+
+This release makes logging easier to tune and fixes collaboration issues.
+
+== Changes
+
+=== Log Level per Child Logger
+
+The log level can be set per child logger.
+
+https://github.com/InditexTech/weavejs/issues/870[https://github.com/InditexTech/weavejs/issues/870]
+
+== Fixes
+
+* The app sometimes blocked on mutex operations (https://github.com/InditexTech/weavejs/issues/867[#867])
+* Selection is cleaned up when users disconnect or reconnect (https://github.com/InditexTech/weavejs/issues/868[#868])
+
+== Migration Steps
+
+None.

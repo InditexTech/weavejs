@@ -1,0 +1,36 @@
+= v2.7.0
+:description: Center alignment guides inside frames and a unified initial room state load.
+
+== 🧲 Center guides in frames.
+
+*Release date:* November 24, 2025
+
+This release adds center alignment guides while dragging inside a frame.
+
+== Changes
+
+=== Center Alignment Guides Inside a Frame
+
+Center alignment guides show while dragging an element inside a frame.
+
+https://github.com/InditexTech/weavejs/issues/809[https://github.com/InditexTech/weavejs/issues/809]
+
+=== Websockets Store Loads Initial Room State Like Azure Web PubSub
+
+Both stores now load the initial room state the same way.
+
+https://github.com/InditexTech/weavejs/issues/808[https://github.com/InditexTech/weavejs/issues/808]
+
+=== Polished create-apps and Docs
+
+The app templates and docs were polished.
+
+https://github.com/InditexTech/weavejs/issues/804[https://github.com/InditexTech/weavejs/issues/804]
+
+== Fixes
+
+* Line size handlers were not positioned correctly inside a frame (https://github.com/InditexTech/weavejs/issues/806[#806])
+
+== Migration Steps
+
+None.

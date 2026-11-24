@@ -1,0 +1,20 @@
+= v2.3.0
+:description: Control how nodes move between containers.
+
+== 📦 Container movement rules.
+
+*Release date:* November 17, 2025
+
+This release adds control over moving nodes to or from a container.
+
+== Changes
+
+=== Lock Nodes and Control Container Moves
+
+Nodes can be locked, and can define whether they may move to a container.
+
+https://github.com/InditexTech/weavejs/issues/790[https://github.com/InditexTech/weavejs/issues/790]
+
+== Migration Steps
+
+None.

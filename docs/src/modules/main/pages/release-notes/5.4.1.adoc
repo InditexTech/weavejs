@@ -1,0 +1,16 @@
+= v5.4.1
+:description: Brush tool pressure smoothing and performance.
+
+== 🔧 Brush tool pressure smoothing and performance.
+
+*Release date:* September 16, 2026
+
+One brush tool fix.
+
+== Fixes
+
+* Brush tool: fix stroke pressure smoothing, finished-stroke rendering accuracy, and drawing performance (https://github.com/InditexTech/weavejs/issues/1174[#1174])
+
+== Migration Steps
+
+None.

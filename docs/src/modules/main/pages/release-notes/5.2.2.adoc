@@ -1,0 +1,16 @@
+= v5.2.2
+:description: Dependency security upgrades.
+
+== 🔧 Dependency security upgrades.
+
+*Release date:* September 2, 2026
+
+A dependency update.
+
+== Fixes
+
+* Upgrade vulnerable direct dependencies (npm audit: 0 vulnerabilities) (https://github.com/InditexTech/weavejs/issues/1147[#1147])
+
+== Migration Steps
+
+None.

@@ -1,0 +1,20 @@
+= v1.3.0
+:description: Better multi-selection feedback.
+
+== 🔷 Multi-selection feedback.
+
+*Release date:* October 23, 2025
+
+This release improves the feedback shown when several nodes are selected.
+
+== Changes
+
+=== Improved Multi-Selection Feedback
+
+Multi-selection feedback was improved.
+
+https://github.com/InditexTech/weavejs/issues/719[https://github.com/InditexTech/weavejs/issues/719]
+
+== Migration Steps
+
+None.

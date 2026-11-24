@@ -1,0 +1,30 @@
+= v3.4.0
+:description: Optional Ctrl/Cmd crop trigger and Node.js 24 support.
+
+== 🛠️ Crop trigger control and Node.js 24.
+
+*Release date:* April 6, 2026
+
+This release adds control over how cropping is triggered and supports Node.js 24.x LTS.
+
+== Changes
+
+=== Disable the Ctrl/Cmd Trigger for Cropping
+
+The Ctrl/Cmd key trigger for cropping image nodes can now be disabled.
+
+https://github.com/InditexTech/weavejs/issues/1001[https://github.com/InditexTech/weavejs/issues/1001]
+
+=== Node.js 24.x LTS Support
+
+Weave.js now supports Node.js 24.x LTS.
+
+https://github.com/InditexTech/weavejs/issues/1005[https://github.com/InditexTech/weavejs/issues/1005]
+
+== Fixes
+
+* Image node selected area was wrong when zooming with Ctrl (crop rectangle) (https://github.com/InditexTech/weavejs/issues/1002[#1002])
+
+== Migration Steps
+
+None.

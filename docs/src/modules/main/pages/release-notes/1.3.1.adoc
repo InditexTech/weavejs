@@ -1,0 +1,17 @@
+= v1.3.1
+:description: Image preload and edge panning fixes.
+
+== 🔧 Image preload and edge panning fixes.
+
+*Release date:* October 27, 2025
+
+Two fixes.
+
+== Fixes
+
+* Set uncropped image properties when adding preloaded images to the stage (https://github.com/InditexTech/weavejs/issues/761[#761])
+* Disable the stage on-edge panning correctly (https://github.com/InditexTech/weavejs/issues/762[#762])
+
+== Migration Steps
+
+None.

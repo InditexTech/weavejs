@@ -1,0 +1,24 @@
+= v2.20.0
+:description: Pixel ratio for cached images.
+
+== 🔍 Cached image pixel ratio.
+
+*Release date:* February 12, 2026
+
+This release refines image caching.
+
+== Changes
+
+=== Pixel Ratio for Cached Images
+
+When using the image cache, a config sets the pixel ratio of cached images.
+
+https://github.com/InditexTech/weavejs/issues/906[https://github.com/InditexTech/weavejs/issues/906]
+
+== Fixes
+
+* Cancelling the brush tool with Escape left the brush active and drawing strokes (https://github.com/InditexTech/weavejs/issues/907[#907])
+
+== Migration Steps
+
+None.

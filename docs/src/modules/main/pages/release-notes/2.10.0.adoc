@@ -1,0 +1,20 @@
+= v2.10.0
+:description: Upscale through CSS transforms.
+
+== ⚡ CSS upscaling.
+
+*Release date:* December 11, 2025
+
+This release adds an option to improve performance.
+
+== Changes
+
+=== Upscale via CSS Transforms
+
+Upscaling through CSS transforms is supported to improve performance.
+
+https://github.com/InditexTech/weavejs/issues/848[https://github.com/InditexTech/weavejs/issues/848]
+
+== Migration Steps
+
+None.

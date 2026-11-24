@@ -1,0 +1,20 @@
+= v2.5.0
+:description: Copy and paste images with external applications.
+
+== 📋 Copy and paste images.
+
+*Release date:* November 19, 2025
+
+This release lets users copy and paste images to and from other applications.
+
+== Changes
+
+=== Copy and Paste Images To and From External Applications
+
+Images can be copied from and pasted into the canvas from external applications.
+
+https://github.com/InditexTech/weavejs/issues/798[https://github.com/InditexTech/weavejs/issues/798]
+
+== Migration Steps
+
+None.

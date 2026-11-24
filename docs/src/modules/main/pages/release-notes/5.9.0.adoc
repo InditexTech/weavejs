@@ -1,0 +1,32 @@
+= v5.9.0
+:description: The sticky note node and tool, and a server-side rendering fix.
+
+== 🔷 Sticky notes.
+
+*Release date:* November 12, 2026
+
+This release adds the *sticky note*, a new canvas primitive with an interactive placement tool, and fixes server-side rendering of rooms that contain video nodes.
+
+== Changes
+
+=== Sticky Note Node and Placement Tool
+
+A new sticky note canvas primitive, with an interactive tool to place it. Sticky notes carry an editable text label and take part in the standard selection, transform and snapping pipeline.
+
+See xref:main:build/nodes/sticky-note.adoc[Sticky note] and xref:main:build/actions/sticky-note-tool.adoc[Sticky note tool].
+
+https://github.com/InditexTech/weavejs/issues/1232[https://github.com/InditexTech/weavejs/issues/1232]
+
+== Fixes
+
+=== Server-Side Render With Video Nodes
+
+Server-side rendering failed with `requestAnimationFrame is not defined` when the room contained a video node.
+
+See xref:main:build/server-side-rendering.adoc[Server-side rendering].
+
+https://github.com/InditexTech/weavejs/issues/1294[https://github.com/InditexTech/weavejs/issues/1294]
+
+== Migration Steps
+
+Register `WeaveStickyNoteNode` and `WeaveStickyNoteToolAction` to use sticky notes. No action is needed otherwise.

@@ -1,0 +1,20 @@
+= v2.17.0
+:description: Get the document of a store.
+
+== 🗂️ Store document access.
+
+*Release date:* February 5, 2026
+
+This release adds direct access to a store's document.
+
+== Changes
+
+=== API to Get a Store's Document
+
+A new API returns the document of a store.
+
+https://github.com/InditexTech/weavejs/issues/895[https://github.com/InditexTech/weavejs/issues/895]
+
+== Migration Steps
+
+None.

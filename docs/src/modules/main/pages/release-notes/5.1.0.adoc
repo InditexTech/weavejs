@@ -1,0 +1,25 @@
+= v5.1.0
+:description: Grouping nodes now keeps their IDs.
+
+== 🔷 Stable node IDs when grouping.
+
+*Release date:* June 22, 2026
+
+A small behavioural change that matters if your application tracks nodes by ID.
+
+== Changes
+
+=== Node IDs Are Preserved When Grouping
+
+Grouping nodes used to re-create them, so each grouped node received a *new* ID. Grouping now *keeps the original ID* of every node moved into the group.
+
+* References you hold to a node (selection state, comments, external metadata) stay valid after grouping
+* Ungrouping and regrouping no longer changes the IDs of the nodes involved
+
+https://github.com/InditexTech/weavejs/issues/1112[https://github.com/InditexTech/weavejs/issues/1112]
+
+== Migration Steps
+
+If your application worked around the old behaviour (for example by remapping IDs after a group action), you can remove that code. No action is needed otherwise.
+
+NOTE: The patch releases 5.1.1 to 5.1.5 contain fixes only. See the xref:main:changelog/index.adoc[Changelog].

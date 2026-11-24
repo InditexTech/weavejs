@@ -1,10 +1,235 @@
 = Release notes
 :description: Discover what's new in Weave.js
 
-== Release versions
+What changed for users in each release, and how to upgrade. Every release gets a page, whatever its type: major, minor, patch or hotfix. The current major lists all of its versions. Earlier majors list their `.0.0` release, their minors with user-facing changes and their last patch; every other release is in the xref:main:changelog/index.adoc[Changelog].
 
-* xref:main:release-notes/5.0.0.adoc[*5.0.0*]
-* xref:main:release-notes/4.0.0.adoc[*4.0.0*]
-* xref:main:release-notes/3.0.0.adoc[*3.0.0*]
-* xref:main:release-notes/2.0.0.adoc[*2.0.0*]
-* xref:main:release-notes/1.0.0.adoc[*1.0.0*]
+[#v5x]
+== 5.x
+
+=== xref:main:release-notes/5.10.0.adoc[v5.10.0]
+
+_November 23, 2026_ — README link fix and Dependabot security fixes.
+
+=== xref:main:release-notes/5.9.0.adoc[v5.9.0]
+
+_November 12, 2026_ — The sticky note node and tool, and a server-side rendering fix.
+
+=== xref:main:release-notes/5.8.0.adoc[v5.8.0]
+
+_November 11, 2026_ — Paragraph indentation, artboard edge selection, smoother handwriting strokes and lighter custom nodes.
+
+=== xref:main:release-notes/5.7.1.adoc[v5.7.1]
+
+_October 27, 2026_ — Text V2 fixes and dependency security updates.
+
+=== xref:main:release-notes/5.7.0.adoc[v5.7.0]
+
+_October 26, 2026_ — Native on-canvas text editing, rich text and a new shape label engine.
+
+=== xref:main:release-notes/5.6.0.adoc[v5.6.0]
+
+_October 22, 2026_ — ESM-only packages made explicit, optional native canvas peers, shape modifiers and image flipping.
+
+=== xref:main:release-notes/5.4.1.adoc[v5.4.1]
+
+_September 16, 2026_ — Brush tool pressure smoothing and performance.
+
+=== xref:main:release-notes/5.4.0.adoc[v5.4.0]
+
+_September 9, 2026_ — Hyperlinks on text nodes.
+
+=== xref:main:release-notes/5.3.0.adoc[v5.3.0]
+
+_September 7, 2026_ — Opt-in "fully enclosed" drag-selection.
+
+=== xref:main:release-notes/5.2.2.adoc[v5.2.2]
+
+_September 2, 2026_ — Dependency security upgrades.
+
+=== xref:main:release-notes/5.2.1.adoc[v5.2.1]
+
+_August 6, 2026_ — Rectangle resize, crop cursor and ungroup resize fixes.
+
+=== xref:main:release-notes/5.1.5.adoc[v5.1.5]
+
+_July 14, 2026_ — Text selection and selection event fixes.
+
+=== xref:main:release-notes/5.1.4.adoc[v5.1.4]
+
+_July 13, 2026_ — Azure Web PubSub room setup order.
+
+=== xref:main:release-notes/5.1.3.adoc[v5.1.3]
+
+_July 6, 2026_ — Dragging a node stacked over the selection.
+
+=== xref:main:release-notes/5.1.2.adoc[v5.1.2]
+
+_July 2, 2026_ — Dragging and consecutive text creation fixes.
+
+=== xref:main:release-notes/5.1.1.adoc[v5.1.1]
+
+_June 22, 2026_ — Azure Web PubSub signature verification and WebSocket close fixes.
+
+=== xref:main:release-notes/5.1.0.adoc[v5.1.0]
+
+_June 22, 2026_ — Grouping nodes now keeps their IDs.
+
+=== xref:main:release-notes/5.0.0.adoc[v5.0.0]
+
+_June 18, 2026_ — Focus on diagramming capabilities, optimistic persistence, and a cleaner store architecture.
+
+[#v4x]
+== 4.x
+
+=== xref:main:release-notes/4.1.1.adoc[v4.1.1]
+
+_May 29, 2026_ — Grouped images reparented into a frame.
+
+=== xref:main:release-notes/4.0.0.adoc[v4.0.0]
+
+_May 15, 2026_ — Focus on unified snapping architecture and custom canvas guides.
+
+[#v3x]
+== 3.x
+
+=== xref:main:release-notes/3.9.1.adoc[v3.9.1]
+
+_May 13, 2026_ — Azure Web PubSub client logging.
+
+=== xref:main:release-notes/3.9.0.adoc[v3.9.0]
+
+_May 13, 2026_ — Programmatic image cropping.
+
+=== xref:main:release-notes/3.8.0.adoc[v3.8.0]
+
+_April 24, 2026_ — Keyboard move without Shift and a roomId getter.
+
+=== xref:main:release-notes/3.7.0.adoc[v3.7.0]
+
+_April 17, 2026_ — Multi-page documents and client-side rendering to several formats.
+
+=== xref:main:release-notes/3.6.0.adoc[v3.6.0]
+
+_April 7, 2026_ — Export an area of the canvas.
+
+=== xref:main:release-notes/3.4.0.adoc[v3.4.0]
+
+_April 6, 2026_ — Optional Ctrl/Cmd crop trigger and Node.js 24 support.
+
+=== xref:main:release-notes/3.3.0.adoc[v3.3.0]
+
+_March 18, 2026_ — Angle lock for stroke-based tools.
+
+=== xref:main:release-notes/3.2.0.adoc[v3.2.0]
+
+_March 16, 2026_ — Upload several images at once, and a revised Image Tool.
+
+=== xref:main:release-notes/3.1.0.adoc[v3.1.0]
+
+_March 6, 2026_ — A smarter text node layout and UX.
+
+=== xref:main:release-notes/3.0.0.adoc[v3.0.0]
+
+_March 5, 2026_ — Focus on performance, architecture flexibility, and cleaner integration APIs.
+
+[#v2x]
+== 2.x
+
+=== xref:main:release-notes/2.23.0.adoc[v2.23.0]
+
+_February 25, 2026_ — Faster selection and text editing.
+
+=== xref:main:release-notes/2.22.0.adoc[v2.22.0]
+
+_February 24, 2026_ — Always-on text outline and better crop on downscale.
+
+=== xref:main:release-notes/2.21.1.adoc[v2.21.1]
+
+_February 24, 2026_ — Stage window event setup.
+
+=== xref:main:release-notes/2.21.0.adoc[v2.21.0]
+
+_February 24, 2026_ — Unified stroke tool, axis-constrained dragging and crop from corners.
+
+=== xref:main:release-notes/2.20.0.adoc[v2.20.0]
+
+_February 12, 2026_ — Pixel ratio for cached images.
+
+=== xref:main:release-notes/2.19.0.adoc[v2.19.0]
+
+_February 11, 2026_ — Image node caching.
+
+=== xref:main:release-notes/2.18.0.adoc[v2.18.0]
+
+_February 6, 2026_ — Frame export bounding box helpers.
+
+=== xref:main:release-notes/2.17.0.adoc[v2.17.0]
+
+_February 5, 2026_ — Get the document of a store.
+
+=== xref:main:release-notes/2.15.0.adoc[v2.15.0]
+
+_January 19, 2026_ — An event with the atomic changes made by a user.
+
+=== xref:main:release-notes/2.14.0.adoc[v2.14.0]
+
+_January 15, 2026_ — Per-logger log levels and mutex and selection fixes.
+
+=== xref:main:release-notes/2.13.0.adoc[v2.13.0]
+
+_January 14, 2026_ — Mutex for concurrent edits and the Users Presence plugin.
+
+=== xref:main:release-notes/2.12.0.adoc[v2.12.0]
+
+_December 19, 2025_ — Connector node and action, and consistent line styles.
+
+=== xref:main:release-notes/2.11.0.adoc[v2.11.0]
+
+_December 15, 2025_ — The measure node and action.
+
+=== xref:main:release-notes/2.10.0.adoc[v2.10.0]
+
+_December 11, 2025_ — Upscale through CSS transforms.
+
+=== xref:main:release-notes/2.9.0.adoc[v2.9.0]
+
+_December 3, 2025_ — Zoom to a scale, JSON/Yjs conversion and a friendlier Standalone Store.
+
+=== xref:main:release-notes/2.7.0.adoc[v2.7.0]
+
+_November 24, 2025_ — Center alignment guides inside frames and a unified initial room state load.
+
+=== xref:main:release-notes/2.5.0.adoc[v2.5.0]
+
+_November 19, 2025_ — Copy and paste images with external applications.
+
+=== xref:main:release-notes/2.4.0.adoc[v2.4.0]
+
+_November 19, 2025_ — A simpler line drawing tool.
+
+=== xref:main:release-notes/2.3.0.adoc[v2.3.0]
+
+_November 17, 2025_ — Control how nodes move between containers.
+
+=== xref:main:release-notes/2.2.0.adoc[v2.2.0]
+
+_November 6, 2025_ — Chunked large messages on Azure Web PubSub and better transactional operations.
+
+=== xref:main:release-notes/2.0.0.adoc[v2.0.0]
+
+_October 30, 2025_ — Improved scalability when using the Azure Web PubSub store
+
+[#v1x]
+== 1.x
+
+=== xref:main:release-notes/1.3.1.adoc[v1.3.1]
+
+_October 27, 2025_ — Image preload and edge panning fixes.
+
+=== xref:main:release-notes/1.3.0.adoc[v1.3.0]
+
+_October 23, 2025_ — Better multi-selection feedback.
+
+=== xref:main:release-notes/1.0.0.adoc[v1.0.0]
+
+_October 17, 2025_ — Initial stable release of Weave.js

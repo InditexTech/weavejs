@@ -1,0 +1,17 @@
+= v5.1.2
+:description: Dragging and consecutive text creation fixes.
+
+== 🔧 Dragging and consecutive text creation fixes.
+
+*Release date:* July 2, 2026
+
+Two interaction fixes.
+
+== Fixes
+
+* Avoid double interaction to drag (https://github.com/InditexTech/weavejs/issues/1122[#1122])
+* Fix text editing trigger inconsistencies when creating consecutive text nodes (https://github.com/InditexTech/weavejs/issues/1123[#1123])
+
+== Migration Steps
+
+None.
