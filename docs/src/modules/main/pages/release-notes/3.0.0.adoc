@@ -1,5 +1,5 @@
 = v3.0.0
-:description: Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+:description: Focus on performance, architecture flexibility, and cleaner integration APIs.
 
 == 🚀 Focus on performance, flexibility, and a cleaner UX.
 

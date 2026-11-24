@@ -1,5 +1,5 @@
 = v5.0.0
-:description: Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+:description: Focus on diagramming capabilities, optimistic persistence, and a cleaner store architecture.
 
 == 🔷 Richer diagramming, faster initial load, and a cleaner store architecture.
 

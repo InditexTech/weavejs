@@ -5,6 +5,8 @@
 
 *Release date:* September 7, 2026
 
+This release adds an opt-in *fully enclosed* mode to drag-selection, so a selection rectangle picks only the nodes it completely contains. The default behaviour is unchanged.
+
 == Changes
 
 === "Fully Enclosed" Drag-Selection Mode

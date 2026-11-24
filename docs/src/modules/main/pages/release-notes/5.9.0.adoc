@@ -5,6 +5,8 @@
 
 *Release date:* November 12, 2026
 
+This release adds the *sticky note*, a new canvas primitive with an interactive placement tool, and fixes server-side rendering of rooms that contain video nodes.
+
 == Changes
 
 === Sticky Note Node and Placement Tool

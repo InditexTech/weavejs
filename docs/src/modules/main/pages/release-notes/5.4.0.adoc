@@ -5,6 +5,8 @@
 
 *Release date:* September 9, 2026
 
+This release lets a text node carry a URL, turning the whole text into a *clickable link*.
+
 == Changes
 
 === Hyperlinks on Text Nodes

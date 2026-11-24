@@ -5,6 +5,8 @@
 
 *Release date:* November 11, 2026
 
+This release gives *finer control over text* with paragraph indentation, makes artboards *easier to select* from any edge, and *smooths handwriting strokes* drawn with a Wacom pen. It also makes the lifecycle hooks of custom nodes, actions and plugins optional.
+
 == Changes
 
 === Paragraph Indentation in Text
