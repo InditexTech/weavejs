@@ -1,0 +1,20 @@
+= v5.10.0
+:description: README link fix and Dependabot security fixes.
+
+== 🔧 README link fix and Dependabot security fixes.
+
+*Release date:* November 23, 2026
+
+A maintenance release with no feature changes.
+
+== Changes
+
+* README linked to a CLA.pdf that no longer exists (https://github.com/InditexTech/weavejs/issues/1304[#1304])
+
+== Security
+
+* Fixed Dependabot vulnerabilities in the app template and dev tooling (https://github.com/InditexTech/weavejs/issues/1308[#1308])
+
+== Migration Steps
+
+None.

@@ -1,0 +1,16 @@
+= v5.1.3
+:description: Dragging a node stacked over the selection.
+
+== 🔧 Dragging a node stacked over the selection.
+
+*Release date:* July 6, 2026
+
+One interaction fix.
+
+== Fixes
+
+* Dragging a node stacked on top of the current selection silently did nothing (https://github.com/InditexTech/weavejs/issues/1126[#1126])
+
+== Migration Steps
+
+None.

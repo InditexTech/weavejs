@@ -1,0 +1,18 @@
+= v5.2.1
+:description: Rectangle resize, crop cursor and ungroup resize fixes.
+
+== 🔧 Rectangle resize, crop cursor and ungroup resize fixes.
+
+*Release date:* August 6, 2026
+
+Three interaction fixes.
+
+== Fixes
+
+* The rectangle resize handle did not work when placed on top of an image: dragging moved the image instead of resizing the rectangle (https://github.com/InditexTech/weavejs/issues/1137[#1137])
+* Crop mode did not show the resize cursor when Ctrl was pressed while the pointer was already over a crop anchor (https://github.com/InditexTech/weavejs/issues/1138[#1138])
+* Elements could not be resized after ungrouping until a multi-selection was made (https://github.com/InditexTech/weavejs/issues/1145[#1145])
+
+== Migration Steps
+
+None.

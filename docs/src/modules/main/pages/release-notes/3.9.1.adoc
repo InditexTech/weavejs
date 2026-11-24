@@ -1,0 +1,16 @@
+= v3.9.1
+:description: Azure Web PubSub client logging.
+
+== 🔧 Azure Web PubSub client logging.
+
+*Release date:* May 13, 2026
+
+One cleanup.
+
+== Fixes
+
+* Removed an unnecessary `console.log` on the Azure Web PubSub store client (https://github.com/InditexTech/weavejs/issues/1061[#1061])
+
+== Migration Steps
+
+None.

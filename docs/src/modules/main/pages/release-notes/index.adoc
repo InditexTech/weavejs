@@ -1,10 +1,14 @@
 = Release notes
 :description: Discover what's new in Weave.js
 
-What changed for users in each release, and how to upgrade. Every new release gets a page, whatever its type: major, minor, patch or hotfix. Releases before 5.10 that have no page of their own (patches, and minors with no user-facing change) are listed in the xref:main:changelog/index.adoc[Changelog].
+What changed for users in each release, and how to upgrade. Every release gets a page, whatever its type: major, minor, patch or hotfix. The current major lists all of its versions. Earlier majors list their `.0.0` release, their minors with user-facing changes and their last patch; every other release is in the xref:main:changelog/index.adoc[Changelog].
 
 [#v5x]
 == 5.x
+
+=== xref:main:release-notes/5.10.0.adoc[v5.10.0]
+
+_November 23, 2026_ — README link fix and Dependabot security fixes.
 
 === xref:main:release-notes/5.9.0.adoc[v5.9.0]
 
@@ -14,6 +18,10 @@ _November 12, 2026_ — The sticky note node and tool, and a server-side renderi
 
 _November 11, 2026_ — Paragraph indentation, artboard edge selection, smoother handwriting strokes and lighter custom nodes.
 
+=== xref:main:release-notes/5.7.1.adoc[v5.7.1]
+
+_October 27, 2026_ — Text V2 fixes and dependency security updates.
+
 === xref:main:release-notes/5.7.0.adoc[v5.7.0]
 
 _October 26, 2026_ — Native on-canvas text editing, rich text and a new shape label engine.
@@ -22,6 +30,10 @@ _October 26, 2026_ — Native on-canvas text editing, rich text and a new shape 
 
 _October 22, 2026_ — ESM-only packages made explicit, optional native canvas peers, shape modifiers and image flipping.
 
+=== xref:main:release-notes/5.4.1.adoc[v5.4.1]
+
+_September 16, 2026_ — Brush tool pressure smoothing and performance.
+
 === xref:main:release-notes/5.4.0.adoc[v5.4.0]
 
 _September 9, 2026_ — Hyperlinks on text nodes.
@@ -29,6 +41,34 @@ _September 9, 2026_ — Hyperlinks on text nodes.
 === xref:main:release-notes/5.3.0.adoc[v5.3.0]
 
 _September 7, 2026_ — Opt-in "fully enclosed" drag-selection.
+
+=== xref:main:release-notes/5.2.2.adoc[v5.2.2]
+
+_September 2, 2026_ — Dependency security upgrades.
+
+=== xref:main:release-notes/5.2.1.adoc[v5.2.1]
+
+_August 6, 2026_ — Rectangle resize, crop cursor and ungroup resize fixes.
+
+=== xref:main:release-notes/5.1.5.adoc[v5.1.5]
+
+_July 14, 2026_ — Text selection and selection event fixes.
+
+=== xref:main:release-notes/5.1.4.adoc[v5.1.4]
+
+_July 13, 2026_ — Azure Web PubSub room setup order.
+
+=== xref:main:release-notes/5.1.3.adoc[v5.1.3]
+
+_July 6, 2026_ — Dragging a node stacked over the selection.
+
+=== xref:main:release-notes/5.1.2.adoc[v5.1.2]
+
+_July 2, 2026_ — Dragging and consecutive text creation fixes.
+
+=== xref:main:release-notes/5.1.1.adoc[v5.1.1]
+
+_June 22, 2026_ — Azure Web PubSub signature verification and WebSocket close fixes.
 
 === xref:main:release-notes/5.1.0.adoc[v5.1.0]
 
@@ -41,12 +81,20 @@ _June 18, 2026_ — Focus on diagramming capabilities, optimistic persistence, a
 [#v4x]
 == 4.x
 
+=== xref:main:release-notes/4.1.1.adoc[v4.1.1]
+
+_May 29, 2026_ — Grouped images reparented into a frame.
+
 === xref:main:release-notes/4.0.0.adoc[v4.0.0]
 
 _May 15, 2026_ — Focus on unified snapping architecture and custom canvas guides.
 
 [#v3x]
 == 3.x
+
+=== xref:main:release-notes/3.9.1.adoc[v3.9.1]
+
+_May 13, 2026_ — Azure Web PubSub client logging.
 
 === xref:main:release-notes/3.9.0.adoc[v3.9.0]
 
@@ -94,6 +142,10 @@ _February 25, 2026_ — Faster selection and text editing.
 === xref:main:release-notes/2.22.0.adoc[v2.22.0]
 
 _February 24, 2026_ — Always-on text outline and better crop on downscale.
+
+=== xref:main:release-notes/2.21.1.adoc[v2.21.1]
+
+_February 24, 2026_ — Stage window event setup.
 
 === xref:main:release-notes/2.21.0.adoc[v2.21.0]
 
@@ -169,6 +221,10 @@ _October 30, 2025_ — Improved scalability when using the Azure Web PubSub stor
 
 [#v1x]
 == 1.x
+
+=== xref:main:release-notes/1.3.1.adoc[v1.3.1]
+
+_October 27, 2025_ — Image preload and edge panning fixes.
 
 === xref:main:release-notes/1.3.0.adoc[v1.3.0]
 

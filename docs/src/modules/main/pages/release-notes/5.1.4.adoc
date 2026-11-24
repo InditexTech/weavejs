@@ -1,0 +1,16 @@
+= v5.1.4
+:description: Azure Web PubSub room setup order.
+
+== 🔧 Azure Web PubSub room setup order.
+
+*Release date:* July 13, 2026
+
+One store fix.
+
+== Fixes
+
+* The Azure Web PubSub store set up the room in memory before its persisted state was loaded (https://github.com/InditexTech/weavejs/issues/1128[#1128])
+
+== Migration Steps
+
+None.

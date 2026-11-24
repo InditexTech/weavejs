@@ -1,0 +1,16 @@
+= v2.21.1
+:description: Stage window event setup.
+
+== 🔧 Stage window event setup.
+
+*Release date:* February 24, 2026
+
+One fix.
+
+== Fixes
+
+* Avoid setting up window events on Stage node initialization (https://github.com/InditexTech/weavejs/issues/9307[#9307])
+
+== Migration Steps
+
+None.

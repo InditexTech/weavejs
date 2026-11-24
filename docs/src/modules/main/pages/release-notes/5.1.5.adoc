@@ -1,0 +1,17 @@
+= v5.1.5
+:description: Text selection and selection event fixes.
+
+== 🔧 Text selection and selection event fixes.
+
+*Release date:* July 14, 2026
+
+Two selection fixes.
+
+== Fixes
+
+* Text selection: the cursor had to be inside the text box to select from the first character; it now matches PowerPoint/Illustrator behavior (https://github.com/InditexTech/weavejs/issues/1130[#1130])
+* `onNodesChange` was not emitted on single-click selection of a draggable node (regression) (https://github.com/InditexTech/weavejs/issues/1131[#1131])
+
+== Migration Steps
+
+None.

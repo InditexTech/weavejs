@@ -1,0 +1,16 @@
+= v4.1.1
+:description: Grouped images reparented into a frame.
+
+== 🔧 Grouped images reparented into a frame.
+
+*Release date:* May 29, 2026
+
+One fix.
+
+== Fixes
+
+* Grouped images disappeared when reparented from the main layer to a frame (https://github.com/InditexTech/weavejs/issues/1085[#1085])
+
+== Migration Steps
+
+None.

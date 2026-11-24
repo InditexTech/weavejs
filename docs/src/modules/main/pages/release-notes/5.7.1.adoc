@@ -1,0 +1,21 @@
+= v5.7.1
+:description: Text V2 fixes and dependency security updates.
+
+== 🔧 Text V2 fixes and dependency security updates.
+
+*Release date:* October 27, 2026
+
+Text editing fixes and a security update.
+
+== Fixes
+
+* Text V2: a newly created node blinked when leaving the first edit session (https://github.com/InditexTech/weavejs/issues/1246[#1246])
+* Rich text: a new list item after Enter lost its marks (size), and the marker and empty line rendered at base size (https://github.com/InditexTech/weavejs/issues/1245[#1245])
+
+== Security
+
+* Resolved open Dependabot security alerts (next, zod, @azure/msal-node, fast-uri) (https://github.com/InditexTech/weavejs/issues/1243[#1243])
+
+== Migration Steps
+
+None.
