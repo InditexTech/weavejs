@@ -322,3 +322,5 @@ const reactReconcilerRenderer = new WeaveKonvaReactReconcilerRenderer();
 
 This change gives applications *full control over renderer / reconciler*, simplifies and streamlines the Image Tool UX and allows
 Weave.js to *scale better with large rooms*.
+
+NOTE: This is the latest release-notes page for the 3.x line. Later 3.x releases are listed in the xref:main:changelog/index.adoc[Changelog].

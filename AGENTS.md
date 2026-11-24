@@ -102,7 +102,7 @@ npx skills@latest add InditexTech/docouture --all
 
 ## Documentation state
 
-Release notes: every major and minor release gets a `release-notes/X.Y.Z.adoc` page (patches never do; a minor with no `Added` entry or breaking change may be skipped and is covered by the Changelog). Seed it with `node .github/scripts/release-notes-seed.mjs X.Y.Z --write`, then edit.
+Release notes: every major and minor release gets a `release-notes/X.Y.Z.adoc` page (patches never do; a minor with no `Added` entry or breaking change may be skipped and is covered by the Changelog). Seed it with `node .github/scripts/release-notes-seed.mjs X.Y.Z --write`, then edit. Only the current major lists all its pages in `nav.adoc` and the index; each earlier major is a single `vN.x` entry pointing at its latest page, and a new major collapses the previous one.
 
 <!-- maintained by the docouture-documenting-changes skill — do not hand-edit structure, only content -->
 

@@ -4,6 +4,7 @@
 Release notes cover every *major* and *minor* release, and describe what changed for users and
 how to upgrade. Patch releases (`X.Y.Z` with `Z` above 0) have no page of their own, and neither
 do minors with no user-facing change. Both are listed in the xref:main:changelog/index.adoc[Changelog].
+When a new major ships, the previous major collapses to a single entry and the new one becomes the full list.
 
 == Release versions
 
@@ -19,6 +20,8 @@ do minors with no user-facing change. Both are listed in the xref:main:changelog
 * xref:main:release-notes/5.0.0.adoc[*5.0.0*]
 
 === Earlier majors
+
+Only the current major lists every release. Each earlier major has a single entry, pointing at its latest release-notes page.
 
 * xref:main:release-notes/4.0.0.adoc[*4.0.0*]
 * xref:main:release-notes/3.0.0.adoc[*3.0.0*]

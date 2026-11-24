@@ -66,3 +66,5 @@ The *1.0 milestone* establishes a solid foundation for the future of Weave.js:
 This release reflects the work of everyone who contributed feedback, testing, and improvements during the pre-1.0 development cycle.
 
 We’re excited to see what you build with *Weave.js 1.0*.
+
+NOTE: This is the latest release-notes page for the 1.x line. Later 1.x releases are listed in the xref:main:changelog/index.adoc[Changelog].
