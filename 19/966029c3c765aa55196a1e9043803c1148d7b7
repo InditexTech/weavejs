@@ -1,0 +1,23 @@
+AGENTS.md
+  s_9b04af72fa5e3f::t_868a3525241ee0 105
+CONTRIBUTING.md
+  s_9b04af72fa5e3f::t_8ca89a157adae6 197,202,205
+docs/src/modules/main/pages/release-notes/index.adoc
+  s_9b04af72fa5e3f::t_a4620c17dd31f1 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "19966029c3c765aa55196a1e9043803c1148d7b7",
+  "prompts": {},
+  "sessions": {
+    "s_9b04af72fa5e3f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df6c44e94ffeKb0T4hWMb6cYV3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
