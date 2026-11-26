@@ -90,3 +90,29 @@ describe('validateBrushTunablePatch', () => {
     expect(validateBrushTunablePatch('profile', [1])).toHaveLength(1);
   });
 });
+
+describe('validation of the look fields added with instruments', () => {
+  it('accepts values inside the range or options', () => {
+    expect(
+      validateBrushTunablePatch('look', {
+        ends: 'flat',
+        variance: 0.5,
+        width: { easing: 'linear', nibAngle: -45, nibContrast: 0.7 },
+      })
+    ).toEqual([]);
+  });
+
+  it('rejects values outside the range or options', () => {
+    expect(validateBrushTunablePatch('look', { variance: 2 })).toHaveLength(1);
+    expect(validateBrushTunablePatch('look', { ends: 'pointy' })).toHaveLength(1);
+    expect(
+      validateBrushTunablePatch('look', { width: { easing: 'bounce' } })
+    ).toHaveLength(1);
+    expect(
+      validateBrushTunablePatch('look', { width: { nibAngle: 400 } })
+    ).toHaveLength(1);
+    expect(
+      validateBrushTunablePatch('look', { width: { nibContrast: -1 } })
+    ).toHaveLength(1);
+  });
+});

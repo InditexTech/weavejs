@@ -82,3 +82,17 @@ When active the user:
 Then the freeform line is added to the canvas as a fully functional node—ready.
 This action integrates seamlessly with Weave.js's real-time state system,
 ensuring the new element appears instantly for all connected users.
+
+== Pens
+
+The tool can draw with a named pen, called an *instrument*. Select one on the action:
+
+[source,ts]
+----
+const brush = instance.getActionHandler<WeaveBrushToolAction>("brushTool");
+
+brush.setInstrument("highlighter"); // pencil, pen, brush, fountainPen, fineliner, marker or highlighter
+----
+
+New strokes then take the look of that pen. If you never select one, the tool draws as before. See
+xref:sdk:api-reference/actions/brush-tool.adoc#instruments[the API reference] for what each instrument does.

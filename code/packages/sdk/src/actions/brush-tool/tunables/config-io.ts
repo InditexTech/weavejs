@@ -10,7 +10,11 @@ import type {
   WeaveBrushInputProfileKey,
 } from '../types';
 import { mergeData } from './merge';
-import { resolveBrushProfilePatch } from './presets';
+import {
+  getBrushInstrument,
+  resolveBrushProfilePatch,
+  type WeaveBrushInstrumentId,
+} from './presets';
 import { validateBrushTunablePatch } from './validate';
 
 /** Version of the exported configuration document. */
@@ -21,10 +25,17 @@ export type WeaveBrushConfigDocument = {
   version: typeof BRUSH_CONFIG_DOCUMENT_VERSION;
   profiles: Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>;
   look: WeaveStrokeLook | null;
+  /** Instrument selected when the document was made; absent when none was. */
+  instrument?: WeaveBrushInstrumentId | 'custom';
 };
 
 export type WeaveBrushConfigParseResult =
-  | { ok: true; profiles: Partial<Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>>; look: WeaveStrokeLook | null | undefined }
+  | {
+      ok: true;
+      profiles: Partial<Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>>;
+      look: WeaveStrokeLook | null | undefined;
+      instrument: WeaveBrushInstrumentId | 'custom' | null;
+    }
   | { ok: false; errors: string[] };
 
 const isObject = (v: unknown): v is Record<string, unknown> =>
@@ -79,6 +90,19 @@ function parseLook(
   return mergeData(WEAVE_STROKE_LEGACY_LOOK, settings);
 }
 
+function parseInstrument(
+  raw: unknown,
+  errors: string[]
+): WeaveBrushInstrumentId | 'custom' | null {
+  if (raw === undefined || raw === null) return null;
+  if (raw === 'custom') return 'custom';
+  if (typeof raw === 'string' && getBrushInstrument(raw)) {
+    return raw as WeaveBrushInstrumentId;
+  }
+  errors.push(`Unknown instrument "${String(raw)}"`);
+  return null;
+}
+
 function readDocument(input: unknown): unknown {
   if (typeof input !== 'string') return input;
   try {
@@ -114,6 +138,9 @@ export function parseBrushConfigDocument(input: unknown): WeaveBrushConfigParseR
   const errors: string[] = [];
   const profiles = parseProfiles(doc['profiles'], errors);
   const look = parseLook(doc['look'], errors);
+  const instrument = parseInstrument(doc['instrument'], errors);
 
-  return errors.length > 0 ? { ok: false, errors } : { ok: true, profiles, look };
+  return errors.length > 0
+    ? { ok: false, errors }
+    : { ok: true, profiles, look, instrument };
 }
