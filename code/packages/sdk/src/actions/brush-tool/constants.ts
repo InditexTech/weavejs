@@ -29,6 +29,15 @@ export const PREVIEW_ID_SUFFIX = '--preview';
  */
 export const PREVIEW_HANDOVER_MAX_FRAMES = 30;
 
+/**
+ * Defaults of the profile settings that are stored only when set. A profile
+ * without them behaves as with these values.
+ */
+export const BRUSH_PROFILE_OPTIONAL_DEFAULTS = {
+  capture: { shiftLock: false },
+  pressure: { synth: 'off' },
+} as const;
+
 export const BRUSH_INPUT_PROFILE_KEYS = [
   'mouse',
   'touch',

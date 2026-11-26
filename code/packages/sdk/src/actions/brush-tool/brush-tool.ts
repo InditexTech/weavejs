@@ -37,6 +37,12 @@ import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { mergeExceptArrays } from '@/utils/utils';
 import { createStabilizer, type BrushStabilizer } from './stages/stabilizer';
 import {
+  createHeadingLock,
+  HEADING_LOCK_THRESHOLD_PX,
+  lockToHeading,
+  type HeadingLock,
+} from './stages/heading-lock';
+import {
   applyEndPolicy,
   applyStartPolicy,
   getRawPressure,
@@ -62,10 +68,13 @@ import {
   type WeaveBrushConfigDocument,
 } from './tunables/config-io';
 import {
+  BRUSH_INSTRUMENT_IDS,
+  getBrushInstrument,
   getBrushScenario,
   resolveBrushLookPatch,
   resolveBrushProfilePatch,
   WeaveBrushPresetRegistry,
+  type WeaveBrushInstrumentId,
   type WeaveBrushScenario,
   type WeaveStrokeLookPatch,
 } from './tunables/presets';
@@ -116,6 +125,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected hasPressureSample = false;
   protected lastPointerPos: { x: number; y: number } | null = null;
   protected lastPointerTime = 0;
+  protected synthLast: { x: number; y: number; time: number } | null = null;
   protected predictedCount = 0;
   protected activeProfile!: WeaveBrushInputProfile;
   protected activeProfileKey: WeaveBrushInputProfileKey = 'mouse';
@@ -131,10 +141,20 @@ export class WeaveBrushToolAction extends WeaveAction {
   };
   /** Scenario applied last, until a profile is changed on its own. */
   protected scenarioId: string | null = null;
+  /** Instrument selected last, `custom` once its settings were changed on their own. */
+  protected instrumentId: WeaveBrushInstrumentId | 'custom' | null = null;
+  /** Properties of the selected instrument, set on every stroke the tool creates. */
+  protected instrumentProps: Record<string, unknown> | null = null;
   /** Pointer that is drawing the stroke in progress. */
   protected strokePointerId: number | null = null;
   /** A pen has been used since the tool was activated. */
   protected penSeen = false;
+  /** Whether Shift was down at the last pointer event. */
+  protected shiftDown = false;
+  /** Pointer type that is drawing the stroke in progress. */
+  protected strokePointerType = '';
+  /** The heading the stroke in progress is locked to, once Shift locked it. */
+  protected headingLock: HeadingLock | null = null;
   /** Last position the pen reported, before any stabilizing. */
   protected lastRawPoint: { x: number; y: number } | null = null;
   protected stabilizer!: BrushStabilizer;
@@ -251,6 +271,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     );
     this.presetIds[key] = 'custom';
     this.scenarioId = null;
+    this.markInstrumentCustom();
 
     return { applied: true, errors: [] };
   }
@@ -266,6 +287,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         'pen.desktop': this.getInputProfile('pen.desktop'),
       },
       look: this.getLook(),
+      ...(this.instrumentId ? { instrument: this.instrumentId } : {}),
     };
   }
 
@@ -293,6 +315,14 @@ export class WeaveBrushToolAction extends WeaveAction {
     if (parsed.look !== undefined) {
       this.look = parsed.look;
     }
+    this.instrumentId = parsed.instrument;
+    const known = parsed.instrument && getBrushInstrument(parsed.instrument);
+    if (known) {
+      this.instrumentProps = { ...known.props };
+      this.props = { ...this.props, ...this.instrumentProps };
+    } else if (parsed.instrument === null) {
+      this.instrumentProps = null;
+    }
     return { applied: true, errors: [] };
   }
 
@@ -309,6 +339,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   setLook(patch: WeaveStrokeLookPatch | null): WeaveBrushSetResult {
     if (patch === null) {
       this.look = null;
+      this.clearInstrument();
       return { applied: true, errors: [] };
     }
 
@@ -318,7 +349,66 @@ export class WeaveBrushToolAction extends WeaveAction {
     }
 
     this.look = mergeData(this.look ?? WEAVE_STROKE_LEGACY_LOOK, patch);
+    this.markInstrumentCustom();
     return { applied: true, errors: [] };
+  }
+
+  /** Instrument selected last, `custom` once changed on its own, or `null`. */
+  getInstrument(): WeaveBrushInstrumentId | 'custom' | null {
+    return this.instrumentId;
+  }
+
+  /**
+   * Selects an instrument: sets the look, the opacity and blend mode of new
+   * strokes and replaces the input profiles it defines. Strokes in progress
+   * and strokes already drawn keep what they have. Nothing changes when the
+   * instrument is unknown.
+   */
+  setInstrument(id: WeaveBrushInstrumentId): WeaveBrushSetResult {
+    const instrument = getBrushInstrument(id, this.props.strokeWidth ?? 1);
+    if (!instrument) {
+      return { applied: false, errors: [`Unknown instrument "${String(id)}"`] };
+    }
+
+    const errors = validateBrushTunablePatch('look', instrument.look);
+    const profiles: Partial<
+      Record<WeaveBrushInputProfileKey, WeaveBrushInputProfile>
+    > = {};
+    for (const [key, patch] of Object.entries(instrument.profiles) as [
+      WeaveBrushInputProfileKey,
+      WeaveBrushInputProfilePatch,
+    ][]) {
+      errors.push(...validateBrushTunablePatch('profile', patch));
+      profiles[key] = resolveBrushProfilePatch(patch);
+    }
+    if (errors.length > 0) {
+      return { applied: false, errors };
+    }
+
+    this.look = resolveBrushLookPatch(instrument.look);
+    Object.assign(this.config.input.profiles, profiles);
+    for (const key of Object.keys(profiles) as WeaveBrushInputProfileKey[]) {
+      this.presetIds[key] = 'custom';
+    }
+    this.scenarioId = null;
+    this.instrumentProps = { ...instrument.props };
+    this.props = { ...this.props, ...this.instrumentProps };
+    this.instrumentId = instrument.id;
+    return { applied: true, errors: [] };
+  }
+
+  /** Instruments that can be selected, in the order they are offered. */
+  getInstruments(): WeaveBrushInstrumentId[] {
+    return [...BRUSH_INSTRUMENT_IDS];
+  }
+
+  private markInstrumentCustom(): void {
+    if (this.instrumentId) this.instrumentId = 'custom';
+  }
+
+  private clearInstrument(): void {
+    this.instrumentId = null;
+    this.instrumentProps = null;
   }
 
   /**
@@ -356,6 +446,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     Object.assign(this.config.input.profiles, profiles);
     this.presetIds = { ...resolved.profiles };
     this.scenarioId = resolved.id;
+    this.clearInstrument();
     this.look = resolveBrushLookPatch(lookPreset.patch);
     return { applied: true, errors: [] };
   }
@@ -408,6 +499,12 @@ export class WeaveBrushToolAction extends WeaveAction {
         set predictedCount(v: number) {
           host().predictedCount = v;
         },
+        get synthLast() {
+          return host().synthLast;
+        },
+        set synthLast(v: { x: number; y: number; time: number } | null) {
+          host().synthLast = v;
+        },
         lastDerivative: 0,
         lastNonZeroPressure: null,
       };
@@ -439,7 +536,8 @@ export class WeaveBrushToolAction extends WeaveAction {
     raw: number,
     clientX: number,
     clientY: number,
-    time?: number
+    time?: number,
+    pointerType?: string
   ): number {
     return smoothPressure(
       this.pressureState,
@@ -447,7 +545,8 @@ export class WeaveBrushToolAction extends WeaveAction {
       raw,
       clientX,
       clientY,
-      this.sampleTime(time)
+      this.sampleTime(time),
+      pointerType
     );
   }
 
@@ -491,7 +590,8 @@ export class WeaveBrushToolAction extends WeaveAction {
       this.getRawPressure(e.evt.pointerType, e.evt.pressure),
       e.evt.clientX,
       e.evt.clientY,
-      e.evt.timeStamp
+      e.evt.timeStamp,
+      e.evt.pointerType
     );
   }
 
@@ -509,7 +609,36 @@ export class WeaveBrushToolAction extends WeaveAction {
     resetPressureState(this.pressureState);
     this.captureState = createCaptureState();
     this.lastRawPoint = null;
+    this.headingLock = null;
     this.stabilizer.reset();
+  }
+
+  /**
+   * Locks a position to one of eight headings while Shift is held, for a mouse
+   * stroke whose profile enables it. Runs before the stabilizer, so the
+   * stabilizer follows the locked line. A predicted position is projected too
+   * but never changes the lock.
+   */
+  private applyShiftLock(
+    point: { x: number; y: number },
+    isPredicted: boolean
+  ): { x: number; y: number } {
+    if (
+      this.activeProfile.capture.shiftLock !== true ||
+      this.strokePointerType !== 'mouse'
+    ) {
+      return point;
+    }
+    if (!this.shiftDown) {
+      if (!isPredicted) this.headingLock = null;
+      return point;
+    }
+
+    const lock = this.headingLock ?? createHeadingLock(this.lastRawPoint ?? point);
+    const zoom = this.instance.getStage().scaleX() || 1;
+    const result = lockToHeading(lock, point, HEADING_LOCK_THRESHOLD_PX / zoom);
+    if (!isPredicted) this.headingLock = result.lock;
+    return result.point;
   }
 
   /**
@@ -535,6 +664,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
   /** Captures the samples of one pointer move into the stroke in progress. */
   private handleMoveEvent(e: Konva.KonvaEventObject<PointerEvent>): void {
+    this.shiftDown = !!e.evt.shiftKey;
   // Samples a pen reports in a batch are smoothed through the same path as
     // any other sample, and the whole burst is applied in one write.
     const deps = {
@@ -542,8 +672,9 @@ export class WeaveBrushToolAction extends WeaveAction {
         raw: number,
         clientX: number,
         clientY: number,
-        time?: number
-      ) => this.smoothPressureSample(raw, clientX, clientY, time),
+        time?: number,
+        pointerType?: string
+      ) => this.smoothPressureSample(raw, clientX, clientY, time, pointerType),
       rawPressure: (
         pointerType: string,
         pressure: unknown,
@@ -638,6 +769,9 @@ export class WeaveBrushToolAction extends WeaveAction {
         this.penActive = true;
         this.penSeen = true;
       }
+
+      this.strokePointerType = e.evt.pointerType;
+      this.shiftDown = !!e.evt.shiftKey;
 
       // The profile is resolved once, here, and kept for the whole stroke.
       this.setActiveProfile(
@@ -1089,10 +1223,12 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     // A captured sample already carries its own position; otherwise it is
     // the stage's current pointer position.
-    const mousePoint =
+    const mousePoint = this.applyShiftLock(
       sample.point ??
-      this.instance.getMousePointerRelativeToContainer(this.measureContainer!)
-        .mousePoint;
+        this.instance.getMousePointerRelativeToContainer(this.measureContainer!)
+          .mousePoint,
+      sample.isPredicted
+    );
 
     // The stabilizer reads time and zoom lazily, so a profile without one
     // costs nothing per sample.
@@ -1391,7 +1527,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.cancelPendingTouch();
     this.penSeen = false;
-    this.props = this.initProps();
+    this.props = { ...this.initProps(), ...this.instrumentProps };
     this.setState(BRUSH_TOOL_STATE.IDLE);
 
     this.instance.emitEvent<WeaveBrushToolActionOnAddingEvent>('onAddingBrush');

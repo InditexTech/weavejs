@@ -5,8 +5,14 @@
 // @vitest-environment node
 
 import { describe, it, expect } from 'vitest';
-import { BRUSH_LEGACY_INPUT_PROFILE } from '../../constants';
-import { WEAVE_STROKE_LEGACY_LOOK } from '@/nodes/stroke/constants';
+import {
+  BRUSH_LEGACY_INPUT_PROFILE,
+  BRUSH_PROFILE_OPTIONAL_DEFAULTS,
+} from '../../constants';
+import {
+  WEAVE_STROKE_LEGACY_LOOK,
+  WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS,
+} from '@/nodes/stroke/constants';
 import {
   BRUSH_LOOK_TUNABLES,
   BRUSH_PROFILE_TUNABLES,
@@ -30,6 +36,29 @@ const valueAt = (obj: Record<string, unknown>, path: string[]) =>
     obj
   );
 
+// The legacy look plus the defaults of the fields that are stored only when set.
+const LOOK_DEFAULTS = {
+  ...WEAVE_STROKE_LEGACY_LOOK,
+  ...WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS,
+  width: {
+    ...WEAVE_STROKE_LEGACY_LOOK.width,
+    ...WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS.width,
+  },
+};
+
+// The legacy profile plus the defaults of the settings that are stored only when set.
+const PROFILE_DEFAULTS = {
+  ...BRUSH_LEGACY_INPUT_PROFILE,
+  capture: {
+    ...BRUSH_LEGACY_INPUT_PROFILE.capture,
+    ...BRUSH_PROFILE_OPTIONAL_DEFAULTS.capture,
+  },
+  pressure: {
+    ...BRUSH_LEGACY_INPUT_PROFILE.pressure,
+    ...BRUSH_PROFILE_OPTIONAL_DEFAULTS.pressure,
+  },
+};
+
 describe('tunable descriptors', () => {
   it('have unique keys per scope', () => {
     for (const list of [BRUSH_PROFILE_TUNABLES, BRUSH_LOOK_TUNABLES]) {
@@ -41,7 +70,7 @@ describe('tunable descriptors', () => {
   it('describe every setting of an input profile', () => {
     const described = new Set(BRUSH_PROFILE_TUNABLES.map((t) => t.key));
     for (const { key } of leaves(
-      BRUSH_LEGACY_INPUT_PROFILE as unknown as Record<string, unknown>
+      PROFILE_DEFAULTS as unknown as Record<string, unknown>
     )) {
       expect(described.has(key), `missing descriptor for profile ${key}`).toBe(true);
     }
@@ -50,7 +79,7 @@ describe('tunable descriptors', () => {
   it('describe every setting of a look except its version', () => {
     const described = new Set(BRUSH_LOOK_TUNABLES.map((t) => t.key));
     for (const { key } of leaves(
-      WEAVE_STROKE_LEGACY_LOOK as unknown as Record<string, unknown>
+      LOOK_DEFAULTS as unknown as Record<string, unknown>
     )) {
       if (key === 'version') continue;
       expect(described.has(key), `missing descriptor for look ${key}`).toBe(true);
@@ -61,8 +90,8 @@ describe('tunable descriptors', () => {
     for (const t of BRUSH_TUNABLES) {
       const source = (
         t.scope === 'profile'
-          ? BRUSH_LEGACY_INPUT_PROFILE
-          : WEAVE_STROKE_LEGACY_LOOK
+          ? PROFILE_DEFAULTS
+          : LOOK_DEFAULTS
       ) as unknown as Record<string, unknown>;
       const value = valueAt(source, t.path);
       if (t.nullable) {
@@ -77,8 +106,8 @@ describe('tunable descriptors', () => {
     for (const t of BRUSH_TUNABLES) {
       const source = (
         t.scope === 'profile'
-          ? BRUSH_LEGACY_INPUT_PROFILE
-          : WEAVE_STROKE_LEGACY_LOOK
+          ? PROFILE_DEFAULTS
+          : LOOK_DEFAULTS
       ) as unknown as Record<string, unknown>;
       const value = valueAt(source, t.path);
       expect(t.default, t.key).toEqual(value === undefined ? null : value);

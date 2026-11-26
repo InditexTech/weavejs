@@ -29,7 +29,8 @@ export type CaptureDeps = {
     raw: number,
     clientX: number,
     clientY: number,
-    time?: number
+    time?: number,
+    pointerType?: string
   ) => number;
   /** Raw pressure a sample reports. */
   rawPressure: (
@@ -69,7 +70,8 @@ export function captureLegacySamples(
       deps.rawPressure(ce.pointerType, ce.pressure),
       ce.clientX,
       ce.clientY,
-      ce.timeStamp
+      ce.timeStamp,
+      ce.pointerType
     ),
     isPredicted: false,
   }));
@@ -130,7 +132,8 @@ export function captureCoalescedSamples(
         deps.rawPressure(ce.pointerType, ce.pressure),
         ce.clientX,
         ce.clientY,
-        ce.timeStamp
+        ce.timeStamp,
+        ce.pointerType
       ),
       point: deps.toContainerPoint(ce.clientX, ce.clientY),
       time: ce.timeStamp,

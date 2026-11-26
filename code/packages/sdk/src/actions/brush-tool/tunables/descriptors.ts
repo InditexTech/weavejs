@@ -48,6 +48,11 @@ export const BRUSH_PROFILE_TUNABLES: WeaveBrushTunable[] = [
     help: 'Event that delivers samples. pointerrawupdate lowers latency where supported.',
     advanced: true,
   }),
+  profile('capture.shiftLock', {
+    stage: 'capture', group: 'Capture', kind: 'capture', type: 'boolean',
+    default: false,
+    help: 'Holding Shift locks a mouse stroke to the nearest of eight headings once the pointer is 16 px from where Shift was pressed. Touch and pen strokes are never locked.',
+  }),
   profile('pressure.zero', {
     stage: 'pressure', group: 'Pressure', kind: 'capture', type: 'enum',
     default: 'legacy', options: ['legacy', 'keep', 'holdLast'],
@@ -95,6 +100,11 @@ export const BRUSH_PROFILE_TUNABLES: WeaveBrushTunable[] = [
     stage: 'pressure', group: 'Pressure', kind: 'capture', type: 'enum',
     default: 'backfill', options: ['backfill', 'none'],
     help: 'Last point: backfill takes the second-to-last pressure, none keeps the lift-off reading.',
+  }),
+  profile('pressure.synth', {
+    stage: 'pressure', group: 'Pressure', kind: 'capture', type: 'enum',
+    default: 'off', options: ['off', 'velocity'],
+    help: 'Where a device that reports no pressure gets it from: off records a constant, velocity derives it from the pointer speed so fast strokes are thinner. A pen keeps its own pressure.',
   }),
   profile('stabilizer.type', {
     stage: 'stabilizer', group: 'Stabilizer', kind: 'capture', type: 'enum',
@@ -219,6 +229,16 @@ export const BRUSH_LOOK_TUNABLES: WeaveBrushTunable[] = [
     default: 'separate', options: ['separate', 'merged'],
     help: 'merged draws the round ends inside the same fill, so translucent colours stay uniform.',
   }),
+  look('ends', {
+    stage: 'ends', group: 'Ends', kind: 'draw', type: 'enum',
+    default: 'round', options: ['round', 'flat'],
+    help: 'round draws a disc at the start and end; flat cuts them square. A one-point stroke is always a disc.',
+  }),
+  look('variance', {
+    stage: 'width', group: 'Width', kind: 'draw', type: 'number',
+    default: 0, min: 0, max: 1, step: 0.01, unit: 'fraction',
+    help: 'Width variation along the stroke, the same for every viewer; 0 for none.',
+  }),
   look('width.min', {
     stage: 'width', group: 'Width', kind: 'draw', type: 'number',
     default: 0, min: 0, max: 1, step: 0.01, unit: 'fraction',
@@ -243,6 +263,21 @@ export const BRUSH_LOOK_TUNABLES: WeaveBrushTunable[] = [
     stage: 'width', group: 'Width', kind: 'draw', type: 'number',
     default: 0, min: 0, max: 200, step: 1, unit: 'px',
     help: 'Distance over which the end narrows; 0 for none.',
+  }),
+  look('width.easing', {
+    stage: 'width', group: 'Width', kind: 'draw', type: 'enum',
+    default: 'easeOut', options: ['linear', 'easeIn', 'easeOut', 'easeInOut'],
+    help: 'Shape of the start and end tapers.',
+  }),
+  look('width.nibAngle', {
+    stage: 'width', group: 'Width', kind: 'draw', type: 'number',
+    default: 0, min: -180, max: 180, step: 1,
+    help: 'Angle of the nib in degrees; the stroke is widest when travelling across it.',
+  }),
+  look('width.nibContrast', {
+    stage: 'width', group: 'Width', kind: 'draw', type: 'number',
+    default: 0, min: 0, max: 1, step: 0.01, unit: 'fraction',
+    help: 'How much narrower the stroke is when travelling along the nib; 0 for a round nib.',
   }),
 ];
 

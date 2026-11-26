@@ -45,6 +45,10 @@ export type WeaveStrokeLook = {
   edgePx: number;
   /** `separate` draws round ends over the fill, `merged` inside the same fill. */
   caps: 'separate' | 'merged';
+  /** Shape of the start and end of the stroke: round discs or cut square. Default `round`. */
+  ends?: 'round' | 'flat';
+  /** Width variation along the stroke, 0 (none) to 1, seeded from the stroke id. Default 0. */
+  variance?: number;
   width: {
     /** Width, as a fraction of the stroke width, at pressure 0. */
     min: number;
@@ -56,5 +60,11 @@ export type WeaveStrokeLook = {
     taperStart: number;
     /** Distance over which the end narrows, 0 for none. */
     taperEnd: number;
+    /** Shape of the tapers. Default `easeOut`. */
+    easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
+    /** Angle of the nib, in degrees from the x axis; used with `nibContrast`. Default 0. */
+    nibAngle?: number;
+    /** How much narrower the stroke is when travelling along the nib, 0 (none) to 1. Default 0. */
+    nibContrast?: number;
   };
 };

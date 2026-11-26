@@ -74,6 +74,7 @@ These settings live in an input profile, see xref:sdk:api-reference/actions/brus
 | mono:[capture.minMovePx] | 0 to 3 | mono:[0] | px | capture | Samples closer than this to the last recorded one are skipped.
 | mono:[capture.predicted] | off \| tail | mono:[tail] |  | capture | Draw the browser-predicted tail ahead of the pen to hide latency.
 | mono:[capture.event] | pointermove \| pointerrawupdate | mono:[pointermove] |  | capture | Event that delivers samples. pointerrawupdate lowers latency where supported. (advanced)
+| mono:[capture.shiftLock] | true \| false | mono:[false] |  | capture | Holding Shift locks a mouse stroke to the nearest of eight headings once the pointer is 16 px from where Shift was pressed. Touch and pen strokes are never locked.
 | mono:[pressure.zero] | legacy \| keep \| holdLast | mono:[legacy] |  | capture | How a pen pressure of 0 is treated: legacy replaces it with 0.5, keep records it, holdLast repeats the last non-zero value.
 | mono:[pressure.filter] | legacy \| timeEma \| oneEuro \| none | mono:[legacy] |  | capture | Pressure smoothing: the legacy velocity-adaptive filter, a time-based one, the One Euro filter, or none.
 | mono:[pressure.timeConstantMs] | 1 to 500 | mono:[40] | ms | capture | Time constant of the timeEma filter; larger is smoother and slower.
@@ -83,6 +84,7 @@ These settings live in an input profile, see xref:sdk:api-reference/actions/brus
 | mono:[pressure.start] | backfill \| average \| none | mono:[backfill] |  | capture | First point: backfill takes the next real sample, average takes the mean of the first movement readings, none keeps the contact reading.
 | mono:[pressure.startSamples] | 1 to 10 (whole) | mono:[3] | count | capture | Number of readings averaged by the average start policy. (advanced)
 | mono:[pressure.end] | backfill \| none | mono:[backfill] |  | capture | Last point: backfill takes the second-to-last pressure, none keeps the lift-off reading.
+| mono:[pressure.synth] | off \| velocity | mono:[off] |  | capture | Where a device that reports no pressure gets it from: off records a constant, velocity derives it from the pointer speed so fast strokes are thinner. A pen keeps its own pressure.
 | mono:[stabilizer.type] | none \| oneEuro \| pulledString \| streamline | mono:[none] |  | capture | Smooths the pen position while drawing.
 | mono:[stabilizer.minCutoff] | 0.1 to 20 | mono:[3] | Hz | capture | One Euro minimum cutoff: lower removes more jitter at slow speed.
 | mono:[stabilizer.beta] | 0 to 1 | mono:[0.01] |  | capture | One Euro speed coefficient: higher removes more lag at high speed.
@@ -117,11 +119,16 @@ These settings live in the look saved with each stroke.
 | mono:[spacingPx] | 0.5 to 10 | mono:[2] | px | draw | Minimum spacing between control points. (advanced)
 | mono:[edgePx] | 0.25 to 5 | mono:[1] | px | draw | Detail of the curve. The centripetal curve keeps every edge within a tenth of this of the true curve; the uniform curve uses it as the target length of an edge. (advanced)
 | mono:[caps] | separate \| merged | mono:[separate] |  | draw | merged draws the round ends inside the same fill, so translucent colours stay uniform.
+| mono:[ends] | round \| flat | mono:[round] |  | draw | round draws a disc at the start and end; flat cuts them square. A one-point stroke is always a disc.
+| mono:[variance] | 0 to 1 | mono:[0] | fraction | draw | Width variation along the stroke, the same for every viewer; 0 for none.
 | mono:[width.min] | 0 to 1 | mono:[0] | fraction | draw | Width at pressure 0, as a fraction of the stroke width.
 | mono:[width.max] | 0 to 1 | mono:[1] | fraction | draw | Width at pressure 1, as a fraction of the stroke width.
 | mono:[width.gamma] | 0.2 to 3 | mono:[1] |  | draw | Response curve: below 1 reacts faster to light pressure, above 1 needs a firmer press.
 | mono:[width.taperStart] | 0 to 200 | mono:[0] | px | draw | Distance over which the start narrows; 0 for none.
 | mono:[width.taperEnd] | 0 to 200 | mono:[0] | px | draw | Distance over which the end narrows; 0 for none.
+| mono:[width.easing] | linear \| easeIn \| easeOut \| easeInOut | mono:[easeOut] |  | draw | Shape of the start and end tapers.
+| mono:[width.nibAngle] | -180 to 180 | mono:[0] |  | draw | Angle of the nib in degrees; the stroke is widest when travelling across it.
+| mono:[width.nibContrast] | 0 to 1 | mono:[0] | fraction | draw | How much narrower the stroke is when travelling along the nib; 0 for a round nib.
 |===
 
 == Factory presets

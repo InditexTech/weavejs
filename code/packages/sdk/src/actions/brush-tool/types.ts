@@ -29,6 +29,11 @@ export type WeaveBrushCaptureConfig = {
   predicted: 'off' | 'tail';
   /** Event used to read samples. */
   event: 'pointermove' | 'pointerrawupdate';
+  /**
+   * Holding Shift locks a mouse stroke to the nearest of eight headings.
+   * Touch and pen strokes are never locked. Default `false`.
+   */
+  shiftLock?: boolean;
 };
 
 export type WeaveBrushPressureConfig = {
@@ -47,6 +52,12 @@ export type WeaveBrushPressureConfig = {
   startSamples: number;
   /** How the last point's pressure is chosen. */
   end: 'backfill' | 'none';
+  /**
+   * Where a device that reports no pressure gets it from. `velocity` derives
+   * it from the pointer speed in screen px/ms. A pen is never affected.
+   * Default `off`.
+   */
+  synth?: 'off' | 'velocity';
 };
 
 export type WeaveBrushStabilizerConfig = {

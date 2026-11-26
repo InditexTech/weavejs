@@ -315,6 +315,226 @@ const RAW_SCENARIOS: WeaveBrushScenario[] = [
   },
 ];
 
+/**
+ * A named pen: the look, node properties and input-profile settings applied
+ * together by `setInstrument`. Applying one replaces the look and the listed
+ * profiles with the legacy ones plus the instrument's changes, so the result
+ * never depends on the instrument selected before.
+ */
+export type WeaveBrushInstrument = {
+  id: WeaveBrushInstrumentId;
+  label: string;
+  description: string;
+  look: WeaveStrokeLookPatch;
+  /** Properties set on the strokes the tool creates. */
+  props: { opacity: number; globalCompositeOperation: string };
+  /** Profiles the instrument replaces; the others are left as they are. */
+  profiles: Partial<
+    Record<WeaveBrushInputProfileKey, WeaveBrushInputProfilePatch>
+  >;
+};
+
+export type WeaveBrushInstrumentId =
+  | 'pencil'
+  | 'pen'
+  | 'brush'
+  | 'fountainPen'
+  | 'fineliner'
+  | 'marker'
+  | 'highlighter';
+
+const INSTRUMENT_BASE_LOOK: WeaveStrokeLookPatch = {
+  outline: 'round',
+  curve: 'centripetal',
+  pressureInterp: 'linear',
+  zoomAware: true,
+};
+
+const NORMAL_PROPS = { opacity: 1, globalCompositeOperation: 'source-over' };
+
+// Speed gives a mouse or a finger the width a pen would get from its pressure.
+// Event time keeps the speed right when the browser batches samples.
+const speedWidth = (
+  patch: WeaveBrushInputProfilePatch
+): WeaveBrushInputProfilePatch =>
+  mergeData(
+    {
+      capture: { source: 'coalesced', clock: 'event' },
+      pressure: { synth: 'velocity', filter: 'timeEma', timeConstantMs: 40 },
+    } as WeaveBrushInputProfile,
+    patch
+  ) as WeaveBrushInputProfilePatch;
+
+/** The profile of a mouse with the Shift lock on: pens draw straight lines when asked. */
+const withShiftLock = (
+  patch: WeaveBrushInputProfilePatch
+): WeaveBrushInputProfilePatch =>
+  mergeData(patch as WeaveBrushInputProfile, {
+    capture: { shiftLock: true },
+  }) as WeaveBrushInputProfilePatch;
+
+const PENCIL_PROFILE = speedWidth({
+  stabilizer: { type: 'streamline', amount: 0.15, zoomAware: true },
+  finalize: { mode: 'dpPressure', toleranceUnit: 'screen', tolerance: 0.8 },
+});
+
+const PEN_PROFILE = speedWidth({
+  stabilizer: { type: 'oneEuro', minCutoff: 4, beta: 0.04, zoomAware: true },
+  finalize: {
+    mode: 'bezierFit',
+    toleranceUnit: 'screen',
+    tolerance: 1.5,
+    resampleSpacingPx: 6,
+  },
+});
+
+const BRUSH_PROFILE = speedWidth({
+  stabilizer: { type: 'streamline', amount: 0.25, zoomAware: true },
+  finalize: {
+    mode: 'bezierFit',
+    toleranceUnit: 'screen',
+    tolerance: 1.2,
+    resampleSpacingPx: 5,
+  },
+});
+
+const MARKER_PROFILE = speedWidth({
+  finalize: { mode: 'dpPressure', toleranceUnit: 'screen', tolerance: 0.8 },
+});
+
+/** A distance as a number of stroke widths, kept inside the range a taper accepts. */
+const widths = (strokeWidth: number, count: number, min = 2) =>
+  Math.min(200, Math.max(min, count * strokeWidth));
+
+/**
+ * The instruments for a stroke width. Distances along the stroke, such as the
+ * tapers, are given in stroke widths so a thick pen tapers over a longer way
+ * than a thin one.
+ */
+export function createBrushInstruments(
+  strokeWidth: number
+): WeaveBrushInstrument[] {
+  return [
+    {
+      id: 'pencil',
+      label: 'Pencil',
+      description:
+        'A thin line that gets thinner the faster it is drawn, keeping the pressure of a pen.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'round',
+        width: { min: 0.25, max: 0.9, gamma: 1.2 },
+      },
+      props: NORMAL_PROPS,
+      profiles: { mouse: withShiftLock(PENCIL_PROFILE), touch: PENCIL_PROFILE },
+    },
+    {
+      id: 'pen',
+      label: 'Pen',
+      description:
+        'A smooth line of changing width with a tapered end, fitted to a curve when the stroke ends.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'round',
+        width: { min: 0.4, max: 1, taperEnd: 12 },
+      },
+      props: NORMAL_PROPS,
+      profiles: { mouse: withShiftLock(PEN_PROFILE), touch: PEN_PROFILE },
+    },
+    {
+      id: 'fountainPen',
+      label: 'Fountain pen',
+      description:
+        'A line whose width follows the angle between its direction and a fixed nib: thick across the nib, thin along it.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'round',
+        width: {
+          min: 0.6,
+          max: 1,
+          nibAngle: -45,
+          nibContrast: 0.7,
+          taperEnd: widths(strokeWidth, 1.5),
+        },
+      },
+      props: NORMAL_PROPS,
+      profiles: { mouse: withShiftLock(PEN_PROFILE), touch: PEN_PROFILE },
+    },
+    {
+      id: 'brush',
+      label: 'Brush',
+      description:
+        'A soft line that swells and tapers at both ends and varies a little along the way.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'round',
+        variance: 0.25,
+        width: {
+          min: 0.15,
+          max: 1,
+          gamma: 0.8,
+          taperStart: widths(strokeWidth, 1.5),
+          taperEnd: widths(strokeWidth, 3),
+          easing: 'easeInOut',
+        },
+      },
+      props: NORMAL_PROPS,
+      profiles: { mouse: withShiftLock(BRUSH_PROFILE), touch: BRUSH_PROFILE },
+    },
+    {
+      id: 'fineliner',
+      label: 'Fineliner',
+      description: 'A thin line of constant width with round ends.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'round',
+        width: { min: 0.5, max: 0.5 },
+      },
+      props: NORMAL_PROPS,
+      profiles: { mouse: withShiftLock({}), touch: {} },
+    },
+    {
+      id: 'marker',
+      label: 'Marker',
+      description:
+        'A broad line with flat ends that thins by 12% at speed, finished with dpPressure.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'flat',
+        width: { min: 0.88, max: 1 },
+      },
+      props: NORMAL_PROPS,
+      profiles: { mouse: withShiftLock(MARKER_PROFILE), touch: MARKER_PROFILE },
+    },
+    {
+      id: 'highlighter',
+      label: 'Highlighter',
+      description:
+        'A broad translucent line of constant width with flat ends that darkens what it crosses.',
+      look: {
+        ...INSTRUMENT_BASE_LOOK,
+        ends: 'flat',
+        width: { min: 1, max: 1 },
+      },
+      props: { opacity: 0.75, globalCompositeOperation: 'multiply' },
+      profiles: { mouse: withShiftLock({}), touch: {} },
+    },
+  ];
+}
+
+/** The instruments for a stroke width of 1, in the order they are offered. Read-only. */
+export const BRUSH_INSTRUMENTS = deepFreeze(createBrushInstruments(1));
+
+/** The ids of the instruments, in the order they are offered. */
+export const BRUSH_INSTRUMENT_IDS = BRUSH_INSTRUMENTS.map((i) => i.id);
+
+export function getBrushInstrument(
+  id: string,
+  strokeWidth = 1
+): WeaveBrushInstrument | undefined {
+  return createBrushInstruments(strokeWidth).find((i) => i.id === id);
+}
+
 /** Factory profile presets per profile. Read-only. */
 export const BRUSH_PROFILE_PRESETS = deepFreeze(RAW_PROFILE_PRESETS);
 /** Factory look presets. Read-only. */
