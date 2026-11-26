@@ -77,6 +77,9 @@ export function thinRoundPoints(pts: RoundPoint[]): RoundPoint[] {
   return out;
 }
 
+/** How the start and end of a stroke are drawn. */
+export type RoundEnds = 'round' | 'flat';
+
 /** Largest gap, in screen pixels, a skipped disc may leave on the outer side of a bend. */
 const MAX_WEDGE_PX = 0.1;
 
@@ -92,12 +95,20 @@ const angleDiff = (a: number, b: number) => {
  * wedge on the outside of the bend. Where the turn is so slight that the
  * wedge would be thinner than a tenth of a screen pixel the disc is skipped,
  * which removes most arcs of a smooth stroke and makes it far cheaper to fill.
+ * With `flat` ends the first and last points get no disc of their own, unless
+ * the stroke is a single point.
  */
-function pointsNeedingDisc(pts: RoundPoint[], scale: number): boolean[] {
+function pointsNeedingDisc(
+  pts: RoundPoint[],
+  scale: number,
+  ends: RoundEnds
+): boolean[] {
   const need = new Array<boolean>(pts.length).fill(false);
   if (pts.length === 0) return need;
-  need[0] = true;
-  need[pts.length - 1] = true;
+  if (ends === 'round' || pts.length < 2) {
+    need[0] = true;
+    need[pts.length - 1] = true;
+  }
 
   // per segment i (pts[i-1] -> pts[i]): direction, outline lean, and validity
   const dir: number[] = [0];
@@ -137,15 +148,17 @@ function pointsNeedingDisc(pts: RoundPoint[], scale: number): boolean[] {
  * Appends the outline of a variable-width stroke to the current path: a disc at
  * every point and, between neighbours, the quad bounded by their two external
  * tangents. Every sub-path has the same winding, so a single non-zero fill is
- * the exact union: turns, reversals and ends are round by construction.
+ * the exact union: turns, reversals and ends are round by construction, unless
+ * `ends` is `flat`, which cuts the start and end square.
  */
 export function appendRoundPath(
   ctx: PathContext,
   points: RoundPoint[],
-  scale = 1
+  scale = 1,
+  ends: RoundEnds = 'round'
 ): void {
   const pts = thinRoundPoints(points);
-  const need = pointsNeedingDisc(pts, scale);
+  const need = pointsNeedingDisc(pts, scale, ends);
 
   // every sub-path gets the same winding, so one non-zero fill is the union
   const polygon = (v: number[][]) => {
@@ -299,12 +312,13 @@ export function drawRoundOutline(
   points: RoundPoint[],
   color: string | CanvasGradient,
   dash: number[] = [],
-  scale = 1
+  scale = 1,
+  ends: RoundEnds = 'round'
 ): void {
   for (const run of splitRoundRuns(points, dash)) {
     ctx.beginPath();
     ctx.fillStyle = color;
-    appendRoundPath(ctx, run, scale);
+    appendRoundPath(ctx, run, scale, ends);
     ctx.fill();
   }
 }

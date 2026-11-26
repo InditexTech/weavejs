@@ -11,6 +11,7 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import {
+  WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS,
   WEAVE_STROKE_NODE_DEFAULT_CONFIG,
   WEAVE_STROKE_NODE_TYPE,
 } from './constants';
@@ -24,7 +25,13 @@ import type {
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { mergeExceptArrays } from '@/utils/utils';
 import { getCentripetalPoints } from './render/curve';
-import { halfWidthAt, readStrokeLook } from './render/look';
+import { halfWidthAt, readStrokeLook, type WidthContext } from './render/look';
+import {
+  arcLengths,
+  headingsAlong,
+  strokeSeed,
+  variationAt,
+} from './render/width-context';
 import { drawRoundOutline } from './render/round-outline';
 
 export class WeaveStrokeNode extends WeaveNode {
@@ -39,6 +46,20 @@ export class WeaveStrokeNode extends WeaveNode {
    * vertices without changing any pixel.
    */
   private static readonly SPLINE_FLATNESS_EPSILON = 0.08;
+
+  /** Variance changes over this many stroke widths, and over at least this many canvas units. */
+  private static readonly VARIANCE_WAVELENGTH = 3;
+  private static readonly VARIANCE_WAVELENGTH_MIN = 6;
+  /** Distance, in canvas units, over which the direction of travel is read for a nib, at least. */
+  private static readonly NIB_WINDOW_MIN = 4;
+
+  private readonly lookGeometryCache = new WeakMap<
+    WeaveStrokePoint[],
+    {
+      key: string;
+      geometry: { centerline: WeaveStrokePoint[]; halfWidths: number[] };
+    }
+  >();
 
   constructor(params?: WeaveStrokeNodeParams) {
     super();
@@ -475,6 +496,75 @@ export class WeaveStrokeNode extends WeaveNode {
   }
 
   /**
+   * The centerline of a stroke with a look and the half-width at each of its
+   * points. Pans redraw a stroke with the same points, look and zoom over and
+   * over, so the last result of each stroke is kept and reused: widths do not
+   * depend on where the stroke is, only on its points, look, id and, when the
+   * look follows the zoom, the zoom.
+   */
+  private lookGeometry(
+    shape: Konva.Shape,
+    look: WeaveStrokeLook,
+    pts: WeaveStrokePoint[],
+    baseW: number,
+    scale: number
+  ): { centerline: WeaveStrokePoint[]; halfWidths: number[] } {
+    const seed = strokeSeed(shape.getAttrs().id);
+    const key = JSON.stringify([
+      look,
+      baseW,
+      look.zoomAware ? scale : 0,
+      seed,
+      pts.length,
+      pts.at(-1),
+    ]);
+    const cached = this.lookGeometryCache.get(pts);
+    if (cached && cached.key === key) return cached.geometry;
+
+    const centerline = this.buildLookCenterline(look, scale, pts);
+
+    // distance along the stroke, in the unit the tapers are given in
+    const unit = look.zoomAware ? scale : 1;
+    const canvasAlong = arcLengths(centerline);
+    const along = unit === 1 ? canvasAlong : canvasAlong.map((d) => d * unit);
+    const total = along.at(-1)!;
+
+    const variance = look.variance ?? 0;
+    const nibbed = (look.width.nibContrast ?? 0) > 0;
+    const headings = nibbed
+      ? headingsAlong(
+          centerline,
+          canvasAlong,
+          Math.max(2 * baseW, WeaveStrokeNode.NIB_WINDOW_MIN)
+        )
+      : null;
+    const wavelength = Math.max(
+      WeaveStrokeNode.VARIANCE_WAVELENGTH * baseW,
+      WeaveStrokeNode.VARIANCE_WAVELENGTH_MIN
+    );
+
+    const halfWidths = centerline.map((p, i) => {
+      const context: WidthContext = {};
+      if (variance > 0) {
+        context.variation = variationAt(seed, canvasAlong[i], wavelength);
+      }
+      if (headings) context.heading = headings[i];
+      return halfWidthAt(
+        look,
+        baseW,
+        p.pressure,
+        along[i],
+        total - along[i],
+        context
+      );
+    });
+
+    const geometry = { centerline, halfWidths };
+    this.lookGeometryCache.set(pts, { key, geometry });
+    return geometry;
+  }
+
+  /**
    * Draws a stroke that has a look: the centerline is built with the look's
    * curve, spacing and detail, widths follow its width rule, and the outline is
    * the legacy ribbon or the round one.
@@ -492,7 +582,12 @@ export class WeaveStrokeNode extends WeaveNode {
 
     if (pts.length < 2) {
       const pt = pts[0];
-      const r = halfWidthAt(look, baseW, pt.pressure, Infinity, Infinity);
+      const r = halfWidthAt(look, baseW, pt.pressure, Infinity, Infinity, {
+        variation:
+          (look.variance ?? 0) > 0
+            ? variationAt(strokeSeed(shape.getAttrs().id), 0, 1)
+            : undefined,
+      });
       ctx.beginPath();
       ctx.fillStyle = color;
       ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
@@ -501,30 +596,19 @@ export class WeaveStrokeNode extends WeaveNode {
     }
 
     const scale = this.screenScale(shape);
-    const centerline = this.buildLookCenterline(look, scale, pts);
-
-    // distance along the stroke, in the unit the tapers are given in
-    const unit = look.zoomAware ? scale : 1;
-    const along: number[] = [0];
-    for (let i = 1; i < centerline.length; i++) {
-      along.push(
-        along[i - 1] +
-          Math.hypot(
-            centerline[i].x - centerline[i - 1].x,
-            centerline[i].y - centerline[i - 1].y
-          ) *
-            unit
-      );
-    }
-    const total = along.at(-1)!;
-    const halfWidth = (i: number, p: WeaveStrokePoint) =>
-      halfWidthAt(look, baseW, p.pressure, along[i], total - along[i]);
+    const { centerline, halfWidths } = this.lookGeometry(
+      shape,
+      look,
+      pts,
+      baseW,
+      scale
+    );
 
     if (look.outline === 'legacy') {
       this.drawCenterlineRibbon(
         ctx,
         centerline,
-        halfWidth,
+        (i) => halfWidths[i],
         color,
         dash,
         look.caps === 'merged'
@@ -535,10 +619,11 @@ export class WeaveStrokeNode extends WeaveNode {
     // `round`, and `freehand` until it has an outline of its own
     drawRoundOutline(
       ctx,
-      centerline.map((p, i) => ({ x: p.x, y: p.y, r: halfWidth(i, p) })),
+      centerline.map((p, i) => ({ x: p.x, y: p.y, r: halfWidths[i] })),
       color,
       dash,
-      scale
+      scale,
+      look.ends ?? WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS.ends
     );
   }
 

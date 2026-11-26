@@ -140,3 +140,108 @@ describe('halfWidthAt', () => {
     );
   });
 });
+
+describe('readStrokeLook fields added after the first release', () => {
+  it('leaves them out of a look that does not have them', () => {
+    const look = readStrokeLook({ version: 1, outline: 'round' })!;
+    expect(look).not.toHaveProperty('ends');
+    expect(look).not.toHaveProperty('variance');
+    expect(look.width).not.toHaveProperty('easing');
+    expect(look.width).not.toHaveProperty('nibAngle');
+    expect(look.width).not.toHaveProperty('nibContrast');
+  });
+
+  it('reads valid values', () => {
+    const look = readStrokeLook({
+      version: 1,
+      ends: 'flat',
+      variance: 0.4,
+      width: { easing: 'easeInOut', nibAngle: 30, nibContrast: 0.6 },
+    })!;
+    expect(look.ends).toBe('flat');
+    expect(look.variance).toBe(0.4);
+    expect(look.width.easing).toBe('easeInOut');
+    expect(look.width.nibAngle).toBe(30);
+    expect(look.width.nibContrast).toBe(0.6);
+  });
+
+  it('clamps numbers and drops invalid values', () => {
+    const look = readStrokeLook({
+      version: 1,
+      ends: 'pointy',
+      variance: 5,
+      width: { easing: 'bounce', nibAngle: 900, nibContrast: -2 },
+    })!;
+    expect(look).not.toHaveProperty('ends');
+    expect(look.variance).toBe(1);
+    expect(look.width).not.toHaveProperty('easing');
+    expect(look.width.nibAngle).toBe(180);
+    expect(look.width.nibContrast).toBe(0);
+  });
+
+  it('ignores non-numeric values', () => {
+    const look = readStrokeLook({ version: 1, variance: 'high' })!;
+    expect(look).not.toHaveProperty('variance');
+  });
+});
+
+describe('halfWidthAt easing, variance and nib', () => {
+  const base = { ...WEAVE_STROKE_LEGACY_LOOK };
+  const tapered = (extra = {}) => ({
+    ...base,
+    width: { ...base.width, taperStart: 10, ...extra },
+  });
+  const at = (look: typeof base, from: number, context?: object) =>
+    halfWidthAt(look, 20, 1, from, Infinity, context);
+
+  it('easeOut is the default taper shape', () => {
+    expect(at(tapered(), 5)).toBe(at(tapered({ easing: 'easeOut' }), 5));
+  });
+
+  it('shapes the taper with the chosen easing', () => {
+    const linear = at(tapered({ easing: 'linear' }), 2.5);
+    const easeIn = at(tapered({ easing: 'easeIn' }), 2.5);
+    const easeOut = at(tapered({ easing: 'easeOut' }), 2.5);
+    expect(easeIn).toBeLessThan(linear);
+    expect(linear).toBeLessThan(easeOut);
+    expect(at(tapered({ easing: 'easeInOut' }), 5)).toBeCloseTo(10 * 0.5, 6);
+    for (const easing of ['linear', 'easeIn', 'easeOut', 'easeInOut']) {
+      expect(at(tapered({ easing }), 10)).toBeCloseTo(10, 6);
+    }
+  });
+
+  it('adds nothing at variance 0 or without a context', () => {
+    expect(at({ ...base, variance: 0 }, Infinity, { variation: 1 })).toBe(10);
+    expect(at({ ...base, variance: 1 }, Infinity)).toBe(10);
+  });
+
+  it('widens and narrows with the variation', () => {
+    const look = { ...base, variance: 1 };
+    expect(at(look, Infinity, { variation: 1 })).toBeCloseTo(15, 6);
+    expect(at(look, Infinity, { variation: -1 })).toBeCloseTo(5, 6);
+    expect(at({ ...base, variance: 0.5 }, Infinity, { variation: 1 })).toBeCloseTo(12.5, 6);
+  });
+
+  it('is widest across the nib and narrowest along it', () => {
+    const look = { ...base, width: { ...base.width, nibAngle: 0, nibContrast: 0.6 } };
+    const along = at(look, Infinity, { heading: 0 });
+    const across = at(look, Infinity, { heading: Math.PI / 2 });
+    expect(across).toBeCloseTo(10, 6);
+    expect(along).toBeCloseTo(10 * 0.4, 6);
+  });
+
+  it('turns the nib with its angle', () => {
+    const look = { ...base, width: { ...base.width, nibAngle: 45, nibContrast: 0.5 } };
+    expect(at(look, Infinity, { heading: Math.PI / 4 })).toBeCloseTo(5, 6);
+    expect(at(look, Infinity, { heading: (3 * Math.PI) / 4 })).toBeCloseTo(10, 6);
+  });
+
+  it('ignores the heading without a nib contrast', () => {
+    expect(at(base, Infinity, { heading: 1 })).toBe(10);
+  });
+
+  it('never goes below the minimum width', () => {
+    const look = { ...base, variance: 1, width: { ...base.width, nibContrast: 1 } };
+    expect(at(look, Infinity, { variation: -1, heading: 0 })).toBe(MIN_HALF_WIDTH);
+  });
+});

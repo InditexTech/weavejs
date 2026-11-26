@@ -19,6 +19,8 @@ export type PressureState = {
   lastDerivative: number;
   /** Last non-zero pressure a pen reported, for the `holdLast` zero policy. */
   lastNonZeroPressure: number | null;
+  /** Last position and time seen by the velocity synthesis. */
+  synthLast: { x: number; y: number; time: number } | null;
 };
 
 /** Time assumed between two samples whose times do not advance, in ms. */
@@ -33,6 +35,7 @@ export function createPressureState(): PressureState {
     predictedCount: 0,
     lastDerivative: 0,
     lastNonZeroPressure: null,
+    synthLast: null,
   };
 }
 
@@ -44,6 +47,7 @@ export function resetPressureState(state: PressureState): void {
   state.predictedCount = 0;
   state.lastDerivative = 0;
   state.lastNonZeroPressure = null;
+  state.synthLast = null;
 }
 
 /**
@@ -198,16 +202,57 @@ function smoothOneEuro(
   return Math.max(state.lastSmoothedPressure, cfg.floor);
 }
 
-/** Smooths one raw pressure sample with the filter selected by the profile. */
+/** Speed, in screen px/ms, at which the synthesised pressure falls to 1/e. */
+const SYNTH_SPEED_SCALE = 1.5;
+
+/** Pressure synthesised while no speed is known yet, at the first sample. */
+const SYNTH_NEUTRAL_PRESSURE = 0.5;
+
+/**
+ * Pressure for a device that reports none: it falls as the pointer speeds up,
+ * so a fast stroke is thinner than a slow one. The speed is measured between
+ * client positions, in screen pixels, so it does not depend on the zoom.
+ */
+export function synthesizeVelocityPressure(
+  state: PressureState,
+  clientX: number,
+  clientY: number,
+  now: number
+): number {
+  if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) {
+    return state.lastSmoothedPressure;
+  }
+  const last = state.synthLast;
+  state.synthLast = { x: clientX, y: clientY, time: now };
+  if (!last) return SYNTH_NEUTRAL_PRESSURE;
+
+  const dt = now - last.time;
+  const ms = dt > 0 ? dt : NOMINAL_SAMPLE_INTERVAL_MS;
+  const speed = Math.hypot(clientX - last.x, clientY - last.y) / ms;
+  return Math.exp(-speed / SYNTH_SPEED_SCALE);
+}
+
+/**
+ * Smooths one raw pressure sample with the filter selected by the profile.
+ * With `synth: 'velocity'` a device that is not a pen has its pressure
+ * synthesised from the pointer speed first; a pen keeps its own.
+ */
 export function smoothPressure(
   state: PressureState,
   cfg: WeaveBrushPressureConfig,
   raw: number,
   clientX: number,
   clientY: number,
-  now: number
+  now: number,
+  pointerType?: string
 ): number {
-  const safeRaw = Number.isFinite(raw) ? raw : 0.5;
+  const synthesized =
+    cfg.synth === 'velocity' && pointerType !== 'pen'
+      ? synthesizeVelocityPressure(state, clientX, clientY, now)
+      : undefined;
+  const safeRaw = Number.isFinite(synthesized ?? raw)
+    ? (synthesized ?? raw)
+    : 0.5;
 
   switch (cfg.filter) {
     case 'timeEma':
@@ -220,7 +265,7 @@ export function smoothPressure(
       state.lastPointerTime = now;
       return Math.max(safeRaw, cfg.floor);
     default:
-      return smoothLegacy(state, cfg, raw, clientX, clientY, now);
+      return smoothLegacy(state, cfg, safeRaw, clientX, clientY, now);
   }
 }
 

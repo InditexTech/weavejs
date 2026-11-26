@@ -22,6 +22,16 @@ export const WEAVE_STROKE_LEGACY_LOOK: WeaveStrokeLook = {
   width: { min: 0, max: 1, gamma: 1, taperStart: 0, taperEnd: 0 },
 };
 
+/**
+ * Defaults of the look fields that are stored only when set. A look without
+ * them is drawn with these values, so it renders as in releases before them.
+ */
+export const WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS = {
+  ends: 'round',
+  variance: 0,
+  width: { easing: 'easeOut', nibAngle: 0, nibContrast: 0 },
+} as const;
+
 export const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
   // MINIMUM subdivisions per curved spline span. Live-drawn strokes have
   // control points ~1-2px apart, where this floor is what applies, so their

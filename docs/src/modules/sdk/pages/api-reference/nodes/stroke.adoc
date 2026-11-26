@@ -116,7 +116,18 @@ type WeaveStrokeLook = {
   spacingPx: number;
   edgePx: number;
   caps: 'separate' | 'merged';
-  width: { min: number; max: number; gamma: number; taperStart: number; taperEnd: number };
+  ends?: 'round' | 'flat';
+  variance?: number;
+  width: {
+    min: number;
+    max: number;
+    gamma: number;
+    taperStart: number;
+    taperEnd: number;
+    easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
+    nibAngle?: number;
+    nibContrast?: number;
+  };
 };
 ----
 
@@ -131,8 +142,20 @@ Missing or invalid fields fall back to the legacy values, and numbers are clampe
 | mono:[pressureInterp] | mono:[linear] never leaves the range of the two neighbouring pressures. mono:[catmullRom] is smooth and clamped to that range.
 | mono:[zoomAware] | Spacing and subdivision are in screen pixels, so no facet shows at high zoom. Tapers are measured in screen pixels too.
 | mono:[caps] | With the mono:[legacy] outline, mono:[separate] draws the round ends over the fill, as before. mono:[merged] puts them in the same fill, so a translucent colour is not darker at the ends.
-| mono:[width] | Half-width is the stroke width times a fraction between mono:[min] and mono:[max], following pressure raised to mono:[gamma], narrowing over mono:[taperStart] and mono:[taperEnd]. The defaults reproduce the earlier width.
+| mono:[ends] | Optional, mono:[round] by default. With the mono:[round] outline, mono:[flat] draws no disc at the start and end, so they are cut square; a stroke of a single point, or of a single dash, is still a disc. A viewer from a release that does not know the field draws round ends.
+| mono:[variance] | Optional, from `0` (none, the default) to `1`. Varies the width smoothly along the stroke, by up to half of it at `1`. The variation depends only on the id of the stroke and the distance along it, so every viewer, every redraw and every zoom level draws the same widths. The preview shown while a stroke is finished and the saved stroke use the same seed. A viewer from a release that does not know the field draws a constant width.
+| mono:[width] | Half-width is the stroke width times a fraction between mono:[min] and mono:[max], following pressure raised to mono:[gamma], narrowing over mono:[taperStart] and mono:[taperEnd] with the shape of mono:[width.easing] (mono:[linear], mono:[easeIn], mono:[easeOut], the default, or mono:[easeInOut]). The defaults reproduce the earlier width.
 |===
+
+=== Nib
+
+A look can give the stroke a flat nib, like a calligraphy or fountain pen, with mono:[width.nibAngle] (in degrees, from `-180` to `180`, `0` by default) and mono:[width.nibContrast] (from `0`, the default, to `1`).
+
+The width at a point follows the angle between the direction of travel and the nib: it is the full width when the stroke goes across the nib and narrows, by up to mono:[nibContrast] of it, as the stroke goes along the nib. At a contrast of `0.7` a stroke along the nib is 30% as wide as one across it.
+
+* The direction of travel is read over a distance of two stroke widths (at least four canvas units) centred on the point, so a jittery path does not make the width jitter.
+* It applies to the mono:[legacy] ribbon and to the mono:[round] outline, and multiplies the pressure width and the variance.
+* A viewer from a release that does not know the fields draws the width without the nib.
 
 === Viewer-side preview
 

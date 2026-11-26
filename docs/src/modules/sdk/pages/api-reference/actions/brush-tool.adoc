@@ -136,8 +136,8 @@ new WeaveBrushToolAction({
 |===
 | Group | Setting | Legacy value
 
-| mono:[capture] | mono:[source] `legacy` \| `coalesced`; mono:[clock] `now` \| `event`; mono:[minMovePx]; mono:[predicted] `off` \| `tail`; mono:[event] `pointermove` \| `pointerrawupdate` | `legacy`, `now`, `0`, `tail`, `pointermove`
-| mono:[pressure] | mono:[zero] `legacy` \| `keep` \| `holdLast`; mono:[filter] `legacy` \| `timeEma` \| `oneEuro` \| `none`; mono:[timeConstantMs]; mono:[oneEuro]; mono:[floor]; mono:[start] `backfill` \| `average` \| `none`; mono:[startSamples]; mono:[end] `backfill` \| `none` | `legacy`, `legacy`, `40`, `{ minCutoff: 1, beta: 0.01 }`, `0.15`, `backfill`, `3`, `backfill`
+| mono:[capture] | mono:[source] `legacy` \| `coalesced`; mono:[clock] `now` \| `event`; mono:[minMovePx]; mono:[predicted] `off` \| `tail`; mono:[event] `pointermove` \| `pointerrawupdate`; mono:[shiftLock] | `legacy`, `now`, `0`, `tail`, `pointermove`, `false`
+| mono:[pressure] | mono:[synth] `off` \| `velocity`; mono:[zero] `legacy` \| `keep` \| `holdLast`; mono:[filter] `legacy` \| `timeEma` \| `oneEuro` \| `none`; mono:[timeConstantMs]; mono:[oneEuro]; mono:[floor]; mono:[start] `backfill` \| `average` \| `none`; mono:[startSamples]; mono:[end] `backfill` \| `none` | `off`, `legacy`, `legacy`, `40`, `{ minCutoff: 1, beta: 0.01 }`, `0.15`, `backfill`, `3`, `backfill`
 | mono:[stabilizer] | mono:[type] `none` \| `oneEuro` \| `pulledString` \| `streamline`; mono:[minCutoff]; mono:[beta]; mono:[radiusPx]; mono:[amount]; mono:[zoomAware]; mono:[catchUpOnEnd] | `none`
 | mono:[finalize] | mono:[mode] `dp` \| `dpPressure` \| `bezierFit` \| `none`; mono:[tolerance]; mono:[toleranceUnit] `canvas` \| `screen`; mono:[pressureWeight]; mono:[resampleSpacingPx] | `dp`, the tool-level mono:[simplifyTolerance], `canvas`
 | mono:[touchGuard] | mono:[waitMs]; mono:[movePx]; mono:[cancelOnSecondTouch]; mono:[ignoreAfterPen] | no wait, no guard
@@ -145,6 +145,20 @@ new WeaveBrushToolAction({
 
 NOTE: The modes other than the legacy ones are introduced progressively. A setting whose mode is not implemented yet behaves
 as the legacy mode. Everything below is implemented except `capture.event`, which still reads pointer moves.
+
+=== Locking a line with Shift
+
+With `capture.shiftLock: true`, holding Shift while drawing with a mouse or a trackpad draws a straight line at one of eight
+headings (every 45 degrees). Without it, which is the default, Shift does nothing.
+
+. The anchor is where the stroke was when Shift went down.
+. While the pointer is less than 16 screen pixels from the anchor the stroke follows the pointer.
+. From 16 pixels on, the heading nearest to the direction of the pointer is chosen and kept, and every position is projected onto
+the line through the anchor along it. The 16 pixels are on screen, so zoom does not change them.
+. Releasing Shift ends the lock and the stroke follows the pointer again. Pressing it again anchors a new line where the stroke is.
+
+The lock is applied before the stabilizer, so a stabilized stroke follows the line too. Touch and pen strokes are never locked,
+whatever the profile says. The instruments turn the lock on for the mouse profile.
 
 === Capture and pressure modes
 
@@ -179,6 +193,18 @@ When the profile has a stabilizer (`stabilizer.type` is not `none`) predicted sa
 |===
 
 Mouse, trackpad and finger input never report pressure and always record 0.5, whatever this setting says.
+
+==== Pressure from the pointer speed
+
+A mouse or a finger reports no pressure, so every point is recorded with 0.5 and a stroke has the same width everywhere.
+With `pressure.synth: "velocity"` the pressure of each point is derived from how fast the pointer moves: it falls as the
+pointer speeds up, so a fast stroke is thinner than a slow one, like a pen drawn quickly.
+
+* The speed is measured in *screen* pixels per millisecond, so the same movement gives the same pressure at every zoom level.
+* The value is saved in the stroke's points as they are captured, so simplification and every viewer see the same widths.
+* It applies only where no pressure is reported. A pen keeps its own pressure, whatever this setting says.
+* The result goes through the profile's pressure filter, like a real reading. Use `capture.clock: "event"` so the time between
+samples is the one the browser reports; with `"now"` the samples of a batch look simultaneous.
 
 ==== Pressure filters
 
@@ -313,6 +339,54 @@ const brush = weave.getActionHandler<WeaveBrushToolAction>("brushTool");
 brush.setInputProfile("pen.desktop", { pressure: { floor: 0.05 } });
 brush.setForcedProfile("pen.desktop");
 ----
+
+== Instruments
+
+An *instrument* is a named pen: the stroke look, the opacity and blend mode of new strokes and the input-profile settings, applied together
+with one call. Nothing changes until an application selects one; with no instrument the tool behaves exactly as in earlier releases.
+
+[cols="2*"]
+|===
+| Method | Description
+
+| mono:[setInstrument(id)] | Selects an instrument. Returns `{ applied, errors }`; an unknown id changes nothing.
+| mono:[getInstrument()] | The selected instrument, `custom` when its look or a profile was changed on its own afterwards, or `null`.
+| mono:[getInstruments()] | The ids that can be selected.
+|===
+
+[cols="2*"]
+|===
+| Instrument | Character
+
+| mono:[pencil] | A thin line that gets thinner the faster it is drawn with a mouse or a finger; a pen keeps its own pressure. Finished with mono:[dpPressure].
+| mono:[pen] | A smooth line of changing width with a tapered end, fitted to a curve with mono:[bezierFit] when the stroke ends.
+| mono:[brush] | A soft line that swells and tapers at both ends, with a little variation in width along the way. The tapers are 1.5 and 3 stroke widths long, fitted to a curve with mono:[bezierFit].
+| mono:[fountainPen] | A line whose width follows the angle between its direction and a fixed nib (mono:[nibAngle] `-45`, mono:[nibContrast] `0.7`): thick across the nib, thin along it. Follows the speed of a mouse like the mono:[pen], and is fitted to a curve.
+| mono:[fineliner] | A thin line of constant width with round ends.
+| mono:[marker] | A broad line with flat ends that thins by 12% at speed with a mouse or a finger. Finished with mono:[dpPressure].
+| mono:[highlighter] | A broad line of constant width with flat ends, opacity `0.75` and the `multiply` blend mode, so it darkens what it crosses.
+|===
+
+[source,ts]
+----
+const brush = weave.getActionHandler<WeaveBrushToolAction>("brushTool");
+
+brush.setInstrument("highlighter");
+brush.getInstrument(); // "highlighter"
+
+brush.setLook({ spacingPx: 3 });
+brush.getInstrument(); // "custom"
+----
+
+* Every instrument turns the Shift lock on for the mouse profile, see <<Locking a line with Shift>>.
+* Selecting an instrument *replaces* the look and the mono:[mouse] and mono:[touch] profiles with the legacy ones plus the instrument's changes, so the result never depends on the instrument selected before. The pen profiles are left as they are.
+* Distances along the stroke, such as the tapers of the mono:[brush], are scaled to the mono:[strokeWidth] in force when the instrument is selected. Set the width first, or select the instrument again after changing it.
+* It also sets the mono:[opacity] and mono:[globalCompositeOperation] of new strokes, overriding values set with mono:[updateProps]. The selection survives activating the tool again.
+* A stroke in progress keeps the settings it started with, and strokes already drawn keep the look they were saved with.
+* Clearing the look with `setLook(null)` or applying a scenario leaves no instrument selected.
+* mono:[exportConfig()] includes the selected instrument in an optional mono:[instrument] field and mono:[importConfig()] restores it; the document `version` stays `1` and a document without the field selects none.
+
+NOTE: A stroke drawn with a look that a release before instruments does not know is drawn by that release as a plain round stroke, without the flat ends.
 
 == Default values
 

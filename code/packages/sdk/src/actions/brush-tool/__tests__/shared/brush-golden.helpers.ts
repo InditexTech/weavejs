@@ -17,6 +17,7 @@ export type GestureStep =
       pressure: number;
       pointerType: string;
       pointerId?: number;
+      shiftKey?: boolean;
     }
   | {
       type: 'move';
@@ -26,6 +27,7 @@ export type GestureStep =
       pressure: number;
       pointerType: string;
       pointerId?: number;
+      shiftKey?: boolean;
       coalesced?: Sample[];
       predicted?: Sample[];
     }
@@ -342,11 +344,14 @@ export function runGesture(
     clock = step.t;
     current = { x: step.x, y: step.y };
     if (step.type === 'down') {
-      handlers['pointerdown'](evt(step));
+      handlers['pointerdown'](
+        evt(step, step.shiftKey ? { shiftKey: true } : {})
+      );
       readLive();
       continue;
     }
     const extra: Record<string, unknown> = {};
+    if (step.shiftKey) extra['shiftKey'] = true;
     if (step.coalesced)
       extra['getCoalescedEvents'] = () =>
         step.coalesced!.map((s) => raw(s, step.pointerType));

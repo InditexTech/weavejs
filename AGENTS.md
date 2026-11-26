@@ -124,6 +124,10 @@ Release notes pattern: **every released version gets a `release-notes/X.Y.Z.adoc
 | sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants,profiles}.ts`, `code/packages/sdk/src/actions/brush-tool/brush-tool.ts` (input profiles, `setInputProfile`) | released in 5.8.0 |
 | sdk:api-reference/actions/brush-tuning.adoc | `code/packages/sdk/src/actions/brush-tool/tunables/*` (descriptors, presets, scenarios, config export), `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` (`WeaveStrokeLook`) | released in 5.8.0 |
 | sdk:api-reference/plugins/brush-lab.adoc | `code/packages/sdk/src/plugins/brush-lab/*`, `code/packages/sdk/src/index.lab.ts` | released in 5.8.0 |
+| main:build/actions/brush-tool.adoc (pens) | `code/packages/sdk/src/actions/brush-tool/brush-tool.ts` (`setInstrument`), `code/packages/sdk/src/actions/brush-tool/tunables/presets.ts` (instruments) | released in 5.11.0 |
+| sdk:api-reference/actions/brush-tool.adoc (instruments, speed pressure, Shift lock) | `code/packages/sdk/src/actions/brush-tool/{brush-tool,types}.ts`, `code/packages/sdk/src/actions/brush-tool/tunables/{presets,config-io}.ts`, `code/packages/sdk/src/actions/brush-tool/stages/{pressure,heading-lock}.ts` | released in 5.11.0 |
+| sdk:api-reference/actions/brush-tuning.adoc (`ends`, `variance`, `width.easing`, `width.nibAngle`, `width.nibContrast`, `pressure.synth`, `capture.shiftLock`) | `code/packages/sdk/src/actions/brush-tool/tunables/descriptors.ts`, `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | released in 5.11.0 |
+| sdk:api-reference/nodes/stroke.adoc (`ends`, `variance`, easing, nib) | `code/packages/sdk/src/nodes/stroke/{types,constants,stroke}.ts`, `render/{look,round-outline,width-context}.ts` | released in 5.11.0 |
 | main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
 | sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | released in 5.7.1 |
 | main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | released in 5.7.0 |
