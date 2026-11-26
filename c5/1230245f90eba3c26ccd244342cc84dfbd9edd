@@ -1,0 +1,107 @@
+AGENTS.md
+  s_562eef9dc74775::t_8cf9c30e25f719 127-130
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.instruments.test.ts
+  s_562eef9dc74775::t_e0e9d6bc812ce2 1-397
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.shift-lock.test.ts
+  s_562eef9dc74775::t_c61c5c0e1e40b0 1-267
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.synth-pressure.test.ts
+  s_562eef9dc74775::t_bffcad984a2ae4 1-164
+code/packages/sdk/src/actions/brush-tool/__tests__/instruments-render.test.ts
+  s_562eef9dc74775::t_c90dec570104ae 1-77
+code/packages/sdk/src/actions/brush-tool/__tests__/shared/brush-golden.helpers.ts
+  s_562eef9dc74775::t_af3134236c8979 20,30,347-349,354
+code/packages/sdk/src/actions/brush-tool/brush-tool.ts
+  s_562eef9dc74775::t_e77dc7e2af9a13 39-44,71-72,77,128,144-147,152-157,274,290,318-325,342,352,356-413,449,502-507,539-540,548-549,593-594,612,616-643,667,675-677,773-775,1226,1228-1231,1530
+code/packages/sdk/src/actions/brush-tool/constants.ts
+  s_562eef9dc74775::t_af138dec42197e 32-40
+code/packages/sdk/src/actions/brush-tool/stages/__tests__/heading-lock.test.ts
+  s_562eef9dc74775::t_4686f7e41b96bb 1-90
+code/packages/sdk/src/actions/brush-tool/stages/heading-lock.ts
+  s_562eef9dc74775::t_7835f1d87adbfe 1-56
+code/packages/sdk/src/actions/brush-tool/stages/pressure.ts
+  s_562eef9dc74775::t_b6f7fea976570c 22-23,38,50,205-239,246-247,249-255,268
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/descriptors.test.ts
+  s_562eef9dc74775::t_4ac97c8d4ed71a 8-15,39-61,73,82,93-94,109-110
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/validate.test.ts
+  s_562eef9dc74775::t_a71e6ad96442cc 93-118
+code/packages/sdk/src/actions/brush-tool/tunables/config-io.ts
+  s_562eef9dc74775::t_92d1ea33392169 13-17,28-29,33-38,93-105,141,143-145
+code/packages/sdk/src/actions/brush-tool/tunables/descriptors.ts
+  s_562eef9dc74775::t_8f1a2220039a7c 51-55,104-108,232-241,267-281
+code/packages/sdk/src/actions/brush-tool/tunables/presets.ts
+  s_562eef9dc74775::t_603981d5b8719a 318-537
+code/packages/sdk/src/actions/brush-tool/types.ts
+  s_562eef9dc74775::t_1573d8033df142 32-36,55-60
+code/packages/sdk/src/nodes/stroke/__tests__/__snapshots__/stroke-look.golden.test.ts.snap
+  s_562eef9dc74775::t_bbe30ad097d753 1-4405
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-blend.test.ts
+  s_483d62c6242f9c::t_c502c97afb6546 1-69
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-ends.test.ts
+  s_562eef9dc74775::t_34922d733da071 1-103
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-look.golden.test.ts
+  s_562eef9dc74775::t_8e66b6ab7d82bd 1-71
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-nib.test.ts
+  s_562eef9dc74775::t_bb78392396cdb8 1-124
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-variance.test.ts
+  s_562eef9dc74775::t_bae4632b5c26f7 1-203
+code/packages/sdk/src/nodes/stroke/constants.ts
+  s_562eef9dc74775::t_9c4e7968c599bb 25-34
+code/packages/sdk/src/nodes/stroke/render/__tests__/look.test.ts
+  s_562eef9dc74775::t_6ef024e7983fd7 143-247
+code/packages/sdk/src/nodes/stroke/render/__tests__/width-context.test.ts
+  s_562eef9dc74775::t_82a5cb03b7b236 1-122
+code/packages/sdk/src/nodes/stroke/render/look.ts
+  s_562eef9dc74775::t_d889ca393d786e 5-8,15-16,30-32,54,76-93,96-105,110-120,125-129,136-137,140-141,149,152-165
+code/packages/sdk/src/nodes/stroke/render/width-context.ts
+  s_562eef9dc74775::t_51cddff8f54566 1-103
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_562eef9dc74775::t_229d037445393d 14,28-34,50-63,498-566,585-590,599-605,611,622,625-626
+code/packages/sdk/src/nodes/stroke/types.ts
+  s_562eef9dc74775::t_93a9c835885860 48-51,63-68
+docs/src/modules/main/pages/build/actions/brush-tool.adoc
+  s_562eef9dc74775::t_591d06f926d563 85-98
+docs/src/modules/sdk/pages/api-reference/nodes/stroke.adoc
+  s_562eef9dc74775::t_b47d06fe5012d8 119-130,145-147,150-159
+openspec/changes/brush-instruments-and-shift-lock/.openspec.yaml
+  s_562eef9dc74775::t_348718e348d9ec 1-2
+openspec/changes/brush-instruments-and-shift-lock/design.md
+  s_562eef9dc74775::t_9a9467662d1c7d 1-38
+openspec/changes/brush-instruments-and-shift-lock/proposal.md
+  s_562eef9dc74775::t_5179ee71b6805c 1-34
+openspec/changes/brush-instruments-and-shift-lock/specs/brush-tool/instruments/spec.md
+  s_562eef9dc74775::t_d4b984a103adfb 1-62
+openspec/changes/brush-instruments-and-shift-lock/specs/brush-tool/pressure-sampling/spec.md
+  s_562eef9dc74775::t_40674078725de9 1-22
+openspec/changes/brush-instruments-and-shift-lock/specs/brush-tool/shift-lock/spec.md
+  s_562eef9dc74775::t_bff85329118c48 1-36
+openspec/changes/brush-instruments-and-shift-lock/specs/brush-tool/tunables/spec.md
+  s_562eef9dc74775::t_8960c90b38157a 1-18
+openspec/changes/brush-instruments-and-shift-lock/specs/stroke-node/rendering/spec.md
+  s_562eef9dc74775::t_1d2af97059bc69 1-43
+openspec/changes/brush-instruments-and-shift-lock/tasks.md
+  s_562eef9dc74775::t_1abc9552f81513 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "c51230245f90eba3c26ccd244342cc84dfbd9edd",
+  "prompts": {},
+  "sessions": {
+    "s_483d62c6242f9c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de7bdd257ffeKtKn6CqBjz79MN",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_562eef9dc74775": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de7c77889ffeXV5UL89eXDrdUx",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
