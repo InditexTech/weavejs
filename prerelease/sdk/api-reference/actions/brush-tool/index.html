@@ -1495,13 +1495,13 @@ point. Without any <code>input</code> configuration, strokes are recorded exactl
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">capture</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">source</code> <code>legacy</code> | <code>coalesced</code>; <code class="dt-mono">clock</code> <code>now</code> | <code>event</code>; <code class="dt-mono">minMovePx</code>; <code class="dt-mono">predicted</code> <code>off</code> | <code>tail</code>; <code class="dt-mono">event</code> <code>pointermove</code> | <code>pointerrawupdate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code>, <code>now</code>, <code>0</code>, <code>tail</code>, <code>pointermove</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">source</code> <code>legacy</code> | <code>coalesced</code>; <code class="dt-mono">clock</code> <code>now</code> | <code>event</code>; <code class="dt-mono">minMovePx</code>; <code class="dt-mono">predicted</code> <code>off</code> | <code>tail</code>; <code class="dt-mono">event</code> <code>pointermove</code> | <code>pointerrawupdate</code>; <code class="dt-mono">shiftLock</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code>, <code>now</code>, <code>0</code>, <code>tail</code>, <code>pointermove</code>, <code>false</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pressure</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">zero</code> <code>legacy</code> | <code>keep</code> | <code>holdLast</code>; <code class="dt-mono">filter</code> <code>legacy</code> | <code>timeEma</code> | <code>oneEuro</code> | <code>none</code>; <code class="dt-mono">timeConstantMs</code>; <code class="dt-mono">oneEuro</code>; <code class="dt-mono">floor</code>; <code class="dt-mono">start</code> <code>backfill</code> | <code>average</code> | <code>none</code>; <code class="dt-mono">startSamples</code>; <code class="dt-mono">end</code> <code>backfill</code> | <code>none</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy</code>, <code>legacy</code>, <code>40</code>, <code>{ minCutoff: 1, beta: 0.01 }</code>, <code>0.15</code>, <code>backfill</code>, <code>3</code>, <code>backfill</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">synth</code> <code>off</code> | <code>velocity</code>; <code class="dt-mono">zero</code> <code>legacy</code> | <code>keep</code> | <code>holdLast</code>; <code class="dt-mono">filter</code> <code>legacy</code> | <code>timeEma</code> | <code>oneEuro</code> | <code>none</code>; <code class="dt-mono">timeConstantMs</code>; <code class="dt-mono">oneEuro</code>; <code class="dt-mono">floor</code>; <code class="dt-mono">start</code> <code>backfill</code> | <code>average</code> | <code>none</code>; <code class="dt-mono">startSamples</code>; <code class="dt-mono">end</code> <code>backfill</code> | <code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>off</code>, <code>legacy</code>, <code>legacy</code>, <code>40</code>, <code>{ minCutoff: 1, beta: 0.01 }</code>, <code>0.15</code>, <code>backfill</code>, <code>3</code>, <code>backfill</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">stabilizer</code></p></td>
@@ -1532,6 +1532,34 @@ as the legacy mode. Everything below is implemented except <code>capture.event</
 </td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="locking-a-line-with-shift"><a class="anchor" href="#locking-a-line-with-shift"></a>Locking a line with Shift</h3>
+<div class="paragraph">
+<p>With <code>capture.shiftLock: true</code>, holding Shift while drawing with a mouse or a trackpad draws a straight line at one of eight
+headings (every 45 degrees). Without it, which is the default, Shift does nothing.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The anchor is where the stroke was when Shift went down.</p>
+</li>
+<li>
+<p>While the pointer is less than 16 screen pixels from the anchor the stroke follows the pointer.</p>
+</li>
+<li>
+<p>From 16 pixels on, the heading nearest to the direction of the pointer is chosen and kept, and every position is projected onto
+the line through the anchor along it. The 16 pixels are on screen, so zoom does not change them.</p>
+</li>
+<li>
+<p>Releasing Shift ends the lock and the stroke follows the pointer again. Pressing it again anchors a new line where the stroke is.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The lock is applied before the stabilizer, so a stabilized stroke follows the line too. Touch and pen strokes are never locked,
+whatever the profile says. The instruments turn the lock on for the mouse profile.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1598,6 +1626,31 @@ samples of a batch look simultaneous. Where an event reports no usable time, the
 </table></div></div>
 <div class="paragraph">
 <p>Mouse, trackpad and finger input never report pressure and always record 0.5, whatever this setting says.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="pressure-from-the-pointer-speed"><a class="anchor" href="#pressure-from-the-pointer-speed"></a>Pressure from the pointer speed</h4>
+<div class="paragraph">
+<p>A mouse or a finger reports no pressure, so every point is recorded with 0.5 and a stroke has the same width everywhere.
+With <code>pressure.synth: "velocity"</code> the pressure of each point is derived from how fast the pointer moves: it falls as the
+pointer speeds up, so a fast stroke is thinner than a slow one, like a pen drawn quickly.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The speed is measured in <strong>screen</strong> pixels per millisecond, so the same movement gives the same pressure at every zoom level.</p>
+</li>
+<li>
+<p>The value is saved in the stroke&#8217;s points as they are captured, so simplification and every viewer see the same widths.</p>
+</li>
+<li>
+<p>It applies only where no pressure is reported. A pen keeps its own pressure, whatever this setting says.</p>
+</li>
+<li>
+<p>The result goes through the profile&#8217;s pressure filter, like a real reading. Use <code>capture.clock: "event"</code> so the time between
+samples is the one the browser reports; with <code>"now"</code> the samples of a batch look simultaneous.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
@@ -1888,6 +1941,131 @@ A change applies from the <strong>next</strong> stroke; a stroke in progress kee
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setForcedProfile</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"pen.desktop"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span></span></code></pre>
 </div>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="instruments"><a class="anchor" href="#instruments"></a>Instruments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An <strong>instrument</strong> is a named pen: the stroke look, the opacity and blend mode of new strokes and the input-profile settings, applied together
+with one call. Nothing changes until an application selects one; with no instrument the tool behaves exactly as in earlier releases.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setInstrument(id)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Selects an instrument. Returns <code>{ applied, errors }</code>; an unknown id changes nothing.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">getInstrument()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The selected instrument, <code>custom</code> when its look or a profile was changed on its own afterwards, or <code>null</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">getInstruments()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ids that can be selected.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Instrument</th>
+<th class="tableblock halign-left valign-top">Character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pencil</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A thin line that gets thinner the faster it is drawn with a mouse or a finger; a pen keeps its own pressure. Finished with <code class="dt-mono">dpPressure</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pen</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A smooth line of changing width with a tapered end, fitted to a curve with <code class="dt-mono">bezierFit</code> when the stroke ends.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">brush</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A soft line that swells and tapers at both ends, with a little variation in width along the way. The tapers are 1.5 and 3 stroke widths long, fitted to a curve with <code class="dt-mono">bezierFit</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">fountainPen</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A line whose width follows the angle between its direction and a fixed nib (<code class="dt-mono">nibAngle</code> <code>-45</code>, <code class="dt-mono">nibContrast</code> <code>0.7</code>): thick across the nib, thin along it. Follows the speed of a mouse like the <code class="dt-mono">pen</code>, and is fitted to a curve.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">fineliner</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A thin line of constant width with round ends.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">marker</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A broad line with flat ends that thins by 12% at speed with a mouse or a finger. Finished with <code class="dt-mono">dpPressure</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">highlighter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A broad line of constant width with flat ends, opacity <code>0.75</code> and the <code>multiply</code> blend mode, so it darkens what it crosses.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">weave</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getActionHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"brushTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setInstrument</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"highlighter"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getInstrument</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(); </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// "highlighter"</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setLook</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">spacingPx:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> });</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getInstrument</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(); </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// "custom"</span></span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Every instrument turns the Shift lock on for the mouse profile, see <a href="#locking-a-line-with-shift">Locking a line with Shift</a>.</p>
+</li>
+<li>
+<p>Selecting an instrument <strong>replaces</strong> the look and the <code class="dt-mono">mouse</code> and <code class="dt-mono">touch</code> profiles with the legacy ones plus the instrument&#8217;s changes, so the result never depends on the instrument selected before. The pen profiles are left as they are.</p>
+</li>
+<li>
+<p>Distances along the stroke, such as the tapers of the <code class="dt-mono">brush</code>, are scaled to the <code class="dt-mono">strokeWidth</code> in force when the instrument is selected. Set the width first, or select the instrument again after changing it.</p>
+</li>
+<li>
+<p>It also sets the <code class="dt-mono">opacity</code> and <code class="dt-mono">globalCompositeOperation</code> of new strokes, overriding values set with <code class="dt-mono">updateProps</code>. The selection survives activating the tool again.</p>
+</li>
+<li>
+<p>A stroke in progress keeps the settings it started with, and strokes already drawn keep the look they were saved with.</p>
+</li>
+<li>
+<p>Clearing the look with <code>setLook(null)</code> or applying a scenario leaves no instrument selected.</p>
+</li>
+<li>
+<p><code class="dt-mono">exportConfig()</code> includes the selected instrument in an optional <code class="dt-mono">instrument</code> field and <code class="dt-mono">importConfig()</code> restores it; the document <code>version</code> stays <code>1</code> and a document without the field selects none.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+A stroke drawn with a look that a release before instruments does not know is drawn by that release as a plain round stroke, without the flat ends.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>

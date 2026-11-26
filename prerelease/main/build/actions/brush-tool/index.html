@@ -2010,6 +2010,25 @@ ensuring the new element appears instantly for all connected users.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="pens"><a class="anchor" href="#pens"></a>Pens</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The tool can draw with a named pen, called an <strong>instrument</strong>. Select one on the action:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getActionHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveBrushToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"brushTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">brush</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setInstrument</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"highlighter"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">); </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// pencil, pen, brush, fountainPen, fineliner, marker or highlighter</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>New strokes then take the look of that pen. If you never select one, the tool draws as before. See
+<a href="../../../../sdk/api-reference/actions/brush-tool/#instruments" class="xref page">the API reference</a> for what each instrument does.</p>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>

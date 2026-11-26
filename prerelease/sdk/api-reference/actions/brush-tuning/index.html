@@ -1376,6 +1376,14 @@ found in a partial profile or look; an empty list means the patch is valid.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Event that delivers samples. pointerrawupdate lowers latency where supported. (advanced)</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">capture.shiftLock</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true | false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">false</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">capture</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Holding Shift locks a mouse stroke to the nearest of eight headings once the pointer is 16 px from where Shift was pressed. Touch and pen strokes are never locked.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pressure.zero</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">legacy | keep | holdLast</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">legacy</code></p></td>
@@ -1446,6 +1454,14 @@ found in a partial profile or look; an empty list means the patch is valid.</p>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">capture</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Last point: backfill takes the second-to-last pressure, none keeps the lift-off reading.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pressure.synth</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">off | velocity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">off</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">capture</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where a device that reports no pressure gets it from: off records a constant, velocity derives it from the pointer speed so fast strokes are thinner. A pen keeps its own pressure.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">stabilizer.type</code></p></td>
@@ -1660,6 +1676,22 @@ found in a partial profile or look; an empty list means the patch is valid.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">merged draws the round ends inside the same fill, so translucent colours stay uniform.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">ends</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">round | flat</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">round</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">draw</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">round draws a disc at the start and end; flat cuts them square. A one-point stroke is always a disc.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">variance</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fraction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">draw</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Width variation along the stroke, the same for every viewer; 0 for none.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">width.min</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 to 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">0</code></p></td>
@@ -1698,6 +1730,30 @@ found in a partial profile or look; an empty list means the patch is valid.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">px</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">draw</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Distance over which the end narrows; 0 for none.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">width.easing</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">linear | easeIn | easeOut | easeInOut</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">easeOut</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">draw</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Shape of the start and end tapers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">width.nibAngle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-180 to 180</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">0</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">draw</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Angle of the nib in degrees; the stroke is widest when travelling across it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">width.nibContrast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fraction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">draw</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How much narrower the stroke is when travelling along the nib; 0 for a round nib.</p></td>
 </tr>
 </tbody>
 </table></div></div>
