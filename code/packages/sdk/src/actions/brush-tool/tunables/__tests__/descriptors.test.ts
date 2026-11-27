@@ -57,6 +57,10 @@ const PROFILE_DEFAULTS = {
     ...BRUSH_LEGACY_INPUT_PROFILE.pressure,
     ...BRUSH_PROFILE_OPTIONAL_DEFAULTS.pressure,
   },
+  stabilizer: {
+    ...BRUSH_LEGACY_INPUT_PROFILE.stabilizer,
+    ...BRUSH_PROFILE_OPTIONAL_DEFAULTS.stabilizer,
+  },
 };
 
 describe('tunable descriptors', () => {

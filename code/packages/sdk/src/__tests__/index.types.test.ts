@@ -46,6 +46,21 @@ describe('index.types barrel: index.common re-exports', () => {
   });
 });
 
+describe('index.types barrel: stroke eraser tool', () => {
+  it('exports the action, separate from the eraser tool', () => {
+    expect(typeof IndexTypes.WeaveStrokeEraserToolAction).toBe('function');
+    expect(typeof IndexTypes.WeaveEraserToolAction).toBe('function');
+    expect(IndexTypes.WeaveStrokeEraserToolAction).not.toBe(
+      IndexTypes.WeaveEraserToolAction
+    );
+  });
+
+  it('exports the name of the action, apart from the eraser tool', () => {
+    expect(IndexTypes.STROKE_ERASER_TOOL_ACTION_NAME).toBe('strokeEraserTool');
+    expect(IndexTypes.ERASER_TOOL_ACTION_NAME).toBe('eraserTool');
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Suite 2: internal-utils/mapping re-exports
 // ---------------------------------------------------------------------------

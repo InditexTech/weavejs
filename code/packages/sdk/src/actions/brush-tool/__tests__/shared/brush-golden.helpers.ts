@@ -142,7 +142,9 @@ export function runGesture(
   beforeStep?: (action: WeaveBrushToolAction, index: number) => void,
   env: StageEnv = IDENTITY_ENV,
   /** Plugins the instance reports, by name. */
-  plugins: Record<string, unknown> = {}
+  plugins: Record<string, unknown> = {},
+  /** Methods added to the stroke node handler, such as one that measures a stroke. */
+  handlerExtras: Record<string, unknown> = {}
 ): GestureResult {
   let clock = 0;
   const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => clock);
@@ -226,11 +228,14 @@ export function runGesture(
       return strokeNode;
     },
     onUpdate: vi.fn(),
+    // the node measures strokes drawn from other points; nothing to measure here
+    getRenderedGeometry: () => null,
     serialize: (node: { getAttrs: () => Record<string, unknown> }) => ({
       key: node.getAttrs()['id'],
       type: 'stroke',
       props: node.getAttrs(),
     }),
+    ...handlerExtras,
   };
 
   const instance = {

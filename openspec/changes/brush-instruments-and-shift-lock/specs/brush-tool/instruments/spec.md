@@ -18,7 +18,7 @@ The system SHALL publish the instruments `pencil`, `pen`, `fineliner`, `marker`,
 
 #### Scenario: Highlighter
 - **WHEN** an application selects `highlighter`
-- **THEN** new strokes have constant width, flat ends, opacity 0.75 and the `multiply` composite operation
+- **THEN** new strokes have constant width, round ends, opacity 0.75 and the `multiply` composite operation
 
 #### Scenario: Unknown id
 - **WHEN** an application selects an id that is not published
@@ -55,7 +55,7 @@ The exported brush configuration SHALL include the selected instrument as an opt
 - **THEN** it is accepted and no instrument is selected
 
 ### Requirement: Instrument characteristics
-Each instrument SHALL differ in character as follows: `fineliner` constant width with round ends; `marker` flat ends with 0.12 thinning; `highlighter` as above; `pencil` and `pen` pressure-responsive width (speed-derived where the device reports no pressure); `brush` tapered ends with variance; `fountainPen` width that follows the angle between travel and a fixed nib.
+Each instrument SHALL differ in character as follows: `fineliner` constant width with round ends; `marker` round ends with 0.12 thinning; `highlighter` as above; `pencil` and `pen` pressure-responsive width (speed-derived where the device reports no pressure); `brush` tapered ends with variance; `fountainPen` width that follows the angle between travel and a fixed nib.
 
 #### Scenario: Mouse with the pen instrument
 - **WHEN** a mouse draws with `pen` selected

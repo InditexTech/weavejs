@@ -22,6 +22,10 @@ import {
   type WeaveStrokeInputMeta,
 } from './types';
 import {
+  BRUSH_CATCH_UP_MIN_PX,
+  BRUSH_COMPLETION_MAX_OFFSET_PX,
+  BRUSH_COMPLETION_MIN_STEP_PX,
+  BRUSH_RAW_TRAIL_MAX,
   BRUSH_TOOL_ACTION_NAME,
   BRUSH_TOOL_DEFAULT_CONFIG,
   BRUSH_LAB_PLUGIN_NAME,
@@ -59,6 +63,8 @@ import {
   type CaptureState,
 } from './stages/capture';
 import { finalizePoints } from './stages/finalize';
+import { finalizeWithinDeviation } from './stages/refine';
+import { completionTail } from './stages/completion';
 import { detectBrushPlatform, resolveBrushInputProfileKey } from './profiles';
 import { validateBrushTunablePatch } from './tunables/validate';
 import { mergeData } from './tunables/merge';
@@ -157,6 +163,21 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected headingLock: HeadingLock | null = null;
   /** Last position the pen reported, before any stabilizing. */
   protected lastRawPoint: { x: number; y: number } | null = null;
+  /** The last positions the pen reported, before any stabilizing, the newest last. */
+  protected rawTrail: { x: number; y: number }[] = [];
+  /** A stroke that has ended and is still reaching the pen, before it is saved. */
+  protected catchUp: {
+    tempStroke: Konva.Line;
+    nodeHandler: WeaveStrokeNode;
+    /** The points the pen made, without the tail that is drawn. */
+    base: WeaveStrokePoint[];
+    /** The end of the line, then the points that complete it. */
+    way: WeaveStrokePoint[];
+    /** Distance along `way` at each of its points. */
+    along: number[];
+    startedAt: number | null;
+    frame: number | null;
+  } | null = null;
   protected stabilizer!: BrushStabilizer;
   private pressureStateView?: PressureState;
   onPropsChange = undefined;
@@ -609,6 +630,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     resetPressureState(this.pressureState);
     this.captureState = createCaptureState();
     this.lastRawPoint = null;
+    this.rawTrail = [];
     this.headingLock = null;
     this.stabilizer.reset();
   }
@@ -763,6 +785,9 @@ export class WeaveBrushToolAction extends WeaveAction {
     );
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
+      // the stroke before is saved first: this one reuses what it is made of
+      this.flushCatchUp();
+
       if (this.shouldIgnorePointerDown(e)) return;
 
       if (e.evt.pointerType === 'pen') {
@@ -1081,6 +1106,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         },
       });
       this.lastRawPoint = { x: mousePoint.x, y: mousePoint.y };
+      this.rawTrail = [{ x: mousePoint.x, y: mousePoint.y }];
     }
 
     this.clickPoint = mousePoint;
@@ -1234,6 +1260,8 @@ export class WeaveBrushToolAction extends WeaveAction {
     // costs nothing per sample.
     if (!sample.isPredicted) {
       this.lastRawPoint = { x: mousePoint.x, y: mousePoint.y };
+      this.rawTrail.push({ x: mousePoint.x, y: mousePoint.y });
+      if (this.rawTrail.length > BRUSH_RAW_TRAIL_MAX) this.rawTrail.shift();
     }
 
     const sampleTime = (): number => this.sampleTime(sample.time);
@@ -1295,23 +1323,38 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   /**
-   * The point that completes a stabilized stroke at the pen's last position,
-   * or `null` when the stroke already ends there or has no stabilizer.
+   * The points that complete a stabilized stroke at the pen's last position,
+   * following the way the pen went since the end of the line, or none when the
+   * stroke already ends there or has no stabilizer.
    */
   private getStrokeCompletion(
     elements: WeaveStrokePoint[],
     tempStroke: Konva.Line
-  ): WeaveStrokePoint | null {
+  ): WeaveStrokePoint[] {
     const cfg = this.activeProfile.stabilizer;
-    if (cfg.type === 'none' || !cfg.catchUpOnEnd) return null;
-    if (!this.lastRawPoint || elements.length === 0) return null;
+    if (cfg.type === 'none' || !cfg.catchUpOnEnd) return [];
+    if (!this.lastRawPoint || elements.length === 0) return [];
 
     const last = elements.at(-1)!;
-    const x = this.lastRawPoint.x - tempStroke.x();
-    const y = this.lastRawPoint.y - tempStroke.y();
-    if (x === last.x && y === last.y) return null;
+    const x = tempStroke.x();
+    const y = tempStroke.y();
+    const zoom = this.instance.getStage().scaleX() || 1;
 
-    return { x, y, pressure: last.pressure };
+    const trail = this.rawTrail.map((p) => ({ x: p.x - x, y: p.y - y }));
+    // the last position is always the end, even where no trail was kept
+    const end = { x: this.lastRawPoint.x - x, y: this.lastRawPoint.y - y };
+    if (
+      trail.length === 0 ||
+      trail.at(-1)!.x !== end.x ||
+      trail.at(-1)!.y !== end.y
+    ) {
+      trail.push(end);
+    }
+
+    return completionTail(last, trail, {
+      minStep: BRUSH_COMPLETION_MIN_STEP_PX / zoom,
+      maxOffset: BRUSH_COMPLETION_MAX_OFFSET_PX / zoom,
+    }).map((point) => ({ ...point, pressure: last.pressure }));
   }
 
   private finalizeStroke(
@@ -1333,11 +1376,11 @@ export class WeaveBrushToolAction extends WeaveAction {
     // A stabilized stroke lags behind the pen: complete it where the pen was
     // lifted.
     const completion = this.getStrokeCompletion(newStrokeElements, tempStroke);
-    if (completion) {
-      newStrokeElements = [...newStrokeElements, completion];
+    if (completion.length > 0) {
+      newStrokeElements = [...newStrokeElements, ...completion];
       box = this.getBoundingBox([
         ...tempStroke.getAttrs().strokeElements,
-        completion,
+        ...completion,
       ]);
     }
 
@@ -1364,12 +1407,30 @@ export class WeaveBrushToolAction extends WeaveAction {
         : 1;
 
     const finalizeStart = performance.now();
-    const compressedPoints = finalizePoints(
+    let compressedPoints = finalizePoints(
       newStrokeElements,
       finalize,
       this.config.simplifyTolerance,
       zoom
     );
+
+    // Keeps the saved line within a bound of the one that was drawn: the
+    // finishing step re-renders the stroke through fewer points, which can
+    // move the line visibly when the pointer is released.
+    const maxDeviationPx =
+      finalize.maxDeviationPx ?? this.config.finalizeMaxDeviationPx;
+    if (finalize.mode !== 'none' && maxDeviationPx > 0) {
+      compressedPoints = finalizeWithinDeviation({
+        points: newStrokeElements,
+        candidate: compressedPoints,
+        finalize,
+        toolTolerance: this.config.simplifyTolerance,
+        zoom: this.instance.getStage().scaleX(),
+        maxDeviationPx,
+        geometryOf: (points) =>
+          nodeHandler.getRenderedGeometry(tempStroke, { points }),
+      }).points;
+    }
 
     this.getTraceSink()?.onStrokeEnd({
       beforeFinalize: newStrokeElements.map((p) => ({
@@ -1476,6 +1537,117 @@ export class WeaveBrushToolAction extends WeaveAction {
     check();
   }
 
+  /**
+   * Starts the glide of the end of a stabilized stroke to the pen's last
+   * position, which is where the stroke is completed: the line goes on along
+   * the way the pen went. Returns false when there is nothing to glide, so
+   * the stroke is saved at once.
+   */
+  private beginCatchUp(
+    tempStroke: Konva.Line,
+    nodeHandler: WeaveStrokeNode
+  ): boolean {
+    if (
+      this.config.catchUpMs <= 0 ||
+      Number.isNaN(this.config.catchUpMs) ||
+      typeof requestAnimationFrame !== 'function'
+    ) {
+      return false;
+    }
+
+    let base = [
+      ...(tempStroke.getAttrs().strokeElements as WeaveStrokePoint[]),
+    ];
+    if (this.predictedCount > 0) base = base.slice(0, -this.predictedCount);
+
+    const tail = this.getStrokeCompletion(base, tempStroke);
+    if (tail.length === 0) return false;
+
+    const from = base.at(-1)!;
+    const way = [from, ...tail];
+    const along = [0];
+    for (let i = 1; i < way.length; i++) {
+      along.push(
+        along[i - 1] +
+          Math.hypot(way[i].x - way[i - 1].x, way[i].y - way[i - 1].y)
+      );
+    }
+    const zoom = this.instance.getStage().scaleX() || 1;
+    if (along.at(-1)! * zoom < BRUSH_CATCH_UP_MIN_PX) {
+      return false;
+    }
+
+    // from here the stroke is the points the pen made, and a tail that is drawn
+    this.predictedCount = 0;
+    tempStroke.setAttrs({ strokeElements: base });
+    this.catchUp = {
+      tempStroke,
+      nodeHandler,
+      base,
+      way,
+      along,
+      startedAt: null,
+      frame: null,
+    };
+    this.catchUp.frame = requestAnimationFrame(this.stepCatchUp);
+    return true;
+  }
+
+  private readonly stepCatchUp = (time: number): void => {
+    const c = this.catchUp;
+    if (!c) return;
+
+    c.startedAt ??= time;
+    const t = Math.min(1, (time - c.startedAt) / this.config.catchUpMs);
+    if (t >= 1) {
+      this.flushCatchUp();
+      return;
+    }
+
+    // fast at first, then slowing as it reaches the pen
+    const eased = 1 - (1 - t) ** 3;
+    const reached = eased * c.along.at(-1)!;
+
+    // the points of the way that are reached, then the point where it is now
+    const drawn: WeaveStrokePoint[] = [];
+    let k = 1;
+    while (k < c.way.length && c.along[k] <= reached) {
+      drawn.push(c.way[k]);
+      k++;
+    }
+    if (k < c.way.length) {
+      const span = c.along[k] - c.along[k - 1];
+      const u = span > 0 ? (reached - c.along[k - 1]) / span : 1;
+      const a = c.way[k - 1];
+      const b = c.way[k];
+      drawn.push({
+        x: a.x + (b.x - a.x) * u,
+        y: a.y + (b.y - a.y) * u,
+        pressure: a.pressure,
+      });
+    }
+
+    c.tempStroke.setAttrs({ strokeElements: [...c.base, ...drawn] });
+    c.nodeHandler.onUpdate(
+      c.tempStroke as WeaveElementInstance,
+      c.tempStroke.getAttrs()
+    );
+    c.frame = requestAnimationFrame(this.stepCatchUp);
+  };
+
+  /** Saves a stroke that is still reaching the pen, now. */
+  private flushCatchUp(): void {
+    const c = this.catchUp;
+    if (!c) return;
+
+    this.catchUp = null;
+    if (c.frame !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(c.frame);
+    }
+    c.tempStroke.setAttrs({ strokeElements: c.base });
+    this.finalizeStroke(c.tempStroke, c.nodeHandler);
+  }
+
   private handleEndStroke() {
     const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
       | Konva.Line
@@ -1485,7 +1657,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       const nodeHandler =
         this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
 
-      if (nodeHandler) {
+      if (nodeHandler && !this.beginCatchUp(tempStroke, nodeHandler)) {
         this.finalizeStroke(tempStroke, nodeHandler);
       }
 
@@ -1520,6 +1692,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     stage.container().focus();
 
     this.cancelAction = cancel;
+    this.flushCatchUp();
 
     if (selectionPlugin) {
       selectionPlugin.setSelectedNodes([]);
@@ -1541,6 +1714,9 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   cleanup(): void {
+    // a stroke still reaching the pen is saved before the tool is left
+    this.flushCatchUp();
+
     const stage = this.instance.getStage();
 
     stage.container().style.touchAction = this.prevTouchAction;

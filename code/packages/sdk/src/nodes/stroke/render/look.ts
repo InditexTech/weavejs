@@ -136,9 +136,21 @@ export function halfWidthAt(
   distanceToEnd: number,
   context?: WidthContext
 ): number {
-  const { min, max, gamma, taperStart, taperEnd } = look.width;
+  const { min, max, gamma } = look.width;
+  let { taperStart, taperEnd } = look.width;
   const ease =
     EASE[look.width.easing ?? WEAVE_STROKE_LOOK_OPTIONAL_DEFAULTS.width.easing];
+
+  // Tapers that do not both fit in a short stroke shrink together, in
+  // proportion. Left as they are they narrow the stroke from both ends at once
+  // and it never reaches its full width: a short stroke would be a hairline.
+  const length = distanceFromStart + distanceToEnd;
+  const reach = taperStart + taperEnd;
+  if (reach > length && reach > 0 && Number.isFinite(length)) {
+    const fit = Math.max(length, 0) / reach;
+    taperStart *= fit;
+    taperEnd *= fit;
+  }
   const p = Math.min(
     1,
     Math.max(0, Number.isFinite(pressure) ? pressure : 0.5)

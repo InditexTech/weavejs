@@ -40,6 +40,8 @@ new WeaveBrushToolAction(params?: WeaveBrushToolActionParams);
 type WeaveBrushToolActionProperties = {
   interpolationSteps: number; // Number of steps for interpolation
   simplifyTolerance: number; // Douglas-Peucker tolerance applied on stroke finalize
+  finalizeMaxDeviationPx: number; // Largest px difference between the stroke as drawn and as saved
+  catchUpMs: number; // Time the end of a stabilized stroke takes to reach the pen
   input: WeaveBrushInputConfig; // Input profiles, see "Input profiles"
 };
 
@@ -85,7 +87,9 @@ For `WeaveBrushToolActionProperties`:
 
 | mono:[interpolationSteps] | mono:[number] |  | mono:[10] | Number of interpolation steps for smooth curve on touch devices.
 | mono:[input] | mono:[WeaveBrushInputConfig] |  | legacy profiles | Per-device input profiles, see <<Input profiles>>.
-| mono:[simplifyTolerance] | mono:[number] |  | mono:[0.5] | Tolerance, in canvas units, of the Douglas-Peucker simplification applied once when a stroke is finalized. While a stroke is being drawn every recorded sample is rendered; on release the point list is simplified before being persisted, so this value governs how much fidelity a finished stroke gives up. Lower values keep a finished stroke closer to the path drawn, at the cost of more points stored per stroke.
+| mono:[simplifyTolerance] | mono:[number] |  | mono:[0.5] | Tolerance, in canvas units, of the Douglas-Peucker simplification applied once when a stroke is finalized. While a stroke is being drawn every recorded sample is rendered; on release the point list is simplified before being persisted, so this value governs how much fidelity a finished stroke gives up. Lower values keep a finished stroke closer to the path drawn, at the cost of more points stored per stroke. See also mono:[finalizeMaxDeviationPx], which bounds the difference as the stroke is drawn.
+| mono:[finalizeMaxDeviationPx] | mono:[number] |  | mono:[0.25] | Largest difference, in screen pixels, between a stroke as it was drawn and as it is saved, for a thin line. A profile can set its own with mono:[finalize.maxDeviationPx]. mono:[0] saves what the finishing step leaves, as releases before this setting did. See <<Keeping the saved line faithful>>.
+| mono:[catchUpMs] | mono:[number] |  | mono:[90] | Time, in milliseconds, the end of a stabilized stroke takes to glide to the pen's position when the pointer is released, before the stroke is saved. mono:[0] completes it at once. See <<Stabilizing the pen position>>.
 |===
 
 == Input profiles
@@ -138,8 +142,8 @@ new WeaveBrushToolAction({
 
 | mono:[capture] | mono:[source] `legacy` \| `coalesced`; mono:[clock] `now` \| `event`; mono:[minMovePx]; mono:[predicted] `off` \| `tail`; mono:[event] `pointermove` \| `pointerrawupdate`; mono:[shiftLock] | `legacy`, `now`, `0`, `tail`, `pointermove`, `false`
 | mono:[pressure] | mono:[synth] `off` \| `velocity`; mono:[zero] `legacy` \| `keep` \| `holdLast`; mono:[filter] `legacy` \| `timeEma` \| `oneEuro` \| `none`; mono:[timeConstantMs]; mono:[oneEuro]; mono:[floor]; mono:[start] `backfill` \| `average` \| `none`; mono:[startSamples]; mono:[end] `backfill` \| `none` | `off`, `legacy`, `legacy`, `40`, `{ minCutoff: 1, beta: 0.01 }`, `0.15`, `backfill`, `3`, `backfill`
-| mono:[stabilizer] | mono:[type] `none` \| `oneEuro` \| `pulledString` \| `streamline`; mono:[minCutoff]; mono:[beta]; mono:[radiusPx]; mono:[amount]; mono:[zoomAware]; mono:[catchUpOnEnd] | `none`
-| mono:[finalize] | mono:[mode] `dp` \| `dpPressure` \| `bezierFit` \| `none`; mono:[tolerance]; mono:[toleranceUnit] `canvas` \| `screen`; mono:[pressureWeight]; mono:[resampleSpacingPx] | `dp`, the tool-level mono:[simplifyTolerance], `canvas`
+| mono:[stabilizer] | mono:[type] `none` \| `oneEuro` \| `pulledString` \| `streamline`; mono:[minCutoff]; mono:[beta]; mono:[dCutoff]; mono:[radiusPx]; mono:[amount]; mono:[zoomAware]; mono:[catchUpOnEnd] | `none`
+| mono:[finalize] | mono:[mode] `dp` \| `dpPressure` \| `bezierFit` \| `none`; mono:[tolerance]; mono:[toleranceUnit] `canvas` \| `screen`; mono:[pressureWeight]; mono:[resampleSpacingPx]; mono:[maxDeviationPx] | `dp`, the tool-level mono:[simplifyTolerance], `canvas`, the tool-level mono:[finalizeMaxDeviationPx]
 | mono:[touchGuard] | mono:[waitMs]; mono:[movePx]; mono:[cancelOnSecondTouch]; mono:[ignoreAfterPen] | no wait, no guard
 |===
 
@@ -254,8 +258,26 @@ from it.
 Distances are *screen pixels* when `stabilizer.zoomAware` is on, so the effect on screen is the same at every zoom level. With
 it off they are canvas units, and a stroke drawn zoomed out is smoothed more strongly on screen than one drawn zoomed in.
 
-A stabilized stroke lags behind the pen. With `stabilizer.catchUpOnEnd` on, the stroke is completed at the position where the
+A stabilized stroke lags behind the pen: by a few px with the `pulledString` leash or a One Euro filter with a quick speed filter
+(see `stabilizer.dCutoff`), and by 15 px or more at the pace of a quick stroke with the other settings. With `stabilizer.catchUpOnEnd` on, the stroke is completed at the position where the
 pen was lifted. With it off the stroke ends where the stabilizer had reached.
+
+The stroke is completed along the way the pen went since the point of its path nearest to the end of the line, not with a straight
+segment. A straight segment has a direction the pen never went in, and a nib or a taper, which follow the direction and the end of
+the line, would draw it as a different stroke. The way is moved by what the line was off it, less and less, so it is exact at the
+last position. If the pen has not been kept long enough to reach back to the line (more than about 32 screen pixels, or 64
+samples), the stroke is completed with a straight segment.
+
+When the pen lifts, the end of the line glides along that way over the tool's `catchUpMs` (90 ms by default), fast at first and
+slowing as it arrives, and the stroke is saved when it has. The points saved are the same as if it had been saved at once. The stroke is
+saved at once, with no glide, when:
+
+* `catchUpMs` is `0`,
+* the line is less than 1.5 screen pixels from the pen, or the stroke has no stabilizer,
+* the next stroke starts, or the tool is left, while it glides,
+* the browser has no animation frames.
+
+The stroke reaches the document up to `catchUpMs` after the pointer lifts. The pointer moving after it lifted does not change the stroke.
 
 ==== Tuning the One Euro filter
 
@@ -269,6 +291,13 @@ and add more lag.
 
 A slow-speed jitter problem means `minCutoff` is too high; a high-speed lag problem means `beta` is too low. With `beta: 0` the
 filter is a plain low-pass filter and lags by about `speed / (2 * pi * minCutoff)`: at 400 px/s and 1 Hz that is 64 px.
+
+The filter measures the speed through a low-pass filter of its own, whose cutoff is `stabilizer.dCutoff` (1 Hz by default).
+That is slow: a stroke that starts fast, or turns, is followed with the smoothing of a slow one for the first 100 to 200 ms,
+and the line lags 15 px or more, which shows when the pen is lifted. Raise `dCutoff` to 8 to 15 to measure the speed quickly. The line
+then keeps within a few px of the pen at any pace, and a slow stroke is smoothed as before. Measured with a mouse, `minCutoff` `4`
+and `beta` `0.04`: 15 px of lag at the end of a quick stroke with `dCutoff` `1`, 4 px with `12`; and the line strays 1 px from the path the pen
+followed, where it strayed 4 px. The pen, the fountain pen and the brush use `12`.
 
 === Finishing a stroke
 
@@ -288,8 +317,42 @@ When a stroke ends its points are reduced before they are saved. `finalize.mode`
 `simplifyTolerance`). With `"screen"` it is in pixels, converted with the zoom in force when the stroke ends, so the same
 setting gives the same on-screen fidelity at every zoom level. `finalize.pressureWeight` is then in pixels per unit of pressure.
 
-NOTE: `bezierFit` changes the stroke a little when the pen lifts, because the live stroke shows the recorded points and the
-saved stroke is the fitted curve. Keep the tolerance small, or use a stabilizer while drawing, to keep that change small.
+NOTE: The finishing step reduces the points, and the stroke is then drawn through fewer points, so the line can move when the
+pointer is released, and the width with it. `bezierFit` and a large tolerance move it more. <<Keeping the saved line faithful>>
+bounds that, whatever the mode.
+
+==== Keeping the saved line faithful
+
+By default a saved stroke is kept within a quarter of a screen pixel of the stroke as it was drawn. The tool's
+`finalizeMaxDeviationPx` sets how much, in screen pixels, for a thin line, and a profile can set its own with
+`finalize.maxDeviationPx` (empty uses the tool's). `0` saves what the finishing step leaves, as releases before this setting did,
+point for point; the legacy golden gestures of the SDK are run with it at `0`.
+
+How it works:
+
+* The result of the finishing step is drawn, and compared with the stroke as it was drawn, the way strokes are drawn: the
+largest distance between the two lines, or between their widths, counts. A result within the bound is saved as it is. A finishing
+step of `none` is left as it is, since it keeps every point.
+* Otherwise the stroke is rebuilt from the drawn points. It starts from a coarse pressure-aware simplification and adds, pass
+after pass, the drawn point nearest to each place where the saved line is farthest from the drawn one, until none is. Points
+are added only where the line needs them, so a smooth stroke stays small. This also replaces a fitted curve that overshoots
+the drawn line, which `bezierFit` does now and then.
+* Where the lines part even though the points there are already as close as they come, as at a sharp turn, the drawn points
+around the place are kept.
+* If no set of points matches, or the work takes longer than 80 ms, every drawn point is kept. The saved stroke then looks
+exactly as it did.
+* The bound is in screen pixels, at the zoom in force when the stroke ends, so it looks the same at every zoom level.
+* It is the bound for a thin line. A broad stroke may move by 5% of its width, never less than the bound and at most four times it,
+because a shift that is a visible part of a hairline is not on a 20 px stroke.
+
+What it costs: the stroke is saved with as many points as the bound needs, never more than were drawn. A smooth, stabilized
+stroke needs about as many as `dpPressure` leaves. One drawn with a mouse, whose positions are whole pixels, needs more, up to about
+five times the points the default finishing step leaves for a hairline, since the wobble of the drawn line is part of what is
+kept. A broad stroke needs fewer. Raise the bound, or set it to `0`, to save fewer points.
+
+NOTE: Measured through the brush tool and the stroke renderer, with the bound off between 2 and 54% of the ink of a stroke
+visibly changes on release for the instruments, and 5 to 13% for the brush with no instrument, depending on the width of the
+line; with the default bound it is 1 to 4% for both.
 
 === Fingers: the touch guard
 
@@ -359,12 +422,12 @@ with one call. Nothing changes until an application selects one; with no instrum
 | Instrument | Character
 
 | mono:[pencil] | A thin line that gets thinner the faster it is drawn with a mouse or a finger; a pen keeps its own pressure. Finished with mono:[dpPressure].
-| mono:[pen] | A smooth line of changing width with a tapered end, fitted to a curve with mono:[bezierFit] when the stroke ends.
-| mono:[brush] | A soft line that swells and tapers at both ends, with a little variation in width along the way. The tapers are 1.5 and 3 stroke widths long, fitted to a curve with mono:[bezierFit].
+| mono:[pen] | A smooth line of changing width with a short rounded end: the taper is half a stroke width long (at least 2 px), so the end is not a needle. Follows a fast stroke closely (One Euro filter with mono:[dCutoff] `12`) and is fitted to a curve with mono:[bezierFit] when the stroke ends.
+| mono:[brush] | A soft line that swells and tapers at both ends, with a little variation in width along the way. It is never thinner than 40% of its width, even at speed, and the tapers are 0.75 and 1.5 stroke widths long with the default shape, which ends blunt. Follows a fast stroke closely like the mono:[pen] and is fitted to a curve with mono:[bezierFit].
 | mono:[fountainPen] | A line whose width follows the angle between its direction and a fixed nib (mono:[nibAngle] `-45`, mono:[nibContrast] `0.7`): thick across the nib, thin along it. Follows the speed of a mouse like the mono:[pen], and is fitted to a curve.
 | mono:[fineliner] | A thin line of constant width with round ends.
-| mono:[marker] | A broad line with flat ends that thins by 12% at speed with a mouse or a finger. Finished with mono:[dpPressure].
-| mono:[highlighter] | A broad line of constant width with flat ends, opacity `0.75` and the `multiply` blend mode, so it darkens what it crosses.
+| mono:[marker] | A broad smooth line with round ends that thins by 12% at speed with a mouse or a finger. Smoothed with a pulled string of 6 screen pixels, which keeps the line within that distance of the pen at any pace. Finished with mono:[dpPressure].
+| mono:[highlighter] | A broad smooth line of constant width with round ends, opacity `0.75` and the `multiply` blend mode, so it darkens what it crosses. Smoothed with a pulled string of 8 screen pixels.
 |===
 
 [source,ts]
@@ -395,6 +458,8 @@ NOTE: A stroke drawn with a look that a release before instruments does not know
 const BRUSH_TOOL_DEFAULT_CONFIG = {
   interpolationSteps: 10,
   simplifyTolerance: 0.5,
+  finalizeMaxDeviationPx: 0.25,
+  catchUpMs: 90,
   input: {
     forceProfile: null,
     profiles: {

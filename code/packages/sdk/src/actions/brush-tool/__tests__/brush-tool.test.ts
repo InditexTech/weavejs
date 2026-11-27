@@ -105,6 +105,8 @@ function makeMockNodeHandler() {  const renderedShape = {
     create: vi.fn().mockReturnValue({ props: { fill: 'red' } }),
     onRender: vi.fn().mockReturnValue(renderedShape),
     onUpdate: vi.fn(),
+    // the node measures strokes the tool finishes; these tests have nothing to measure
+    getRenderedGeometry: vi.fn().mockReturnValue(null),
     serialize: vi.fn().mockReturnValue({ id: 'stroke-id', type: 'stroke', props: {} }),
     _renderedShape: renderedShape,
   };

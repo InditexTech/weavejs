@@ -12,6 +12,10 @@ export type StrokeAttrs = {
   stroke?: string;
   dash?: number[];
   look?: unknown;
+  eraseMask?: unknown;
+  erasures?: unknown;
+  id?: string;
+  exportSourceId?: string;
 };
 
 /** A shape as the stroke node sees it: attributes and the absolute scale. */

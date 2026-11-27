@@ -33,6 +33,10 @@ Enables users to directly comment and give feedback on the stage.
 Allows users to erase (delete) elements of the canvas. When enabled the user can click on an element and it will be erased.
 
 [card,subheader="UX"]
+.xref:sdk:api-reference/actions/stroke-eraser-tool.adoc[WeaveStrokeEraserToolAction]
+Allows users to erase part of a stroke. When enabled the user drags a circle or a square over a stroke and the area under it is removed, leaving the rest of the stroke exactly as it was drawn.
+
+[card,subheader="UX"]
 .xref:sdk:api-reference/actions/move-tool.adoc[WeaveMoveToolAction]
 Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas at its will.
 

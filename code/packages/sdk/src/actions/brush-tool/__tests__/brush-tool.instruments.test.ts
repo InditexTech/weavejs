@@ -56,26 +56,26 @@ describe('brush instruments', () => {
     );
   });
 
-  it('selects the highlighter: flat ends, constant width, translucent, multiply', () => {
+  it('selects the highlighter: round ends, constant width, translucent, multiply', () => {
     const action = new WeaveBrushToolAction();
     expect(action.setInstrument('highlighter')).toEqual({
       applied: true,
       errors: [],
     });
     const look = action.getLook()!;
-    expect(look.ends).toBe('flat');
+    expect(look.ends).toBe('round');
     expect(look.width.min).toBe(look.width.max);
     expect(propsOf(action).opacity).toBe(0.75);
     expect(propsOf(action).globalCompositeOperation).toBe('multiply');
   });
 
-  it('selects the fineliner with round ends and the marker with flat ends', () => {
+  it('selects the fineliner and the marker with round ends', () => {
     const action = new WeaveBrushToolAction();
     action.setInstrument('fineliner');
     expect(action.getLook()!.ends).toBe('round');
     expect(action.getLook()!.width.min).toBe(action.getLook()!.width.max);
     action.setInstrument('marker');
-    expect(action.getLook()!.ends).toBe('flat');
+    expect(action.getLook()!.ends).toBe('round');
     expect(action.getLook()!.width.min).toBeCloseTo(0.88);
   });
 
@@ -306,12 +306,15 @@ describe('brush instrument', () => {
   };
 
   it('tapers both ends and varies the width', () => {
-    const look = brushAt().getLook()!;
+    // at a stroke width of 1 both tapers are the shortest a look accepts
+    const look = brushAt(8).getLook()!;
     expect(look.width.taperStart).toBeGreaterThan(0);
     expect(look.width.taperEnd).toBeGreaterThan(look.width.taperStart);
     expect(look.variance).toBeGreaterThan(0);
     expect(look.width.min).toBeLessThan(look.width.max);
     expect(look.ends).toBe('round');
+    // the default taper shape, which ends blunt, not the soft one, which ends in a needle
+    expect(look.width.easing).toBeUndefined();
   });
 
   it('scales its tapers to the stroke width', () => {
@@ -393,5 +396,131 @@ describe('instruments and the Shift lock', () => {
     action.setInstrument('pen');
     action.applyScenario('A');
     expect(action.getInputProfile('mouse').capture.shiftLock).toBeUndefined();
+  });
+});
+
+describe('the ends of the pens', () => {
+  const lookAt = (id: 'pen' | 'brush', strokeWidth: number) => {
+    const action = new WeaveBrushToolAction();
+    action.updateProps({ strokeWidth });
+    expect(action.setInstrument(id).applied).toBe(true);
+    return action.getLook()!.width;
+  };
+
+  it('gives the pen a short taper that follows its width, so it ends rounded and not in a needle', () => {
+    expect(lookAt('pen', 8).taperEnd).toBe(4);
+    expect(lookAt('pen', 20).taperEnd).toBe(10);
+    // never shorter than a look accepts for a taper, and never longer than the line is wide
+    expect(lookAt('pen', 1).taperEnd).toBe(2);
+    for (const w of [4, 8, 16, 40])
+      expect(lookAt('pen', w).taperEnd!).toBeLessThanOrEqual(w);
+  });
+
+  it('keeps the brush from getting hair-thin: a floor of 40% of its width and short tapers', () => {
+    const width = lookAt('brush', 8);
+    expect(width.min).toBeGreaterThanOrEqual(0.4);
+    expect(width.taperStart).toBe(6);
+    expect(width.taperEnd).toBe(12);
+  });
+});
+
+describe('releasing a quick stroke', () => {
+  /** A curving stroke with a mouse at about 1.75 px/ms, 8 ms between events. */
+  const quick = (): Gesture => {
+    const steps: GestureStep[] = [
+      { type: 'down', t: 0, x: 20, y: 80, pressure: 0.5, pointerType: 'mouse' },
+    ];
+    for (let i = 1; i <= 30; i++) {
+      steps.push({
+        type: 'move',
+        t: i * 8,
+        x: 20 + i * 14,
+        y: 80 + 30 * Math.sin(i / 5),
+        pressure: 0.5,
+        pointerType: 'mouse',
+      });
+    }
+    steps.push({ type: 'up', t: 30 * 8 + 6 });
+    return { name: 'quick', steps };
+  };
+  const PEN = { x: 20 + 30 * 14, y: 80 + 30 * Math.sin(30 / 5) };
+
+  /** How far the line was from the pointer in the last frame drawn before the release. */
+  const lag = (id: WeaveBrushInstrumentId, patch?: object) => {
+    const { live } = runGesture(quick(), undefined, (action, i) => {
+      if (i !== 0) return;
+      action.setInstrument(id);
+      if (patch) action.setInputProfile('mouse', patch as never);
+    });
+    const last = live[live.length - 1];
+    return Math.hypot(last.x - PEN.x, last.y - PEN.y);
+  };
+
+  it.each(['pen', 'fountainPen', 'brush'] as const)(
+    'finds the line of the %s within a few px of the pointer',
+    (id) => {
+      expect(lag(id)).toBeLessThan(6);
+    }
+  );
+
+  it('is what the speed filter does: with its default of 1 Hz the line is far further behind', () => {
+    for (const id of ['pen', 'fountainPen', 'brush'] as const) {
+      expect(lag(id, { stabilizer: { dCutoff: 1 } })).toBeGreaterThan(
+        lag(id) * 1.8
+      );
+    }
+  });
+
+  it.each(['marker', 'highlighter'] as const)(
+    'keeps the line of the %s within the leash of the pointer',
+    (id) => {
+      expect(lag(id)).toBeLessThanOrEqual(8 + 1e-3);
+    }
+  );
+});
+
+describe('what smooths the instruments', () => {
+  const profile = (
+    id: Parameters<WeaveBrushToolAction['setInstrument']>[0],
+    key: 'mouse' | 'touch'
+  ) => {
+    const action = new WeaveBrushToolAction();
+    action.setInstrument(id);
+    return action.getInputProfile(key).stabilizer;
+  };
+
+  it.each(['pen', 'fountainPen', 'brush'] as const)(
+    '%s follows a fast stroke closely: a One Euro filter with a quick speed filter',
+    (id) => {
+      for (const key of ['mouse', 'touch'] as const) {
+        const stabilizer = profile(id, key);
+        expect(stabilizer.type).toBe('oneEuro');
+        expect(stabilizer.dCutoff).toBeGreaterThanOrEqual(8);
+        expect(stabilizer.zoomAware).toBe(true);
+      }
+    }
+  );
+
+  it.each(['marker', 'highlighter'] as const)(
+    '%s is smoothed with a pulled string, which never trails the pen by more than its leash',
+    (id) => {
+      for (const key of ['mouse', 'touch'] as const) {
+        const stabilizer = profile(id, key);
+        expect(stabilizer.type).toBe('pulledString');
+        expect(stabilizer.radiusPx).toBeGreaterThan(0);
+        expect(stabilizer.radiusPx).toBeLessThanOrEqual(10);
+        expect(stabilizer.zoomAware).toBe(true);
+      }
+    }
+  );
+
+  it('leaves the pen of a tablet alone for the broad pens', () => {
+    for (const id of ['marker', 'highlighter'] as const) {
+      const action = new WeaveBrushToolAction();
+      action.setInstrument(id);
+      expect(action.getInputProfile('pen.desktop')).toEqual(
+        BRUSH_LEGACY_INPUT_PROFILE
+      );
+    }
   });
 });

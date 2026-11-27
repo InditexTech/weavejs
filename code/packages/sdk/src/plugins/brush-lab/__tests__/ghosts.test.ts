@@ -142,6 +142,36 @@ describe('replayRecording', () => {
     expect(notCaught[notCaught.length - 1].x).toBeLessThan(lastRaw.x);
   });
 
+  it('completes along the way the pen went, not along a straight segment, as the brush does', () => {
+    // right along a line, then sharply up in the last two events
+    const events = [
+      ...Array.from({ length: 30 }, (_, i) => ({
+        time: i * 8,
+        samples: [{ x: i * 6, y: 0, pressure: 0.6 }],
+      })),
+      { time: 240, samples: [{ x: 181, y: -6, pressure: 0.6 }] },
+      { time: 248, samples: [{ x: 182, y: -12, pressure: 0.6 }] },
+    ];
+    const rec = recording();
+    rec.gesture = { events };
+    const lagging = {
+      ...coalesced,
+      stabilizer: {
+        ...coalesced.stabilizer,
+        type: 'streamline' as const,
+        amount: 0.8,
+        catchUpOnEnd: true,
+      },
+    };
+    const points = replayRecording(rec, lagging, 0);
+    expect(points[points.length - 1]).toMatchObject({ x: 182, y: -12 });
+
+    // the line was well behind the pen, and a segment from there to the end would
+    // pass 10 px from the corner the pen turned at, (174, 0)
+    const corner = Math.min(...points.map((p) => Math.hypot(p.x - 174, p.y)));
+    expect(corner).toBeLessThan(2.5);
+  });
+
   it('gives each coalesced sample its own time', () => {
     const rec = recording(4);
     // samples of one event share its time unless they carry their own
