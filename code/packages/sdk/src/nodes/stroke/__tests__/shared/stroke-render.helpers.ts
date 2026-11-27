@@ -13,6 +13,7 @@ export type StrokeAttrs = {
   dash?: number[];
   look?: unknown;
   eraseMask?: unknown;
+  erasures?: unknown;
   id?: string;
   exportSourceId?: string;
 };

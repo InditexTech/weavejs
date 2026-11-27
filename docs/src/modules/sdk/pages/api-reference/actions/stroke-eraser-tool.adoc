@@ -4,7 +4,7 @@
 == Overview
 
 The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/stroke-eraser-tool/stroke-eraser-tool.ts[WeaveStrokeEraserToolAction]
-class lets users erase an area of the strokes drawn with the xref:sdk:api-reference/actions/brush-tool.adoc[brush tool]. The user drags the eraser over a stroke and the parts it covers are removed; what is left of the stroke becomes one or more strokes of its own.
+class lets users erase an area of the strokes drawn with the xref:sdk:api-reference/actions/brush-tool.adoc[brush tool]. The user drags the eraser, a circle or a square, over a stroke and the parts it covers are removed, to the edge of the eraser; what is left of the stroke is the stroke as it was drawn.
 
 It is a separate action from the xref:sdk:api-reference/actions/eraser-tool.adoc[WeaveEraserToolAction], which deletes a whole node with a click. Both can be registered in the same application.
 
@@ -32,10 +32,11 @@ new WeaveStrokeEraserToolAction(params?: WeaveStrokeEraserToolParams);
 
 [source,ts]
 ----
+type WeaveStrokeEraserShape = 'circle' | 'square';
+
 type WeaveStrokeEraserToolProps = {
   size: number;
-  minPieceLengthPx: number;
-  finalize: Partial<WeaveBrushFinalizeConfig>;
+  shape: WeaveStrokeEraserShape;
 };
 
 type WeaveStrokeEraserToolParams = {
@@ -60,18 +61,44 @@ For `WeaveStrokeEraserToolProps`:
 |===
 | Property | Type | Required | Default | Description
 
-| mono:[size] | mono:[number] |  | mono:[24] | Diameter of the eraser, in screen pixels. It is converted to canvas units with the zoom at every pointer sample, so the eraser covers the same area of the screen at any zoom.
-| mono:[minPieceLengthPx] | mono:[number] |  | mono:[2] | Pieces whose centerline is shorter than this, in screen pixels, are not created.
-| mono:[finalize] | mono:[Partial<WeaveBrushFinalizeConfig>] |  | see below | How the points of a piece are reduced when the erase is written. A partial value is merged over the default.
+| mono:[size] | mono:[number] |  | mono:[24] | Diameter of a circular eraser, or side of a square one, in screen pixels. It is converted to canvas units with the zoom at every pointer sample, so the eraser covers the same area of the screen at any zoom.
+| mono:[shape] | mono:[WeaveStrokeEraserShape] |  | mono:['circle'] | mono:['circle'] or mono:['square']. A square keeps its sides parallel to the edges of the screen, whatever the rotation of the stroke it erases.
 |===
 
-The default mono:[finalize] is `{ mode: 'dpPressure', toleranceUnit: 'screen', tolerance: 0.5, pressureWeight: 20, maxDeviationPx: 0.25 }`: a pressure-aware simplification with its tolerance in screen pixels, kept within a quarter of a screen pixel of the line the piece was cut from, so what is left of a stroke does not visibly change when the erase is saved. See xref:sdk:api-reference/actions/brush-tool.adoc#keeping-the-saved-line-faithful[keeping the saved line faithful] for how the bound works, and the xref:sdk:api-reference/actions/brush-tool.adoc[brush tool] for the other modes. Set mono:[maxDeviationPx] to `0` to save the pieces as the simplification leaves them. Keeping the pieces of one erase within the bound shares a budget of 200 ms; past it the remaining pieces are saved as the simplification leaves them, so releasing the pointer over many strokes is not held up.
+A value that is not valid (a size that is not a positive number, an unknown shape) is replaced by its default.
 
-The properties can be changed at runtime with `updateProps`:
+The properties can be changed at runtime with `updateProps`, also while the tool is in use: the ring that shows the eraser follows the change at once. For example, to let the user switch between the circle and the square:
 
 [source,ts]
 ----
-instance.getActionHandler<WeaveStrokeEraserToolAction>("strokeEraserTool")?.updateProps({ size: 40 });
+const eraser = instance.getActionHandler<WeaveStrokeEraserToolAction>("strokeEraserTool");
+
+eraser?.updateProps({ shape: "square" });
+eraser?.updateProps({ size: 40 });
+----
+
+On a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import type { WeaveStrokeEraserToolAction } from "@inditextech/weave-sdk";
+
+const StrokeEraserShapeToggle = () => {
+  const instance = useWeave((state) => state.instance);
+  const [shape, setShape] = React.useState<"circle" | "square">("circle");
+
+  const toggle = React.useCallback(() => {
+    const next = shape === "circle" ? "square" : "circle";
+    instance
+      .getActionHandler<WeaveStrokeEraserToolAction>("strokeEraserTool")
+      ?.updateProps({ shape: next });
+    setShape(next);
+  }, [instance, shape]);
+
+  return <button onClick={toggle}>Eraser: {shape}</button>;
+};
 ----
 
 == Trigger
@@ -83,33 +110,32 @@ instance.triggerAction("strokeEraserTool");
 
 == Behaviour
 
-* While the user drags, the parts of the strokes the eraser covers are hidden on that user's screen only (a local xref:sdk:api-reference/nodes/stroke.adoc#erase-mask[erase mask]). Nothing is written to the shared document and other users see no change.
-* The eraser path joins every pointer sample with the next, so a fast drag does not skip a stroke between two samples.
+* While the user drags, the parts of the strokes the eraser covers are hidden on that user's screen only (the local xref:sdk:api-reference/nodes/stroke.adoc#erase-mask[erase mask]), drawn by the same code that draws the saved erase. Nothing is written to the shared document and other users see no change.
+* The eraser path is the area it sweeps between each pointer sample and the next, so a fast drag does not skip a stroke between two samples.
 * On release the erase is written in a single transaction, so one undo restores everything the drag changed. Pressing `Escape` during the drag discards it and writes nothing; pressing it with no drag in progress leaves the tool.
 * A mutex lock is taken on the strokes that change while the erase is written. If the write fails, the previews are taken off, nothing is left locked, the failure is logged and the tool carries on.
 * A finger or a pen works as a mouse does: the tool keeps the browser from scrolling or zooming the page under a drag (`touch-action: none` on the stage while it is active), only the pointer that began the erase counts, and a pinch, or the browser cancelling the pointer, drops it without writing.
-* A stroke whose last erase the host has not yet rendered is skipped until it has, so a quick second drag never erases it for the points it had before.
-* The cost of the preview does not grow with the length of the drag: what is worked out for a stroke is kept, and each step costs the new capsule.
+* A stroke whose last erase the host has not yet rendered is skipped until it has, so a quick second drag never erases a stroke that is about to change.
 * Only nodes of type `stroke` are erased. Other nodes, including the single-line xref:sdk:api-reference/nodes/stroke-single.adoc[stroke-single] node, are never touched. A stroke that is `locked`, or locked by another user, is skipped and shows no preview.
 
-=== What is erased
+=== What is saved
 
-The cut follows the stroke as it is drawn: the centerline and widths given by xref:sdk:api-reference/nodes/stroke.adoc#rendered-geometry[getRenderedGeometry], not the saved control points.
+The stroke is not cut and does not become several strokes. What the eraser took off is saved on it, in its mono:[erasures] property (see xref:sdk:api-reference/nodes/stroke.adoc#erasures[erasures]): for each stretch of the drag over the stroke, the eraser and the path of its centre, in the space of the stroke.
 
-* For a stroke with round ends, a point is erased when its distance to the eraser is less than the eraser radius plus the stroke's half-width there, so the round end of a remaining piece does not overlap the erased area.
-* For a stroke with flat ends, a point is erased when the eraser comes within its radius of the drawn cross-section of the stroke, so the square end of a remaining piece touches the erased area, and the eraser has no effect past the start or end of the stroke.
-
-=== What is left
-
-* The first piece keeps the id of the stroke and is written as an update of it. The other pieces get new ids and are inserted right after it, in the same parent, so the stacking order with respect to other nodes does not change. A stroke with nothing left is removed.
-* Pieces are ordinary xref:sdk:api-reference/nodes/stroke.adoc[stroke] nodes with no new required field, so any viewer draws them.
-* A piece keeps the colour, stroke width, opacity, blend mode, dash, `inputMeta`, position, rotation, scale and look of the stroke. A cut end has no taper; an end that is still the original start or end of the stroke keeps its taper.
-* Each piece gets its own box, and its points are reduced with the finalize configuration.
+* The stroke keeps its id, its place in the stack, its points, its look, its colour, width, opacity, blend mode, dash and mono:[inputMeta], and its box: the only property that changes is mono:[erasures], which gets the new entries after the ones it had.
+* What is left is the stroke as it was drawn, to the edge of the eraser: an arc of the circle, the sides of the square, or, for a drag, the edge of the area swept. No round or square end is added where the stroke is erased, a corner of the ink next to the erase is as it was, and nothing outside the area the eraser covered changes. A drag at an angle across a line cuts it at that angle.
+* An eraser that is narrower than a stroke takes a channel out of it; one that does not cover the whole width leaves the part it did not cover.
+* The path of each stretch is reduced to a tenth of a screen pixel of the path of the drag, and its numbers are rounded, so a straight drag is saved as two points and a click as one.
+* A stroke is written only when the eraser reaches its ink, as far as its centerline and widths tell, so a drag that crosses the box of a diagonal line without touching it changes nothing.
+* A stroke with nothing left to see is removed in the same step.
+* When the stroke is moved, rotated, put in a group or resized, the erasures follow it.
+* The box of a stroke with erasures is the box of what is left, so the frame of a selection, snapping, aligning and the area the stroke can be picked in follow what shows; erasing only the middle of a stroke does not change them.
 
 == Known limitations
 
-* *Width variation.* A look with mono:[variance] draws its width variation from the id of the stroke and the distance from its start. A piece that does not hold the original start has a new id, so it can show a different variation, by up to the amplitude of the look (at most about 12% of the width for the brush instrument).
-* *Dashes.* A dashed stroke starts its dash pattern again at the start of each piece.
-* *Near a cut.* The curve through the points of a piece ends where the piece ends, while the original goes on, so within about 20 px of a cut the line of a piece bends differently by a fraction of a pixel. Elsewhere it is within the bound above.
-* *Concurrent erases.* If two users erase the same stroke within the time it takes the mutex lock to reach the other, both can write pieces of it and the pieces can overlap. The lock is the mitigation.
-* *Uneven scale.* A stroke scaled differently on each axis keeps the eraser round in screen space only on average: the radius follows the mean scale.
+* *Older viewers.* A viewer of a release before this one does not know the mono:[erasures] property and draws the stroke in full, so the erased parts show again there. That includes a server-side render or an export made with an older release: use this release or a later one wherever the strokes are drawn.
+* *The erased ink stays in the data.* The stroke keeps all its points; the erase only hides what the eraser covered.
+* *One stroke.* A line cut in two is still one stroke: it is selected, moved and deleted as one, and its parts cannot be moved apart.
+* *Slivers.* The erase is exact, so an eraser that does not cover the whole width of a stroke, such as one of 24 pixels dragged along a line 22 pixels wide a pixel off its middle, leaves a sliver of the part it did not cover. Use a larger eraser.
+* *Concurrent erases.* If two users erase the same stroke within the time it takes the mutex lock to reach the other, one of the two erases can be lost: the last write wins. The lock is the mitigation.
+* *Uneven scale.* A stroke scaled differently on each axis keeps the eraser round in screen space only on average: the radius of a circle follows the mean scale. A square follows the scale exactly.

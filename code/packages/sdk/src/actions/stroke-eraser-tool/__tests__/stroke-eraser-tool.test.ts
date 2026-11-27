@@ -22,6 +22,7 @@ import {
 } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 import { createBrushInstruments } from '../../brush-tool/tunables/presets';
+import type { WeaveStrokeErasure } from '@/nodes/stroke/render/erasure';
 
 type Op =
   | { type: 'update'; element: WeaveStateElement }
@@ -230,6 +231,38 @@ function setup(
 const maskOf = (world: World, shape: Konva.Node) =>
   world.handler.getEraseMask(shape);
 
+/** The paths of the eraser that are shown on a stroke while a drag goes on. */
+const chainsOf = maskOf;
+
+/** The axes of a square erasure, as numbers: a zero may come out as minus zero. */
+const expectAxes = (erasure: WeaveStrokeErasure, expected: number[]) => {
+  const axes = (erasure as { axes: number[] }).axes;
+  expected.forEach((v, i) => expect(axes[i]).toBeCloseTo(v, 9));
+};
+
+/** Distance from a point to a path through points. */
+const distanceToPolyline = (
+  p: { x: number; y: number },
+  line: { x: number; y: number }[]
+) => {
+  let best = Infinity;
+  for (let i = 1; i < line.length; i++) {
+    const a = line[i - 1];
+    const b = line[i];
+    const ex = b.x - a.x;
+    const ey = b.y - a.y;
+    const l = ex * ex + ey * ey;
+    const t = l
+      ? Math.max(0, Math.min(1, ((p.x - a.x) * ex + (p.y - a.y) * ey) / l))
+      : 0;
+    best = Math.min(
+      best,
+      Math.hypot(p.x - (a.x + ex * t), p.y - (a.y + ey * t))
+    );
+  }
+  return best;
+};
+
 const updateOf = (ops: Op[], id: string) =>
   ops.find((o) => o.type === 'update' && o.element.key === id) as
     | Extract<Op, { type: 'update' }>
@@ -262,7 +295,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-// ─── 4.1 registration and lifecycle ──────────────────────────────────────────
+// ─── registration and lifecycle ──────────────────────────────────────────────
 
 describe('lifecycle', () => {
   it('is named strokeEraserTool and starts idle', () => {
@@ -281,7 +314,9 @@ describe('lifecycle', () => {
       STROKE_ERASER_TOOL_STATE.ERASING
     );
     expect(world.utilityLayer.getChildren()).toHaveLength(1);
-    expect(world.utilityLayer.getChildren()[0].getChildren()).toHaveLength(2);
+    const ring = world.utilityLayer.getChildren()[0].getChildren();
+    expect(ring).toHaveLength(2);
+    expect(ring.map((c) => c.getClassName())).toEqual(['Circle', 'Circle']);
     expect(world.stage.container().style.cursor).toBe('none');
     expect(cancel).not.toHaveBeenCalled();
   });
@@ -344,7 +379,124 @@ describe('lifecycle', () => {
   });
 });
 
-// ─── 4.2 pointer handling ────────────────────────────────────────────────────
+// ─── the eraser: its size, its shape and its ring ────────────────────────────
+
+describe('the size and shape of the eraser', () => {
+  const ringOf = (world: World) => world.utilityLayer.getChildren()[0];
+
+  it('is a circle of 24 screen pixels by default', () => {
+    const { action } = make();
+    expect(
+      (action as unknown as { getSettings: () => unknown }).getSettings()
+    ).toEqual({ size: 24, shape: 'circle' });
+  });
+
+  it('can be a square from the start', () => {
+    const { action, world, cancel } = make({
+      config: { shape: 'square', size: 30 },
+    });
+    action.trigger(cancel);
+    const [outer, inner] = ringOf(world).getChildren() as Konva.Rect[];
+    expect(outer.getClassName()).toBe('Rect');
+    expect([outer.width(), inner.width()]).toEqual([32, 30]);
+    expect([outer.x(), inner.x()]).toEqual([-16, -15]);
+  });
+
+  it('changes the ring while the tool is in use', () => {
+    const { action, world, cancel } = make();
+    action.trigger(cancel);
+    const circles = ringOf(world).getChildren() as Konva.Circle[];
+    expect(circles.map((c) => c.radius())).toEqual([13, 12]);
+
+    action.updateProps({ size: 40 });
+    expect(world.utilityLayer.getChildren()).toHaveLength(1);
+    expect(
+      (ringOf(world).getChildren() as Konva.Circle[]).map((c) => c.radius())
+    ).toEqual([21, 20]);
+
+    action.updateProps({ shape: 'square' });
+    expect(world.utilityLayer.getChildren()).toHaveLength(1);
+    const rects = ringOf(world).getChildren() as Konva.Rect[];
+    expect(rects.map((r) => r.getClassName())).toEqual(['Rect', 'Rect']);
+    expect(rects.map((r) => r.width())).toEqual([42, 40]);
+
+    action.updateProps({ shape: 'circle' });
+    expect(ringOf(world).getChildren()[0].getClassName()).toBe('Circle');
+  });
+
+  it('keeps the ring where the pointer is when it changes', () => {
+    const { action, world, cancel, move } = make();
+    action.trigger(cancel);
+    move(120, 80);
+    action.updateProps({ shape: 'square' });
+    expect(ringOf(world).position()).toEqual({ x: 120, y: 80 });
+  });
+
+  it('does not touch the ring when it is not in use', () => {
+    const { action, world } = make();
+    action.updateProps({ shape: 'square', size: 50 });
+    expect(world.utilityLayer.getChildren()).toHaveLength(0);
+  });
+
+  it('falls back to the defaults for a value that is not valid', () => {
+    const { action, world, cancel } = make();
+    action.updateProps({ size: -5, shape: 'star' });
+    action.trigger(cancel);
+    const circles = ringOf(world).getChildren() as Konva.Circle[];
+    expect(circles.map((c) => c.radius())).toEqual([13, 12]);
+    expect(
+      (action as unknown as { getSettings: () => unknown }).getSettings()
+    ).toEqual({ size: 24, shape: 'circle' });
+  });
+
+  it('erases with a square once it is chosen, also in the middle of a session', () => {
+    const { action, world, cancel, down } = make({ config: { size: 12 } });
+    const stroke = world.addStroke({ id: 's' });
+    action.trigger(cancel);
+    action.updateProps({ shape: 'square' });
+
+    down(50, 10);
+    const [chain] = chainsOf(world, stroke)!;
+    expect(chain.shape).toBe('square');
+    expectAxes(chain, [6, 0, 0, 6]);
+  });
+
+  it('keeps the same screen size for a square at any zoom', () => {
+    for (const zoom of [0.5, 2]) {
+      const { action, world, cancel, down } = make({
+        config: { size: 20, shape: 'square' },
+      });
+      world.stage.scale({ x: zoom, y: zoom });
+      const stroke = world.addStroke({ id: 's' });
+      action.trigger(cancel);
+      down(50, 10);
+      const [chain] = chainsOf(world, stroke)!;
+      const axes = (chain as { axes: number[] }).axes;
+      expect(axes[0]).toBeCloseTo(10 / zoom, 9);
+      expect(axes[3]).toBeCloseTo(10 / zoom, 9);
+    }
+  });
+
+  it('turns a square with the stroke it erases', () => {
+    const { action, world, cancel, down } = make({
+      config: { size: 10, shape: 'square' },
+    });
+    const stroke = world.addStroke({
+      id: 's',
+      at: { x: 100, y: 100 },
+      rotation: 90,
+    });
+    action.trigger(cancel);
+    down(100, 150);
+    const axes = (chainsOf(world, stroke)![0] as { axes: number[] }).axes;
+    expect(axes[0]).toBeCloseTo(0, 6);
+    expect(axes[1]).toBeCloseTo(-5, 6);
+    expect(axes[2]).toBeCloseTo(5, 6);
+    expect(axes[3]).toBeCloseTo(0, 6);
+  });
+});
+
+// ─── pointer handling ────────────────────────────────────────────────────────
 
 describe('pointer handling', () => {
   it('sizes the eraser in screen pixels, whatever the zoom', () => {
@@ -356,7 +508,9 @@ describe('pointer handling', () => {
 
       down(50, 10);
       // 12 screen px of radius is 12 / zoom canvas units
-      expect(maskOf(world, stroke)![0].r).toBeCloseTo(12 / zoom, 9);
+      expect(
+        (chainsOf(world, stroke)![0] as { radius: number }).radius
+      ).toBeCloseTo(12 / zoom, 9);
     }
   });
 
@@ -370,30 +524,48 @@ describe('pointer handling', () => {
     down(10, 10);
     world.stage.scale({ x: 2, y: 2 });
     move(20, 10);
-    const radii = maskOf(world, stroke)!.map((c) => c.r);
+    const radii = chainsOf(world, stroke)!.map(
+      (c) => (c as { radius: number }).radius
+    );
     expect(radii).toEqual([10, 5]);
   });
 
-  it('joins samples with capsules, so a fast drag does not skip a stroke', () => {
+  it('keeps one path while the drag goes on', () => {
+    const { action, world, cancel, down, move } = make({ config: { size: 8 } });
+    const stroke = world.addStroke({ id: 's', y: 10 });
+    action.trigger(cancel);
+
+    down(10, 10);
+    move(20, 10);
+    move(30, 14);
+    const chains = chainsOf(world, stroke)!;
+    expect(chains).toHaveLength(1);
+    expect(chains[0].points.slice(-4)).toEqual([20, 10 - 6, 30, 14 - 6]);
+  });
+
+  it('joins samples into a path, so a fast drag does not skip a stroke', () => {
     const { action, world, cancel, down, move } = make({ config: { size: 4 } });
     const stroke = world.addStroke({ id: 's', y: 100 });
     action.trigger(cancel);
 
     down(50, 0);
     move(50, 400);
-    const mask = maskOf(world, stroke)!;
     // from one end of the drag step to the other, in the space of the stroke
-    expect(mask.at(-1)!.a).toEqual({ x: 50, y: 0 - stroke.y() });
-    expect(mask.at(-1)!.b).toEqual({ x: 50, y: 400 - stroke.y() });
+    expect(chainsOf(world, stroke)![0].points.slice(-4)).toEqual([
+      50,
+      0 - stroke.y(),
+      50,
+      400 - stroke.y(),
+    ]);
   });
 
-  it('gives the capsules in the space of the stroke', () => {
+  it('gives the path in the space of the stroke', () => {
     const { action, world, cancel, down } = make({ config: { size: 8 } });
     const stroke = world.addStroke({ id: 's', at: { x: 100, y: 200 } });
     action.trigger(cancel);
 
     down(130, 204);
-    expect(maskOf(world, stroke)![0].a).toEqual({ x: 30, y: 4 });
+    expect(chainsOf(world, stroke)![0].points.slice(0, 2)).toEqual([30, 4]);
   });
 
   it('only reaches the strokes near the eraser', () => {
@@ -405,6 +577,21 @@ describe('pointer handling', () => {
     down(50, 12);
     expect(maskOf(world, near)).not.toBeNull();
     expect(maskOf(world, far)).toBeNull();
+  });
+
+  it('starts a path for a stroke the eraser reaches only after it has been dragged for a while', () => {
+    const { action, world, cancel, down, move } = make({ config: { size: 8 } });
+    const late = world.addStroke({ id: 'late', y: 300 });
+    action.trigger(cancel);
+
+    down(50, 10);
+    move(50, 100);
+    expect(maskOf(world, late)).toBeNull();
+    move(50, 296);
+    // the step that reaches it starts where the previous one ended
+    const chains = chainsOf(world, late)!;
+    expect(chains).toHaveLength(1);
+    expect(chains[0].points).toEqual([50, 100 - late.y(), 50, 296 - late.y()]);
   });
 
   it('ignores a button other than the main one', () => {
@@ -452,7 +639,7 @@ describe('pointer handling', () => {
   });
 });
 
-// ─── 4.3 preview: what can be erased ─────────────────────────────────────────
+// ─── what can be erased ──────────────────────────────────────────────────────
 
 describe('what the eraser reaches', () => {
   it('leaves other node types alone', () => {
@@ -520,7 +707,7 @@ describe('what the eraser reaches', () => {
     expect(maskOf(world, mine)).not.toBeNull();
   });
 
-  it('leaves the preview of a stroke being handed over alone', () => {
+  it('leaves the preview of a stroke being drawn alone', () => {
     const { action, world, cancel, down } = make({ config: { size: 40 } });
     const preview = world.addStroke({ id: 'x--preview' });
     action.trigger(cancel);
@@ -538,13 +725,13 @@ describe('what the eraser reaches', () => {
 
     // the group is turned a quarter: the stroke now runs down the layer from (300, 100)
     down(296, 150);
-    const c = maskOf(world, shape)![0];
-    expect(c.a.x).toBeCloseTo(50, 6);
-    expect(c.a.y).toBeCloseTo(4, 6);
+    const [x, y] = chainsOf(world, shape)![0].points;
+    expect(x).toBeCloseTo(50, 6);
+    expect(y).toBeCloseTo(4, 6);
   });
 });
 
-// ─── 4.5 commit ──────────────────────────────────────────────────────────────
+// ─── commit ──────────────────────────────────────────────────────────────────
 
 describe('commit', () => {
   it('writes nothing while dragging and once on release', async () => {
@@ -563,108 +750,157 @@ describe('commit', () => {
     expect(world.transactions.count).toBe(1);
   });
 
-  it('keeps the id on the first piece and adds the other under the same parent', async () => {
+  it('saves what was erased on the stroke, and changes nothing else of it', async () => {
     const { action, world, cancel, drag } = make({ config: { size: 12 } });
-    world.addStroke({ id: 'below', y: 150 });
-    world.addStroke({ id: 's' });
-    world.addStroke({ id: 'above', y: 200 });
+    const stroke = world.addStroke({
+      id: 's',
+      width: 10,
+      attrs: {
+        look: { version: 1, outline: 'round' },
+        inputMeta: { profile: 'mouse' },
+        opacity: 0.75,
+        globalCompositeOperation: 'multiply',
+        dash: [4, 4],
+      },
+    });
+    const before = world.handler.serialize(stroke as never).props;
     action.trigger(cancel);
-
     await drag(50, -20, 40);
 
-    const update = updateOf(world.ops, 's')!;
-    const adds = addsOf(world.ops);
-    expect(update.element.key).toBe('s');
-    expect(update.element.props.id).toBe('s');
-    expect(adds).toHaveLength(1);
-    expect(adds[0].element.key).not.toBe('s');
-    expect(adds[0].element.props.id).toBe(adds[0].element.key);
-    expect(adds[0].parentId).toBe('mainLayer');
+    // one write, an update of the stroke: no new stroke, nothing moved in the order
+    expect(world.ops).toHaveLength(1);
+    expect(world.ops[0].type).toBe('update');
+    expect(addsOf(world.ops)).toHaveLength(0);
+    expect(world.order).toEqual(['s']);
+
+    const { erasures, ...rest } = updateOf(world.ops, 's')!.element.props;
+    expect(rest).toEqual(before);
+    expect(rest).not.toHaveProperty('eraseMask');
+    expect(erasures).toHaveLength(1);
   });
 
-  it('puts the extra pieces at the position of the stroke, below what was above it', async () => {
+  it('saves the path of the eraser in the space of the stroke', async () => {
     const { action, world, cancel, drag } = make({ config: { size: 12 } });
-    world.addStroke({ id: 'below', y: 150 });
     world.addStroke({ id: 's' });
-    world.addStroke({ id: 'above', y: 200 });
     action.trigger(cancel);
-
     await drag(50, -20, 40);
 
-    const extra = addsOf(world.ops)[0].element.key;
-    expect(world.order).toEqual(['below', 's', extra, 'above']);
+    const [e] = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    // straight down across the stroke, whose box is at y = 6
+    expect(e).toEqual({
+      shape: 'circle',
+      radius: 6,
+      points: [50, -26, 50, 34],
+    });
   });
 
-  it('splits a stroke cut twice into three pieces', async () => {
+  it('saves a square with its axes', async () => {
+    const { action, world, cancel, drag } = make({
+      config: { size: 12, shape: 'square' },
+    });
+    world.addStroke({ id: 's' });
+    action.trigger(cancel);
+    await drag(50, -20, 40);
+
+    const [e] = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    expect(e.shape).toBe('square');
+    expectAxes(e, [6, 0, 0, 6]);
+    expect(e.points).toEqual([50, -26, 50, 34]);
+  });
+
+  it('reduces the path of a long straight drag to its two ends', async () => {
     const { action, world, cancel, down, move, up } = make({
       config: { size: 12 },
     });
     world.addStroke({ id: 's' });
     action.trigger(cancel);
 
-    down(25, -20);
-    move(25, 10);
-    move(25, 40);
-    move(75, 40);
-    move(75, 10);
-    await up(75, -20);
+    down(50, -40);
+    for (let y = -35; y <= 60; y += 5) move(50, y);
+    await up(50, 60);
 
-    expect(addsOf(world.ops)).toHaveLength(2);
-    expect(world.order).toHaveLength(3);
-    expect(world.order[0]).toBe('s');
+    const [e] = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    // two points, from above the ink to below it: the rest of the samples are on the line
+    expect(e.points).toHaveLength(4);
+    expect(e.points[0]).toBe(50);
+    expect(e.points[2]).toBe(50);
+    expect(e.points[1]).toBeLessThan(-6);
+    expect(e.points[3]).toBeGreaterThan(14);
   });
 
-  it('keeps look, colour, width and the other attributes on every piece', async () => {
-    const { action, world, cancel, drag } = make({ config: { size: 12 } });
-    const look = { version: 1, outline: 'round' };
-    world.addStroke({
-      id: 's',
-      width: 10,
-      attrs: {
-        look,
-        inputMeta: { profile: 'mouse' },
-        opacity: 0.75,
-        globalCompositeOperation: 'multiply',
-        dash: [4, 4],
-        isEraser: false,
-      },
+  it('keeps a curved path within a tenth of a screen pixel', async () => {
+    const zoom = 2;
+    const { action, world, cancel, down, move, up } = make({
+      config: { size: 12 },
     });
+    world.stage.scale({ x: zoom, y: zoom });
+    const stroke = world.addStroke({ id: 's', x1: 200 });
     action.trigger(cancel);
-    await drag(50, -20, 40);
 
-    for (const op of world.ops) {
-      if (op.type === 'remove') continue;
-      const p = op.element.props;
-      expect(p.stroke).toBe('#000000ff');
-      expect(p.strokeWidth).toBe(10);
-      expect(p.opacity).toBe(0.75);
-      expect(p.globalCompositeOperation).toBe('multiply');
-      expect(p.dash).toEqual([4, 4]);
-      expect(p.inputMeta).toEqual({ profile: 'mouse' });
-      expect(p.look).toEqual(look);
-      expect(p.nodeType).toBe('stroke');
-      expect(p).not.toHaveProperty('eraseMask');
+    const raw: { x: number; y: number }[] = [];
+    const at = (i: number) => ({
+      x: 10 + i * 1.5,
+      y: 10 + 12 * Math.sin(i / 9),
+    });
+    down(at(0).x, at(0).y);
+    for (let i = 1; i < 120; i++) {
+      move(at(i).x, at(i).y);
+      raw.push({ x: at(i).x, y: at(i).y - stroke.y() });
     }
+    await up(at(119).x, at(119).y);
+
+    const [e] = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    expect(e.points.length).toBeLessThan(raw.length * 2);
+    const saved = [];
+    for (let i = 0; i < e.points.length; i += 2) {
+      saved.push({ x: e.points[i], y: e.points[i + 1] });
+    }
+    const worst = Math.max(...raw.map((p) => distanceToPolyline(p, saved)));
+    // a tenth of a screen pixel, in the units of the canvas at this zoom
+    expect(worst).toBeLessThanOrEqual(0.1 / zoom + 1e-6);
   });
 
-  it('gives each piece its own box and stores its points relative to it', async () => {
+  it('adds to what was erased before, and leaves that as it was', async () => {
     const { action, world, cancel, drag } = make({ config: { size: 12 } });
-    world.addStroke({ id: 's', width: 8, y: 10 });
+    const earlier: WeaveStrokeErasure = {
+      shape: 'circle',
+      radius: 3,
+      points: [10, 4],
+    };
+    world.addStroke({ id: 's', attrs: { erasures: [earlier] } });
     action.trigger(cancel);
-    await drag(50, -20, 40);
+    await drag(60, -20, 40);
 
-    const first = updateOf(world.ops, 's')!.element.props;
-    const second = addsOf(world.ops)[0].element.props;
+    const saved = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    expect(saved).toHaveLength(2);
+    expect(saved[0]).toEqual(earlier);
+    expect(saved[1]).toMatchObject({ shape: 'circle', radius: 6 });
+  });
 
-    expect(first.x).toBeCloseTo(0, 6);
-    expect(first.width).toBeLessThan(50);
-    expect(second.x).toBeGreaterThan(50);
-    expect(second.width).toBeLessThan(50);
-    for (const props of [first, second]) {
-      expect(props.height).toBeGreaterThanOrEqual(8);
-      const pts = props.strokeElements as { x: number; y: number }[];
-      expect(Math.min(...pts.map((p) => p.x))).toBeGreaterThanOrEqual(0);
-    }
+  it('saves one path for each stretch of a drag over a stroke', async () => {
+    const { action, world, cancel, down, move, up } = make({
+      config: { size: 12 },
+    });
+    world.addStroke({ id: 's' });
+    action.trigger(cancel);
+
+    down(25, 10);
+    move(30, 12);
+    // another size: the zoom changed on the way
+    world.stage.scale({ x: 2, y: 2 });
+    move(60, 12);
+    await up(60, 12);
+
+    const saved = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    expect(saved).toHaveLength(2);
+    expect((saved[0] as { radius: number }).radius).toBe(6);
+    expect((saved[1] as { radius: number }).radius).toBe(3);
   });
 
   it('does not move what is left of a rotated, scaled stroke', async () => {
@@ -677,44 +913,57 @@ describe('commit', () => {
       rotation: 30,
       scale: 1.5,
     });
-    const toWorld = (shape: Konva.Node, p: { x: number; y: number }) =>
-      shape.getTransform().point(p);
-
+    const original = { ...stroke.getAttrs() };
+    const toLayer = (p: { x: number; y: number }) =>
+      stroke.getTransform().point(p);
     const own = stroke.getAttrs().strokeElements as { x: number; y: number }[];
-    const originalFirst = toWorld(stroke, own[0]);
-    const originalLast = toWorld(stroke, own.at(-1)!);
     action.trigger(cancel);
 
     // across the middle of the stroke, in layer space
-    const middle = toWorld(stroke, { x: 50, y: own[0].y });
+    const middle = toLayer({ x: 50, y: own[0].y });
     down(middle.x - 30, middle.y - 30);
     move(middle.x, middle.y);
     await up(middle.x + 30, middle.y + 30);
 
-    const piece = (props: Record<string, unknown>, which: 'first' | 'last') => {
-      const shape = new Konva.Shape({
-        x: props.x as number,
-        y: props.y as number,
-        rotation: props.rotation as number,
-        scaleX: props.scaleX as number,
-        scaleY: props.scaleY as number,
-      });
-      const pts = props.strokeElements as { x: number; y: number }[];
-      return toWorld(shape, which === 'first' ? pts[0] : pts.at(-1)!);
-    };
+    const props = updateOf(world.ops, 's')!.element.props;
+    for (const key of [
+      'x',
+      'y',
+      'rotation',
+      'scaleX',
+      'scaleY',
+      'width',
+      'height',
+    ]) {
+      expect(props[key]).toBe(original[key]);
+    }
+    expect(props.strokeElements).toEqual(original.strokeElements);
 
-    const first = updateOf(world.ops, 's')!.element.props;
-    const last = addsOf(world.ops)[0].element.props;
+    // what was saved, taken back into the layer, is where the eraser went
+    const [e] = props.erasures as WeaveStrokeErasure[];
+    const first = toLayer({ x: e.points[0], y: e.points[1] });
+    const last = toLayer({ x: e.points.at(-2)!, y: e.points.at(-1)! });
+    // the saved numbers are rounded to a thousandth of a unit of the stroke
+    expect(first.x).toBeCloseTo(middle.x - 30, 2);
+    expect(first.y).toBeCloseTo(middle.y - 30, 2);
+    // the path ends at the last position the pointer moved to
+    expect(last.x).toBeCloseTo(middle.x, 2);
+    expect(last.y).toBeCloseTo(middle.y, 2);
+    expect((e as { radius: number }).radius).toBeCloseTo(6 / 1.5, 6);
+  });
 
-    const a = piece(first, 'first');
-    expect(a.x).toBeCloseTo(originalFirst.x, 4);
-    expect(a.y).toBeCloseTo(originalFirst.y, 4);
-    const b = piece(last, 'last');
-    expect(b.x).toBeCloseTo(originalLast.x, 4);
-    expect(b.y).toBeCloseTo(originalLast.y, 4);
-    expect(first.rotation).toBe(30);
-    expect(first.scaleX).toBe(1.5);
-    expect(last.rotation).toBe(30);
+  it('erases the middle of a stroke that has only its two ends as points', async () => {
+    // as a straight line is saved once the brush has simplified it
+    const { action, world, cancel, drag } = make({ config: { size: 12 } });
+    const stroke = world.addStroke({ id: 's', step: 100 });
+    expect(stroke.getAttrs().strokeElements).toHaveLength(2);
+    action.trigger(cancel);
+    await drag(50, -20, 40);
+
+    expect(updateOf(world.ops, 's')).toBeDefined();
+    const [e] = updateOf(world.ops, 's')!.element.props
+      .erasures as WeaveStrokeErasure[];
+    expect(e.points).toEqual([50, -26, 50, 34]);
   });
 
   it('removes a stroke the eraser covers completely', async () => {
@@ -733,7 +982,26 @@ describe('commit', () => {
     expect(world.order).toEqual([]);
   });
 
-  it('trims the end of a stroke with a single update and no new piece', async () => {
+  it('removes a stroke that several drags leave nothing of', async () => {
+    const { action, world, cancel, down, move, up } = make({
+      config: { size: 12 },
+    });
+    // earlier erasures took the left of the stroke; this drag takes the rest
+    world.addStroke({
+      id: 's',
+      attrs: {
+        erasures: [{ shape: 'circle', radius: 30, points: [-10, 4, 40, 4] }],
+      },
+    });
+    action.trigger(cancel);
+    down(45, 10);
+    move(105, 10);
+    await up(105, 10);
+
+    expect(world.ops.map((o) => o.type)).toEqual(['remove']);
+  });
+
+  it('trims the end of a stroke with a single update', async () => {
     const { action, world, cancel, down, up } = make({ config: { size: 20 } });
     world.addStroke({ id: 's' });
     action.trigger(cancel);
@@ -741,30 +1009,9 @@ describe('commit', () => {
     down(100, 10);
     await up(100, 10);
 
-    expect(addsOf(world.ops)).toHaveLength(0);
+    expect(world.ops).toHaveLength(1);
     expect(updateOf(world.ops, 's')).toBeDefined();
     expect(world.order).toEqual(['s']);
-  });
-
-  it('drops a piece too short to be seen', async () => {
-    const { action, world, cancel, down, move, up } = make({
-      config: { size: 20, minPieceLengthPx: 6 },
-    });
-    // 8 units of stroke to the right of the first cut, which a second cut takes
-    world.addStroke({ id: 's', step: 1, width: 2 });
-    action.trigger(cancel);
-
-    down(20, -20);
-    move(20, 40);
-    move(45, 40);
-    move(45, -20);
-    await up(45, -20);
-
-    // what is left of the middle (about 5 units) is shorter than 6
-    const keys = world.ops.flatMap((o) =>
-      o.type === 'remove' ? [] : [o.element.key]
-    );
-    expect(keys).toHaveLength(2);
   });
 
   it('skips a stroke that became locked before the release', async () => {
@@ -803,6 +1050,31 @@ describe('commit', () => {
     expect(world.transactions.count).toBe(0);
   });
 
+  it('writes nothing for a stroke whose box the eraser crossed but whose ink it did not touch', async () => {
+    const { action, world, cancel, down, move, up } = make({
+      config: { size: 12 },
+    });
+    // a diagonal line: its box is a square, and the eraser goes by a corner of it
+    const diagonal = world.addStroke({ id: 'd', width: 4 });
+    diagonal.setAttrs({
+      width: 100,
+      height: 100,
+      strokeElements: [
+        { x: 0, y: 0, pressure: 1 },
+        { x: 100, y: 100, pressure: 1 },
+      ],
+    });
+    action.trigger(cancel);
+
+    down(90, 10);
+    move(95, 12);
+    expect(maskOf(world, diagonal)).not.toBeNull();
+    await up(97, 14);
+
+    expect(world.ops).toHaveLength(0);
+    expect(maskOf(world, diagonal)).toBeNull();
+  });
+
   it('changes several strokes of one gesture in one transaction, under one lock', async () => {
     const { action, world, cancel, down, move, up } = make({
       config: { size: 12 },
@@ -818,28 +1090,11 @@ describe('commit', () => {
     await up(50, 100);
 
     expect(world.transactions.count).toBe(1);
-    expect(world.transactions.opsInside[0]).toBeGreaterThanOrEqual(6);
+    expect(world.transactions.opsInside[0]).toBe(3);
     expect(world.locks).toHaveLength(1);
     expect(world.locks[0].operation).toBe(STROKE_ERASER_MUTEX_OPERATION);
     expect([...world.locks[0].nodeIds].sort()).toEqual(['a', 'b', 'c']);
-  });
-
-  it('keeps the order of strokes when several are split', async () => {
-    const { action, world, cancel, down, move, up } = make({
-      config: { size: 12 },
-    });
-    world.addStroke({ id: 'a', y: 10 });
-    world.addStroke({ id: 'b', y: 40 });
-    action.trigger(cancel);
-
-    down(50, -10);
-    move(50, 25);
-    move(50, 60);
-    await up(50, 60);
-
-    const added = addsOf(world.ops).map((o) => o.element.key);
-    expect(added).toHaveLength(2);
-    expect(world.order).toEqual(['a', added[0], 'b', added[1]]);
+    expect(world.order).toEqual(['a', 'b', 'c']);
   });
 
   it('writes nothing, and removes the preview, when the lock is refused', async () => {
@@ -853,7 +1108,7 @@ describe('commit', () => {
     expect(maskOf(world, stroke)).toBeNull();
   });
 
-  it('keeps the preview until the node takes the committed stroke', async () => {
+  it('keeps the preview until the node takes the saved erase', async () => {
     const { action, world, cancel, drag } = make({ config: { size: 12 } });
     const stroke = world.addStroke({ id: 's' });
     action.trigger(cancel);
@@ -863,7 +1118,7 @@ describe('commit', () => {
 
     // the host renders the written state
     stroke.setAttrs({
-      strokeElements: [{ x: 0, y: 0, pressure: 1 }],
+      erasures: [{ shape: 'circle', radius: 6, points: [50, -26, 50, 34] }],
     });
     expect(maskOf(world, stroke)).toBeNull();
   });
@@ -888,36 +1143,13 @@ describe('commit', () => {
     }
   });
 
-  it('finalizes the points of the pieces with the configured override', async () => {
-    const dense = make({
-      config: { size: 12, finalize: { mode: 'none' } },
-    });
-    dense.world.addStroke({ id: 's', step: 1 });
-    dense.action.trigger(dense.cancel);
-    await dense.drag(50, -20, 40);
-    const kept = (
-      updateOf(dense.world.ops, 's')!.element.props.strokeElements as unknown[]
-    ).length;
-
-    const reduced = make({ config: { size: 12 } });
-    reduced.world.addStroke({ id: 's', step: 1 });
-    reduced.action.trigger(reduced.cancel);
-    await reduced.drag(50, -20, 40);
-    const fewer = (
-      updateOf(reduced.world.ops, 's')!.element.props
-        .strokeElements as unknown[]
-    ).length;
-
-    expect(fewer).toBeLessThan(kept);
-  });
-
   it('lets props change the size while the tool is registered', () => {
     const { action, world, cancel, down } = make({ config: { size: 10 } });
     const stroke = world.addStroke({ id: 's' });
     action.updateProps({ size: 30 });
     action.trigger(cancel);
     down(50, 10);
-    expect(maskOf(world, stroke)![0].r).toBe(15);
+    expect((chainsOf(world, stroke)![0] as { radius: number }).radius).toBe(15);
   });
 });
 
@@ -929,47 +1161,44 @@ describe('strokes of every brush instrument', () => {
   describe.each(instruments.map((i) => [i.id, i] as const))(
     '%s',
     (_id, instrument) => {
-      it.each([0.25, 1, 4])('can be cut at zoom %s', async (zoom) => {
-        const { action, world, cancel, down, move, up } = make({
-          config: { size: 24 },
-        });
-        world.stage.scale({ x: zoom, y: zoom });
-        // a stroke as long on screen at every zoom, drawn across by the eraser
-        const k = 1 / zoom;
-        world.addStroke({
-          id: 's',
-          x1: 100 * k,
-          y: 10 * k,
-          step: k,
-          attrs: {
-            look: instrument.look,
-            ...instrument.props,
-          },
-        });
-        action.trigger(cancel);
+      it.each([0.25, 1, 4])(
+        'can be erased at zoom %s, and is saved as it was',
+        async (zoom) => {
+          const { action, world, cancel, down, move, up } = make({
+            config: { size: 24 },
+          });
+          world.stage.scale({ x: zoom, y: zoom });
+          // a stroke as long on screen at every zoom, drawn across by the eraser
+          const k = 1 / zoom;
+          const stroke = world.addStroke({
+            id: 's',
+            x1: 100 * k,
+            y: 10 * k,
+            step: k,
+            attrs: {
+              look: instrument.look,
+              ...instrument.props,
+            },
+          });
+          const before = world.handler.serialize(stroke as never).props;
+          action.trigger(cancel);
 
-        down(50 * k, -20 * k);
-        move(50 * k, 10 * k);
-        move(50 * k, 40 * k);
-        await up(50 * k, 40 * k);
+          down(50 * k, -20 * k);
+          move(50 * k, 10 * k);
+          move(50 * k, 40 * k);
+          await up(50 * k, 40 * k);
 
-        const update = updateOf(world.ops, 's')!;
-        const adds = addsOf(world.ops);
-        expect(update).toBeDefined();
-        expect(adds).toHaveLength(1);
-
-        for (const op of [update, ...adds]) {
-          const pts = op.element.props.strokeElements as { pressure: number }[];
-          expect(pts.length).toBeGreaterThanOrEqual(2);
-          expect(op.element.props.look).toBeDefined();
-          expect(op.element.props.strokeWidth).toBe(8);
+          expect(world.ops).toHaveLength(1);
+          const { erasures, ...rest } = updateOf(world.ops, 's')!.element.props;
+          // every point, the look and every other attribute: exactly as they were
+          expect(rest).toEqual(before);
+          expect(erasures).toHaveLength(1);
+          expect((erasures as { radius: number }[])[0].radius).toBeCloseTo(
+            12 * k,
+            9
+          );
         }
-        // the piece that ends at the cut has no end taper
-        const width = (
-          update.element.props.look as { width?: { taperEnd?: number } }
-        ).width;
-        expect(width?.taperEnd ?? 0).toBe(0);
-      });
+      );
     }
   );
 });
@@ -1021,7 +1250,7 @@ describe('touch and pen input', () => {
     fire(world, 'pointerup', 50, 40);
     await flush();
 
-    expect(addsOf(world.ops)).toHaveLength(1);
+    expect(updateOf(world.ops, 's')).toBeDefined();
   });
 
   it('is not ended, nor moved, by another pointer', async () => {
@@ -1031,14 +1260,14 @@ describe('touch and pen input', () => {
 
     fire(world, 'pointerdown', 50, -20, { pointerId: 1 });
     fire(world, 'pointermove', 50, 10, { pointerId: 1 });
-    const before = maskOf(world, stroke)!.length;
+    const before = [...chainsOf(world, stroke)![0].points];
 
     // a second finger moves and lifts
     fire(world, 'pointermove', 80, 10, { pointerId: 2 });
     fire(world, 'pointerup', 80, 10, { pointerId: 2 });
     await flush();
     expect(world.ops).toHaveLength(0);
-    expect(maskOf(world, stroke)!.length).toBe(before);
+    expect(chainsOf(world, stroke)![0].points).toEqual(before);
 
     fire(world, 'pointermove', 50, 40, { pointerId: 1 });
     fire(world, 'pointerup', 50, 40, { pointerId: 1 });
@@ -1148,17 +1377,14 @@ describe('failing and repeating', () => {
     expect(maskOf(world, stroke)).not.toBeNull();
     const writes = world.ops.length;
 
-    // a second drag, while the node still has the points of the first
+    // a second drag, while the node still has the erasures it had
     await drag(20, -20, 40);
     expect(world.ops.length).toBe(writes);
     expect(maskOf(world, stroke)).not.toBeNull();
 
-    // the host renders the committed stroke
+    // the host renders the saved erase
     stroke.setAttrs({
-      strokeElements: [
-        { x: 0, y: 4, pressure: 1 },
-        { x: 10, y: 4, pressure: 1 },
-      ],
+      erasures: [{ shape: 'circle', radius: 6, points: [50, -26, 50, 34] }],
     });
     expect(maskOf(world, stroke)).toBeNull();
 
@@ -1185,169 +1411,5 @@ describe('failing and repeating', () => {
     } finally {
       vi.useRealTimers();
     }
-  });
-});
-
-// ─── what is left of a stroke does not change when it is saved ───────────────
-
-describe('pieces stay faithful to the stroke they were cut from', () => {
-  const penLook = createBrushInstruments(6).find((i) => i.id === 'pen')!.look;
-
-  // The time the pieces may take is a limit on the work, not a part of what is
-  // saved: how long the machine takes, which depends on what else it is doing,
-  // must not change the result. The clock does not move, so the limit never comes.
-  beforeEach(() => {
-    vi.spyOn(performance, 'now').mockReturnValue(0);
-  });
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  /**
-   * Erases the middle of a wavy stroke and measures, in the space of the node,
-   * how far the first piece that is written is from the part of the stroke it
-   * was cut from. Positions only: a piece has no taper at its cut end.
-   */
-  const shiftOfFirstPiece = async (
-    config: Parameters<typeof make>[0],
-    extra: Record<string, unknown>,
-    // a hairline, so the bound is the one asked for: a broad stroke is allowed more
-    width = 2
-  ) => {
-    const { action, world, cancel, down, move, up } = make(config);
-    const stroke = world.addStroke({
-      id: 's',
-      step: 1,
-      x1: 400,
-      width,
-      attrs: extra,
-    });
-    // wavy, so that reducing its points has something to lose
-    const wavy = (stroke.getAttrs().strokeElements as { x: number }[]).map(
-      (p, i) => ({
-        x: p.x,
-        y: 8 + 3 * Math.sin(i / 17) + 1.5 * Math.sin(i / 5),
-        pressure: 0.5 + 0.3 * Math.sin(i / 40),
-      })
-    );
-    stroke.setAttrs({ strokeElements: wavy, height: 16 });
-    action.trigger(cancel);
-
-    down(200, -20);
-    move(200, 8);
-    move(200, 40);
-    // what the preview shows of the stroke, before it is written
-    const shown = world.handler.cutStrokeWithMask(
-      stroke,
-      maskOf(world, stroke)!
-    )!;
-    await up(200, 40);
-
-    const props = updateOf(world.ops, 's')!.element.props;
-    const geometry = world.handler.getRenderedGeometry({
-      getAttrs: () => ({ ...stroke.getAttrs(), ...props }),
-      getAbsoluteScale: () => ({ x: 1, y: 1 }),
-    } as unknown as Konva.Node)!;
-
-    // the piece is drawn at its own x and y, the stroke at its own
-    const dx = (props.x as number) - stroke.x();
-    const dy = (props.y as number) - stroke.y();
-    const piece = geometry.centerline.map((p) => ({
-      x: p.x + dx,
-      y: p.y + dy,
-    }));
-    const original = shown.runs[0].points.map((p) => ({ x: p.x, y: p.y }));
-
-    // distance from a point to a line made of segments
-    const distance = (
-      p: { x: number; y: number },
-      line: { x: number; y: number }[]
-    ) => {
-      let best = Infinity;
-      for (let i = 1; i < line.length; i++) {
-        const a = line[i - 1];
-        const b = line[i];
-        const ex = b.x - a.x;
-        const ey = b.y - a.y;
-        const l = ex * ex + ey * ey;
-        const t = l
-          ? Math.max(0, Math.min(1, ((p.x - a.x) * ex + (p.y - a.y) * ey) / l))
-          : 0;
-        best = Math.min(
-          best,
-          Math.hypot(p.x - (a.x + ex * t), p.y - (a.y + ey * t))
-        );
-      }
-      return best;
-    };
-
-    // The curve through the points of a piece ends where the piece ends, while
-    // the original goes on: near a cut it bends differently, which no choice of
-    // points can change. So the interior and the last stretch are told apart.
-    const cutAt = original.at(-1)!.x;
-    const apart = (keep: (x: number) => boolean) =>
-      Math.max(
-        ...piece.filter((p) => keep(p.x)).map((p) => distance(p, original)),
-        ...original.filter((p) => keep(p.x)).map((p) => distance(p, piece))
-      );
-
-    return {
-      pieces: 1 + addsOf(world.ops).length,
-      points: (props.strokeElements as unknown[]).length,
-      interior: apart((x) => x < cutAt - 20),
-      wholePiece: apart(() => true),
-    };
-  };
-
-  it.each([
-    ['a stroke with a look', { look: penLook }],
-    ['a stroke with no look', {}],
-  ])(
-    'keeps what is left of %s within a quarter of a pixel',
-    async (_name, extra) => {
-      const kept = await shiftOfFirstPiece({ config: { size: 12 } }, extra);
-      expect(kept.pieces).toBe(2);
-      expect(kept.interior).toBeLessThanOrEqual(0.25 + 0.05);
-      // the cut end bends a little differently, by a fraction of a pixel
-      expect(kept.wholePiece).toBeLessThanOrEqual(0.5);
-    }
-  );
-
-  it('is what keeps them there: without the bound the same stroke is moved more', async () => {
-    const loose = await shiftOfFirstPiece(
-      { config: { size: 12, finalize: { maxDeviationPx: 0 } } },
-      { look: penLook }
-    );
-    const kept = await shiftOfFirstPiece(
-      { config: { size: 12 } },
-      { look: penLook }
-    );
-    expect(loose.interior).toBeGreaterThan(0.35);
-    expect(kept.interior).toBeLessThan(loose.interior);
-    // and it costs points
-    expect(kept.points).toBeGreaterThan(loose.points);
-  });
-
-  it('lets a broad stroke move more, as the brush does', async () => {
-    const hairline = await shiftOfFirstPiece(
-      { config: { size: 12 } },
-      { look: penLook },
-      2
-    );
-    const broad = await shiftOfFirstPiece(
-      { config: { size: 12 } },
-      { look: penLook },
-      24
-    );
-    expect(broad.points).toBeLessThan(hairline.points);
-    expect(broad.interior).toBeLessThanOrEqual(0.25 * 4 + 0.05);
-  });
-
-  it('can be asked for a different bound', async () => {
-    const tight = await shiftOfFirstPiece(
-      { config: { size: 12, finalize: { maxDeviationPx: 0.08 } } },
-      { look: penLook }
-    );
-    expect(tight.interior).toBeLessThanOrEqual(0.08 + 0.05);
   });
 });

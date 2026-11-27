@@ -3,7 +3,7 @@
 
 == Introduction
 
-This action allows users to erase part of a stroke. The user drags the eraser over a stroke drawn with the xref:main:build/actions/brush-tool.adoc[Brush Tool] and the parts it covers disappear; what is left of the stroke stays on the canvas as one or more strokes.
+This action allows users to erase part of a stroke. The user drags the eraser, a circle or a square, over a stroke drawn with the xref:main:build/actions/brush-tool.adoc[Brush Tool] and the parts it covers disappear, to the edge of the eraser; what is left of the stroke stays on the canvas exactly as it was drawn.
 
 It does not replace the xref:main:build/actions/eraser-tool.adoc[Eraser Tool], which deletes a whole element with a click. Register the one that fits, or both.
 
@@ -28,11 +28,11 @@ const instance = new Weave({
   ...
   actions: [
     ...,
-    new WeaveStrokeEraserToolAction({ config: { size: 24 } }), // <.>
+    new WeaveStrokeEraserToolAction({ config: { size: 24, shape: "circle" } }), // <.>
   ]
 })
 ----
-<.> Added in this step. The size is the diameter of the eraser, in screen pixels.
+<.> Added in this step. The size is the diameter of a circular eraser, or the side of a square one, in screen pixels. The shape is `"circle"` or `"square"`.
 
 === Setup the action trigger
 Setup on a button or any element on the UI the user can interact with on the action event:
@@ -60,19 +60,46 @@ const MyStrokeEraserToolTriggerComponent = () => {
 };
 ----
 
+=== Let the user choose the shape
+The shape and the size can be changed at any time, also while the tool is in use, and the ring that shows the eraser follows at once. Setup a button, or any element, that changes them with `updateProps`:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import type { WeaveStrokeEraserToolAction } from "@inditextech/weave-sdk";
+
+const MyStrokeEraserShapeToggle = () => {
+  const instance = useWeave((state) => state.instance);
+  const [shape, setShape] = React.useState<"circle" | "square">("circle");
+
+  const toggle = React.useCallback(() => {
+    const next = shape === "circle" ? "square" : "circle";
+    instance
+      .getActionHandler<WeaveStrokeEraserToolAction>("strokeEraserTool")
+      ?.updateProps({ shape: next });
+    setShape(next);
+  }, [instance, shape]);
+
+  return <button onClick={toggle}>Eraser: {shape}</button>;
+};
+----
+
 === Trigger the action
 Finally a final user trigger the UI element that launches the action.
 
-When enabled, a ring shows the size of the eraser. The user presses and drags over a stroke and the part under the ring disappears from their screen. When the user lets go the change is saved and shared with everyone, as a single step: one undo brings back everything the drag erased. Pressing `Escape` while dragging cancels the erase and leaves the strokes as they were.
+When enabled, a ring shows the shape and size of the eraser. The user presses and drags over a stroke and the part under the ring disappears from their screen. When the user lets go the change is saved and shared with everyone, as a single step: one undo brings back everything the drag erased. Pressing `Escape` while dragging cancels the erase and leaves the strokes as they were.
 
 NOTE: The eraser keeps the same size on screen at any zoom level.
 
 == Things to know
 
-* A stroke that is cut in two becomes two strokes. The first keeps the original identity, and both stay where they were in the stacking order. What is left of the stroke does not visibly change when you let go.
+* The edge of the erase is the edge of the eraser: a click with the circle leaves a round bite, a drag across a line leaves a gap with straight sides, and a drag at an angle cuts at that angle. The ends of what is left are not rounded and not shortened.
+* A stroke that is erased in two places is still one stroke: it is selected, moved and deleted as one, and its parts cannot be moved apart. What was erased is saved on it, and the erased ink stays in its data.
+* An eraser that does not cover the whole width of a stroke leaves the part it did not cover, so use a larger one to wipe a broad stroke in one pass. A stroke that has nothing left to see is removed.
+* The frame of a selection, snapping and aligning follow what is left of a stroke.
 * It works with a finger or a pen as it does with a mouse. A pinch, or a second finger, does not erase.
-* A stroke drawn with a variable width (the Brush pen) can show a slightly different width pattern on the pieces after the first.
-* A dashed stroke starts its dash pattern again in each piece.
-* If two people erase the same stroke at the same moment, the pieces can overlap.
+* Viewers of a release before the stroke eraser draw an erased stroke in full, so the erased parts show again there. Use this release or a later one wherever strokes are drawn, a server-side render included.
+* If two people erase the same stroke at the same moment, one of the two erases can be lost.
 
 See the xref:sdk:api-reference/actions/stroke-eraser-tool.adoc[API reference] for the options.

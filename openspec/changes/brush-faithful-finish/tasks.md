@@ -21,10 +21,6 @@
 - [x] 3.1b Complete the stroke along the way the pen went (`completionTail`, the last 64 positions kept, the offset faded, a straight segment when the path does not reach back), glide along it, and use it for the Brush Lab ghosts too; verify unit tests of `completionTail`, a brush test that the corner the pen turned at is kept, that gliding and saving at once give the same points, and the ghost test
 - [x] 3.2 Document it, and verify the docs build
 
-## 4. The eraser pieces
+## 4. Integration
 
-- [x] 4.1 Keep the pieces of an erase within the bound of the line they were cut from, with the piece's own look and one deadline for the whole erase, and verify tests on pieces and through the action: within the bound, drifting without it, a broad stroke allowed more, a deadline falling back to the finishing step
-
-## 5. Integration
-
-- [x] 5.1 Run the SDK tests, lint and type check and the docs build, and verify `openspec validate brush-faithful-finish --strict` passes
+- [x] 4.1 Run the SDK tests, lint and type check and the docs build, and verify `openspec validate brush-faithful-finish --strict` passes

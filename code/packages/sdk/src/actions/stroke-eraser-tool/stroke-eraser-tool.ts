@@ -4,8 +4,8 @@
 
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { v4 as uuidv4 } from 'uuid';
 import type {
+  WeaveElementAttributes,
   WeaveElementInstance,
   WeaveStateElement,
 } from '@inditextech/weave-types';
@@ -15,25 +15,34 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import { PREVIEW_ID_SUFFIX } from '../brush-tool/constants';
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import { WEAVE_STROKE_NODE_TYPE } from '@/nodes/stroke/constants';
-import type { WeaveEraserCapsule } from '@/nodes/stroke/render/erase';
+import {
+  compactErasure,
+  holesOfAll,
+  readErasures,
+  touchesInk,
+  type WeaveStrokeErasure,
+} from '@/nodes/stroke/render/erasure';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import {
   STROKE_ERASER_CURSOR_STYLE,
-  STROKE_ERASER_DEFAULT_FINALIZE,
   STROKE_ERASER_DEFAULT_PROPS,
   STROKE_ERASER_MUTEX_OPERATION,
-  STROKE_ERASER_REFINE_BUDGET_MS,
+  STROKE_ERASER_PATH_TOLERANCE_PX,
+  STROKE_ERASER_SHAPES,
   STROKE_ERASER_TOOL_ACTION_NAME,
   STROKE_ERASER_TOOL_STATE,
 } from './constants';
-import { eraserRadiusInCanvas, toNodeSpaceCapsule } from './local-space';
-import { buildStrokePieces } from './pieces';
+import {
+  eraserRadiusInCanvas,
+  nodeSpaceEraser,
+  sameEraser,
+} from './local-space';
 import type {
+  WeaveStrokeEraserShape,
   WeaveStrokeEraserToolActionState,
   WeaveStrokeEraserToolParams,
   WeaveStrokeEraserToolProps,
 } from './types';
-import type { WeaveBrushFinalizeConfig } from '../brush-tool/types';
 
 type XY = { x: number; y: number };
 
@@ -42,11 +51,38 @@ type EraseTarget = {
   node: Konva.Node;
   /** Bounds of the node in the space of the main layer, with room for the stroke width. */
   bounds: { x1: number; y1: number; x2: number; y2: number };
-  mask: WeaveEraserCapsule[];
+  /** One path for each stretch of the drag that went over the stroke, in the space of the node. */
+  chains: WeaveStrokeErasure[];
 };
 
-/** Frames a preview may wait for its node to take the committed stroke, at most. */
+/** What the commit does to a stroke the gesture erased. */
+type PlannedChange = {
+  target: EraseTarget;
+  /** Everything erased of the stroke: what was saved, then what this drag added. */
+  erasures: WeaveStrokeErasure[];
+  /** Nothing of the stroke is left to see. */
+  empty: boolean;
+};
+
+/** Frames a preview may wait for its node to take the committed erase, at most. */
 const HANDOVER_MAX_FRAMES = 30;
+
+/** The settings of the eraser, with what is not valid left out. */
+function settingsOf(
+  props: Partial<WeaveStrokeEraserToolProps> | undefined
+): WeaveStrokeEraserToolProps {
+  const size = props?.size;
+  const shape = props?.shape;
+  return {
+    size:
+      typeof size === 'number' && Number.isFinite(size) && size > 0
+        ? size
+        : STROKE_ERASER_DEFAULT_PROPS.size,
+    shape: STROKE_ERASER_SHAPES.includes(shape as WeaveStrokeEraserShape)
+      ? (shape as WeaveStrokeEraserShape)
+      : STROKE_ERASER_DEFAULT_PROPS.shape,
+  };
+}
 
 export class WeaveStrokeEraserToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -68,14 +104,7 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
   constructor(params?: WeaveStrokeEraserToolParams) {
     super();
 
-    this.defaultProps = {
-      ...STROKE_ERASER_DEFAULT_PROPS,
-      ...params?.config,
-      finalize: {
-        ...STROKE_ERASER_DEFAULT_FINALIZE,
-        ...params?.config?.finalize,
-      },
-    };
+    this.defaultProps = settingsOf(params?.config);
 
     this.initialize();
   }
@@ -92,13 +121,13 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
   }
 
   private getSettings(): WeaveStrokeEraserToolProps {
-    const props = this.props as Partial<WeaveStrokeEraserToolProps>;
-    return {
-      size: props.size ?? this.defaultProps.size,
-      minPieceLengthPx:
-        props.minPieceLengthPx ?? this.defaultProps.minPieceLengthPx,
-      finalize: { ...this.defaultProps.finalize, ...props.finalize },
-    };
+    return settingsOf(this.props as Partial<WeaveStrokeEraserToolProps>);
+  }
+
+  /** Changes the size or the shape of the eraser, also while the tool is in use: the ring follows. */
+  updateProps(props: WeaveElementAttributes): void {
+    super.updateProps(props);
+    if (this.cursor) this.buildCursor();
   }
 
   private setState(state: WeaveStrokeEraserToolActionState) {
@@ -242,7 +271,7 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
 
     for (const node of nodes) {
       if (!node.isVisible() || !this.canErase(node)) continue;
-      // its points are about to change: a mask now would be for the old ones
+      // its erasures are about to change: a mask now would be for the old ones
       if (this.pendingHandover.has(node)) continue;
       const rect = node.getClientRect({ relativeTo: layer });
       const room = (node.getAttrs().strokeWidth ?? 1) * 2;
@@ -254,7 +283,7 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
           x2: rect.x + rect.width + room,
           y2: rect.y + rect.height + room,
         },
-        mask: [],
+        chains: [],
       });
     }
   }
@@ -279,29 +308,46 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
 
     const from = this.lastPoint ?? point;
     const zoom = this.instance.getStage().scaleX();
-    const radius = eraserRadiusInCanvas(this.getSettings().size / 2, zoom);
+    const { size, shape } = this.getSettings();
+    const half = eraserRadiusInCanvas(size / 2, zoom);
     this.lastPoint = point;
 
-    const x1 = Math.min(from.x, point.x) - radius;
-    const x2 = Math.max(from.x, point.x) + radius;
-    const y1 = Math.min(from.y, point.y) - radius;
-    const y2 = Math.max(from.y, point.y) + radius;
+    // a square is as far from its centre as its half side along each axis
+    const x1 = Math.min(from.x, point.x) - half;
+    const x2 = Math.max(from.x, point.x) + half;
+    const y1 = Math.min(from.y, point.y) - half;
+    const y2 = Math.max(from.y, point.y) + half;
 
     for (const target of this.targets.values()) {
       const b = target.bounds;
       if (x2 < b.x1 || x1 > b.x2 || y2 < b.y1 || y1 > b.y2) continue;
 
-      target.mask.push(
-        toNodeSpaceCapsule(target.node, layer, from, point, radius)
-      );
-      handler.setEraseMask(target.node, target.mask.slice());
+      const eraser = nodeSpaceEraser(target.node, layer, shape, half);
+      const a = eraser.toNode(from);
+      const p = eraser.toNode(point);
+
+      // the path goes on while the eraser is the same and the last step ended where this one starts
+      const chain = target.chains.at(-1);
+      const n = chain?.points.length ?? 0;
+      if (
+        chain &&
+        sameEraser(chain, eraser.stamp) &&
+        chain.points[n - 2] === a.x &&
+        chain.points[n - 1] === a.y
+      ) {
+        chain.points.push(p.x, p.y);
+      } else {
+        target.chains.push({ ...eraser.stamp, points: [a.x, a.y, p.x, p.y] });
+      }
+
+      handler.setEraseMask(target.node, target.chains.slice());
     }
   }
 
   private clearMasks(): void {
     const handler = this.strokeHandler();
     for (const target of this.targets.values()) {
-      if (target.mask.length > 0) handler?.setEraseMask(target.node, null);
+      if (target.chains.length > 0) handler?.setEraseMask(target.node, null);
     }
     this.targets.clear();
   }
@@ -318,46 +364,39 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
   // ---- commit ------------------------------------------------------------
 
   /**
-   * What each erased stroke becomes: its surviving pieces, kept within a bound
-   * of the line they were cut from, or nothing when none survives.
+   * What each stroke the drag reached becomes: its saved erasures with what the
+   * drag added, the path of each reduced to a tenth of a screen pixel. A stroke
+   * whose ink the eraser never touched is left out, and one with nothing left to
+   * see is marked to be removed.
    */
-  private planChanges(targets: EraseTarget[], handler: WeaveStrokeNode) {
-    const settings = this.getSettings();
-    const finalize = settings.finalize as WeaveBrushFinalizeConfig;
-    const deadline = performance.now() + STROKE_ERASER_REFINE_BUDGET_MS;
-
-    const changes: {
-      target: EraseTarget;
-      pieces: ReturnType<typeof buildStrokePieces>;
-    }[] = [];
+  private planChanges(
+    targets: EraseTarget[],
+    handler: WeaveStrokeNode
+  ): PlannedChange[] {
+    const changes: PlannedChange[] = [];
 
     for (const target of targets) {
-      if (target.mask.length === 0 || !this.canErase(target.node)) continue;
+      if (target.chains.length === 0 || !this.canErase(target.node)) continue;
 
-      const cut = handler.cutStrokeWithMask(target.node, target.mask);
-      if (!cut?.erased) continue;
+      const geometry = handler.getRenderedGeometry(target.node);
+      if (!geometry) continue;
 
       // points are in the space of the node: one screen pixel is this much of it
       const scale = target.node.getAbsoluteScale().x;
-      const zoom = Number.isFinite(scale) && scale > 0 ? scale : 1;
-      const attrs = target.node.getAttrs();
+      const pixel = 1 / (Number.isFinite(scale) && scale > 0 ? scale : 1);
+
+      const added = target.chains.map((chain) =>
+        compactErasure(chain, STROKE_ERASER_PATH_TOLERANCE_PX * pixel)
+      );
+      if (!touchesInk(geometry, holesOfAll(added), pixel)) continue;
+
+      const extent = handler.getVisibleExtent(target.node, added);
+      if (!extent) continue;
 
       changes.push({
         target,
-        pieces: buildStrokePieces({
-          runs: cut.runs,
-          strokeWidth: attrs.strokeWidth ?? 1,
-          look: attrs.look,
-          finalize,
-          zoom,
-          minLength: eraserRadiusInCanvas(settings.minPieceLengthPx, zoom),
-          geometryOf: (look, points) =>
-            handler.getRenderedGeometry(target.node, {
-              points,
-              look: look ?? null,
-            }),
-          deadline,
-        }),
+        erasures: [...readErasures(target.node.getAttrs().erasures), ...added],
+        empty: extent.empty,
       });
     }
 
@@ -366,9 +405,9 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
 
   /**
    * Writes the gesture to the document in one transaction, under a mutex lock
-   * on the strokes it changes: the first piece of each stroke updates it, the
-   * others are inserted after it, and a stroke nothing survives is removed.
-   * If anything fails the previews are taken off and nothing is left locked.
+   * on the strokes it changes: each gets the new erasures, and a stroke nothing
+   * of which is left to see is removed. If anything fails the previews are taken
+   * off and nothing is left locked.
    */
   private async commitGesture(): Promise<void> {
     this.erasing = false;
@@ -388,15 +427,14 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
       // a preview that is not written has nothing to wait for
       const written = new Set(changes.map((c) => c.target));
       for (const target of all) {
-        if (!written.has(target) && target.mask.length > 0) {
+        if (!written.has(target) && target.chains.length > 0) {
           handler.setEraseMask(target.node, null);
         }
       }
       if (changes.length === 0) return;
 
-      // Armed before the write: the host may render it at once, and a mask
-      // kept past that would be applied to the piece in the space of the box
-      // it had before.
+      // Armed before the write: the host may render it at once, and a preview
+      // kept past that would be drawn over the saved erase.
       for (const change of changes) {
         stops.push(this.releaseMaskWhenUpdated(change.target));
       }
@@ -436,65 +474,29 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
     }
   }
 
-  private writeChange({
-    target,
-    pieces,
-  }: {
-    target: EraseTarget;
-    pieces: ReturnType<typeof buildStrokePieces>;
-  }): void {
+  private writeChange({ target, erasures, empty }: PlannedChange): void {
     const handler = this.strokeHandler();
     if (!handler) return;
 
-    const node = target.node;
-    const serialized = handler.serialize(node as WeaveElementInstance);
-    const id = serialized.key;
+    const serialized = handler.serialize(target.node as WeaveElementInstance);
 
-    if (pieces.length === 0) {
+    if (empty) {
       this.instance.removeNodeNT(serialized);
       return;
     }
 
-    const { parent, index } = this.instance.getNode(id);
-    const parentId = parent?.key ?? 'mainLayer';
-    const offset = { x: node.offsetX() ?? 0, y: node.offsetY() ?? 0 };
-    const toParent = node.getTransform();
-
-    pieces.forEach((piece, i) => {
-      // where the corner of the piece's box falls, so the piece does not move
-      const origin = toParent.point({
-        x: piece.box.x + offset.x,
-        y: piece.box.y + offset.y,
-      });
-      const key = i === 0 ? id : uuidv4();
-      const element: WeaveStateElement = {
-        ...serialized,
-        key,
-        props: {
-          ...serialized.props,
-          id: key,
-          x: origin.x,
-          y: origin.y,
-          width: piece.box.width,
-          height: piece.box.height,
-          strokeElements: piece.points,
-          ...(piece.look === undefined ? {} : { look: piece.look }),
-        },
-      };
-
-      if (i === 0) {
-        this.instance.updateNodeNT(element);
-      } else {
-        this.instance.addNodeNT(element, parentId, { index: index + i });
-      }
-    });
+    const element: WeaveStateElement = {
+      ...serialized,
+      props: { ...serialized.props, erasures },
+    };
+    this.instance.updateNodeNT(element);
   }
 
   /**
-   * Keeps the preview of a stroke on screen until the node has taken the
-   * committed stroke, so there is no frame in which the whole stroke shows
-   * again: the host renders the written state asynchronously. Returns a
-   * function that stops waiting.
+   * Keeps the preview of a stroke on screen until the node has taken the saved
+   * erase, so there is no frame in which the whole stroke shows again: the host
+   * renders the written state asynchronously. Returns a function that stops
+   * waiting.
    */
   private releaseMaskWhenUpdated(target: EraseTarget): () => void {
     const handler = this.strokeHandler();
@@ -505,7 +507,7 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
     const stop = () => {
       finished = true;
       this.pendingHandover.delete(node);
-      node.off('strokeElementsChange.strokeEraser');
+      node.off('erasuresChange.strokeEraser');
     };
     const release = () => {
       if (finished) return;
@@ -513,7 +515,7 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
       handler?.setEraseMask(node, null);
     };
 
-    node.on('strokeElementsChange.strokeEraser', release);
+    node.on('erasuresChange.strokeEraser', release);
 
     let frames = 0;
     const wait = () => {
@@ -535,7 +537,8 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
     this.removeCursor();
 
     const stage = this.instance.getStage();
-    const radius = this.getSettings().size / 2;
+    const { size, shape } = this.getSettings();
+    const radius = size / 2;
     const pos = stage.getRelativePointerPosition() ?? { x: 0, y: 0 };
 
     this.cursor = new Konva.Group({
@@ -545,22 +548,26 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
       listening: false,
       draggable: false,
     });
-    this.cursor.add(
-      new Konva.Circle({
-        radius: radius + 1,
-        stroke: STROKE_ERASER_CURSOR_STYLE.outer,
-        strokeWidth: 1,
-        listening: false,
-      })
-    );
-    this.cursor.add(
-      new Konva.Circle({
-        radius,
-        stroke: STROKE_ERASER_CURSOR_STYLE.inner,
-        strokeWidth: 1,
-        listening: false,
-      })
-    );
+
+    const outline = (grow: number, stroke: string) =>
+      shape === 'square'
+        ? new Konva.Rect({
+            x: -(radius + grow),
+            y: -(radius + grow),
+            width: 2 * (radius + grow),
+            height: 2 * (radius + grow),
+            stroke,
+            strokeWidth: 1,
+            listening: false,
+          })
+        : new Konva.Circle({
+            radius: radius + grow,
+            stroke,
+            strokeWidth: 1,
+            listening: false,
+          });
+    this.cursor.add(outline(1, STROKE_ERASER_CURSOR_STYLE.outer));
+    this.cursor.add(outline(0, STROKE_ERASER_CURSOR_STYLE.inner));
 
     this.instance.getUtilityLayer()?.add(this.cursor);
   }

@@ -13,7 +13,6 @@ The finishing step promises the saved stroke stays within its tolerance of the d
 - **BREAKING (default behaviour):** with no configuration the brush used to save what the finishing step left, and now saves a stroke within the bound. Strokes of a document are not changed, and the data format is the same; new strokes keep more points where the line needs them. `finalizeMaxDeviationPx: 0` restores the earlier behaviour point for point.
 - The line of a stroke always reaches its last point, whatever the spacing of its points. This also changes the drawing of existing strokes whose last two points are closer than the spacing of the stroke (2 px) by up to that much at the end.
 - A stabilized stroke is completed along the way the pointer went, not with a straight segment, and glides from where its line ends to the pointer over 90 ms (`catchUpMs`, `0` is at once) when the pointer is released, and is saved when it arrives. It is saved at once if the next stroke starts, the tool is left, or there are no animation frames.
-- The pieces that the stroke eraser leaves are kept within the same bound of the line they were cut from, within a time budget for the whole erase.
 
 ## Capabilities
 
@@ -28,6 +27,5 @@ The finishing step promises the saved stroke stays within its tolerance of the d
 
 - `code/packages/sdk/src/actions/brush-tool/`: `stages/refine.ts` (new), `brush-tool.ts` (finish and glide), `types.ts`, `constants.ts`, `tunables/descriptors.ts`.
 - `code/packages/sdk/src/nodes/stroke/stroke.ts`: the line reaches its last point; the geometry of a stroke for other points or another look; the geometry of a stroke without a look is kept while its points are the same.
-- `code/packages/sdk/src/actions/stroke-eraser-tool/pieces.ts`: pieces kept within the bound.
 - Docs: SDK API reference for the brush tool and its tuning, ledger rows in `AGENTS.md`.
 - Tests: the legacy golden gestures are run with the bound at 0, which is the behaviour they pin.

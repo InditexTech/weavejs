@@ -6,34 +6,34 @@
 
 ## What Changes
 
-- Add a new action, `strokeEraserTool`, separate from `eraserTool`. While the pointer is dragged it erases an area of `stroke` nodes and splits each touched stroke into its surviving pieces. Other node types, including `stroke-single`, are never touched.
-- The eraser size is in screen pixels and is converted per sample with the stage zoom, so it feels the same at any zoom. The eraser path is a chain of capsules (segment plus radius), so fast drags do not skip strokes.
-- Cutting uses the centerline and half-widths the renderer draws, not the stored control points. The effective radius is the eraser radius plus the local half-width, so a round piece end does not protrude into the erased area. For a look with flat ends the cut does not use end discs.
-- Survivors go through the existing finalize stage (`finalizePoints`), by default `dpPressure` with a screen-unit tolerance, overridable through the action props, and are kept within a quarter of a screen pixel of the line they were cut from (the bound of `brush-tool/finish-fidelity`), within a time budget for the whole erase. Pieces too short to read are dropped.
-- The preview while dragging is local and non-serialized: a mask of eraser capsules on the stroke node, added to the serialize deny-list. Nothing reaches the store or other users. The mask is applied by the stroke renderer using the same pure geometry module as the commit, so preview and commit agree. Commit happens on pointer-up and Esc cancels. The cost of the preview does not grow with the length of the drag.
+- Add a new action, `strokeEraserTool`, separate from `eraserTool`. While the pointer is dragged it erases an area of `stroke` nodes. Other node types, including `stroke-single`, are never touched.
+- The eraser is a circle or a square. The `shape` prop sets it (default `circle`), also while the tool is in use, and the ring cursor shows it. The size is in screen pixels (the diameter of a circle, the side of a square) and is converted per sample with the stage zoom, so it feels the same at any zoom. A square stays aligned with the screen, whatever the rotation of the stroke it erases. The eraser path is the area it sweeps between consecutive pointer samples, so fast drags do not skip strokes.
+- A stroke is not cut. What an eraser took off is saved on the stroke as `erasures`: for each stretch of a drag over it, the eraser (the radius of a circle, or the axes of a square) and the path of its centre, in the space of the stroke, reduced to a tenth of a screen pixel. The renderer draws the stroke as ever with those areas clipped out, so what is left is the stroke as it was drawn, to the edge of the eraser: no round or square end is added at a cut, no point of the stroke or of its look changes, and its id, box and place in the stack stay. An eraser that crosses a line cuts it; one that does not cover the whole width of a broad stroke leaves what it did not cover.
+- The preview while dragging is local and not serialized: the same erasures, still being made, in an `eraseMask` attribute that the renderer applies together with the saved ones, so the preview and the result are drawn by the same code. Nothing reaches the store or other users. The commit happens on pointer-up and Esc cancels.
+- The commit is ONE `stateTransactional`: each stroke the drag touched gets its `erasures` extended (an update of the stroke), and a stroke with nothing left to see is removed. One undo step per gesture. A drag that never touches the ink of a stroke writes nothing.
+- Nodes that are `locked`, or mutex-locked by another user, are skipped. A mutex is taken around the commit.
+- Once parts of a stroke are erased its box is the box of what is left: the frame of a selection, snapping, aligning, the area the stroke can be picked in and what an export crops to follow what shows. Erasing the middle of a stroke does not change them.
+- Resizing a stroke rescales its erasures with its points: a circle by the mean of the two scales, a square exactly.
+- Expose the stroke node's rendered geometry (`centerline` and `halfWidths`) through a public accessor, so the eraser and the renderer share one source for what is left to see.
 - Works with a finger or a pen: the page is not scrolled or zoomed by the drag, only the pointer that began the erase counts, and a pinch drops it.
 - A failed write takes the previews off, leaves nothing locked, and the tool carries on. A stroke whose last erase the host has not yet taken is not erased again until it has.
-- The commit is ONE `stateTransactional`: the first piece keeps the original id (update), extra pieces are inserted at the original z-index and parent, and a stroke with no survivors is removed. One undo step per gesture.
-- Nodes that are `locked`, or mutex-locked by another user, are skipped. A mutex is taken around the commit.
-- Pieces keep look, stroke, width, opacity, blend mode, `inputMeta` and the node transform. Cut ends get taper 0 and an end that is still the original keeps its taper. Each piece gets its own bounding box.
-- Expose the stroke node's rendered geometry (`centerline` and `halfWidths`) through a public accessor, so the eraser and the renderer share one source.
-- Known limitations, documented: pieces of a stroke with `variance` may show a different width wobble, because the variation is seeded from the stroke id and arc length; a dashed stroke restarts its dash pattern in each piece; two users erasing the same stroke within the mutex propagation latency can produce overlapping pieces, with the lock as mitigation.
-- Non-breaking: `eraserTool` is unchanged and the new action is registered separately by hosts. No new required fields in stroke data; pieces are ordinary stroke nodes, so any existing viewer renders them. Documents without erased strokes are unaffected.
+- Known limitations, documented: a viewer of a release before this one draws a stroke without its erasures, so the erased parts show again there, a server-side renderer included; what was erased stays in the saved data of the stroke; two users erasing the same stroke within the mutex propagation latency can lose one of the two erases, the last write winning, with the lock as mitigation; an eraser that does not cover the whole width of a stroke leaves a sliver of what it did not cover.
+- Non-breaking: `eraserTool` is unchanged and the new action is registered separately by hosts. One optional field, `erasures`, is added to stroke data. Documents without erased strokes are unaffected, and a stroke without erasures is drawn exactly as before.
 
 ## Capabilities
 
 ### New Capabilities
-- `stroke-eraser/tool`: the `strokeEraserTool` action: pointer input, screen-pixel size, capsule path, cut geometry, preview, commit, skipping locked nodes, cancel, scope of node types.
-- `stroke-eraser/pieces`: how a stroke is split: which centerline and radius are used, what each piece keeps and changes, ids, z-order, bounding boxes, transforms, short-piece dropping, zero-survivor removal.
+- `stroke-eraser/tool`: the `strokeEraserTool` action: pointer input, size and shape in screen pixels, the swept path, preview, commit, skipping locked nodes, cancel, scope of node types.
+- `stroke-eraser/erasure`: what an erase saves: the erasures of a stroke, the exact edge, the compact path, what follows a resize, removal of a stroke with nothing left, no write for a drag that touches no ink.
 
 ### Modified Capabilities
-- `stroke-node/rendering`: a public accessor for the rendered centerline and half-widths (also for other points or another look), and a non-serialized erase mask that the renderer skips, in every draw path, at a cost that depends on the capsules added and not on all of them.
+- `stroke-node/rendering`: a public accessor for the rendered centerline and half-widths (also for other points or another look), saved erasures and the local erase mask clipped out of the stroke in every draw path, the box and pick area of a stroke follow what is left, and a resize rescales the erasures.
 
 ## Impact
 
-- `code/packages/sdk/src/actions/stroke-eraser-tool/` (new: action, constants, types, pieces, node-space conversion, tests).
-- `code/packages/sdk/src/nodes/stroke/` (`stroke.ts` public geometry accessor and erase mask with its memo, erase-mask draw support in the three draw paths, serialize deny-list; `render/erase.ts` the pure cut).
-- `code/packages/sdk/src/actions/brush-tool/stages/finalize.ts` and `stages/refine.ts` consumed, not changed (see the change `brush-faithful-finish`).
-- SDK exports for the new action.
+- `code/packages/sdk/src/actions/stroke-eraser-tool/` (new: action, constants, types, node-space conversion, tests).
+- `code/packages/sdk/src/nodes/stroke/` (`stroke.ts`: public geometry accessor, the clip of erasures in the draw paths, the visible extent, the box and pick area, `scaleReset`, serialize deny-list of the local mask; `render/erasure.ts`: the pure module).
+- `code/packages/sdk/src/actions/brush-tool/stages/refine.ts` is consumed by the brush tool only (see the change `brush-faithful-finish`).
+- SDK exports for the new action and the erasure types.
 - Docs: SDK API reference and build pages for the new tool and the stroke node, ledger rows in `AGENTS.md`.
 - Downstream: weavejs-frontend#237, weavejs-backend#193.

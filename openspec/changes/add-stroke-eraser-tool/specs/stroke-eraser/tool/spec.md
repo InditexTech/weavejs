@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines the stroke eraser action: a drag tool that erases an area of stroke nodes with a screen-sized eraser, previews the result locally and commits it as one undoable step.
+Defines the stroke eraser action: a drag tool that erases an area of stroke nodes with a screen-sized circle or square, previews the result locally and commits it as one undoable step.
 
 ## ADDED Requirements
 
@@ -15,7 +15,7 @@ The system SHALL provide a `strokeEraserTool` action that is separate from `eras
 
 #### Scenario: Not registered
 - **WHEN** a host does not register `strokeEraserTool`
-- **THEN** no stroke is ever split by any existing action
+- **THEN** no stroke is ever erased by any existing action
 
 ### Requirement: Only stroke nodes are erased
 The action SHALL erase only nodes of type `stroke`. Every other node type, including `stroke-single`, SHALL be left untouched, however the eraser path crosses it. Strokes flagged `isEraser` SHALL be treated like any other stroke.
@@ -28,45 +28,38 @@ The action SHALL erase only nodes of type `stroke`. Every other node type, inclu
 - **WHEN** the eraser path crosses a `stroke-single` node
 - **THEN** the node is unchanged
 
-### Requirement: Eraser size in screen pixels
-The eraser size SHALL be set in screen pixels and converted to canvas units with the stage zoom at each pointer sample, so the eraser covers the same screen area at any zoom. The action SHALL show a ring cursor of that size on the utility layer.
+### Requirement: Eraser size and shape
+The eraser SHALL be a circle or a square, set by the `shape` prop (default `circle`), and its size SHALL be set by the `size` prop in screen pixels (default 24): the diameter of a circle, the side of a square. The size SHALL be converted to canvas units with the stage zoom at each pointer sample, so the eraser covers the same screen area at any zoom. A square SHALL stay aligned with the screen whatever the rotation or scale of the stroke it erases. Either prop SHALL be changeable at any time with `updateProps`, including while the tool is in use, and a value that is not valid SHALL be replaced by its default. The action SHALL show a ring cursor of the shape and size on the utility layer, and the ring SHALL follow a change of either prop at once.
 
 #### Scenario: Zoomed in
-- **WHEN** the stage is at 4x zoom and the eraser is 20 px
+- **WHEN** the stage is at 4x zoom and a circular eraser is 20 px
 - **THEN** the erased radius is 10 px on screen, which is 2.5 canvas units
 
 #### Scenario: Zoom changes between samples
 - **WHEN** the zoom changes during a drag
 - **THEN** each sample uses the zoom in force at that sample
 
+#### Scenario: A square
+- **WHEN** the shape is `square` and the size 20 px
+- **THEN** the eraser is a square of 20 screen pixels on a side, with its sides parallel to the edges of the screen
+
+#### Scenario: Changing the shape in use
+- **WHEN** `updateProps` sets the shape to `square` while the tool is active
+- **THEN** the ring becomes a square at once, at the same place, and the next sample erases with a square
+
+#### Scenario: Not valid
+- **WHEN** a size that is not a positive number or an unknown shape is set
+- **THEN** the default size and the circle are used
+
 ### Requirement: Continuous eraser path
-The eraser path SHALL be the union of capsules (a segment between consecutive pointer samples plus the radius), so a fast drag does not skip a stroke between two samples.
+The area the eraser erases SHALL be the area it sweeps between consecutive pointer samples (a capsule for a circle, a hexagon for a square), so a fast drag does not skip a stroke between two samples.
 
 #### Scenario: Fast drag
 - **WHEN** two consecutive samples are far apart and a thin stroke crosses the line between them
-- **THEN** the stroke is cut where it crosses that line
-
-### Requirement: Cut where the stroke is drawn
-The system SHALL decide what to erase using the centerline and half-widths the stroke is drawn with, for strokes with a look and for strokes without one, and not the stored control points. For a stroke with round ends, a point of the stroke SHALL be erased when its distance to the eraser path is below the eraser radius plus the half-width at that point, so a round end left by the cut does not overlap the erased area. For a stroke with flat ends, a point SHALL be erased when the eraser path comes within the eraser radius of the drawn cross-section of the stroke at that point, so a square end left by the cut touches the erased area and the eraser has no effect beyond the start or end of the stroke.
-
-#### Scenario: Wide stroke
-- **WHEN** the eraser edge touches the drawn outline of a wide stroke without reaching its centerline
-- **THEN** that part of the stroke is erased
-
-#### Scenario: Round end of a piece
-- **WHEN** a stroke with round ends is cut and a piece is left with a round end
-- **THEN** the drawn end does not overlap the erased area
-
-#### Scenario: Flat end of a piece
-- **WHEN** a stroke with flat ends is cut
-- **THEN** the square end of each piece touches the erased area and no more of the stroke is erased than the eraser covers
-
-#### Scenario: Eraser past a flat end
-- **WHEN** the eraser stops short of the start or end of a stroke with flat ends, closer than a half-width but farther than its radius
-- **THEN** the stroke is unchanged
+- **THEN** the stroke is erased where it crosses that line
 
 ### Requirement: Local preview
-While the pointer is down the system SHALL show the erased parts as removed on the local screen only. The preview SHALL NOT write to the shared document, SHALL NOT be sent to other users and SHALL NOT be included when the node is serialized.
+While the pointer is down the system SHALL show the erased parts as removed on the local screen only, drawn by the same code that draws the saved erase. The preview SHALL NOT write to the shared document, SHALL NOT be sent to other users and SHALL NOT be included when the node is serialized.
 
 #### Scenario: Dragging
 - **WHEN** a user drags over a stroke
@@ -78,7 +71,7 @@ While the pointer is down the system SHALL show the erased parts as removed on t
 
 #### Scenario: Preview matches commit
 - **WHEN** the user releases the pointer
-- **THEN** the committed pieces cover exactly what the preview showed
+- **THEN** the saved erase covers what the preview showed, to within a tenth of a screen pixel
 
 ### Requirement: Commit on release, cancel with Escape
 The system SHALL commit the erase when the pointer is released and SHALL discard it, leaving every stroke as it was, when the user presses Escape during the drag.
@@ -99,7 +92,7 @@ The system SHALL commit the erase when the pointer is released and SHALL discard
 All changes of one gesture SHALL be written in a single transaction, so one undo restores every stroke the gesture changed.
 
 #### Scenario: Several strokes
-- **WHEN** one drag cuts three strokes
+- **WHEN** one drag erases part of three strokes
 - **THEN** one undo restores all three
 
 ### Requirement: Locked strokes are skipped
@@ -115,22 +108,7 @@ The system SHALL NOT change a stroke that is `locked` or that is mutex-locked by
 
 #### Scenario: Concurrent erase
 - **WHEN** two users erase the same stroke within the lock propagation latency
-- **THEN** their pieces can overlap, which is a documented limitation
-
-### Requirement: Default finalize configuration
-Surviving points SHALL be reduced with the finalize stage the brush tool uses. The default SHALL be a pressure-aware simplification with its tolerance in screen pixels at the zoom of the stroke at the commit, kept within a quarter of a screen pixel of the line the piece was cut from (see `brush-tool/finish-fidelity`), and a host SHALL be able to override it through the action's props. The work of keeping pieces within the bound SHALL share one time budget for the whole erase; once it is spent the remaining pieces SHALL be saved as the finishing step leaves them.
-
-#### Scenario: Default
-- **WHEN** no override is given
-- **THEN** pieces are simplified with the default and stay within the bound of the cut curve
-
-#### Scenario: Override
-- **WHEN** a host sets a different finalize configuration
-- **THEN** pieces are simplified with it
-
-#### Scenario: Many strokes in one erase
-- **WHEN** one erase changes so many strokes that keeping them all within the bound takes longer than the budget
-- **THEN** the release of the pointer is not held up beyond it and the remaining pieces are saved as the finishing step leaves them
+- **THEN** one of the two erases can be lost, which is a documented limitation
 
 ### Requirement: Finger and pen input
 The system SHALL stop the browser from scrolling or zooming the page under a finger or pen that drags while the tool is active, and SHALL restore the setting when the tool is left. Only the pointer that began an erase SHALL move, commit or cancel it. When a pinch begins the erase SHALL be dropped, and no erase SHALL begin while a pinch is under way. A pointer that the browser cancels SHALL drop the erase without writing it.
@@ -159,15 +137,8 @@ When writing an erase fails, the system SHALL remove the previews, SHALL NOT lea
 - **THEN** every stroke is drawn in full again, no lock is held, and the next erase works
 
 ### Requirement: A stroke is not erased again while its last erase is landing
-The system SHALL NOT erase a stroke again until the host has taken what the last erase wrote to it, or the wait for it is over, so that a preview is never made for the points the stroke had before.
+The system SHALL NOT erase a stroke again until the host has taken what the last erase wrote to it, or the wait for it is over, so that a preview is never made on a stroke that is about to change.
 
 #### Scenario: A quick second erase
 - **WHEN** a second erase begins over a stroke before the host has taken the first
 - **THEN** the stroke is not erased by the second, and is again once the first has landed
-
-### Requirement: The preview does not slow as a drag goes on
-The cost of showing the erase SHALL depend on the capsules added since the last step, not on all the capsules of the drag.
-
-#### Scenario: A long scrub
-- **WHEN** an eraser is dragged back and forth over one stroke for hundreds of steps
-- **THEN** each step costs about what the first did

@@ -189,27 +189,58 @@ Returns the centerline of a stroke and the half-width at each of its points, as 
 * The geometry of a stroke is kept while its points, width and look are the same, so asking again, or redrawing, does not build it again.
 * mono:[ends] is mono:[flat] only for a mono:[round] or mono:[freehand] outline with mono:[ends] set to mono:[flat]; in every other case the ends are round.
 
+=== Erasures
+
+A stroke can have parts of it erased. The mono:[erasures] property lists, for each stretch of a drag with the xref:sdk:api-reference/actions/stroke-eraser-tool.adoc[stroke eraser] over the stroke, the eraser and the path of its centre. The stroke is not cut: its points, look, box and id stay as they were, and the renderer draws it with the erased areas clipped out.
+
+[source,ts]
+----
+type WeaveStrokeErasure =
+  | { shape: 'circle'; radius: number; points: number[] }
+  | { shape: 'square'; axes: [number, number, number, number]; points: number[] };
+----
+
+* mono:[points] is the path of the centre of the eraser, as x, y, x, y, ..., in the node's own space, like mono:[strokeElements]. One point is a click.
+* A circle is the area within mono:[radius] of the path. A square is the area a square sweeps as its centre follows the path; mono:[axes] are the vectors from its centre to the middle of two neighbouring sides (x and y of one, then x and y of the other), so a square that the rotation or scale of the node has turned into a parallelogram is kept as it was.
+* What is left is the stroke as it was drawn, to the edge of the eraser: an arc for a circle, straight sides for a square, the edge of the swept area for a drag. No round or square end is added where the stroke is erased, and nothing outside the area changes. An eraser that does not cover the whole width of a stroke leaves the part it did not cover.
+* The erased areas may overlap. It works for strokes with no look, for the mono:[legacy] outline, and for the mono:[round] and mono:[freehand] outlines, with the widths, taper, variance, nib, dash and colour the stroke has.
+* An entry that is not well formed (no points, a radius that is not positive, numbers that are not finite) is left out, and the stroke is drawn with the rest. A stroke without erasures, or whose erasures do not reach it, is drawn exactly as before.
+* When the stroke is resized, its erasures are scaled with its points: the paths and the axes of a square along each axis, and the radius of a circle by the mean of the two scales.
+* A viewer of a release that does not know mono:[erasures] draws the stroke in full, and what was erased stays in the saved data of the stroke.
+
 === Erase mask
 
 [source,ts]
 ----
 const stroke = weave.getNodeHandler<WeaveStrokeNode>('stroke');
 stroke.setEraseMask(konvaStrokeNode, [
-  { a: { x: 40, y: 10 }, b: { x: 60, y: 10 }, r: 6 },
+  { shape: 'circle', radius: 6, points: [40, 10, 60, 10] },
 ]);
-stroke.setEraseMask(konvaStrokeNode, null);  // draw the stroke in full again
+stroke.setEraseMask(konvaStrokeNode, null);  // draw the stroke as it is saved
 stroke.getEraseMask(konvaStrokeNode);        // the current mask, or null
-stroke.cutStrokeWithMask(konvaStrokeNode, mask); // { erased, runs, ends } | null
 ----
 
-Hides part of one stroke on this screen. Each entry of the mask is a capsule: the segment from mono:[a] to mono:[b] widened by the radius mono:[r], in the node's own space, like mono:[strokeElements]. The parts of the stroke the capsules reach are not drawn.
+Hides part of one stroke on this screen, as erasures that are not saved yet: the same entries as mono:[erasures], applied together with them. The stroke eraser uses it while a drag goes on, so the preview is drawn by the same code as the saved erase.
 
-* mono:[cutStrokeWithMask] gives what is left of the stroke after a mask, as runs of its drawn centerline (points with their widths, and whether each end of a run is a cut). A mask that only grows, as an eraser dragged over the stroke makes it, costs only the capsules added since the last time; a different stroke, look or set of capsules starts again.
 * The mask only changes how this screen draws. It is not saved, other users do not see it, and it is left out when the node is serialized.
-* The rest of the stroke keeps the widths it has, including its taper, variance and nib, and each remaining run gets the same ends as the stroke: round, or square for a look with mono:[ends] set to mono:[flat].
-* A stroke with a dash pattern starts the pattern again in each run.
-* A mask that reaches nothing leaves the stroke drawn exactly as without a mask.
-* It works for strokes with no look, for the mono:[legacy] outline, and for the mono:[round] and mono:[freehand] outlines.
+* It does not change the box of the stroke.
+
+=== What is left to see
+
+[source,ts]
+----
+const stroke = weave.getNodeHandler<WeaveStrokeNode>('stroke');
+stroke.getVisibleExtent(konvaStrokeNode);
+// { empty: boolean, bounds: { x, y, width, height } | null } | null
+
+// with erasures that are not saved yet, and how closely the width is checked, in the node's units
+stroke.getVisibleExtent(konvaStrokeNode, extraErasures, 0.5);
+----
+
+Works out which places along the centerline still have some of their width showing once the saved erasures, and the ones given, are out. mono:[bounds] is the box of the centerline that is left, with a step of it on each side (the box of the ink is that with the stroke width added all round), and mono:[empty] is true when nothing shows. It returns mono:[null] when the stroke has no points.
+
+* The line is looked at along its length, no more than twice mono:[resolution] apart, also in a long straight stretch between two points, and across its width at mono:[resolution]; by default half a screen pixel.
+* A place is given up only when every sample across its width is inside an erasure, so the box is never smaller than what shows, and a sliver that shows is never taken for nothing.
 
 === The box of a stroke
 
@@ -218,3 +249,4 @@ The box of a stroke is the box of its points widened by half of mono:[strokeWidt
 * mono:[getClientRect] of the node gives it, also to a caller that leaves the stroke of a node out of its box: the mono:[stroke] of this node is its ink, not a border.
 * The mono:[width] and mono:[height] of the node are still those of the box of the points, and are saved as they were.
 * A line drawn thinner than mono:[strokeWidth], as a pen is at speed, has a little room between it and the frame.
+* Once the stroke has erasures the box is that of what is left to see (see above), so the frames, snapping, aligning, fitting and the crop of an export follow what shows, and the area the stroke can be picked in is that box with the stroke width round it. Erasing only the middle of a stroke leaves both as they were. A stroke with nothing left to see keeps the box it had. The box is worked out once and kept until the erasures, the geometry or the zoom change.

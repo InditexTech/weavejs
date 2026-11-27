@@ -34,12 +34,16 @@ import {
 } from './render/width-context';
 import { drawRoundOutline } from './render/round-outline';
 import {
-  createEraseMemo,
-  cutStroke,
-  type WeaveEraseMask,
-  type WeaveEraseMemo,
-  type WeaveEraserCutResult,
-} from './render/erase';
+  clipOutHoles,
+  holeReaches,
+  holesOfAll,
+  readErasures,
+  scaleErasure,
+  visibleExtent,
+  type WeaveErasureBounds,
+  type WeaveStrokeErasure,
+  type WeaveVisibleExtent,
+} from './render/erasure';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
@@ -70,8 +74,29 @@ export class WeaveStrokeNode extends WeaveNode {
     }
   >();
 
-  /** What has been worked out of the erase of each stroke with an erase mask. */
-  private readonly eraseMemos = new WeakMap<Konva.Node, WeaveEraseMemo>();
+  /** The area the ink of each stroke can be in, kept while its points and width are the same. */
+  private readonly inkAreaCache = new WeakMap<
+    WeaveStrokePoint[],
+    {
+      length: number;
+      last: WeaveStrokePoint | undefined;
+      strokeWidth: number;
+      area: WeaveErasureBounds;
+    }
+  >();
+
+  /** The box of what is left of each stroke with erasures, kept while nothing it depends on changes. */
+  private readonly extentCache = new WeakMap<
+    Konva.Node,
+    {
+      centerline: WeaveStrokePoint[];
+      erasures: unknown;
+      width: number;
+      height: number;
+      bucket: number;
+      rect: WeaveErasureBounds;
+    }
+  >();
 
   private readonly lookGeometryCache = new WeakMap<
     WeaveStrokePoint[],
@@ -765,105 +790,156 @@ export class WeaveStrokeNode extends WeaveNode {
   }
 
   /**
-   * Hides part of a stroke on this screen only: the parts the capsules reach
-   * (in the node's own space) are not drawn. Nothing is saved or sent to
-   * other users, and the mask is left out when the node is serialized. `null`
-   * draws the stroke in full again.
+   * Hides part of a stroke on this screen only while a drag with the eraser
+   * goes on: what the given erasures cover (in the node's own space) is not
+   * drawn. Nothing is saved or sent to other users, and it is left out when
+   * the node is serialized. `null` draws the stroke as it is saved again. What
+   * the eraser saves is the `erasures` attribute.
    */
-  setEraseMask(shape: Konva.Node, mask: WeaveEraseMask | null): void {
+  setEraseMask(shape: Konva.Node, mask: WeaveStrokeErasure[] | null): void {
     shape.setAttr('eraseMask', mask && mask.length > 0 ? mask : undefined);
     shape.getLayer()?.batchDraw();
   }
 
-  getEraseMask(shape: Konva.Node): WeaveEraseMask | null {
+  getEraseMask(shape: Konva.Node): WeaveStrokeErasure[] | null {
     return shape.getAttrs().eraseMask ?? null;
   }
 
   /**
-   * What is left of a stroke after an erase mask, as runs of its drawn
-   * centerline, and how their ends are drawn. A mask that only grows, as an
-   * eraser dragged over the stroke makes it, costs only its new capsules: what
-   * was worked out is kept for the stroke. `null` when the stroke has no points.
+   * What is left to see of a stroke once its saved erasures and the `extra`
+   * ones are out: the box of the centerline that still shows, or that nothing
+   * does. `resolution` is how closely, in the node's units, the width of the
+   * stroke is checked; by default half a screen pixel. `null` when the stroke
+   * has no points.
    */
-  cutStrokeWithMask(
+  getVisibleExtent(
     shape: Konva.Node,
-    mask: WeaveEraseMask
-  ): (WeaveEraserCutResult & { ends: 'round' | 'flat' }) | null {
+    extra: WeaveStrokeErasure[] = [],
+    resolution?: number
+  ): WeaveVisibleExtent | null {
     const geometry = this.getRenderedGeometry(shape);
     if (!geometry) return null;
 
-    let memo = this.eraseMemos.get(shape);
-    if (!memo) {
-      memo = createEraseMemo(geometry);
-      this.eraseMemos.set(shape, memo);
-    }
-    return { ...cutStroke(geometry, mask, memo), ends: geometry.ends };
+    const erasures = [...readErasures(shape.getAttrs().erasures), ...extra];
+    return visibleExtent(
+      geometry,
+      holesOfAll(erasures),
+      resolution ?? 0.5 / this.screenScale(shape as Konva.Shape)
+    );
   }
 
   /**
-   * Draws only what the erase mask leaves of a stroke, one run at a time, with
-   * the widths and ends of the stroke as they are drawn. Returns false when
-   * the mask reaches nothing, so the caller draws the stroke as usual.
+   * The box of the stroke in its own space: its own width and height, or, once
+   * parts of it are erased, the box of what is left, so the frame of a
+   * selection, snapping and the area it can be picked in follow what shows.
    */
-  private drawErased(
-    ctx: Context,
-    shape: Konva.Shape,
-    mask: WeaveEraseMask,
-    look: WeaveStrokeLook | null,
-    color: string | CanvasGradient,
-    dash: number[]
-  ): boolean {
-    const cut = this.cutStrokeWithMask(shape, mask);
-    if (!cut) return false;
+  private selfRect(shape: Konva.Shape): WeaveErasureBounds {
+    const full = { x: 0, y: 0, width: shape.width(), height: shape.height() };
 
-    const { erased, runs, ends } = cut;
-    if (!erased) return false;
+    const saved = shape.getAttrs().erasures;
+    if (!Array.isArray(saved) || saved.length === 0) return full;
 
-    const scale = this.screenScale(shape);
-    for (const run of runs) {
-      if (run.points.length < 2) continue;
+    const geometry = this.getRenderedGeometry(shape);
+    if (!geometry) return full;
 
-      if (look && look.outline !== 'legacy') {
-        drawRoundOutline(
-          ctx,
-          run.points.map((p, i) => ({ x: p.x, y: p.y, r: run.halfWidths[i] })),
-          color,
-          dash,
-          scale,
-          ends
-        );
-      } else {
-        this.drawCenterlineRibbon(
-          ctx,
-          run.points,
-          (i) => run.halfWidths[i],
-          color,
-          dash,
-          look ? look.caps === 'merged' : false
-        );
-      }
+    const resolution = 0.5 / this.screenScale(shape);
+    const bucket = Math.round(Math.log2(resolution) * 2);
+    const cached = this.extentCache.get(shape);
+    if (
+      cached &&
+      cached.centerline === geometry.centerline &&
+      cached.erasures === saved &&
+      cached.width === full.width &&
+      cached.height === full.height &&
+      cached.bucket === bucket
+    ) {
+      return cached.rect;
     }
-    return true;
+
+    const extent = this.getVisibleExtent(shape, [], resolution);
+    const rect = extent?.bounds ?? full;
+    this.extentCache.set(shape, {
+      centerline: geometry.centerline,
+      erasures: saved,
+      width: full.width,
+      height: full.height,
+      bucket,
+      rect,
+    });
+    return rect;
   }
 
-  private drawShape(ctx: Context, shape: Konva.Shape) {
-    const strokeElements: WeaveStrokePoint[] = shape.getAttrs().strokeElements;
-
-    if (strokeElements?.length === 0) {
-      return;
+  /**
+   * The area all the ink of a stroke is in, in its own space: its points and
+   * the width of the stroke all round, which no width of a look goes past.
+   */
+  private inkArea(
+    pts: WeaveStrokePoint[],
+    strokeWidth: number
+  ): WeaveErasureBounds {
+    const last = pts.at(-1);
+    const cached = this.inkAreaCache.get(pts);
+    if (
+      cached &&
+      cached.length === pts.length &&
+      cached.last === last &&
+      cached.strokeWidth === strokeWidth
+    ) {
+      return cached.area;
     }
 
+    let x1 = Infinity;
+    let y1 = Infinity;
+    let x2 = -Infinity;
+    let y2 = -Infinity;
+    for (const p of pts) {
+      x1 = Math.min(x1, p.x);
+      y1 = Math.min(y1, p.y);
+      x2 = Math.max(x2, p.x);
+      y2 = Math.max(y2, p.y);
+    }
+    const pad = strokeWidth + 2;
+    const area = {
+      x: x1 - pad,
+      y: y1 - pad,
+      width: x2 - x1 + 2 * pad,
+      height: y2 - y1 + 2 * pad,
+    };
+    this.inkAreaCache.set(pts, {
+      length: pts.length,
+      last,
+      strokeWidth,
+      area,
+    });
+    return area;
+  }
+
+  /** The area a stroke can be picked in: its box, with the width of the stroke all round once parts are erased. */
+  private hitRect(shape: Konva.Shape): WeaveErasureBounds {
+    const rect = this.selfRect(shape);
+    const saved = shape.getAttrs().erasures;
+    if (!Array.isArray(saved) || saved.length === 0) return rect;
+
+    const pad = (shape.getAttrs().strokeWidth ?? 1) / 2;
+    return {
+      x: rect.x - pad,
+      y: rect.y - pad,
+      width: rect.width + 2 * pad,
+      height: rect.height + 2 * pad,
+    };
+  }
+
+  /** Draws the stroke with its look, or as the legacy ribbon, in full. */
+  private drawBody(
+    ctx: Context,
+    shape: Konva.Shape,
+    strokeElements: WeaveStrokePoint[]
+  ) {
     const color = shape.getAttrs().stroke ?? 'black';
     const strokeWidth = shape.getAttrs().strokeWidth ?? 1;
     const dash = shape.getAttrs().dash ?? [];
 
     const look = this.resolveLook(shape);
-
-    const mask: WeaveEraseMask | undefined = shape.getAttrs().eraseMask;
-    if (mask && mask.length > 0) {
-      if (this.drawErased(ctx, shape, mask, look, color, dash)) return;
-    }
-
     if (look) {
       this.drawRibbonWithLook(
         ctx,
@@ -880,6 +956,38 @@ export class WeaveStrokeNode extends WeaveNode {
     this.drawRibbonWithDash(ctx, strokeElements, strokeWidth, color, dash);
   }
 
+  private drawShape(ctx: Context, shape: Konva.Shape) {
+    const attrs = shape.getAttrs();
+    const strokeElements: WeaveStrokePoint[] = attrs.strokeElements;
+
+    if (strokeElements?.length === 0) {
+      return;
+    }
+
+    // What an eraser took off, saved or still being dragged, is clipped out
+    // while the stroke is drawn as ever, so what is left is the stroke as it was
+    // drawn, to the edge of the eraser.
+    if (strokeElements && (attrs.erasures || attrs.eraseMask)) {
+      const holes = holesOfAll([
+        ...readErasures(attrs.erasures),
+        ...readErasures(attrs.eraseMask),
+      ]);
+      if (holes.length > 0) {
+        const area = this.inkArea(strokeElements, attrs.strokeWidth ?? 1);
+        const reaching = holes.filter((hole) => holeReaches(hole, area));
+        if (reaching.length > 0) {
+          ctx.save();
+          clipOutHoles(ctx, area, reaching);
+          this.drawBody(ctx, shape, strokeElements);
+          ctx.restore();
+          return;
+        }
+      }
+    }
+
+    this.drawBody(ctx, shape, strokeElements);
+  }
+
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stroke = new Konva.Shape({
       ...props,
@@ -889,8 +997,9 @@ export class WeaveStrokeNode extends WeaveNode {
       },
       dashEnabled: false,
       hitFunc: (context, shape) => {
+        const rect = this.hitRect(shape);
         context.beginPath();
-        context.rect(0, 0, shape.width(), shape.height());
+        context.rect(rect.x, rect.y, rect.width, rect.height);
         context.closePath();
         // important Konva method that fill and stroke shape from its properties
         context.fillStrokeShape(shape);
@@ -898,6 +1007,9 @@ export class WeaveStrokeNode extends WeaveNode {
     });
 
     this.setupDefaultNodeAugmentation(stroke);
+
+    // Once parts of the stroke are erased its box is that of what is left.
+    stroke.getSelfRect = () => this.selfRect(stroke);
 
     // The stroke of this node is its ink, not a border. Callers that leave the
     // border out of a box (the frames of a selection or a hover, snapping,
@@ -960,8 +1072,17 @@ export class WeaveStrokeNode extends WeaveNode {
       };
       newPoints.push(point);
     }
+    const erasures = readErasures(strokeNode.getAttrs().erasures);
     strokeNode.setAttrs({
       strokeElements: newPoints,
+      // what was erased stays where it was erased
+      ...(erasures.length > 0
+        ? {
+            erasures: erasures.map((erasure) =>
+              scaleErasure(erasure, strokeNode.scaleX(), strokeNode.scaleY())
+            ),
+          }
+        : {}),
     });
 
     node.width(Math.max(5, node.width() * node.scaleX()));

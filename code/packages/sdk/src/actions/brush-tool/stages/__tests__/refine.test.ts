@@ -469,25 +469,7 @@ describe('finalizeWithinDeviation', () => {
     });
   });
 
-  it('keeps the result of the finishing step, not every point, when asked and time runs out', () => {
-    const points = handStroke(1);
-    const candidate = finalizePoints(points, BEZIER, 0.5, 1);
-    const out = finalizeWithinDeviation({
-      points,
-      candidate,
-      finalize: BEZIER,
-      toolTolerance: 0.5,
-      zoom: 1,
-      maxDeviationPx: 0.05,
-      geometryOf: geometryFor(look),
-      deadline: -1,
-      fallback: 'candidate',
-    });
-    expect(out.points).toBe(candidate);
-    expect(out.tightened).toBe(false);
-  });
-
-  it('stops at a deadline it is given, shared by the strokes of one release', () => {
+  it('stops at a deadline it is given', () => {
     const points = handStroke(1);
     const candidate = finalizePoints(points, BEZIER, 0.5, 1);
     const out = finalizeWithinDeviation({

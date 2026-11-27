@@ -85,9 +85,12 @@ export { WeaveStrokeNode } from './nodes/stroke/stroke';
 export * from './nodes/stroke/constants';
 export * from './nodes/stroke/types';
 export type {
-  WeaveEraseMask,
-  WeaveEraserCapsule,
-} from './nodes/stroke/render/erase';
+  WeaveErasureBounds,
+  WeaveStrokeCircleErasure,
+  WeaveStrokeErasure,
+  WeaveStrokeSquareErasure,
+  WeaveVisibleExtent,
+} from './nodes/stroke/render/erasure';
 export { WeaveStrokeSingleNode } from './nodes/stroke-single/stroke-single';
 export * from './nodes/stroke-single/constants';
 export * from './nodes/stroke-single/types';

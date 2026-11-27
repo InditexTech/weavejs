@@ -127,18 +127,8 @@ export type FinalizeWithinDeviationInput = {
   /** Largest allowed difference, in screen pixels. */
   maxDeviationPx: number;
   geometryOf: GeometryOf;
-  /**
-   * When to stop, as `performance.now()` gives the time. Defaults to a fixed
-   * time after the start. A caller with several strokes to finish can share one
-   * deadline among them.
-   */
+  /** When to stop, as `performance.now()` gives the time. Defaults to a fixed time after the start. */
   deadline?: number;
-  /**
-   * What to keep when the drawn line is not matched, or time runs out: every
-   * drawn point, which looks exactly as drawn (the default), or the result of
-   * the finishing step.
-   */
-  fallback?: 'drawn' | 'candidate';
 };
 
 export type FinalizeWithinDeviationResult = {
@@ -224,7 +214,6 @@ export function finalizeWithinDeviation({
   maxDeviationPx,
   geometryOf,
   deadline,
-  fallback = 'drawn',
 }: FinalizeWithinDeviationInput): FinalizeWithinDeviationResult {
   const unchanged = (deviationPx = 0) => ({
     points: candidate,
@@ -357,6 +346,5 @@ export function finalizeWithinDeviation({
   }
 
   // nothing simpler matches the drawn line, or there is no time to find it
-  if (fallback === 'candidate') return unchanged(first * scale);
   return { points, deviationPx: 0, tightened: true };
 }

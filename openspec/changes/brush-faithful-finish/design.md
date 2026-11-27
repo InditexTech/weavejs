@@ -33,7 +33,7 @@ See proposal.md for why. What the code does, and what was measured through the r
 - Alternative: keep only the profile's result. Rejected: the result can bend away from the line or overshoot.
 - Trade-off: the result is a subset of the drawn points, so it never adds a position the user did not draw.
 
-**D3. A time budget, and what to do when it runs out.** Each stroke may take 80 ms; a caller with several strokes (the eraser) passes one deadline for all. For the brush the fallback is every drawn point: the stroke looks exactly as drawn, at the cost of size. For the eraser pieces it is the result of the finishing step, since a piece's points are dense samples of a curve, not a user's input.
+**D3. A time budget, and what to do when it runs out.** Each stroke may take 80 ms, and a caller can pin the time it stops at, as the tests do so that the speed of the machine cannot change a result. The fallback is every drawn point: the stroke looks exactly as drawn, at the cost of size.
 
 **D4. A bound for hairlines, relaxed with width.** The bound is what a thin line needs: a shift of 0.25 px is a quarter of a hairline. For a broad line the same shift is invisible, so the bound grows to 5% of the median drawn width, at most four times itself. This is what makes thick, unstabilized pens (marker, highlighter) affordable, since their input noise is what costs points.
 - Trade-off: the setting is a minimum bound, not an exact one, for strokes wider than 5 px.
@@ -52,8 +52,6 @@ See proposal.md for why. What the code does, and what was measured through the r
 - Alternative: draw a tip at the pointer all the time. Rejected: it changes how the stabilizers feel while drawing, which nobody asked for.
 - Alternative: run the stabilizer on after release. Rejected: a first-order filter fed a fixed target moves along a straight line towards it, as the glide does, and it depends on the filter and its clock.
 - Trade-off: the stroke reaches the document up to 90 ms after the pointer lifts.
-
-**D8. The eraser reuses it.** Pieces are samples of the rendered curve of the stroke they were cut from, reduced and drawn again, which is the same problem. A piece is measured against the line of its own points with the look it will have (no taper at a cut end, the original id), within one time budget (200 ms) for the whole erase.
 
 ## Risks / Trade-offs
 
