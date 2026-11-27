@@ -1,0 +1,35 @@
+code/packages/sdk/src/actions/brush-tool/brush-tool.ts
+  s_eb312353457cb7::t_50e7af319b2126 1551-1552,1576,1609
+code/packages/sdk/src/actions/brush-tool/stages/completion.ts
+  s_eb312353457cb7::t_90cdb8098a423f 59
+code/packages/sdk/src/actions/brush-tool/stages/refine.ts
+  s_eb312353457cb7::t_6ffe9881f117d5 224-225
+code/packages/sdk/src/actions/stroke-eraser-tool/__tests__/stroke-eraser-tool.test.ts
+  s_eb312353457cb7::t_5b7a2a5265f57f 1382
+code/packages/sdk/src/actions/stroke-eraser-tool/stroke-eraser-tool.ts
+  s_eb312353457cb7::t_81c59e19f61c1e 621
+code/packages/sdk/src/managers/export/export.ts
+  s_eb312353457cb7::t_5fedb34f9e09af 30-31,414,464,563,606
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-geometry.test.ts
+  s_eb312353457cb7::t_f5607c3cd800aa 67,88
+code/packages/sdk/src/nodes/stroke/render/erasure.ts
+  s_eb312353457cb7::t_bac19723346ffa 188,190-191,196-237,404,468,479-517,525,534-537,539-558,561-562,564-565,567-569
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_eb312353457cb7::t_57373f440753c8 135,357,611,749,848,881
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "9eb60bf3dbca3a10376ac50772a6b622e9dacb9d",
+  "prompts": {},
+  "sessions": {
+    "s_eb312353457cb7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de76a07f5ffepcUsScFaMsGPkT",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
