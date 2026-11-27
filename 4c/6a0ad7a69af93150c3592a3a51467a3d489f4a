@@ -1,0 +1,59 @@
+AGENTS.md
+  s_eb312353457cb7::t_0b79de4e12297e 131-133
+code/packages/sdk/src/actions/brush-tool/stages/__tests__/refine.test.ts
+  s_eb312353457cb7::t_d61111a344bcb6 472
+code/packages/sdk/src/actions/brush-tool/stages/refine.ts
+  s_eb312353457cb7::t_81b8c66d519941 130
+code/packages/sdk/src/actions/stroke-eraser-tool/__tests__/local-space.test.ts
+  s_eb312353457cb7::t_3193f442e775ad 9-13,43,48-51,60-61,64,77-78,80-83,91-96,103-193
+code/packages/sdk/src/actions/stroke-eraser-tool/__tests__/stroke-eraser-tool.test.ts
+  s_eb312353457cb7::t_724b340a8b4300 25,234-265,298,317-319,382-499,511-513,527-529,533-546,554-559,562,568,582-596,642,710,728-730,734,753,755-766,770-779,782,786-796,798-803,806-810,813,820-822,824-831,834-837,839-840,843-851,853-864,867,869-874,876,878-903,916-918,923,928-953,955-961,963-966,985-1004,1012,1053-1077,1093,1097,1111,1121,1152,1164-1199,1201,1253,1263,1270,1380,1385,1387
+code/packages/sdk/src/actions/stroke-eraser-tool/local-space.ts
+  s_eb312353457cb7::t_d38d1061e7ac7b 6,21-33,35-38,41-42,44,47-49,54-82
+code/packages/sdk/src/actions/stroke-eraser-tool/stroke-eraser-tool.ts
+  s_eb312353457cb7::t_e6867326c107cc 8,18-24,30-31,35-39,41,54-64,67,70-86,107,124-130,274,286,311-312,315-319,325-343,350,367-370,372-376,379,381-382,386-394,398-399,408-410,430,436-437,477,481,483,488-492,496-499,510,518,540-541,551-570
+code/packages/sdk/src/nodes/stroke/__tests__/shared/stroke-render.helpers.ts
+  s_eb312353457cb7::t_f7ad74dc84a888 16
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-erasure-node.test.ts
+  s_eb312353457cb7::t_18344dd3f9f852 5,7-14,18-20,22-41,44-47,50-56,58-60,62-72,76-83,86-88,91-95,98-104,107-111,114-121,125-127,130-137,139,141-147,149-156,158-161,163-166,170-174,176,178-183,185-187,189,191-200
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-erasures.test.ts
+  s_eb312353457cb7::t_1185c33de05614 14,20,31,34-44,68-88,90,93-95,98-99,103-114,117-124,128-132,134-137,140-145,147-149,152-155,158-167,171-172,174-178,180-181,185-188,190-200,202-206,208-209,211,213-216,218,220-252,254-257
+code/packages/sdk/src/nodes/stroke/render/__tests__/erasure.test.ts
+  s_eb312353457cb7::t_9d0351c99534c1 5-6,8,10-44,47-49,52-60,62-87,90-166,170-264,266-267,269,271-299,302-321,326-329,333-335,339-340,342-343,346-348,351-367,369-371,374-378,380-381,384-391,394-400,402-427,429,431-436,439-442,444-454,456-459,461-463,466-471,473-477,479-483,486-489,491-497,499-508,510,512-526,528,530-541
+code/packages/sdk/src/nodes/stroke/render/erasure.ts
+  s_eb312353457cb7::t_4504f675a175b0 9-13,16-25,28-38,41-65,68-69,71,73-122,125-149,153-156,158-172,175-178,181-183,185-214,216-218,221-234,237-242,244-274,276-277,279-293,295-296,298-302,305-313,315,318-330,332-333,336-337,339-355,357-384,387-395,399-409,411-431,433,437-440,442-458,461-467,469-481,483-487,489,491-496,498-529,532-535,538-548,550-600
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_eb312353457cb7::t_19c71c0c352f8d 37-46,77-99,793-797,799,804,809-813,815,817-819,823-828,832-834,836-837,839-840,842-856,858-869,872-889,891-899,901-915,917-937,959-990,1000,1002,1011-1013,1075,1078-1085
+docs/src/modules/main/pages/build/actions/index.adoc
+  s_eb312353457cb7::t_c9072c8fe80b55 73
+docs/src/modules/main/pages/build/actions/stroke-eraser-tool.adoc
+  s_eb312353457cb7::t_5f8f2321e01bbf 6,31,35,63-87,91,97-100,102-103
+docs/src/modules/sdk/pages/api-reference/actions/index.adoc
+  s_eb312353457cb7::t_74391a667bece8 37
+docs/src/modules/sdk/pages/api-reference/nodes/stroke.adoc
+  s_eb312353457cb7::t_737d56487ece86 192-210,217,219,223,226-243,252
+openspec/changes/add-stroke-eraser-tool/specs/stroke-eraser/tool/spec.md
+  s_eb312353457cb7::t_ec4af3088b025f 5,18,31-32,35,42-44,46-48,50-52,54-55,57-59,62,74,95,111,140
+openspec/changes/add-stroke-eraser-tool/tasks.md
+  s_eb312353457cb7::t_776d82bbc22a54 9,11-14,16,18-22,27-31,35,38,42-45
+openspec/changes/brush-faithful-finish/design.md
+  s_eb312353457cb7::t_a2b37f5999b781 36
+openspec/changes/brush-faithful-finish/tasks.md
+  s_eb312353457cb7::t_5bc54f1327259f 24,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "4c6a0ad7a69af93150c3592a3a51467a3d489f4a",
+  "prompts": {},
+  "sessions": {
+    "s_eb312353457cb7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de76a07f5ffepcUsScFaMsGPkT",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
