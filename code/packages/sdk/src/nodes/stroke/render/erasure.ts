@@ -185,37 +185,54 @@ const holesCache = new WeakMap<
 export function holesOf(erasure: WeaveStrokeErasure): WeaveErasureHole[] {
   const { points } = erasure;
   const cached = holesCache.get(erasure);
-  if (cached && cached.length === points.length) return cached.holes;
+  if (cached?.length === points.length) return cached.holes;
 
-  const holes: WeaveErasureHole[] = [];
-  const n = points.length / 2;
-  const at = (i: number): XY => ({ x: points[2 * i], y: points[2 * i + 1] });
-
-  if (erasure.shape === 'circle') {
-    const r = erasure.radius;
-    for (let i = n === 1 ? 0 : 1; i < n; i++) {
-      const a = at(n === 1 ? 0 : i - 1);
-      const b = at(i);
-      holes.push({ kind: 'capsule', a, b, r, bounds: boundsOf([a, b], r) });
-    }
-  } else {
-    const [ux, uy, vx, vy] = erasure.axes;
-    const corners = (c: XY): XY[] => [
-      { x: c.x + ux + vx, y: c.y + uy + vy },
-      { x: c.x + ux - vx, y: c.y + uy - vy },
-      { x: c.x - ux - vx, y: c.y - uy - vy },
-      { x: c.x - ux + vx, y: c.y - uy + vy },
-    ];
-    for (let i = n === 1 ? 0 : 1; i < n; i++) {
-      const pts = hull(
-        n === 1 ? corners(at(0)) : [...corners(at(i - 1)), ...corners(at(i))]
-      );
-      holes.push({ kind: 'polygon', points: pts, bounds: boundsOf(pts) });
-    }
-  }
-
+  const holes =
+    erasure.shape === 'circle' ? circleHoles(erasure) : squareHoles(erasure);
   holesCache.set(erasure, { length: points.length, holes });
   return holes;
+}
+
+/** The position of the `i`th point of a path given as x, y, x, y, ... */
+const pointAt = (points: number[], i: number): XY => ({
+  x: points[2 * i],
+  y: points[2 * i + 1],
+});
+
+/** The steps of a path: each point with the one before it, or the one point of a click. */
+function stepsOf(points: number[]): [XY, XY][] {
+  const n = points.length / 2;
+  if (n === 1) return [[pointAt(points, 0), pointAt(points, 0)]];
+
+  const steps: [XY, XY][] = [];
+  for (let i = 1; i < n; i++)
+    steps.push([pointAt(points, i - 1), pointAt(points, i)]);
+  return steps;
+}
+
+function circleHoles(erasure: WeaveStrokeCircleErasure): WeaveErasureHole[] {
+  const r = erasure.radius;
+  return stepsOf(erasure.points).map(([a, b]) => ({
+    kind: 'capsule',
+    a,
+    b,
+    r,
+    bounds: boundsOf([a, b], r),
+  }));
+}
+
+function squareHoles(erasure: WeaveStrokeSquareErasure): WeaveErasureHole[] {
+  const [ux, uy, vx, vy] = erasure.axes;
+  const corners = (c: XY): XY[] => [
+    { x: c.x + ux + vx, y: c.y + uy + vy },
+    { x: c.x + ux - vx, y: c.y + uy - vy },
+    { x: c.x - ux - vx, y: c.y - uy - vy },
+    { x: c.x - ux + vx, y: c.y - uy + vy },
+  ];
+  return stepsOf(erasure.points).map(([a, b]) => {
+    const pts = hull([...corners(a), ...(a === b ? [] : corners(b))]);
+    return { kind: 'polygon', points: pts, bounds: boundsOf(pts) };
+  });
 }
 
 /** The pieces of several erasures, in order. */
@@ -384,7 +401,7 @@ function slicesOf(
       });
     }
   }
-  const last = out[out.length - 1];
+  const last = out.at(-1)!;
   const end = centerline[n - 1];
   out.push({
     x: end.x,
@@ -448,43 +465,7 @@ export function visibleExtent(
 
   const slices = slicesOf(geometry, 2 * resolution);
   const n = slices.length;
-  const alive = new Array<boolean>(n).fill(true);
-
-  if (holes.length > 0) {
-    const reach = boundsOf(
-      holes.flatMap((h) => [
-        { x: h.bounds.x, y: h.bounds.y },
-        { x: h.bounds.x + h.bounds.width, y: h.bounds.y + h.bounds.height },
-      ])
-    );
-
-    for (let i = 0; i < n; i++) {
-      const { x, y, h, nx, ny } = slices[i];
-      if (
-        !intersects({ x: x - h, y: y - h, width: 2 * h, height: 2 * h }, reach)
-      ) {
-        continue;
-      }
-
-      const samples: XY[] = [{ x, y }];
-      if (nx !== 0 || ny !== 0) {
-        const k = Math.max(2, Math.min(64, Math.ceil((2 * h) / resolution)));
-        for (let s = 0; s <= k; s++) {
-          const t = -1 + (2 * s) / k;
-          samples.push({ x: x + nx * h * t, y: y + ny * h * t });
-        }
-      } else {
-        for (let s = 0; s < 8; s++) {
-          const a = (s * Math.PI) / 4;
-          samples.push({ x: x + h * Math.cos(a), y: y + h * Math.sin(a) });
-        }
-      }
-
-      alive[i] = samples.some(
-        (p) => !holes.some((hole) => holeContains(hole, p))
-      );
-    }
-  }
+  const alive = slices.map((slice) => !isCovered(slice, holes, resolution));
 
   if (!alive.some(Boolean)) return { empty: true, bounds: null };
 
@@ -495,6 +476,45 @@ export function visibleExtent(
   return { empty: false, bounds: boundsOf(visible) };
 }
 
+/** Positions across the width of a place on the centerline, `resolution` apart, and its middle. */
+function samplesAcross(slice: Slice, resolution: number): XY[] {
+  const { x, y, h, nx, ny } = slice;
+  const samples: XY[] = [{ x, y }];
+
+  if (nx === 0 && ny === 0) {
+    // no direction to go across: the ring round the place
+    for (let s = 0; s < 8; s++) {
+      const a = (s * Math.PI) / 4;
+      samples.push({ x: x + h * Math.cos(a), y: y + h * Math.sin(a) });
+    }
+    return samples;
+  }
+
+  const k = Math.max(2, Math.min(64, Math.ceil((2 * h) / resolution)));
+  for (let s = 0; s <= k; s++) {
+    const t = -1 + (2 * s) / k;
+    samples.push({ x: x + nx * h * t, y: y + ny * h * t });
+  }
+  return samples;
+}
+
+/** Whether the whole width of a place on the centerline is inside the holes. */
+function isCovered(
+  slice: Slice,
+  holes: WeaveErasureHole[],
+  resolution: number
+): boolean {
+  if (holes.length === 0) return false;
+
+  const { x, y, h } = slice;
+  const box = { x: x - h, y: y - h, width: 2 * h, height: 2 * h };
+  if (!holes.some((hole) => intersects(box, hole.bounds))) return false;
+
+  return samplesAcross(slice, resolution).every((p) =>
+    holes.some((hole) => holeContains(hole, p))
+  );
+}
+
 /**
  * The path through `points` (x, y, x, y, ...) reduced so that no point of the
  * original is farther than `tolerance` from the reduced one. The first and the
@@ -502,10 +522,7 @@ export function visibleExtent(
  */
 export function simplifyPoints(points: number[], tolerance: number): number[] {
   const n = points.length / 2;
-  if (n <= 2) {
-    const stays = n === 2 && points[0] === points[2] && points[1] === points[3];
-    return stays ? [points[0], points[1]] : [...points];
-  }
+  if (n <= 2) return dropRepeats(points);
 
   const keep = new Array<boolean>(n).fill(false);
   keep[0] = true;
@@ -514,36 +531,42 @@ export function simplifyPoints(points: number[], tolerance: number): number[] {
 
   while (stack.length > 0) {
     const [first, last] = stack.pop()!;
-    const a = { x: points[2 * first], y: points[2 * first + 1] };
-    const b = { x: points[2 * last], y: points[2 * last + 1] };
-    let worst = -1;
-    let worstAt = -1;
-    for (let i = first + 1; i < last; i++) {
-      const d = distanceToSegment(
-        { x: points[2 * i], y: points[2 * i + 1] },
-        a,
-        b
-      );
-      if (d > worst) {
-        worst = d;
-        worstAt = i;
-      }
-    }
-    if (worst > tolerance) {
-      keep[worstAt] = true;
-      stack.push([first, worstAt], [worstAt, last]);
+    const { at, distance } = farthestFrom(points, first, last);
+    if (distance > tolerance) {
+      keep[at] = true;
+      stack.push([first, at], [at, last]);
     }
   }
 
-  const out: number[] = [];
+  const kept: number[] = [];
   for (let i = 0; i < n; i++) {
-    if (!keep[i]) continue;
-    // a point where the path stays put, as at a click, is one point
-    const same =
-      out.length > 0 &&
-      out[out.length - 2] === points[2 * i] &&
-      out[out.length - 1] === points[2 * i + 1];
-    if (!same) out.push(points[2 * i], points[2 * i + 1]);
+    if (keep[i]) kept.push(points[2 * i], points[2 * i + 1]);
+  }
+  return dropRepeats(kept);
+}
+
+/** The point between two of a path that is farthest from the line between them. */
+function farthestFrom(points: number[], first: number, last: number) {
+  const a = pointAt(points, first);
+  const b = pointAt(points, last);
+  let distance = -1;
+  let at = first;
+  for (let i = first + 1; i < last; i++) {
+    const d = distanceToSegment(pointAt(points, i), a, b);
+    if (d > distance) {
+      distance = d;
+      at = i;
+    }
+  }
+  return { at, distance };
+}
+
+/** The path without a point that stays where the one before it was, so a click is one point. */
+function dropRepeats(points: number[]): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < points.length; i += 2) {
+    const same = out.at(-2) === points[i] && out.at(-1) === points[i + 1];
+    if (!same) out.push(points[i], points[i + 1]);
   }
   return out;
 }

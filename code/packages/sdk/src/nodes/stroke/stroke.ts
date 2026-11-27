@@ -132,7 +132,7 @@ export class WeaveStrokeNode extends WeaveNode {
     // The line reaches its last point. Without this a dense stroke stopped up
     // to `minDist` short of it, and a sparser one with the same shape did not,
     // so the end of a stroke moved, with its taper, when its points were reduced.
-    const end = pts[pts.length - 1];
+    const end = pts.at(-1)!;
     if (last !== end) result.push(end);
     return result;
   }
@@ -354,8 +354,7 @@ export class WeaveStrokeNode extends WeaveNode {
     const last = pts.at(-1);
     const cached = this.legacyGeometryCache.get(pts);
     if (
-      cached &&
-      cached.length === pts.length &&
+      cached?.length === pts.length &&
       cached.last === last &&
       cached.baseW === baseW
     ) {
@@ -609,7 +608,7 @@ export class WeaveStrokeNode extends WeaveNode {
       pts.at(-1),
     ]);
     const cached = this.lookGeometryCache.get(pts);
-    if (cached && cached.key === key) return cached.geometry;
+    if (cached?.key === key) return cached.geometry;
 
     const centerline = this.buildLookCenterline(look, scale, pts);
 
@@ -747,7 +746,7 @@ export class WeaveStrokeNode extends WeaveNode {
 
     const baseW = attrs.strokeWidth ?? 1;
     const look =
-      override && override.look !== undefined
+      override?.look !== undefined
         ? readStrokeLook(override.look)
         : this.resolveLook(shape as Konva.Shape);
 
@@ -846,8 +845,7 @@ export class WeaveStrokeNode extends WeaveNode {
     const bucket = Math.round(Math.log2(resolution) * 2);
     const cached = this.extentCache.get(shape);
     if (
-      cached &&
-      cached.centerline === geometry.centerline &&
+      cached?.centerline === geometry.centerline &&
       cached.erasures === saved &&
       cached.width === full.width &&
       cached.height === full.height &&
@@ -880,8 +878,7 @@ export class WeaveStrokeNode extends WeaveNode {
     const last = pts.at(-1);
     const cached = this.inkAreaCache.get(pts);
     if (
-      cached &&
-      cached.length === pts.length &&
+      cached?.length === pts.length &&
       cached.last === last &&
       cached.strokeWidth === strokeWidth
     ) {

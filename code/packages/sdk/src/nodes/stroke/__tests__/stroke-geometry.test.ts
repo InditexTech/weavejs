@@ -64,7 +64,7 @@ describe('rendered stroke geometry', () => {
     const g = makeNode().getRenderedGeometry(shapeOf(attrs))!;
     const drawn = renderStroke(attrs);
 
-    expect(g.centerline.length).toBe(g.halfWidths.length);
+    expect(g.centerline).toHaveLength(g.halfWidths.length);
     for (let i = 5; i < g.centerline.length - 5; i += 7) {
       const p = g.centerline[i];
       const r = g.halfWidths[i];
@@ -85,7 +85,7 @@ describe('rendered stroke geometry', () => {
     const attrs = { ...attrsOf(roundLook), strokeElements: curved };
     const near = node.getRenderedGeometry(shapeOf(attrs, 8))!;
     const far = node.getRenderedGeometry(shapeOf(attrs, 0.25))!;
-    expect(near.centerline.length).not.toBe(far.centerline.length);
+    expect(near.centerline).not.toHaveLength(far.centerline.length);
   });
 
   it('reports the ends of the look', () => {

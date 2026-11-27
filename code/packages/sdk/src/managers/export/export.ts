@@ -27,8 +27,8 @@ import {
 } from '@/plugins/stage-grid/constants';
 
 export class WeaveExportManager {
-  private instance: Weave;
-  private logger: Logger;
+  private readonly instance: Weave;
+  private readonly logger: Logger;
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -411,7 +411,7 @@ export class WeaveExportManager {
           exportArea: false,
         });
 
-        exportGroup.toImage({
+        void exportGroup.toImage({
           x: Math.round(backgroundRect.x),
           y: Math.round(backgroundRect.y),
           width: Math.round(backgroundRect.width),
@@ -461,7 +461,7 @@ export class WeaveExportManager {
           exportArea: false,
         });
 
-        exportGroup.toBlob({
+        void exportGroup.toBlob({
           x: Math.round(backgroundRect.x),
           y: Math.round(backgroundRect.y),
           width: Math.round(backgroundRect.width),
@@ -560,7 +560,7 @@ export class WeaveExportManager {
           exportArea: true,
         });
 
-        stage.toImage({
+        void stage.toImage({
           x: area.x,
           y: area.y,
           width: area.width,
@@ -603,7 +603,7 @@ export class WeaveExportManager {
           exportArea: true,
         });
 
-        stage.toBlob({
+        void stage.toBlob({
           x: area.x,
           y: area.y,
           width: area.width,

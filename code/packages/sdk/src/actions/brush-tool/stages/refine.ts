@@ -221,7 +221,8 @@ export function finalizeWithinDeviation({
     tightened: false,
   });
 
-  if (!(maxDeviationPx > 0) || points.length < 3) return unchanged();
+  if (maxDeviationPx <= 0 || Number.isNaN(maxDeviationPx) || points.length < 3)
+    return unchanged();
 
   const started = performance.now();
   const limit = deadline ?? started + MAX_REFINE_MS;

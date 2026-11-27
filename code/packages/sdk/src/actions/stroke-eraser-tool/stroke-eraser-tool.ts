@@ -618,9 +618,7 @@ export class WeaveStrokeEraserToolAction extends WeaveAction {
 
     // a finger or a pen that drags would otherwise scroll or zoom the page,
     // and the browser would cancel the pointer
-    if (this.prevTouchAction === null) {
-      this.prevTouchAction = stage.container().style.touchAction;
-    }
+    this.prevTouchAction ??= stage.container().style.touchAction;
     stage.container().style.touchAction = 'none';
 
     this.buildCursor();

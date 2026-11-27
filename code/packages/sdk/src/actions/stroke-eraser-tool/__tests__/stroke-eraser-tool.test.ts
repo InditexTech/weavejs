@@ -1379,7 +1379,7 @@ describe('failing and repeating', () => {
 
     // a second drag, while the node still has the erasures it had
     await drag(20, -20, 40);
-    expect(world.ops.length).toBe(writes);
+    expect(world.ops).toHaveLength(writes);
     expect(maskOf(world, stroke)).not.toBeNull();
 
     // the host renders the saved erase

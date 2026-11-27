@@ -1548,7 +1548,8 @@ export class WeaveBrushToolAction extends WeaveAction {
     nodeHandler: WeaveStrokeNode
   ): boolean {
     if (
-      !(this.config.catchUpMs > 0) ||
+      this.config.catchUpMs <= 0 ||
+      Number.isNaN(this.config.catchUpMs) ||
       typeof requestAnimationFrame !== 'function'
     ) {
       return false;
@@ -1572,7 +1573,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       );
     }
     const zoom = this.instance.getStage().scaleX() || 1;
-    if (along[along.length - 1] * zoom < BRUSH_CATCH_UP_MIN_PX) {
+    if (along.at(-1)! * zoom < BRUSH_CATCH_UP_MIN_PX) {
       return false;
     }
 
@@ -1605,7 +1606,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     // fast at first, then slowing as it reaches the pen
     const eased = 1 - (1 - t) ** 3;
-    const reached = eased * c.along[c.along.length - 1];
+    const reached = eased * c.along.at(-1)!;
 
     // the points of the way that are reached, then the point where it is now
     const drawn: WeaveStrokePoint[] = [];

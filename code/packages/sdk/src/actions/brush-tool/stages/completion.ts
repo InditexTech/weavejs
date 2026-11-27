@@ -56,7 +56,7 @@ export function completionTail(
   for (let i = 1; i < way.length; i++) {
     along.push(along[i - 1] + distance(way[i - 1], way[i]));
   }
-  const length = along[along.length - 1];
+  const length = along.at(-1)!;
   if (length <= 0) return [{ x: end.x, y: end.y }];
 
   const offset = { x: tip.x - trail[from].x, y: tip.y - trail[from].y };
