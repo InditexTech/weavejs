@@ -1,0 +1,175 @@
+AGENTS.md
+  s_eb312353457cb7::t_53af0842f4289f 131-139
+code/packages/sdk/src/__tests__/index.types.test.ts
+  s_eb312353457cb7::t_0f765bd5192d72 48-62
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.catch-up.test.ts
+  s_eb312353457cb7::t_11a76fd93bf48b 1-329
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.finalize-fidelity.test.ts
+  s_eb312353457cb7::t_71afeb363b39a9 1-262
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.golden.test.ts
+  s_eb312353457cb7::t_0c035a033bb341 26-31,33-34,51,58
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.instruments.test.ts
+  s_eb312353457cb7::t_9afa5c3f31a6ce 59,66,72,78,309-310,316-317,401-526
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.test.ts
+  s_eb312353457cb7::t_94e5a5e21c1182 108-109
+code/packages/sdk/src/actions/brush-tool/__tests__/shared/brush-golden.helpers.ts
+  s_eb312353457cb7::t_2482c785e1427a 145-147,231-232,238
+code/packages/sdk/src/actions/brush-tool/brush-tool.ts
+  s_eb312353457cb7::t_b5e7a91b497889 25-28,66-67,166-180,633,788-790,1109,1263-1264,1326-1328,1333,1335-1336,1339-1341,1343-1357,1379-1380,1383,1410,1417-1434,1540-1649,1659,1694,1716-1718
+code/packages/sdk/src/actions/brush-tool/constants.ts
+  s_eb312353457cb7::t_1738224f8a55b2 39,119-134,136-150
+code/packages/sdk/src/actions/brush-tool/stages/__tests__/completion.test.ts
+  s_eb312353457cb7::t_78f99d5a8a46dc 1-116
+code/packages/sdk/src/actions/brush-tool/stages/__tests__/refine.test.ts
+  s_eb312353457cb7::t_51953acfb841c5 1-556
+code/packages/sdk/src/actions/brush-tool/stages/completion.ts
+  s_eb312353457cb7::t_03cc15ab68a6b6 1-77
+code/packages/sdk/src/actions/brush-tool/stages/refine.ts
+  s_eb312353457cb7::t_4d038fa0e05dde 1-362
+code/packages/sdk/src/actions/brush-tool/stages/stabilizer.ts
+  s_eb312353457cb7::t_953097c38a0b73 71-77,88,122,124-125
+code/packages/sdk/src/actions/brush-tool/tunables/__tests__/descriptors.test.ts
+  s_eb312353457cb7::t_ccd93d268a4670 60-63
+code/packages/sdk/src/actions/brush-tool/tunables/descriptors.ts
+  s_eb312353457cb7::t_0d6f2977e9fb96 124-136,184-196
+code/packages/sdk/src/actions/brush-tool/tunables/presets.ts
+  s_eb312353457cb7::t_0f91a381d0dc6f 381-384,386-392,402-408,417-419,421,425-428,459,463,497,500-501,523,526,536,539,543-546
+code/packages/sdk/src/actions/brush-tool/types.ts
+  s_eb312353457cb7::t_ac6f76728e321e 68-73,94-102,142-143
+code/packages/sdk/src/actions/stroke-eraser-tool/__tests__/local-space.test.ts
+  s_eb312353457cb7::t_dc96654bcfc0a5 1-113
+code/packages/sdk/src/actions/stroke-eraser-tool/__tests__/pieces.test.ts
+  s_eb312353457cb7::t_2d66b75dcb1d15 1-369
+code/packages/sdk/src/actions/stroke-eraser-tool/__tests__/stroke-eraser-tool.test.ts
+  s_eb312353457cb7::t_94f4c73e749ec7 1-1353
+code/packages/sdk/src/actions/stroke-eraser-tool/constants.ts
+  s_eb312353457cb7::t_efc2d2f7c6cf58 1-50
+code/packages/sdk/src/actions/stroke-eraser-tool/local-space.ts
+  s_eb312353457cb7::t_bebd13ff2517e6 1-42
+code/packages/sdk/src/actions/stroke-eraser-tool/pieces.ts
+  s_eb312353457cb7::t_5d45cf39899493 1-166
+code/packages/sdk/src/actions/stroke-eraser-tool/stroke-eraser-tool.ts
+  s_eb312353457cb7::t_c2b3e6dffb9847 1-647
+code/packages/sdk/src/actions/stroke-eraser-tool/types.ts
+  s_eb312353457cb7::t_54c0d315820ecb 1-24
+code/packages/sdk/src/index.common.ts
+  s_eb312353457cb7::t_0406aee75f5de3 87-90,132-134
+code/packages/sdk/src/managers/export/export.ts
+  s_483d62c6242f9c::t_77e99fd818b48b 128-132,351-355
+code/packages/sdk/src/nodes/stroke/__tests__/shared/stroke-render.helpers.ts
+  s_932b9ea24c6a06::t_4ddf6d5ab737e0 15-17
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-box.test.ts
+  s_eb312353457cb7::t_49cf661baf69b4 1-134
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-erase-mask.test.ts
+  s_eb312353457cb7::t_1df551e40c4065 1-271
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-geometry.test.ts
+  s_eb312353457cb7::t_c46b7f17062ba3 1-165
+code/packages/sdk/src/nodes/stroke/__tests__/stroke-variance.test.ts
+  s_932b9ea24c6a06::t_fcbb74ff33394c 61-68
+code/packages/sdk/src/nodes/stroke/render/__tests__/erase.test.ts
+  s_eb312353457cb7::t_a836f2ac8ab33a 1-401
+code/packages/sdk/src/nodes/stroke/render/__tests__/look.test.ts
+  s_eb312353457cb7::t_5a88314d2b1810 130-169
+code/packages/sdk/src/nodes/stroke/render/erase.ts
+  s_eb312353457cb7::t_b6d57d24dac07f 1-383
+code/packages/sdk/src/nodes/stroke/render/look.ts
+  s_eb312353457cb7::t_6ccefa7a48c982 139-140,143-153
+code/packages/sdk/src/nodes/stroke/stroke.ts
+  s_eb312353457cb7::t_05e1f4682a0c75 36-42,63-75,107-111,314-355,375,380,575-577,653-659,701-848,861-866,902-911,985
+code/packages/sdk/src/plugins/brush-lab/__tests__/ghosts.test.ts
+  s_eb312353457cb7::t_eb89f01cdd9dc6 145-174
+code/packages/sdk/src/plugins/brush-lab/ghosts.ts
+  s_eb312353457cb7::t_0bdeecaec28eb8 7-12,60,63-71
+docs/src/modules/main/nav.adoc
+  s_eb312353457cb7::t_edd9e1b7777585 76
+docs/src/modules/main/pages/build/actions/index.adoc
+  s_eb312353457cb7::t_4a2947ce38c672 71-74
+docs/src/modules/main/pages/build/actions/stroke-eraser-tool.adoc
+  s_eb312353457cb7::t_2494b4ba0a84c4 1-78
+docs/src/modules/sdk/nav.adoc
+  s_eb312353457cb7::t_ba329d899c602e 75
+docs/src/modules/sdk/pages/api-reference/actions/brush-tool.adoc
+  s_eb312353457cb7::t_8c9d0de71ddbfb 43-44,90-92,145-146,261-262,265-281,295-301,320-355,425-426,429-430,461-462
+docs/src/modules/sdk/pages/api-reference/actions/brush-tuning.adoc
+  s_eb312353457cb7::t_e60c18d427dfae 91,101,130
+docs/src/modules/sdk/pages/api-reference/actions/index.adoc
+  s_eb312353457cb7::t_fbe816c26f53fe 35-38
+docs/src/modules/sdk/pages/api-reference/actions/stroke-eraser-tool.adoc
+  s_eb312353457cb7::t_4de10331a7f0dd 1-115
+docs/src/modules/sdk/pages/api-reference/nodes/stroke.adoc
+  s_eb312353457cb7::t_7c678ddbd6fcb5 147,170-220
+openspec/changes/add-stroke-eraser-tool/.openspec.yaml
+  s_eb312353457cb7::t_004f39509e4d14 1-2
+openspec/changes/add-stroke-eraser-tool/design.md
+  s_483d62c6242f9c::t_02b00c7b009249 1-74
+openspec/changes/add-stroke-eraser-tool/proposal.md
+  s_eb312353457cb7::t_244d76ffc9f5fe 1-39
+openspec/changes/add-stroke-eraser-tool/specs/stroke-eraser/pieces/spec.md
+  s_eb312353457cb7::t_16b9d5f0382559 1-106
+openspec/changes/add-stroke-eraser-tool/specs/stroke-eraser/tool/spec.md
+  s_eb312353457cb7::t_6e0c25066c5f8a 1-173
+openspec/changes/add-stroke-eraser-tool/specs/stroke-node/rendering/spec.md
+  s_eb312353457cb7::t_578bb251ab9df1 1-48
+openspec/changes/add-stroke-eraser-tool/tasks.md
+  s_eb312353457cb7::t_ac60548833f788 1-47
+openspec/changes/brush-faithful-finish/.openspec.yaml
+  s_483d62c6242f9c::t_a36352dbcfd5d1 1-2
+openspec/changes/brush-faithful-finish/design.md
+  s_eb312353457cb7::t_72925d789ec6b4 1-68
+openspec/changes/brush-faithful-finish/proposal.md
+  s_eb312353457cb7::t_afc95a74aa8c03 1-33
+openspec/changes/brush-faithful-finish/specs/brush-tool/finish-fidelity/spec.md
+  s_eb312353457cb7::t_240649e93fcae5 1-98
+openspec/changes/brush-faithful-finish/specs/brush-tool/input-profiles/spec.md
+  s_eb312353457cb7::t_3d93f1d54824ae 1-22
+openspec/changes/brush-faithful-finish/specs/stroke-node/rendering/spec.md
+  s_eb312353457cb7::t_590305efa07a42 1-23
+openspec/changes/brush-faithful-finish/tasks.md
+  s_eb312353457cb7::t_a6d520e4b5cb0a 1-30
+openspec/changes/brush-instruments-and-shift-lock/specs/brush-tool/instruments/spec.md
+  s_eb312353457cb7::t_f23f812841bfeb 21,58
+openspec/changes/refine-brush-pens/.openspec.yaml
+  s_eb312353457cb7::t_4678439177a784 1-2
+openspec/changes/refine-brush-pens/design.md
+  s_eb312353457cb7::t_c86b8e8f6c6ce1 1-60
+openspec/changes/refine-brush-pens/proposal.md
+  s_eb312353457cb7::t_0ddf460697f682 1-40
+openspec/changes/refine-brush-pens/specs/brush-tool/pen-feel/spec.md
+  s_eb312353457cb7::t_4d2be2d0994c76 1-63
+openspec/changes/refine-brush-pens/specs/stroke-node/rendering/spec.md
+  s_eb312353457cb7::t_7c0b3068b360eb 1-39
+openspec/changes/refine-brush-pens/tasks.md
+  s_eb312353457cb7::t_3cfa79303b1394 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "e8bfd6975fd8b62fc35e925588706923d7205490",
+  "prompts": {},
+  "sessions": {
+    "s_483d62c6242f9c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de7bdd257ffeKtKn6CqBjz79MN",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_932b9ea24c6a06": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de7b0af83ffeVP9hBNmz4VDoJ3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_eb312353457cb7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de76a07f5ffepcUsScFaMsGPkT",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
