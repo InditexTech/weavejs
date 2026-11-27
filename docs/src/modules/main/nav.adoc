@@ -73,6 +73,7 @@
 ** xref:main:build/actions/selection-tool.adoc[Selection Tool]
 ** xref:main:build/actions/star-tool.adoc[Star Tool]
 ** xref:main:build/actions/sticky-note-tool.adoc[Sticky Note Tool]
+** xref:main:build/actions/stroke-eraser-tool.adoc[Stroke Eraser Tool]
 ** xref:main:build/actions/stroke-tool.adoc[Stroke Tool]
 ** xref:main:build/actions/text-tool.adoc[Text Tool]
 ** xref:main:build/actions/video-tool.adoc[Video Tool]

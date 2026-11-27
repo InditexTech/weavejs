@@ -36,6 +36,7 @@ export const PREVIEW_HANDOVER_MAX_FRAMES = 30;
 export const BRUSH_PROFILE_OPTIONAL_DEFAULTS = {
   capture: { shiftLock: false },
   pressure: { synth: 'off' },
+  stabilizer: { dCutoff: 1 },
 } as const;
 
 export const BRUSH_INPUT_PROFILE_KEYS = [
@@ -115,4 +116,35 @@ export const BRUSH_TOOL_DEFAULT_CONFIG = {
   // ~75% of raw samples; going below it buys little and costs point count
   // in every persisted document.
   simplifyTolerance: 0.5,
+  // Largest difference, in screen pixels, between a stroke as it was drawn and
+  // as it is saved. Those figures were measured against the simplified points
+  // joined by a plain spline; drawn the way strokes are now drawn (a variable
+  // width, curves through unevenly spaced points) a simplified stroke strays
+  // by 1-2 px typically and by tens of px where the path turns sharply. A
+  // quarter of a pixel is below what an anti-aliased edge shows, even on a
+  // hairline, and the points are added only where the saved line needs them.
+  // 0 saves what the finishing step leaves, as releases before this setting did.
+  // A profile can set its own with `finalize.maxDeviationPx`.
+  finalizeMaxDeviationPx: 0.25,
+  // A stabilized stroke lags behind the pen, by 5-20 px at the pace of a quick
+  // stroke, and completes at the pen's position when the pen lifts
+  // (`stabilizer.catchUpOnEnd`). Done at once the end of the line jumps; it
+  // glides there instead over this many milliseconds, then the stroke is saved.
+  // 0 completes it at once, as releases before this setting did.
+  catchUpMs: 90,
 };
+
+/** A stroke that is within this many screen pixels of the pen when it ends is completed at once. */
+export const BRUSH_CATCH_UP_MIN_PX = 1.5;
+
+/** Positions of the pen kept for completing a stabilized stroke where the pen was lifted. */
+export const BRUSH_RAW_TRAIL_MAX = 64;
+
+/**
+ * Completing a stabilized stroke follows the way the pen went, from the point
+ * of its path nearest to the end of the line. Samples closer than this many
+ * screen pixels to the one before are skipped, and the way is not followed
+ * from a point farther than this many from the end of the line.
+ */
+export const BRUSH_COMPLETION_MIN_STEP_PX = 1.5;
+export const BRUSH_COMPLETION_MAX_OFFSET_PX = 32;

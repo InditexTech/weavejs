@@ -58,6 +58,14 @@ describe('variance', () => {
     expect(recordDrawCalls(attrs(varied, { id: 'stroke-1' }), makeNode())).toEqual(first);
   });
 
+  it('is the same for the clone of a stroke made by an export', () => {
+    expect(
+      recordDrawCalls(
+        attrs(varied, { id: 'uuid-of-the-clone', exportSourceId: 'stroke-1' })
+      )
+    ).toEqual(recordDrawCalls(attrs(varied, { id: 'stroke-1' })));
+  });
+
   it('is the same for the preview of a finished stroke', () => {
     expect(recordDrawCalls(attrs(varied, { id: 'stroke-1--preview' }))).toEqual(
       recordDrawCalls(attrs(varied, { id: 'stroke-1' }))

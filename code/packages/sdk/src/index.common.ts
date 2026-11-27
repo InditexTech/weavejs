@@ -84,6 +84,10 @@ export * from './nodes/frame/types';
 export { WeaveStrokeNode } from './nodes/stroke/stroke';
 export * from './nodes/stroke/constants';
 export * from './nodes/stroke/types';
+export type {
+  WeaveEraseMask,
+  WeaveEraserCapsule,
+} from './nodes/stroke/render/erase';
 export { WeaveStrokeSingleNode } from './nodes/stroke-single/stroke-single';
 export * from './nodes/stroke-single/constants';
 export * from './nodes/stroke-single/types';
@@ -125,6 +129,9 @@ export * from './actions/selection-tool/types';
 export { WeaveEraserToolAction } from './actions/eraser-tool/eraser-tool';
 export * from './actions/eraser-tool/constants';
 export * from './actions/eraser-tool/types';
+export { WeaveStrokeEraserToolAction } from './actions/stroke-eraser-tool/stroke-eraser-tool';
+export * from './actions/stroke-eraser-tool/constants';
+export * from './actions/stroke-eraser-tool/types';
 export { WeaveRectangleToolAction } from './actions/rectangle-tool/rectangle-tool';
 export * from './actions/rectangle-tool/constants';
 export * from './actions/rectangle-tool/types';

@@ -125,7 +125,11 @@ export class WeaveExportManager {
     exportGroup.add(background);
 
     for (const node of nodes) {
-      const clonedNode = node.clone({ id: uuidv4() });
+      const clonedNode = node.clone({
+        id: uuidv4(),
+        // lets id-seeded rendering (stroke width variance) match the original
+        exportSourceId: node.getAttrs().id,
+      });
       const absPos = node.getAbsolutePosition();
       clonedNode.absolutePosition({
         x: absPos.x / scaleX,
@@ -344,7 +348,11 @@ export class WeaveExportManager {
       exportGroup.add(background);
 
       for (const node of nodes) {
-        const clonedNode = node.clone({ id: uuidv4() });
+        const clonedNode = node.clone({
+          id: uuidv4(),
+          // lets id-seeded rendering (stroke width variance) match the original
+          exportSourceId: node.getAttrs().id,
+        });
         const absPos = node.getAbsolutePosition();
         clonedNode.absolutePosition({
           x: absPos.x / scaleX,

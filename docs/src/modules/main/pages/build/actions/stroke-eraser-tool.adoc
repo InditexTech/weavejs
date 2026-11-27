@@ -1,0 +1,78 @@
+= Stroke Eraser Tool
+:description: Erase part of a brush stroke by dragging over it
+
+== Introduction
+
+This action allows users to erase part of a stroke. The user drags the eraser over a stroke drawn with the xref:main:build/actions/brush-tool.adoc[Brush Tool] and the parts it covers disappear; what is left of the stroke stays on the canvas as one or more strokes.
+
+It does not replace the xref:main:build/actions/eraser-tool.adoc[Eraser Tool], which deletes a whole element with a click. Register the one that fits, or both.
+
+Only strokes are erased. Any other element under the eraser is left as it is, and so is a stroke that is locked or that another user is working on.
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveStrokeEraserToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveStrokeEraserToolAction({ config: { size: 24 } }), // <.>
+  ]
+})
+----
+<.> Added in this step. The size is the diameter of the eraser, in screen pixels.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("strokeEraserTool");
+----
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyStrokeEraserToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("strokeEraserTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Stroke Eraser</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+When enabled, a ring shows the size of the eraser. The user presses and drags over a stroke and the part under the ring disappears from their screen. When the user lets go the change is saved and shared with everyone, as a single step: one undo brings back everything the drag erased. Pressing `Escape` while dragging cancels the erase and leaves the strokes as they were.
+
+NOTE: The eraser keeps the same size on screen at any zoom level.
+
+== Things to know
+
+* A stroke that is cut in two becomes two strokes. The first keeps the original identity, and both stay where they were in the stacking order. What is left of the stroke does not visibly change when you let go.
+* It works with a finger or a pen as it does with a mouse. A pinch, or a second finger, does not erase.
+* A stroke drawn with a variable width (the Brush pen) can show a slightly different width pattern on the pieces after the first.
+* A dashed stroke starts its dash pattern again in each piece.
+* If two people erase the same stroke at the same moment, the pieces can overlap.
+
+See the xref:sdk:api-reference/actions/stroke-eraser-tool.adoc[API reference] for the options.

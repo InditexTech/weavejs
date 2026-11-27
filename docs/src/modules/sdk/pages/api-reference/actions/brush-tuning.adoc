@@ -88,6 +88,7 @@ These settings live in an input profile, see xref:sdk:api-reference/actions/brus
 | mono:[stabilizer.type] | none \| oneEuro \| pulledString \| streamline | mono:[none] |  | capture | Smooths the pen position while drawing.
 | mono:[stabilizer.minCutoff] | 0.1 to 20 | mono:[3] | Hz | capture | One Euro minimum cutoff: lower removes more jitter at slow speed.
 | mono:[stabilizer.beta] | 0 to 1 | mono:[0.01] |  | capture | One Euro speed coefficient: higher removes more lag at high speed.
+| mono:[stabilizer.dCutoff] | 0.1 to 60 | mono:[1] | Hz | capture | One Euro speed filter cutoff: higher lets the smoothing ease off sooner when the pen speeds up, so a fast stroke lags less behind the pen.
 | mono:[stabilizer.radiusPx] | 0 to 40 | mono:[4] | px | capture | Pulled string leash length: the pen must move this far before the line follows.
 | mono:[stabilizer.amount] | 0 to 1 | mono:[0.3] | fraction | capture | Streamline strength: 0 follows the pen exactly, 1 is the strongest smoothing.
 | mono:[stabilizer.zoomAware] | true \| false | mono:[false] |  | capture | Interpret the distances in screen pixels, so the effect on screen is the same at every zoom level. Off: canvas units.
@@ -97,6 +98,7 @@ These settings live in an input profile, see xref:sdk:api-reference/actions/brus
 | mono:[finalize.toleranceUnit] | canvas \| screen | mono:[canvas] |  | capture | canvas: tolerance in canvas units. screen: in pixels, converted with the zoom when the stroke ends.
 | mono:[finalize.pressureWeight] | 0 to 200 | mono:[20] |  | capture | Distance units per pressure unit when simplification keeps pressure detail. (advanced)
 | mono:[finalize.resampleSpacingPx] | 0.5 to 20 | mono:[2] | px | capture | Spacing of the points a fitted curve is resampled to. (advanced)
+| mono:[finalize.maxDeviationPx] | 0 to 5 | mono:[tool-level value] | px | capture | Largest difference, in screen pixels, between the stroke as drawn and as saved, for a thin line; a broad one may move more. When the finishing step would change the line or its width by more, the stroke is rebuilt from the drawn points until it does not. Empty uses the tool-level mono:[finalizeMaxDeviationPx] (0.25). 0 keeps the result of the finishing step as it is.
 | mono:[touchGuard.waitMs] | 0 to 500 | mono:[0] | ms | capture | Wait before a finger stroke is committed, so a second finger can cancel it.
 | mono:[touchGuard.movePx] | 0 to 40 | mono:[0] | px | capture | Movement that commits the stroke before the wait ends.
 | mono:[touchGuard.cancelOnSecondTouch] | true \| false | mono:[false] |  | capture | Cancel the stroke when a second finger lands during the wait.
@@ -125,7 +127,7 @@ These settings live in the look saved with each stroke.
 | mono:[width.max] | 0 to 1 | mono:[1] | fraction | draw | Width at pressure 1, as a fraction of the stroke width.
 | mono:[width.gamma] | 0.2 to 3 | mono:[1] |  | draw | Response curve: below 1 reacts faster to light pressure, above 1 needs a firmer press.
 | mono:[width.taperStart] | 0 to 200 | mono:[0] | px | draw | Distance over which the start narrows; 0 for none.
-| mono:[width.taperEnd] | 0 to 200 | mono:[0] | px | draw | Distance over which the end narrows; 0 for none.
+| mono:[width.taperEnd] | 0 to 200 | mono:[0] | px | draw | Distance over which the end narrows; 0 for none. A stroke shorter than both tapers together shortens them in proportion.
 | mono:[width.easing] | linear \| easeIn \| easeOut \| easeInOut | mono:[easeOut] |  | draw | Shape of the start and end tapers.
 | mono:[width.nibAngle] | -180 to 180 | mono:[0] |  | draw | Angle of the nib in degrees; the stroke is widest when travelling across it.
 | mono:[width.nibContrast] | 0 to 1 | mono:[0] | fraction | draw | How much narrower the stroke is when travelling along the nib; 0 for a round nib.

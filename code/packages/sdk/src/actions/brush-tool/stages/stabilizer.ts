@@ -68,7 +68,13 @@ class OneEuroAxis {
     this.seeded = true;
   }
 
-  filter(value: number, time: number, minCutoff: number, beta: number): number {
+  filter(
+    value: number,
+    time: number,
+    minCutoff: number,
+    beta: number,
+    dCutoff: number
+  ): number {
     if (!this.seeded) {
       this.seed(value, time);
       return value;
@@ -79,7 +85,7 @@ class OneEuroAxis {
       return r / (r + 1);
     };
 
-    const a = factor(1);
+    const a = factor(dCutoff);
     this.derivative = a * ((value - this.last) / dt) + (1 - a) * this.derivative;
 
     const alpha = factor(minCutoff + beta * Math.abs(this.derivative));
@@ -113,9 +119,10 @@ class OneEuroStabilizer implements BrushStabilizer {
 
   apply(point: StabilizerPoint, ctx: StabilizerContext): StabilizerPoint {
     const s = unitScale(this.cfg, ctx);
+    const { minCutoff, beta, dCutoff = 1 } = this.cfg;
     return {
-      x: this.x.filter(point.x * s, ctx.now, this.cfg.minCutoff, this.cfg.beta) / s,
-      y: this.y.filter(point.y * s, ctx.now, this.cfg.minCutoff, this.cfg.beta) / s,
+      x: this.x.filter(point.x * s, ctx.now, minCutoff, beta, dCutoff) / s,
+      y: this.y.filter(point.y * s, ctx.now, minCutoff, beta, dCutoff) / s,
     };
   }
 }

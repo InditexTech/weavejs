@@ -144,7 +144,7 @@ Missing or invalid fields fall back to the legacy values, and numbers are clampe
 | mono:[caps] | With the mono:[legacy] outline, mono:[separate] draws the round ends over the fill, as before. mono:[merged] puts them in the same fill, so a translucent colour is not darker at the ends.
 | mono:[ends] | Optional, mono:[round] by default. With the mono:[round] outline, mono:[flat] draws no disc at the start and end, so they are cut square; a stroke of a single point, or of a single dash, is still a disc. A viewer from a release that does not know the field draws round ends.
 | mono:[variance] | Optional, from `0` (none, the default) to `1`. Varies the width smoothly along the stroke, by up to half of it at `1`. The variation depends only on the id of the stroke and the distance along it, so every viewer, every redraw and every zoom level draws the same widths. The preview shown while a stroke is finished and the saved stroke use the same seed. A viewer from a release that does not know the field draws a constant width.
-| mono:[width] | Half-width is the stroke width times a fraction between mono:[min] and mono:[max], following pressure raised to mono:[gamma], narrowing over mono:[taperStart] and mono:[taperEnd] with the shape of mono:[width.easing] (mono:[linear], mono:[easeIn], mono:[easeOut], the default, or mono:[easeInOut]). The defaults reproduce the earlier width.
+| mono:[width] | Half-width is the stroke width times a fraction between mono:[min] and mono:[max], following pressure raised to mono:[gamma], narrowing over mono:[taperStart] and mono:[taperEnd] with the shape of mono:[width.easing] (mono:[linear], mono:[easeIn], mono:[easeOut], the default, or mono:[easeInOut]). A stroke shorter than mono:[taperStart] and mono:[taperEnd] together shortens both in proportion, so that it still reaches its full width where they meet; a longer one is drawn over the distances given. The defaults reproduce the earlier width.
 |===
 
 === Nib
@@ -167,3 +167,54 @@ stroke.setLookPreview(null);                              // back to the saved l
 ----
 
 The preview only changes how this screen draws. It does not change any saved stroke and other users do not see it.
+
+=== Rendered geometry
+
+[source,ts]
+----
+const stroke = weave.getNodeHandler<WeaveStrokeNode>('stroke');
+const geometry = stroke.getRenderedGeometry(konvaStrokeNode);
+// { centerline: WeaveStrokePoint[], halfWidths: number[], ends: 'round' | 'flat' } | null
+
+// the geometry the stroke would have with other points, or another look (null is the legacy ribbon)
+stroke.getRenderedGeometry(konvaStrokeNode, { points: otherPoints, look: otherLook });
+----
+
+Returns the centerline of a stroke and the half-width at each of its points, as the stroke is drawn now, so a feature that works on the drawn shape does not have to rebuild it from the saved points. It returns mono:[null] when the stroke has no points.
+
+* The geometry follows the look in force: the saved look, or the viewer-side preview when one is on. A stroke with no look gets the legacy ribbon's centerline and widths.
+* Coordinates are in the node's own space, like mono:[strokeElements].
+* For a look that follows the zoom (mono:[zoomAware]) the centerline depends on the current zoom, so ask for it again after the zoom changes.
+* The line reaches the last point of the stroke, whatever the spacing of its points, so the same shape drawn from dense points and from a few ends in the same place.
+* The geometry of a stroke is kept while its points, width and look are the same, so asking again, or redrawing, does not build it again.
+* mono:[ends] is mono:[flat] only for a mono:[round] or mono:[freehand] outline with mono:[ends] set to mono:[flat]; in every other case the ends are round.
+
+=== Erase mask
+
+[source,ts]
+----
+const stroke = weave.getNodeHandler<WeaveStrokeNode>('stroke');
+stroke.setEraseMask(konvaStrokeNode, [
+  { a: { x: 40, y: 10 }, b: { x: 60, y: 10 }, r: 6 },
+]);
+stroke.setEraseMask(konvaStrokeNode, null);  // draw the stroke in full again
+stroke.getEraseMask(konvaStrokeNode);        // the current mask, or null
+stroke.cutStrokeWithMask(konvaStrokeNode, mask); // { erased, runs, ends } | null
+----
+
+Hides part of one stroke on this screen. Each entry of the mask is a capsule: the segment from mono:[a] to mono:[b] widened by the radius mono:[r], in the node's own space, like mono:[strokeElements]. The parts of the stroke the capsules reach are not drawn.
+
+* mono:[cutStrokeWithMask] gives what is left of the stroke after a mask, as runs of its drawn centerline (points with their widths, and whether each end of a run is a cut). A mask that only grows, as an eraser dragged over the stroke makes it, costs only the capsules added since the last time; a different stroke, look or set of capsules starts again.
+* The mask only changes how this screen draws. It is not saved, other users do not see it, and it is left out when the node is serialized.
+* The rest of the stroke keeps the widths it has, including its taper, variance and nib, and each remaining run gets the same ends as the stroke: round, or square for a look with mono:[ends] set to mono:[flat].
+* A stroke with a dash pattern starts the pattern again in each run.
+* A mask that reaches nothing leaves the stroke drawn exactly as without a mask.
+* It works for strokes with no look, for the mono:[legacy] outline, and for the mono:[round] and mono:[freehand] outlines.
+
+=== The box of a stroke
+
+The box of a stroke is the box of its points widened by half of mono:[strokeWidth] on every side. That is the most the line is drawn away from them, so the frames of a selection and of a hover, snapping, aligning and fitting to the screen surround a thick line, its round ends included, and the frame of a hover and the frame of a selection are the same.
+
+* mono:[getClientRect] of the node gives it, also to a caller that leaves the stroke of a node out of its box: the mono:[stroke] of this node is its ink, not a border.
+* The mono:[width] and mono:[height] of the node are still those of the box of the points, and are saved as they were.
+* A line drawn thinner than mono:[strokeWidth], as a pen is at speed, has a little room between it and the frame.

@@ -69,6 +69,10 @@ the canvas to build visual collaborative applications. This are the actions:
 Allows users to erase (delete) elements of the canvas. When enabled the user can click on an element and it will be erased.
 
 [card,subheader="UX"]
+.xref:main:build/actions/stroke-eraser-tool.adoc[Stroke Eraser Tool]
+Allows users to erase part of a stroke. When enabled the user drags over a stroke and the area under the eraser is removed, leaving what is left of the stroke.
+
+[card,subheader="UX"]
 .xref:main:build/actions/move-tool.adoc[Move Tool]
 Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas at its will.
 

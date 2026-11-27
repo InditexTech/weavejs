@@ -131,6 +131,39 @@ describe.each([
   });
 });
 
+describe('the speed filter of the One Euro stabilizer', () => {
+  const euro = { type: 'oneEuro', minCutoff: 4, beta: 0.04, zoomAware: false };
+
+  /**
+   * How far the line is behind the pen, in px, 25 ms into a stroke that starts
+   * at 1200 px/s (6 px every 5 ms): the speed filter has not measured the speed
+   * yet, so the smoothing has not eased off.
+   */
+  const lagAtStart = (stabilizer: Stabilizer) => {
+    const { live } = runGesture(jittery(6), config(stabilizer));
+    return START_X + 5 * 6 - live[5].x;
+  };
+
+  it('is the same with its default of 1 Hz as when it is not set', () => {
+    const unset = runGesture(jittery(6), config(euro)).live;
+    const set = runGesture(jittery(6), config({ ...euro, dCutoff: 1 })).live;
+    expect(set).toEqual(unset);
+  });
+
+  it('lets the line keep up with a stroke that starts fast when it is higher', () => {
+    const slowFilter = lagAtStart(euro);
+    const fastFilter = lagAtStart({ ...euro, dCutoff: 15 });
+    expect(slowFilter).toBeGreaterThan(8);
+    expect(fastFilter).toBeLessThan(slowFilter / 2);
+  });
+
+  it('still smooths a slow stroke when it is higher', () => {
+    const slowRaw = deviation(jittery(0.3), { type: 'none' });
+    const smoothed = deviation(jittery(0.3), { ...euro, dCutoff: 15 });
+    expect(smoothed).toBeLessThan(slowRaw * 0.6);
+  });
+});
+
 describe('completing the stroke where the pen was lifted', () => {
   const lagging = { type: 'streamline', amount: 1, zoomAware: false };
   const endX = START_X + N * 2;

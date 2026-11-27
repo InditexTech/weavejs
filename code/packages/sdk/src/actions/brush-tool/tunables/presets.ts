@@ -378,8 +378,18 @@ const PENCIL_PROFILE = speedWidth({
   finalize: { mode: 'dpPressure', toleranceUnit: 'screen', tolerance: 0.8 },
 });
 
+// The One Euro filter measures the speed through a filter of its own, which is
+// slow unless told otherwise: at the start of a fast stroke the smoothing has
+// not eased off yet and the line lags 15 px or more behind the pen. A speed
+// filter of 12 Hz follows a stroke within a few px and still smooths a slow one.
 const PEN_PROFILE = speedWidth({
-  stabilizer: { type: 'oneEuro', minCutoff: 4, beta: 0.04, zoomAware: true },
+  stabilizer: {
+    type: 'oneEuro',
+    minCutoff: 4,
+    beta: 0.04,
+    dCutoff: 12,
+    zoomAware: true,
+  },
   finalize: {
     mode: 'bezierFit',
     toleranceUnit: 'screen',
@@ -389,7 +399,13 @@ const PEN_PROFILE = speedWidth({
 });
 
 const BRUSH_PROFILE = speedWidth({
-  stabilizer: { type: 'streamline', amount: 0.25, zoomAware: true },
+  stabilizer: {
+    type: 'oneEuro',
+    minCutoff: 3,
+    beta: 0.04,
+    dCutoff: 12,
+    zoomAware: true,
+  },
   finalize: {
     mode: 'bezierFit',
     toleranceUnit: 'screen',
@@ -398,9 +414,17 @@ const BRUSH_PROFILE = speedWidth({
   },
 });
 
+// A pulled string removes the jitter of a mouse without a lag that grows with
+// the speed: the line is never more than the leash behind the pen, so the broad
+// pens stay smooth and still end where the pen was lifted.
 const MARKER_PROFILE = speedWidth({
+  stabilizer: { type: 'pulledString', radiusPx: 6, zoomAware: true },
   finalize: { mode: 'dpPressure', toleranceUnit: 'screen', tolerance: 0.8 },
 });
+
+const HIGHLIGHTER_PROFILE: WeaveBrushInputProfilePatch = {
+  stabilizer: { type: 'pulledString', radiusPx: 8, zoomAware: true },
+};
 
 /** A distance as a number of stroke widths, kept inside the range a taper accepts. */
 const widths = (strokeWidth: number, count: number, min = 2) =>
@@ -432,11 +456,11 @@ export function createBrushInstruments(
       id: 'pen',
       label: 'Pen',
       description:
-        'A smooth line of changing width with a tapered end, fitted to a curve when the stroke ends.',
+        'A smooth line of changing width with a short rounded end, fitted to a curve when the stroke ends.',
       look: {
         ...INSTRUMENT_BASE_LOOK,
         ends: 'round',
-        width: { min: 0.4, max: 1, taperEnd: 12 },
+        width: { min: 0.4, max: 1, taperEnd: widths(strokeWidth, 0.5) },
       },
       props: NORMAL_PROPS,
       profiles: { mouse: withShiftLock(PEN_PROFILE), touch: PEN_PROFILE },
@@ -470,12 +494,11 @@ export function createBrushInstruments(
         ends: 'round',
         variance: 0.25,
         width: {
-          min: 0.15,
+          min: 0.4,
           max: 1,
           gamma: 0.8,
-          taperStart: widths(strokeWidth, 1.5),
-          taperEnd: widths(strokeWidth, 3),
-          easing: 'easeInOut',
+          taperStart: widths(strokeWidth, 0.75),
+          taperEnd: widths(strokeWidth, 1.5),
         },
       },
       props: NORMAL_PROPS,
@@ -497,10 +520,10 @@ export function createBrushInstruments(
       id: 'marker',
       label: 'Marker',
       description:
-        'A broad line with flat ends that thins by 12% at speed, finished with dpPressure.',
+        'A broad smooth line with round ends that thins by 12% at speed, finished with dpPressure.',
       look: {
         ...INSTRUMENT_BASE_LOOK,
-        ends: 'flat',
+        ends: 'round',
         width: { min: 0.88, max: 1 },
       },
       props: NORMAL_PROPS,
@@ -510,14 +533,17 @@ export function createBrushInstruments(
       id: 'highlighter',
       label: 'Highlighter',
       description:
-        'A broad translucent line of constant width with flat ends that darkens what it crosses.',
+        'A broad smooth translucent line of constant width with round ends that darkens what it crosses.',
       look: {
         ...INSTRUMENT_BASE_LOOK,
-        ends: 'flat',
+        ends: 'round',
         width: { min: 1, max: 1 },
       },
       props: { opacity: 0.75, globalCompositeOperation: 'multiply' },
-      profiles: { mouse: withShiftLock({}), touch: {} },
+      profiles: {
+        mouse: withShiftLock(HIGHLIGHTER_PROFILE),
+        touch: HIGHLIGHTER_PROFILE,
+      },
     },
   ];
 }

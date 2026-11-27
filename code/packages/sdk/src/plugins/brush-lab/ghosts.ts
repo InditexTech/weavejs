@@ -4,6 +4,12 @@
 
 import { createStabilizer } from '@/actions/brush-tool/stages/stabilizer';
 import { finalizePoints } from '@/actions/brush-tool/stages/finalize';
+import { completionTail } from '@/actions/brush-tool/stages/completion';
+import {
+  BRUSH_COMPLETION_MAX_OFFSET_PX,
+  BRUSH_COMPLETION_MIN_STEP_PX,
+  BRUSH_RAW_TRAIL_MAX,
+} from '@/actions/brush-tool/constants';
 import type { WeaveBrushInputProfile } from '@/actions/brush-tool/types';
 import type { LabPressurePoint, LabRecording } from './types';
 
@@ -51,16 +57,18 @@ export function replayRecording(
   });
 
   // A stabilized stroke lags the pen: the brush completes it where the pen
-  // was lifted.
+  // was lifted, along the way the pen went.
   const cfg = profile.stabilizer;
-  const lastRaw = kept.at(-1)!.point;
   const lastOut = points.at(-1)!;
-  if (
-    cfg.type !== 'none' &&
-    cfg.catchUpOnEnd &&
-    (lastRaw.x !== lastOut.x || lastRaw.y !== lastOut.y)
-  ) {
-    points.push({ x: lastRaw.x, y: lastRaw.y, pressure: lastOut.pressure });
+  if (cfg.type !== 'none' && cfg.catchUpOnEnd) {
+    const trail = kept.slice(-BRUSH_RAW_TRAIL_MAX).map((c) => c.point);
+    const zoom = recording.zoom || 1;
+    for (const p of completionTail(lastOut, trail, {
+      minStep: BRUSH_COMPLETION_MIN_STEP_PX / zoom,
+      maxOffset: BRUSH_COMPLETION_MAX_OFFSET_PX / zoom,
+    })) {
+      points.push({ x: p.x, y: p.y, pressure: lastOut.pressure });
+    }
   }
 
   return finalizePoints(

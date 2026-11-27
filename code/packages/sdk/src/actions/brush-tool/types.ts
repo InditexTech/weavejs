@@ -65,6 +65,12 @@ export type WeaveBrushStabilizerConfig = {
   /** `oneEuro` minimum cutoff (Hz) and speed coefficient. */
   minCutoff: number;
   beta: number;
+  /**
+   * `oneEuro` cutoff (Hz) of the filter that measures the speed, which sets how
+   * quickly the smoothing eases off when the pen speeds up. Higher follows a
+   * fast stroke with less lag. Default 1.
+   */
+  dCutoff?: number;
   /** `pulledString` leash radius, in screen px. */
   radiusPx: number;
   /** `streamline` amount, 0 (none) to 1 (strongest). */
@@ -85,6 +91,15 @@ export type WeaveBrushFinalizeConfig = {
   pressureWeight: number;
   /** Spacing (screen px) used to resample a fitted curve to points. */
   resampleSpacingPx: number;
+  /**
+   * Largest difference, in screen px, between the stroke as it was drawn and
+   * as it is saved, for a thin line (a broad one may move up to 5% of its
+   * width, at most four times this). When the finishing step would move the
+   * line or change its width by more, the stroke is rebuilt from the drawn
+   * points until it does not. Unset uses the tool-level
+   * `finalizeMaxDeviationPx`; 0 keeps the result of the finishing step.
+   */
+  maxDeviationPx?: number;
 };
 
 export type WeaveBrushTouchGuardConfig = {
@@ -124,6 +139,8 @@ export type WeaveBrushInputConfig = {
 export type WeaveBrushToolActionProperties = {
   interpolationSteps: number; // Number of steps for interpolation
   simplifyTolerance: number; // Douglas-Peucker tolerance applied on stroke finalize
+  finalizeMaxDeviationPx: number; // Largest px difference between the stroke as drawn and as saved
+  catchUpMs: number; // Time a stabilized stroke takes to reach the pen when it ends; 0 is at once
   input: WeaveBrushInputConfig;
 };
 

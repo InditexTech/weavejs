@@ -23,7 +23,15 @@ import { GESTURES, runGesture } from './shared/brush-golden.helpers';
  * were generated from the implementation before the staged pipeline was
  * introduced and pin the legacy behaviour: the legacy preset must keep
  * reproducing them point for point.
+ *
+ * "Legacy" is the finishing step as it was, so the bound on how far a saved
+ * stroke may be from the drawn one is off here (`finalizeMaxDeviationPx: 0`).
+ * With it on, which is the default, the stroke is rebuilt from the drawn
+ * points where the finishing step moves the line, see
+ * `brush-tool.finalize-fidelity.test.ts`.
  */
+const LEGACY = { config: { finalizeMaxDeviationPx: 0 } };
+
 describe('brush tool legacy golden gestures', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -40,14 +48,14 @@ describe('brush tool legacy golden gestures', () => {
         stagePointerWrites: _stagePointerWrites,
         strokesCreated: _strokesCreated,
         ...recorded
-      } = runGesture(gesture);
+      } = runGesture(gesture, LEGACY);
       expect(recorded).toMatchSnapshot();
     });
   }
 
   it('is deterministic', () => {
     for (const gesture of GESTURES) {
-      expect(runGesture(gesture)).toEqual(runGesture(gesture));
+      expect(runGesture(gesture, LEGACY)).toEqual(runGesture(gesture, LEGACY));
     }
   });
 });

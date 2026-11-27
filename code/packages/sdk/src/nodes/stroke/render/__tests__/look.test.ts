@@ -127,6 +127,46 @@ describe('halfWidthAt', () => {
     expect(halfWidthAt(l, 20, 0.8, 20, 200)).toBeCloseTo(mid, 10);
   });
 
+  describe('a stroke shorter than its tapers', () => {
+    const l = () => look({ taperStart: 10, taperEnd: 20 });
+    const full = () => halfWidthAt(l(), 20, 0.8, 100, 100);
+
+    it('still reaches its full width, where the two tapers meet', () => {
+      // 15 long: the tapers shrink in proportion, to 5 and 10, which meet at 5
+      expect(halfWidthAt(l(), 20, 0.8, 5, 10)).toBeCloseTo(full(), 10);
+    });
+
+    it('narrows to both ends over the shorter tapers', () => {
+      const meet = halfWidthAt(l(), 20, 0.8, 5, 10);
+      expect(halfWidthAt(l(), 20, 0.8, 2.5, 12.5)).toBeLessThan(meet);
+      expect(halfWidthAt(l(), 20, 0.8, 10, 5)).toBeLessThan(meet);
+      expect(halfWidthAt(l(), 20, 0.8, 0, 15)).toBe(MIN_HALF_WIDTH);
+      expect(halfWidthAt(l(), 20, 0.8, 15, 0)).toBe(MIN_HALF_WIDTH);
+    });
+
+    it('is as wide as a stroke that is long enough, at the point where its taper has been covered', () => {
+      const short = halfWidthAt(l(), 20, 0.8, 5, 10);
+      const long = halfWidthAt(l(), 20, 0.8, 10, 400);
+      expect(short).toBeCloseTo(long, 10);
+    });
+
+    it('is drawn as before when the tapers fit', () => {
+      // 40 long is exactly the tapers: nothing is shrunk
+      const shrunk = halfWidthAt(l(), 20, 0.8, 10, 30);
+      const longer = halfWidthAt(l(), 20, 0.8, 10, 300);
+      expect(shrunk).toBeCloseTo(longer, 10);
+    });
+
+    it('leaves the width of a dot to the minimum', () => {
+      expect(halfWidthAt(l(), 20, 0.8, 0, 0)).toBe(
+        Math.max(
+          halfWidthAt(look({ taperStart: 0, taperEnd: 0 }), 20, 0.8, 0, 0),
+          MIN_HALF_WIDTH
+        )
+      );
+    });
+  });
+
   it('never goes below the minimum half-width and tolerates a bad pressure', () => {
     expect(halfWidthAt(look({ min: 0, max: 0 }), 20, 0.5, 100, 100)).toBe(
       MIN_HALF_WIDTH
